@@ -21,24 +21,26 @@ describe('api:announcements/show', () => {
 			expect(valid).toBe(INVALID);
 		});
 
-		test('accept announcementId', () => {
-			expect(v({ announcementId: 'x' }))
-				.toBe(VALID);
-		});
+		describe('announcementId', () => {
+			test('accept id', () => {
+				expect(v({ announcementId: 'x' }))
+					.toBe(VALID);
+			});
 
-		test('null announcementId', () => {
-			expect(v({ announcementId: null }))
-				.toBe(INVALID);
-		});
+			test('null id', () => {
+				expect(v({ announcementId: null }))
+					.toBe(INVALID);
+			});
 
-		test('0 character announcementId', () => {
-			expect(v({ announcementId: '' }))
-				.toBe(INVALID);
-		});
+			test('0 character id', () => {
+				expect(v({ announcementId: '' }))
+					.toBe(INVALID);
+			});
 
-		test('whitespace-only announcementId', () => {
-			expect(v({ announcementId: ' ' }))
-				.toBe(INVALID);
+			test('whitespace-only id', () => {
+				expect(v({ announcementId: ' ' }))
+					.toBe(INVALID);
+			});
 		});
 	});
 });

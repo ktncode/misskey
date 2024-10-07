@@ -7,12 +7,12 @@ process.env.NODE_ENV = 'test';
 
 import { describe, test, expect } from '@jest/globals';
 import { getValidator } from '../../../../../test/prelude/get-api-validator.js';
-import { paramDef } from './create.js';
+import { paramDef } from './delete.js';
 
 const VALID = true;
 const INVALID = false;
 
-describe('api:blocking/create', () => {
+describe('api:antennas/delete', () => {
 	describe('validation', () => {
 		const v = getValidator(paramDef);
 
@@ -21,24 +21,24 @@ describe('api:blocking/create', () => {
 			expect(valid).toBe(INVALID);
 		});
 
-		describe('userId', () => {
-			test('accept userId', () => {
-				expect(v({ userId: 'x' }))
+		describe('clipId', () => {
+			test('accept id', () => {
+				expect(v({ antennaId: 'x' }))
 					.toBe(VALID);
 			});
 
-			test('null userId', () => {
-				expect(v({ userId: null }))
+			test('null id', () => {
+				expect(v({ antennaId: null }))
 					.toBe(INVALID);
 			});
 
-			test('0 character userId', () => {
-				expect(v({ userId: '' }))
+			test('0 character id', () => {
+				expect(v({ antennaId: '' }))
 					.toBe(INVALID);
 			});
 
-			test('whitespace-only userId', () => {
-				expect(v({ userId: ' ' }))
+			test('whitespace-only id', () => {
+				expect(v({ antennaId: ' ' }))
 					.toBe(INVALID);
 			});
 		});

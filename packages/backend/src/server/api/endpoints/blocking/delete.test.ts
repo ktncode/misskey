@@ -21,24 +21,26 @@ describe('api:blocking/delete', () => {
 			expect(valid).toBe(INVALID);
 		});
 
-		test('accept userId', () => {
-			expect(v({ userId: 'x' }))
-				.toBe(VALID);
-		});
+		describe('userId', () => {
+			test('accept userId', () => {
+				expect(v({ userId: 'x' }))
+					.toBe(VALID);
+			});
 
-		test('null userId', () => {
-			expect(v({ userId: null }))
-				.toBe(INVALID);
-		});
+			test('null userId', () => {
+				expect(v({ userId: null }))
+					.toBe(INVALID);
+			});
 
-		test('0 character userId', () => {
-			expect(v({ userId: '' }))
-				.toBe(INVALID);
-		});
+			test('0 character userId', () => {
+				expect(v({ userId: '' }))
+					.toBe(INVALID);
+			});
 
-		test('whitespace-only userId', () => {
-			expect(v({ userId: ' ' }))
-				.toBe(INVALID);
+			test('whitespace-only userId', () => {
+				expect(v({ userId: ' ' }))
+					.toBe(INVALID);
+			});
 		});
 	});
 });
