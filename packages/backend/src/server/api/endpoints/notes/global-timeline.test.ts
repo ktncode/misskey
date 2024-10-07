@@ -7,12 +7,12 @@ process.env.NODE_ENV = 'test';
 
 import { describe, test, expect } from '@jest/globals';
 import { getValidator } from '../../../../../test/prelude/get-api-validator.js';
-import { paramDef } from './bubble-timeline.js';
+import { paramDef } from './global-timeline.js';
 
 const VALID = true;
 const INVALID = false;
 
-describe('api:notes/bubble-timeline', () => {
+describe('api:notes/global-timeline', () => {
 	describe('validation', () => {
 		const v = getValidator(paramDef);
 
