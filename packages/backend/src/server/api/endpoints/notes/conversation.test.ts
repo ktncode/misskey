@@ -16,28 +16,28 @@ describe('api:notes/conversation', () => {
 	describe('validation', () => {
 		const v = getValidator(paramDef);
 
-		describe('noteId', () => {
-			test('reject empty', () => {
-				const valid = v({ });
-				expect(valid).toBe(INVALID);
-			});
+		test('reject empty', () => {
+			const valid = v({ });
+			expect(valid).toBe(INVALID);
+		});
 
-			test('accept noteId', () => {
+		describe('noteId', () => {
+			test('accept id', () => {
 				expect(v({ noteId: 'x' }))
 					.toBe(VALID);
 			});
 
-			test('null noteId', () => {
+			test('null id', () => {
 				expect(v({ noteId: null }))
 					.toBe(INVALID);
 			});
 
-			test('0 character noteId', () => {
+			test('0 character id', () => {
 				expect(v({ noteId: '' }))
 					.toBe(INVALID);
 			});
 
-			test('whitespace-only noteId', () => {
+			test('whitespace-only id', () => {
 				expect(v({ noteId: ' ' }))
 					.toBe(INVALID);
 			});
@@ -81,7 +81,7 @@ describe('api:notes/conversation', () => {
 					.toBe(INVALID);
 			});
 
-			test('100 limit', () => {
+			test('100 offset', () => {
 				expect(v({ noteId: 'x', offset: 100 }))
 					.toBe(VALID);
 			});

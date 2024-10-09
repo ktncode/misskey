@@ -7,12 +7,12 @@ process.env.NODE_ENV = 'test';
 
 import { describe, test, expect } from '@jest/globals';
 import { getValidator } from '../../../../../test/prelude/get-api-validator.js';
-import { paramDef } from './delete.js';
+import { paramDef } from './state.js';
 
 const VALID = true;
 const INVALID = false;
 
-describe('api:notes/delete', () => {
+describe('api:notes/state', () => {
 	describe('validation', () => {
 		const v = getValidator(paramDef);
 

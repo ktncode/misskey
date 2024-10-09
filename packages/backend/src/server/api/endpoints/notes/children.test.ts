@@ -16,12 +16,12 @@ describe('api:notes/children', () => {
 	describe('validation', () => {
 		const v = getValidator(paramDef);
 
-		describe('noteId', () => {
-			test('reject empty noteId', () => {
-				const valid = v({ });
-				expect(valid).toBe(INVALID);
-			});
+		test('reject empty', () => {
+			const valid = v({ });
+			expect(valid).toBe(INVALID);
+		});
 
+		describe('noteId', () => {
 			test('accept noteId', () => {
 				expect(v({ noteId: 'x' }))
 					.toBe(VALID);

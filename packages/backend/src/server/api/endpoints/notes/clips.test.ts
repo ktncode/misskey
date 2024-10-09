@@ -21,24 +21,26 @@ describe('api:notes/clips', () => {
 			expect(valid).toBe(INVALID);
 		});
 
-		test('accept noteId', () => {
-			expect(v({ noteId: 'x' }))
-				.toBe(VALID);
-		});
+		describe('noteId', () => {
+			test('accept noteId', () => {
+				expect(v({ noteId: 'x' }))
+					.toBe(VALID);
+			});
 
-		test('null noteId', () => {
-			expect(v({ noteId: null }))
-				.toBe(INVALID);
-		});
+			test('null noteId', () => {
+				expect(v({ noteId: null }))
+					.toBe(INVALID);
+			});
 
-		test('0 character noteId', () => {
-			expect(v({ noteId: '' }))
-				.toBe(INVALID);
-		});
+			test('0 character noteId', () => {
+				expect(v({ noteId: '' }))
+					.toBe(INVALID);
+			});
 
-		test('whitespace-only noteId', () => {
-			expect(v({ noteId: ' ' }))
-				.toBe(INVALID);
+			test('whitespace-only noteId', () => {
+				expect(v({ noteId: ' ' }))
+					.toBe(INVALID);
+			});
 		});
 	});
 });

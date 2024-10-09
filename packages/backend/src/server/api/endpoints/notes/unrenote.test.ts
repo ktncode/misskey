@@ -7,12 +7,12 @@ process.env.NODE_ENV = 'test';
 
 import { describe, test, expect } from '@jest/globals';
 import { getValidator } from '../../../../../test/prelude/get-api-validator.js';
-import { paramDef } from './delete.js';
+import { paramDef } from './unrenote.js';
 
 const VALID = true;
 const INVALID = false;
 
-describe('api:notes/delete', () => {
+describe('api:notes/unrenote', () => {
 	describe('validation', () => {
 		const v = getValidator(paramDef);
 
@@ -39,6 +39,35 @@ describe('api:notes/delete', () => {
 
 			test('whitespace-only id', () => {
 				expect(v({ noteId: ' ' }))
+					.toBe(INVALID);
+			});
+		});
+
+		describe('quote', () => {
+			test('accept quote', () => {
+				expect(v({ noteId: 'x', quote: false }))
+					.toBe(VALID);
+				expect(v({ noteId: 'x', quote: true }))
+					.toBe(VALID);
+			});
+
+			test('null quote', () => {
+				expect(v({ noteId: 'x', quote: null }))
+					.toBe(INVALID);
+			});
+
+			test('0 character quote', () => {
+				expect(v({ noteId: 'x', quote: '' }))
+					.toBe(INVALID);
+			});
+
+			test('whitespace-only quote', () => {
+				expect(v({ noteId: 'x', quote: ' ' }))
+					.toBe(INVALID);
+			});
+
+			test('non boolean quote', () => {
+				expect(v({ noteId: 'x', quote: 'x' }))
 					.toBe(INVALID);
 			});
 		});
