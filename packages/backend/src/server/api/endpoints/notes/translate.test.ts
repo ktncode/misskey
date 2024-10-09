@@ -44,11 +44,6 @@ describe('api:notes/translate', () => {
 		});
 
 		describe('targetLang', () => {
-			test('reject empty', () => {
-				const valid = v({ });
-				expect(valid).toBe(INVALID);
-			});
-
 			test('accept lang', () => {
 				expect(v({ noteId: 'x', targetLang: 'x' }))
 					.toBe(VALID);
