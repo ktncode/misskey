@@ -1,0 +1,73 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+process.env.NODE_ENV = 'test';
+
+import { describe, test, expect } from '@jest/globals';
+import { getValidator } from '../../../../../test/prelude/get-api-validator.js';
+import { paramDef } from './create.js';
+
+const VALID = true;
+const INVALID = false;
+
+describe('api:mute/create', () => {
+	describe('validation', () => {
+		const v = getValidator(paramDef);
+
+		test('reject empty', () => {
+			const valid = v({ });
+			expect(valid).toBe(INVALID);
+		});
+
+		describe('userId', () => {
+			test('accept id', () => {
+				expect(v({ userId: 'x' }))
+					.toBe(VALID);
+			});
+
+			test('null id', () => {
+				expect(v({ userId: null }))
+					.toBe(INVALID);
+			});
+
+			test('0 character id', () => {
+				expect(v({ userId: '' }))
+					.toBe(INVALID);
+			});
+
+			test('whitespace-only id', () => {
+				expect(v({ userId: ' ' }))
+					.toBe(INVALID);
+			});
+		});
+
+		describe('expiresAt', () => {
+			test('accept expiresAt', () => {
+				expect(v({ userId: 'x', expiresAt: 1 }))
+					.toBe(VALID);
+			});
+
+			test('null expiresAt', () => {
+				expect(v({ userId: 'x', expiresAt: null }))
+					.toBe(VALID);
+			});
+
+			test('0 character expiresAt', () => {
+				expect(v({ userId: 'x', expiresAt: '' }))
+					.toBe(INVALID);
+			});
+
+			test('whitespace-only expiresAt', () => {
+				expect(v({ userId: 'x', sinceDate: ' ' }))
+					.toBe(INVALID);
+			});
+
+			test('non integer expiresAt', () => {
+				expect(v({ userId: 'x', sinceDate: 'x' }))
+					.toBe(INVALID);
+			});
+		});
+	});
+});
