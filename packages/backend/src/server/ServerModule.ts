@@ -9,6 +9,7 @@ import { CoreModule } from '@/core/CoreModule.js';
 import { ApiCallService } from './api/ApiCallService.js';
 import { FileServerService } from './FileServerService.js';
 import { HealthServerService } from './HealthServerService.js';
+import { MetricsServerService } from './MetricsServerService.js';
 import { NodeinfoServerService } from './NodeinfoServerService.js';
 import { ServerService } from './ServerService.js';
 import { WellKnownServerService } from './WellKnownServerService.js';
@@ -61,6 +62,7 @@ import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.j
 		ClientLoggerService,
 		FeedService,
 		HealthServerService,
+		MetricsServerService,
 		UrlPreviewService,
 		ActivityPubServerService,
 		FileServerService,
