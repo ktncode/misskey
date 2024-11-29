@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import { Brackets, ObjectLiteral } from 'typeorm';
+import { Brackets, createQueryBuilder, getRepository, ObjectLiteral } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { MiUser } from '@/models/User.js';
 import type { UserProfilesRepository, FollowingsRepository, ChannelFollowingsRepository, BlockingsRepository, NoteThreadMutingsRepository, MutingsRepository, RenoteMutingsRepository } from '@/models/_.js';
@@ -88,6 +88,11 @@ export class QueryService {
 				qb
 					.where('note.renoteUserId IS NULL')
 					.orWhere(`note.renoteUserId NOT IN (${ blockingQuery.getQuery() })`);
+			}))
+			.andWhere(new Brackets(qb => {
+				qb
+					.where('(SELECT note.replyUserId FROM note WHERE note.id = renote.Id) IS NULL')
+					.orWhere(`(SELECT note.replyUserId FROM note WHERE note.id = renote.Id) NOT IN (${ blockingQuery.getQuery() })`);
 			}));
 
 		q.setParameters(blockingQuery.getParameters());
@@ -154,6 +159,11 @@ export class QueryService {
 				qb
 					.where('note.renoteUserId IS NULL')
 					.orWhere(`note.renoteUserId NOT IN (${ mutingQuery.getQuery() })`);
+			}))
+			.andWhere(new Brackets(qb => {
+				qb
+					.where('(SELECT note.replyUserId FROM note WHERE note.id = renote.Id) IS NULL')
+					.orWhere(`(SELECT note.replyUserId FROM note WHERE note.id = renote.Id) NOT IN (${ mutingQuery.getQuery() })`);
 			}))
 			// mute instances
 			.andWhere(new Brackets(qb => {
