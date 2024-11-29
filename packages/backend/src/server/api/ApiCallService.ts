@@ -335,7 +335,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			}
 
 			// TODO: 毎リクエスト計算するのもあれだしキャッシュしたい
-			const factor = user ? (await this.roleService.getUserPolicies(user.id)).rateLimitFactor : 1;
+			const factor = user ? (await this.roleService.getUserPolicies(user.id)).rateLimitFactor * 2 : 1;
 
 			if (factor > 0) {
 				// Rate limit

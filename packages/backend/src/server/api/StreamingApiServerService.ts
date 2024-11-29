@@ -68,7 +68,7 @@ export class StreamingApiServerService {
 			limitActor = getIpHash(requestIp || 'wtf');
 		}
 
-		const factor = user ? (await this.roleService.getUserPolicies(user.id)).rateLimitFactor : 1;
+		const factor = user ? (await this.roleService.getUserPolicies(user.id)).rateLimitFactor * 2 : 1;
 
 		if (factor <= 0) return false;
 

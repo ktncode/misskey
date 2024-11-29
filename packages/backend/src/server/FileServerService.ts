@@ -34,6 +34,8 @@ import { AuthenticateService } from '@/server/api/AuthenticateService.js';
 import type { IEndpointMeta } from '@/server/api/endpoints.js';
 import type { FastifyInstance, FastifyRequest, FastifyReply, FastifyPluginOptions } from 'fastify';
 import type Limiter from 'ratelimiter';
+import type { MiLocalUser } from '@/models/User.js';
+import { RoleService } from '@/core/RoleService.js';
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
@@ -59,6 +61,7 @@ export class FileServerService {
 		private loggerService: LoggerService,
 		private authenticateService: AuthenticateService,
 		private rateLimiterService: RateLimiterService,
+		private roleService: RoleService,
 	) {
 		this.logger = this.loggerService.getLogger('server', 'gray');
 
@@ -597,6 +600,7 @@ export class FileServerService {
 	}
 
 	// Based on ApiCallService
+	@bindThis
 	private async checkRateLimit(
 		request: FastifyRequest<{
 			Body?: Record<string, unknown> | undefined,
@@ -625,10 +629,11 @@ export class FileServerService {
 		const actor = user?.id ?? getIpHash(request.ip);
 
 		// Call both limits: the per-resource limit and the shared cross-resource limit
-		return await this.checkResourceLimit(reply, actor, group, resource) && await this.checkSharedLimit(reply, actor, group);
+		return await this.checkResourceLimit(reply, user, actor, group, resource) && await this.checkSharedLimit(reply, user, actor, group);
 	}
 
-	private async checkResourceLimit(reply: FastifyReply, actor: string, group: string, resource: string): Promise<boolean> {
+	@bindThis
+	private async checkResourceLimit(reply: FastifyReply, user: MiLocalUser | null, actor: string, group: string, resource: string): Promise<boolean> {
 		const limit = {
 			// Group by resource
 			key: `${group}${resource}`,
@@ -638,10 +643,11 @@ export class FileServerService {
 			duration: 1000 * 60 * 10,
 		};
 
-		return await this.checkLimit(reply, actor, limit);
+		return await this.checkLimit(reply, user, actor, limit);
 	}
 
-	private async checkSharedLimit(reply: FastifyReply, actor: string, group: string): Promise<boolean> {
+	@bindThis
+	private async checkSharedLimit(reply: FastifyReply, user: MiLocalUser | null, actor: string, group: string): Promise<boolean> {
 		const limit = {
 			key: group,
 
@@ -650,12 +656,15 @@ export class FileServerService {
 			duration: 1000 * 60 * 60,
 		};
 
-		return await this.checkLimit(reply, actor, limit);
+		return await this.checkLimit(reply, user, actor, limit);
 	}
 
-	private async checkLimit(reply: FastifyReply, actor: string, limit: IEndpointMeta['limit'] & { key: NonNullable<string> }): Promise<boolean> {
+	@bindThis
+	private async checkLimit(reply: FastifyReply, user: MiLocalUser | null, actor: string, limit: IEndpointMeta['limit'] & { key: NonNullable<string> }): Promise<boolean> {
+		const factor = user ? (await this.roleService.getUserPolicies(user.id)).rateLimitFactor * 2 : 1;
+
 		try {
-			await this.rateLimiterService.limit(limit, actor);
+			await this.rateLimiterService.limit(limit, actor, factor);
 			return true;
 		} catch (err) {
 			// errはLimiter.LimiterInfoであることが期待される
