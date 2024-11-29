@@ -89,10 +89,11 @@ export class QueryService {
 					.where('note.renoteUserId IS NULL')
 					.orWhere(`note.renoteUserId NOT IN (${ blockingQuery.getQuery() })`);
 			}))
+			// filter out renotes where the user being replied to is muted.
 			.andWhere(new Brackets(qb => {
 				qb
-					.where('(SELECT note.replyUserId FROM note WHERE note.id = renote.Id) IS NULL')
-					.orWhere(`(SELECT note.replyUserId FROM note WHERE note.id = renote.Id) NOT IN (${ blockingQuery.getQuery() })`);
+					.where('(SELECT "replyUserId" FROM note n WHERE "n".id = note.renoteId) IS NULL')
+					.orWhere(`(SELECT "replyUserId" FROM note n WHERE "n".id = note.renoteId) NOT IN (${ blockingQuery.getQuery() })`);
 			}));
 
 		q.setParameters(blockingQuery.getParameters());
@@ -160,10 +161,11 @@ export class QueryService {
 					.where('note.renoteUserId IS NULL')
 					.orWhere(`note.renoteUserId NOT IN (${ mutingQuery.getQuery() })`);
 			}))
+			// filter out renotes where the user being replied to is muted.
 			.andWhere(new Brackets(qb => {
 				qb
-					.where('(SELECT note.replyUserId FROM note WHERE note.id = renote.Id) IS NULL')
-					.orWhere(`(SELECT note.replyUserId FROM note WHERE note.id = renote.Id) NOT IN (${ mutingQuery.getQuery() })`);
+					.where('(SELECT "replyUserId" FROM note n WHERE "n".id = note.renoteId) IS NULL')
+					.orWhere(`(SELECT "replyUserId" FROM note n WHERE "n".id = note.renoteId) NOT IN (${ mutingQuery.getQuery() })`);
 			}))
 			// mute instances
 			.andWhere(new Brackets(qb => {
