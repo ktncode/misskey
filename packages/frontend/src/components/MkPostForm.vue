@@ -1261,9 +1261,13 @@ defineExpose({
 .preview {
 	padding: 16px 20px 0 20px;
 	min-height: 75px;
-	max-height: 150px;
+	height: 100px;
 	overflow: auto;
 	background-size: auto auto;
+	background-image: linear-gradient(to bottom, var(--popup), transparent 24px),
+                      linear-gradient(to top, var(--popup), transparent 24px),
+                      repeating-linear-gradient(135deg, transparent, transparent 6px, var(--panel) 6px, var(--panel) 12px);
+	resize: vertical;
 }
 
 .targetNote {
