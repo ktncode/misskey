@@ -1114,6 +1114,7 @@ defineExpose({
 .root {
 	position: relative;
 	container-type: inline-size;
+	overflow-y: auto;
 
 	&.modal {
 		width: 100%;
