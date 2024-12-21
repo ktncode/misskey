@@ -4,7 +4,7 @@
 <!-- Please give us a brief description of what this PR does. -->
 
 # **Contribution Guidelines**
-By submitting this merge request, you agree to follow our [Contribution Guidelines](https://activitypub.software/TransFem-org/Sharkey/-/blob/develop/CONTRIBUTING.md)
+By submitting this merge request, you agree to follow our [Contribution Guidelines](https://activitypub.software/TransFem-org/Sharkey/-/blob/develop/CONTRIBUTING.sharkey.md)
 - [ ] I agree to follow this project's Contribution Guidelines
 - [ ] I have made sure to test this merge request
 
