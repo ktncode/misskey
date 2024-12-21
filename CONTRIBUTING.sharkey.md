@@ -165,48 +165,50 @@ When Updating the Font make sure to copy **all generated files** from the `dest`
 For the CSS simply copy the file content and replace the old content in `style.css` and for the WOFF, TTF and SVG simply replace them.
 
 ## Development
-### Setup
-Before developing, you have to set up environment. Misskey requires Redis, PostgreSQL, and FFmpeg.
+### Accessing source code
+In order to submit code changes, you will need to create a fork of the main repository. This can be done via the GitLab UI, by pressing the "Fork" button while signed into an activitypub.software GitLab account.
 
-You would want to install Meilisearch to experiment related features. Technically, meilisearch is not strict requirement, but some features and tests require it.
+Once you have created a fork, you should clone it locally and update submodules using Git. For example, to clone using SSH, use the following commands, replacing "<YOUR_USERNAME>" with your GitLab username:
 
-There are a few ways to proceed.
-
-#### Use system-wide software
-You could install them in system-wide (such as from package manager).
-
-#### Use `docker compose`
-You could obtain middleware container by typing `docker compose -f $PROJECT_ROOT/compose.local-db.yml up -d`.
-
-#### Use Devcontainer
-Devcontainer also has necessary setting. This method can be done by connecting from VSCode.
-
-Instead of running `pnpm` locally, you can use Dev Container to set up your development environment.
-To use Dev Container, open the project directory on VSCode with Dev Containers installed.
-**Note:** If you are using Windows, please clone the repository with WSL. Using Git for Windows will result in broken files due to the difference in how newlines are handled.
-
-It will run the following command automatically inside the container.
 ``` bash
+git clone git@activitypub.software:<YOUR_USERNAME>/Sharkey.git
 git submodule update --init
-pnpm install --frozen-lockfile
-cp .devcontainer/devcontainer.yml .config/default.yml
+```
+
+**Note:** If you are using Windows, please clone the repository with WSL. Using Git for Windows will result in broken files due to the difference in how newlines are handled.
+### Environment setup
+Before developing, you should set up a testing environment. You can do this using Docker via the Docker Compose plugin. You will also need to have `pnpm` installed.
+(You may wish to perform this setup using system-wide software installed separately, e.g. via a package manager, or using Devcontainer. Both are possible, but they will require manual setup that will not be covered in this document.)
+
+First, you will need to copy `.config/docker_example.env` to `.config/docker.env`. This file will contain configurations for the PostgreSQL database, such as username and password. You may set these as you wish.
+You will also need to copy `.config/example.yml` to `.config/default.yml`. This file will contain configurations for Sharkey. Ensure that the username and password in the `db:` section match the ones set in `docker.env`.
+
+Now, use the following command to start a local database container:
+
+``` bash
+docker compose -f compose.local-db.yml up -d
+```
+
+This will run a local PostgreSQL database server in the background. (To stop the database, run `docker compose -f compose.local-db.yml down`.)
+
+Once the database is active, run the following commands:
+``` bash
 pnpm build
 pnpm migrate
 ```
 
-After finishing the migration, you can proceed.
+This will build Sharkey and perform database migrations. After finishing the migration, the database will be ready for use.
 
 ### Start developing
-During development, it is useful to use the
-```
+After making code changes, you can run Sharkey using the following command:
+``` bash
 pnpm dev
 ```
-command.
 
-- Server-side source files and automatically builds them if they are modified. Automatically start the server process(es).
+- Checks server-side source files and automatically builds them if they are modified. Automatically starts the server process(es).
 - Vite HMR (just the `vite` command) is available. The behavior may be different from production.
 - Service Worker is watched by esbuild.
-- The front end can be viewed by accessing `http://localhost:5173`.
+- The frontend can be viewed by accessing `http://localhost:5173`.
 - The backend listens on the port configured with `port` in .config/default.yml.
 If you have not changed it from the default, it will be "http://localhost:3000".
 If "port" in .config/default.yml is set to something other than 3000, you need to change the proxy settings in packages/frontend/vite.config.local-dev.ts.
@@ -220,7 +222,7 @@ MK_DEV_PREFER=backend pnpm dev
 
 - This mode is closer to the production environment than the default mode.
 - Vite runs behind the backend (the backend will proxy Vite at /vite).
-- You can see Misskey by accessing `http://localhost:3000` (Replace `3000` with the port configured with `port` in .config/default.yml).
+- You can see Sharkey by accessing `http://localhost:3000` (Replace `3000` with the port configured with `port` in .config/default.yml).
 - To change the port of Vite, specify with `VITE_PORT` environment variable.
 - HMR may not work in some environments such as Windows.
 
