@@ -30,8 +30,6 @@ ahead!". We try our best to incorporate improvements from our users!
 Also, when you start implementation, assign yourself to the Issue (if you cannot do it yourself, ask Committer to assign you).
 By expressing your intention to work on the Issue, you can prevent conflicts in the work.
 
-To the Committers: you should not assign someone on it before the Final Decision.
-
 ### How issues are triaged
 
 The Committers may:
@@ -40,32 +38,30 @@ The Committers may:
 * split an issue into multiple issues,
 * or re-open that has been closed for some reason which is not applicable anymore.
 
-@syuilo reserves the Final Decision rights including whether the project will implement feature and how to implement, these rights are not always exercised.
-
 ## Well-known branches
 - **`stable`** branch is tracking the latest release and used for production purposes.
 - **`develop`** branch is where we work for the next release.
-	- When you create a PR, basically target it to this branch.
+	- When you create an MR, basically target it to this branch.
 
-## Creating a PR
-Thank you for your PR! Before creating a PR, please check the following:
-- If possible, prefix the title with a keyword that identifies the type of this PR, as shown below.
+## Creating an MR
+Thank you for your MR! Before creating an MR, please check the following:
+- If possible, prefix the title with a keyword that identifies the type of this MR, as shown below.
 	- `fix` / `refactor` / `feat` / `enhance` / `perf` / `chore` etc
-	- Also, make sure that the granularity of this PR is appropriate. Please do not include more than one type of change or interest in a single PR.
-- If there is an Issue which will be resolved by this PR, please include a reference to the Issue in the text.
+	- Also, make sure that the granularity of this MR is appropriate. Please do not include more than one type of change or interest in a single MR.
+- If there is an Issue which will be resolved by this MR, please include a reference to the Issue in the text.
 - Please add the summary of the changes to [`CHANGELOG.md`](CHANGELOG.md). However, this is not necessary for changes that do not affect the users, such as refactoring.
 - Check if there are any documents that need to be created or updated due to this change.
 - If you have added a feature or fixed a bug, please add a test case if possible.
 - Please make sure that tests and Lint are passed in advance.
 	- You can run it with `pnpm test` and `pnpm lint`. [See more info](#testing)
-- If this PR includes UI changes, please attach a screenshot in the text.
+- If this MR includes UI changes, please attach a screenshot in the text.
 
 Thanks for your cooperation 🤗
 
 ### Additional things for ActivityPub payload changes
 *This section is specific to misskey-dev implementation. Other fork or implementation may take different way. A significant difference is that non-"misskey-dev" extension is not described in the misskey-hub's document.*
 
-If PR includes changes to ActivityPub payload, please reflect it in [misskey-hub's document](https://github.com/misskey-dev/misskey-hub-next/blob/master/content/ns.md) by sending PR.
+If the MR includes changes to ActivityPub payload, please reflect it in [misskey-hub's document](https://github.com/misskey-dev/misskey-hub-next/blob/master/content/ns.md) by sending a PR.
 
 The name of purporsed extension property (referred as "extended property" in later) to ActivityPub shall be prefixed by `_misskey_`. (i.e. `_misskey_quote`)
 
@@ -87,12 +83,12 @@ Be willing to comment on the good points and not just the things you want fixed 
 
 ### Review perspective
 - Scope
-	- Are the goals of the PR clear?
-	- Is the granularity of the PR appropriate?
+	- Are the goals of the MR clear?
+	- Is the granularity of the MR appropriate?
 - Security
-	- Does merging this PR create a vulnerability?
+	- Does merging this MR create a vulnerability?
 - Performance
-	- Will merging this PR cause unexpected performance degradation?
+	- Will merging this MR cause unexpected performance degradation?
 	- Is there a more efficient way?
 - Testing
 	- Does the test ensure the expected behavior?
@@ -103,10 +99,7 @@ Be willing to comment on the good points and not just the things you want fixed 
 ### For reporter
 Thank you for your reporting!
 
-If you can also create a patch to fix the vulnerability, please create a PR on the private fork.
-
-> [!note]
-> There is a GitHub bug that prevents merging if a PR not following the develop branch of upstream, so please keep follow the develop branch.
+If you can also create a patch to fix the vulnerability, please create an MR on the private fork.
 
 ### For misskey-dev member
 修正PRがdevelopに追従されていないとマージできないので、マージできなかったら
@@ -116,7 +109,7 @@ If you can also create a patch to fix the vulnerability, please create a PR on t
 などと伝える。
 
 ## Deploy
-The `/deploy` command by issue comment can be used to deploy the contents of a PR to the preview environment.
+The `/deploy` command by issue comment can be used to deploy the contents of an MR to the preview environment.
 ```
 /deploy sha=<commit hash>
 ```
@@ -127,7 +120,7 @@ An actual domain will be assigned so you can test the federation.
 ## Release
 ### Release Instructions
 1. Commit version changes in the `develop` branch ([package.json](package.json))
-2. Create a release PR.
+2. Create a release MR.
 	- Into `stable` from `develop` branch.
 	- The title must be in the format `Release: x.y.z`.
 		- `x.y.z` is the new version you are trying to release.
@@ -156,13 +149,13 @@ For newly added languages, once the translation progress per language exceeds 70
 ![Crowdin](https://d322cqt584bo4o.cloudfront.net/misskey/localized.svg)
 
 ## Icon Font (Shark Font)
-Sharkey has its own Icon Font called Shark Font which can be found at https://activitypub.software/TransFem-org/shark-font
-Build Instructions can all be found over there in the `README`.
+Sharkey has its own icon font called Shark Font which can be found at https://activitypub.software/TransFem-org/shark-font
+Build instructions can all be found over there in the `README`.
 
-If you have an Icon Suggestion or want to add an Icon please open an issue/merge request over at that repo.
+If you have an icon suggestion or want to add an icon please open an issue/merge request over at that repo.
 
-When Updating the Font make sure to copy **all generated files** from the `dest` folder into `packages/backend/assets/fonts/sharkey-icons`
-For the CSS simply copy the file content and replace the old content in `style.css` and for the WOFF, TTF and SVG simply replace them.
+When updating the font, make sure to copy **all generated files** from the `dest` folder into `packages/backend/assets/fonts/sharkey-icons`.
+For the CSS, simply copy the file content and replace the old content in `style.css` and for the WOFF, TTF and SVG simply replace them.
 
 ## Development
 ### Accessing source code
