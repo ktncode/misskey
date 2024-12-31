@@ -34,6 +34,8 @@ testCommit:
     - develop
     - merge_requests
     - stable
+  rules:
+    - if: $SCHEDULE != true
 
 getImageTag:
   stage: deploy
@@ -60,6 +62,8 @@ getImageTag:
     - stable
     - develop
     - tags
+  rules:
+    - if: $SCHEDULE != true
 
 buildDocker:
   stage: deploy
@@ -85,6 +89,8 @@ buildDocker:
     - stable
     - develop
     - tags
+  rules:
+    - if: $SCHEDULE != true
 
 mergeManifests:
   stage: deploy
@@ -112,3 +118,33 @@ mergeManifests:
     - stable
     - develop
     - tags
+  rules:
+    - if: $SCHEDULE != true
+
+crowdin:upload:
+  stage: deploy
+  image: crowdin/cli
+  rules:
+    - if: $SCHEDULE != true
+      changes:
+        - sharkey-locales/en-US.yml
+  script:
+    - crowdin upload sources
+
+crowdin:download:
+  stage: deploy
+  image: crowdin/cli
+  rules:
+    # we need to set a scheduled pipeline with the SCHEDULE variable set to true.
+    - if: $SCHEDULE == true
+  before_script:
+    - apk add git
+    - git config user.name "Crowdin CI"
+    - git config user.email "crowdin-ci@activitypub.software"
+    # we need CROWDIN_PAT set as a valid personal access token called 'crowdin'.
+    - git remote set-url --push origin "https://crowdin:${CROWDIN_PAT}@activitypub.software/TransFem.org/Sharkey.git"
+  script:
+    - crowdin download translations
+    - git add sharkey-locales/
+    - git commit -m "Crowdin Download"
+    - git push origin develop-i18n
