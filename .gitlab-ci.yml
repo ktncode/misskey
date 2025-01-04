@@ -31,11 +31,12 @@ testCommit:
      - node_modules/
      - packages/*/node_modules/
   only:
-    - develop
-    - merge_requests
-    - stable
-  rules:
-    - if: $SCHEDULE != true
+    refs:
+      - develop
+      - merge_requests
+      - stable
+    variables:
+      - $SCHEDULE != true
 
 getImageTag:
   stage: deploy
@@ -59,11 +60,12 @@ getImageTag:
     reports:
       dotenv: build.env
   only:
-    - stable
-    - develop
-    - tags
-  rules:
-    - if: $SCHEDULE != true
+    refs:
+      - stable
+      - develop
+      - tags
+    variables:
+      - $SCHEDULE != true
 
 buildDocker:
   stage: deploy
@@ -86,11 +88,11 @@ buildDocker:
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --destination "${CI_REGISTRY_IMAGE}:${REGISTRY_PUSH_VERSION}-${ARCH}"
   only:
-    - stable
-    - develop
-    - tags
-  rules:
-    - if: $SCHEDULE != true
+    refs:
+      - stable
+      - develop
+    variables:
+      - $SCHEDULE != true
 
 mergeManifests:
   stage: deploy
@@ -115,11 +117,12 @@ mergeManifests:
       --template ${CI_REGISTRY_IMAGE}:${REGISTRY_PUSH_VERSION}-ARCH
       --target ${CI_REGISTRY_IMAGE}:${REGISTRY_PUSH_TAG}
   only:
-    - stable
-    - develop
-    - tags
-  rules:
-    - if: $SCHEDULE != true
+    refs:
+      - stable
+      - develop
+      - tags
+    variables:
+      - $SCHEDULE != true
 
 crowdin:upload:
   stage: deploy
