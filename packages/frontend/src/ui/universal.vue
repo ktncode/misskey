@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div :class="$style.root">
 	<XSidebar v-if="!isMobile" :class="$style.sidebar"/>
 
-	<MkStickyContainer ref="contents" :class="$style.contents" style="container-type: inline-size;" @contextmenu.stop="onContextmenu">
+	<MkStickyContainer ref="contents" :class="[$style.contents, pageMetadata?.userName ? $style.background : '']" style="container-type: inline-size;" @contextmenu.stop="onContextmenu">
 		<template #header>
 			<div>
 				<XAnnouncements v-if="$i"/>
@@ -329,6 +329,11 @@ $widgets-hide-threshold: 1090px;
 	overflow-y: scroll;
 	overscroll-behavior: unset;
 }
+
+.background {
+	background: var(--MI_THEME-bg);
+}
+
 .widgets {
 	width: 350px;
 	height: 100%;
