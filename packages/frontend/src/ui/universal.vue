@@ -328,9 +328,7 @@ $widgets-hide-threshold: 1090px;
 	overflow: auto;
 	overflow-y: scroll;
 	overscroll-behavior: unset;
-	background: var(--MI_THEME-bg);
 }
-
 .widgets {
 	width: 350px;
 	height: 100%;
