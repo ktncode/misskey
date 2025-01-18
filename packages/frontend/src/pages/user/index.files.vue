@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template v-for="file in files" :key="file.note.id + file.file.id">
 				<div v-if="file.file.isSensitive && !showingFiles.includes(file.file.id)" :class="$style.img" @click="showingFiles.push(file.file.id)">
 					<!-- TODO: 画像以外のファイルに対応 -->
-					<ImgWithBlurhash :class="$style.sensitiveImg" :hash="file.file.blurhash" :src="thumbnail(file.file)" :title="file.file.name" :forceBlurhash="true"/>
+					<ImgWithBlurhash :class="$style.sensitiveImg" :hash="file.file.blurhash" :src="file.thumbnailUrl" :title="file.file.name" :forceBlurhash="true"/>
 					<div :class="$style.sensitive">
 						<div>
 							<div><i class="ti ti-eye-exclamation"></i> {{ i18n.ts.sensitive }}</div>
@@ -23,7 +23,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<MkA v-else :class="$style.img" :to="notePage(file.note)">
 					<!-- TODO: 画像以外のファイルに対応 -->
-					<ImgWithBlurhash :hash="file.file.blurhash" :src="thumbnail(file.file)" :title="file.file.name"/>
+					<ImgWithBlurhash :hash="file.file.blurhash" :src="file.thumbnailUrl" :title="file.file.name"/>
 				</MkA>
 			</template>
 		</div>
@@ -54,6 +54,7 @@ const fetching = ref(true);
 const files = ref<{
 	note: Misskey.entities.Note;
 	file: Misskey.entities.DriveFile;
+	thumbnailUrl: string;
 }[]>([]);
 const showingFiles = ref<string[]>([]);
 
@@ -71,10 +72,14 @@ onMounted(() => {
 	}).then(notes => {
 		for (const note of notes) {
 			for (const file of note.files) {
-				files.value.push({
-					note,
-					file,
-				});
+				const thumbnailUrl = thumbnail(file);
+				if (thumbnailUrl) {
+					files.value.push({
+						note,
+						file,
+						thumbnailUrl,
+					});
+				}
 			}
 		}
 		fetching.value = false;
