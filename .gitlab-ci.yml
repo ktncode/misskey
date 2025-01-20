@@ -129,7 +129,7 @@ crowdin:upload:
   stage: deploy
   image: crowdin/cli
   rules:
-    - if: $SCHEDULE == null
+    - if: $SCHEDULE == null && $CI_COMMIT_BRANCH == "develop"
       changes:
         - sharkey-locales/en-US.yml
   script:
