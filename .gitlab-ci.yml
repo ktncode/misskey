@@ -91,6 +91,7 @@ buildDocker:
     refs:
       - stable
       - develop
+      - tags
     variables:
       - $SCHEDULE == null
 
