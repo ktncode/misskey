@@ -107,13 +107,6 @@ If you can also create a patch to fix the vulnerability, please create an MR on 
 
 などと伝える。
 
-## Deploy
-The `/deploy` command by issue comment can be used to deploy the contents of an MR to the preview environment.
-```
-/deploy sha=<commit hash>
-```
-An actual domain will be assigned so you can test the federation.
-
 ## Merge
 
 ## Release
