@@ -160,7 +160,6 @@ git clone git@activitypub.software:<YOUR_USERNAME>/Sharkey.git
 git submodule update --init
 ```
 
-**Note:** If you are using Windows, please clone the repository with WSL. Using Git for Windows will result in broken files due to the difference in how newlines are handled.
 ### Environment setup
 Before developing, you should set up a testing environment. You can do this using Docker via the Docker Compose plugin. You will also need to have `pnpm` installed.
 (You may wish to perform this setup using system-wide software installed separately, e.g. via a package manager, or using Devcontainer. Both are possible, but they will require manual setup that will not be covered in this document.)
