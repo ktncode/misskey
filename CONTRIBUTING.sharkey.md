@@ -49,7 +49,6 @@ Thank you for your MR! Before creating an MR, please check the following:
 	- `fix` / `refactor` / `feat` / `enhance` / `perf` / `chore` etc
 	- Also, make sure that the granularity of this MR is appropriate. Please do not include more than one type of change or interest in a single MR.
 - If there is an Issue which will be resolved by this MR, please include a reference to the Issue in the text.
-- Please add the summary of the changes to [`CHANGELOG.md`](CHANGELOG.md). However, this is not necessary for changes that do not affect the users, such as refactoring.
 - Check if there are any documents that need to be created or updated due to this change.
 - If you have added a feature or fixed a bug, please add a test case if possible.
 - Please make sure that tests and Lint are passed in advance.
