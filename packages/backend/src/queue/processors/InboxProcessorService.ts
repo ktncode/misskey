@@ -232,7 +232,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 			const signerHost = this.utilityService.extractDbHost(authUser.user.uri!);
 			const activityIdHost = this.utilityService.extractDbHost(activity.id);
 			if (signerHost !== activityIdHost) {
-				throw new Bull.UnrecoverableError(`skip: signerHost(${signerHost}) !== activity.id host(${activityIdHost}`);
+				throw new Bull.UnrecoverableError(`skip: signerHost(${signerHost}) !== activity.id host(${activityIdHost})`);
 			}
 		} else {
 			// Activity ID should only be string or undefined.
