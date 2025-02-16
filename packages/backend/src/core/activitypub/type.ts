@@ -403,6 +403,13 @@ export interface IMove extends IActivity {
 	target: IObject | string;
 }
 
+export const validActivityTypes = ['Announce', 'Create', 'Update', 'Delete', 'Undo', 'Follow', 'Accept', 'Reject', 'Add', 'Remove', 'Like', 'Dislike', 'EmojiReaction', 'EmojiReact', 'Flag', 'Block', 'Move'];
+
+export const isActivity = (object: IObject): object is IActivity => {
+	const type = getApType(object);
+	return type != null && validActivityTypes.includes(type);
+};
+
 export const isApObject = (object: string | IObject): object is IObject => typeof(object) === 'object';
 export const isCreate = (object: IObject): object is ICreate => getApType(object) === 'Create';
 export const isDelete = (object: IObject): object is IDelete => getApType(object) === 'Delete';
