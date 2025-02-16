@@ -4,7 +4,7 @@
  */
 
 import { URL } from 'node:url';
-import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import httpSignature from '@peertube/http-signature';
 import * as Bull from 'bullmq';
 import type Logger from '@/logger.js';
@@ -43,7 +43,7 @@ type UpdateInstanceJob = {
 @Injectable()
 export class InboxProcessorService implements OnApplicationShutdown {
 	private logger: Logger;
-	private updateInstanceQueue: CollapsedQueue<MiNote['id'], UpdateInstanceJob>;
+	public readonly updateInstanceQueue: CollapsedQueue<MiNote['id'], UpdateInstanceJob>;
 
 	constructor(
 		@Inject(DI.meta)
@@ -53,6 +53,8 @@ export class InboxProcessorService implements OnApplicationShutdown {
 		private config: Config,
 
 		private utilityService: UtilityService,
+
+		@Inject(forwardRef(() => ApInboxService))
 		private apInboxService: ApInboxService,
 		private federatedInstanceService: FederatedInstanceService,
 		private fetchInstanceMetadataService: FetchInstanceMetadataService,
