@@ -290,7 +290,10 @@ export class ApResolverService {
 	}
 
 	@bindThis
-	public createResolver(): Resolver {
+	public createResolver(opts?: {
+		// Override the recursion limit
+		recursionLimit?: number,
+	}): Resolver {
 		return new Resolver(
 			this.config,
 			this.meta,
@@ -308,6 +311,7 @@ export class ApResolverService {
 			this.loggerService,
 			this.apLogService,
 			this.apUtilityService,
+			opts?.recursionLimit,
 		);
 	}
 }
