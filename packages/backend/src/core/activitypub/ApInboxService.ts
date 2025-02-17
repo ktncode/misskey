@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import * as Bull from 'bullmq';
 import { DI } from '@/di-symbols.js';
@@ -35,7 +35,7 @@ import { IdentifiableError } from '@/misc/identifiable-error.js';
 import InstanceChart from '@/core/chart/charts/instance.js';
 import FederationChart from '@/core/chart/charts/federation.js';
 import { FetchInstanceMetadataService } from '@/core/FetchInstanceMetadataService.js';
-import { InboxProcessorService } from '@/queue/processors/InboxProcessorService.js';
+import { UpdateInstanceQueue } from '@/core/UpdateInstanceQueue.js';
 import { getApHrefNullable, getApId, getApIds, getApType, getNullableApId, isAccept, isActor, isAdd, isAnnounce, isApObject, isBlock, isCollection, isCollectionOrOrderedCollection, isCreate, isDelete, isFlag, isFollow, isLike, isDislike, isMove, isPost, isReject, isRemove, isTombstone, isUndo, isUpdate, validActor, validPost, isActivity } from './type.js';
 import { ApNoteService } from './models/ApNoteService.js';
 import { ApLoggerService } from './ApLoggerService.js';
@@ -96,9 +96,7 @@ export class ApInboxService {
 		private readonly fetchInstanceMetadataService: FetchInstanceMetadataService,
 		private readonly instanceChart: InstanceChart,
 		private readonly federationChart: FederationChart,
-
-		@Inject(forwardRef(() => InboxProcessorService))
-		private readonly inboxProcessorService: InboxProcessorService,
+		private readonly updateInstanceQueue: UpdateInstanceQueue,
 	) {
 		this.logger = this.apLoggerService.logger;
 	}
@@ -430,7 +428,7 @@ export class ApInboxService {
 
 			if (i == null) return;
 
-			this.inboxProcessorService.updateInstanceQueue.enqueue(i.id, {
+			this.updateInstanceQueue.enqueue(i.id, {
 				latestRequestReceivedAt: new Date(),
 				shouldUnsuspend: i.suspensionState === 'autoSuspendedForNotResponding',
 			});
