@@ -126,7 +126,7 @@ mergeManifests:
       - $SCHEDULE == null
 
 crowdin:upload:
-  stage: deploy
+  stage: test
   image: crowdin/cli
   rules:
     - if: $SCHEDULE == null && $CI_COMMIT_BRANCH == "develop"
