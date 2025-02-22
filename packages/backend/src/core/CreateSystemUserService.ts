@@ -29,7 +29,7 @@ export class CreateSystemUserService {
 	}
 
 	@bindThis
-	public async createSystemUser(username: string): Promise<MiUser> {
+	public async createSystemUser(username: string, data?: Partial<MiUser>): Promise<MiUser> {
 		const password = randomUUID();
 
 		// Generate hash of password
@@ -63,6 +63,7 @@ export class CreateSystemUserService {
 				isExplorable: false,
 				approved: true,
 				isBot: true,
+				...(data ?? {}),
 			}).then(x => transactionalEntityManager.findOneByOrFail(MiUser, x.identifiers[0]));
 
 			await transactionalEntityManager.insert(MiUserKeypair, {

@@ -49,7 +49,15 @@ export class InstanceActorService {
 			this.cache.set(user);
 			return user;
 		} else {
-			const created = await this.createSystemUserService.createSystemUser(ACTOR_USERNAME) as MiLocalUser;
+			const created = await this.createSystemUserService.createSystemUser(ACTOR_USERNAME, {
+				/* we always allow requests about our instance actor, because when
+				 a remote instance needs to check our signature on a request we
+				 sent, it will need to fetch information about the user that
+				 signed it (which is our instance actor), and if we try to check
+				 their signature on *that* request, we'll fetch *their* instance
+				 actor... leading to an infinite recursion */
+				allowUnsignedFetch: 'always',
+			}) as MiLocalUser;
 			this.cache.set(created);
 			return created;
 		}
