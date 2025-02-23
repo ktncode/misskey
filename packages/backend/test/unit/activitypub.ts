@@ -2,15 +2,14 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { IdService } from '@/core/IdService.js';
-
 process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
+import { generateKeyPair } from 'crypto';
 import { Test } from '@nestjs/testing';
 import { jest } from '@jest/globals';
 
+import type { MiLocalUser, MiRemoteUser } from '@/models/User.js';
 import { ApImageService } from '@/core/activitypub/models/ApImageService.js';
 import { ApNoteService } from '@/core/activitypub/models/ApNoteService.js';
 import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
@@ -26,12 +25,11 @@ import { MiMeta, MiNote, MiUser, MiUserKeypair, UserProfilesRepository, UserPubl
 import { DI } from '@/di-symbols.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
 import { DownloadService } from '@/core/DownloadService.js';
-import type { MiLocalUser, MiRemoteUser } from '@/models/User.js';
 import { genAidx } from '@/misc/id/aidx.js';
 import { MockResolver } from '../misc/mock-resolver.js';
 import { UserKeypairService } from '@/core/UserKeypairService.js';
 import { MemoryKVCache, RedisKVCache } from '@/misc/cache.js';
-import { generateKeyPair } from 'crypto';
+import { IdService } from '@/core/IdService.js';
 
 const host = 'https://host1.test';
 
