@@ -539,7 +539,7 @@ function applyEnvOverrides(config: Source) {
 
 	// these are all the settings that can be overridden
 
-	_apply_top([['url', 'port', 'address', 'socket', 'chmodSocket', 'disableHsts', 'id', 'dbReplications']]);
+	_apply_top([['url', 'port', 'address', 'socket', 'chmodSocket', 'disableHsts', 'id', 'dbReplications', 'websocketCompression']]);
 	_apply_top(['db', ['host', 'port', 'db', 'user', 'pass', 'disableCache']]);
 	_apply_top(['dbSlaves', Array.from((config.dbSlaves ?? []).keys()), ['host', 'port', 'db', 'user', 'pass']]);
 	_apply_top([
