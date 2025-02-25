@@ -421,3 +421,7 @@ checkActivityPubGetSignature: false
   # How long to save each log entry before deleting it.
   # Default: 2592000000 (1 week)
   #maxAge: 2592000000
+
+# Transparently compress every websocket message on clients that support it.
+# Trades server CPU usage for reduced bandwidth usage and a faster frontend on the client.
+websocketCompression: false
