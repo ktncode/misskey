@@ -26,7 +26,7 @@ import MainStreamConnection from './stream/Connection.js';
 import { ChannelsService } from './stream/ChannelsService.js';
 import type * as http from 'node:http';
 import type { IEndpointMeta } from './endpoints.js';
-import type {Config} from "@/config.js";
+import type { Config } from "@/config.js";
 
 @Injectable()
 export class StreamingApiServerService {
