@@ -146,12 +146,11 @@ export class InboxProcessorService implements OnApplicationShutdown {
 				authUser = await this.apDbResolverService.getAuthUserFromApId(actorId);
 			} catch (err) {
 				// 対象が4xxならスキップ
-				if (err instanceof StatusError) {
-					if (!err.isRetryable) {
-						throw new Bull.UnrecoverableError(`skip: Ignored deleted actors on both ends ${actorId} - ${err.statusCode}`);
-					}
-					throw new Error(`Error in actor ${actorId} - ${err.statusCode}`);
+				if (!isRetryableError(err)) {
+					throw new Bull.UnrecoverableError(`skip: Ignored deleted actors on both ends ${actorId}`);
 				}
+
+				throw err;
 			}
 		}
 
