@@ -36,7 +36,7 @@ import InstanceChart from '@/core/chart/charts/instance.js';
 import FederationChart from '@/core/chart/charts/federation.js';
 import { FetchInstanceMetadataService } from '@/core/FetchInstanceMetadataService.js';
 import { UpdateInstanceQueue } from '@/core/UpdateInstanceQueue.js';
-import { getApHrefNullable, getApId, getApIds, getApType, getNullableApId, isAccept, isActor, isAdd, isAnnounce, isApObject, isBlock, isCollection, isCollectionOrOrderedCollection, isCreate, isDelete, isFlag, isFollow, isLike, isDislike, isMove, isPost, isReject, isRemove, isTombstone, isUndo, isUpdate, validActor, validPost, isActivity } from './type.js';
+import { getApHrefNullable, getApId, getApIds, getApType, getNullableApId, isAccept, isActor, isAdd, isAnnounce, isApObject, isBlock, isCollection, isCollectionOrOrderedCollection, isCreate, isDelete, isFlag, isFollow, isLike, isDislike, isMove, isPost, isReject, isRemove, isTombstone, isUndo, isUpdate, validActor, validPost, isActivity, IObjectWithId } from './type.js';
 import { ApNoteService } from './models/ApNoteService.js';
 import { ApLoggerService } from './ApLoggerService.js';
 import { ApDbResolverService } from './ApDbResolverService.js';
@@ -318,9 +318,7 @@ export class ApInboxService {
 		const targetUri = getApId(activityObject);
 		if (targetUri.startsWith('bear:')) return 'skip: bearcaps url not supported.';
 
-		// Force a fetch by passing URL only, since the target object must be trusted for announceActivity.
-		// We cannot just re-fetch or the resolver will throw a recursion error.
-		const target = await resolver.resolve(targetUri).catch(e => {
+		const target = await resolver.secureResolve(activityObject, uri).catch(e => {
 			this.logger.error(`Resolution failed: ${e}`);
 			throw e;
 		});
@@ -332,7 +330,7 @@ export class ApInboxService {
 	}
 
 	@bindThis
-	private async announceNote(actor: MiRemoteUser, activity: IAnnounce, target: IPost, resolver?: Resolver): Promise<string | void> {
+	private async announceNote(actor: MiRemoteUser, activity: IAnnounce, target: IPost & IObjectWithId, resolver?: Resolver): Promise<string | void> {
 		const uri = getApId(activity);
 
 		if (actor.isSuspended) {
@@ -354,7 +352,9 @@ export class ApInboxService {
 			// Announce対象をresolve
 			let renote;
 			try {
-				renote = await this.apNoteService.resolveNote(target, { resolver });
+				// The target ID is verified by secureResolve, so we know it shares host authority with the actor who sent it.
+				// This means we can pass that ID to resolveNote and avoid an extra fetch, which will fail if the note is private.
+				renote = await this.apNoteService.resolveNote(target, { resolver, sentFrom: new URL(getApId(target)) });
 				if (renote == null) return 'announce target is null';
 			} catch (err) {
 				// 対象が4xxならスキップ
@@ -394,12 +394,7 @@ export class ApInboxService {
 		}
 	}
 
-	private async announceActivity(announce: IAnnounce, activity: IActivity, resolver: Resolver): Promise<string | void> {
-		// Shouldn't happen, but just in case
-		if (!activity.id) {
-			throw new Bull.UnrecoverableError(`Cannot announce an activity with no ID: ${announce.id}`);
-		}
-
+	private async announceActivity(announce: IAnnounce, activity: IActivity & IObjectWithId, resolver: Resolver): Promise<string | void> {
 		// Since this is a new activity, we need to get a new actor.
 		const actorId = getApId(activity.actor);
 		const actor = await this.apPersonService.resolvePerson(actorId, resolver);
