@@ -362,9 +362,11 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 			].map((p): Promise<'public' | 'private'> => p
 				.then(isPublic => isPublic ? 'public' : 'private')
 				.catch(err => {
+					// Permanent error implies hidden or inaccessible, which is a normal thing.
 					if (isRetryableError(err)) {
-						this.logger.error('error occurred while fetching following/followers collection', { stack: err });
+						this.logger.error(`error occurred while fetching following/followers collection: ${renderInlineError(err)}`);
 					}
+
 					return 'private';
 				}),
 			),
@@ -388,7 +390,10 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		const emojis = await this.apNoteService.extractEmojis(person.tag ?? [], host)
 			.then(_emojis => _emojis.map(emoji => emoji.name))
 			.catch(err => {
-				this.logger.error('error occurred while fetching user emojis', { stack: err });
+				// Permanent error implies hidden or inaccessible, which is a normal thing.
+				if (isRetryableError(err)) {
+					this.logger.error(`error occurred while fetching user emojis: ${renderInlineError(err)}`);
+				}
 				return [];
 			});
 		//#endregion
@@ -534,11 +539,19 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 			// Register to the cache
 			this.cacheService.uriPersonCache.set(user.uri, user);
 		} catch (err) {
-			this.logger.error('error occurred while fetching user avatar/banner', { stack: err });
+			// Permanent error implies hidden or inaccessible, which is a normal thing.
+			if (isRetryableError(err)) {
+				this.logger.error(`error occurred while fetching user avatar/banner: ${renderInlineError(err)}`);
+			}
 		}
 		//#endregion
 
-		await this.updateFeatured(user.id, resolver).catch(err => this.logger.error(err));
+		await this.updateFeatured(user.id, resolver).catch(err => {
+			// Permanent error implies hidden or inaccessible, which is a normal thing.
+			if (isRetryableError(err)) {
+				this.logger.error(`Error updating featured notes: ${renderInlineError(err)}`);
+			}
+		});
 
 		return user;
 	}
@@ -575,8 +588,11 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		this.logger.info(`Updating the Person: ${person.id}`);
 
 		// カスタム絵文字取得
-		const emojis = await this.apNoteService.extractEmojis(person.tag ?? [], exist.host).catch(e => {
-			this.logger.info(`extractEmojis: ${e}`);
+		const emojis = await this.apNoteService.extractEmojis(person.tag ?? [], exist.host).catch(err => {
+			// Permanent error implies hidden or inaccessible, which is a normal thing.
+			if (isRetryableError(err)) {
+				this.logger.error(`error occurred while fetching user emojis: ${renderInlineError(err)}`);
+			}
 			return [];
 		});
 
@@ -593,11 +609,13 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 			].map((p): Promise<'public' | 'private' | undefined> => p
 				.then(isPublic => isPublic ? 'public' : 'private')
 				.catch(err => {
+					// Permanent error implies hidden or inaccessible, which is a normal thing.
 					if (isRetryableError(err)) {
-						this.logger.error('error occurred while fetching following/followers collection', { stack: err });
+						this.logger.error(`error occurred while fetching following/followers collection: ${renderInlineError(err)}`);
 						// Do not update the visibility on transient errors.
 						return undefined;
 					}
+
 					return 'private';
 				}),
 			),
@@ -639,7 +657,15 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 					.filter((a: unknown) => typeof(a) === 'string' && a.length > 0 && a.length <= 128)
 					.slice(0, 32)
 				: [],
-			...(await this.resolveAvatarAndBanner(exist, person.icon, person.image, person.backgroundUrl).catch(() => ({}))),
+			...(await this.resolveAvatarAndBanner(exist, person.icon, person.image, person.backgroundUrl).catch(err => {
+				// Permanent error implies hidden or inaccessible, which is a normal thing.
+				if (isRetryableError(err)) {
+					this.logger.error(`error occurred while fetching user avatar/banner: ${renderInlineError(err)}`);
+				}
+
+				// Can't return null or destructuring operator will break
+				return {};
+			})),
 		} as Partial<MiRemoteUser> & Pick<MiRemoteUser, 'isBot' | 'isCat' | 'speakAsCat' | 'isLocked' | 'movedToUri' | 'alsoKnownAs' | 'isExplorable'>;
 
 		const moving = ((): boolean => {
@@ -723,7 +749,12 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 			{ followerSharedInbox: person.sharedInbox ?? person.endpoints?.sharedInbox ?? null },
 		);
 
-		await this.updateFeatured(exist.id, resolver).catch(err => this.logger.error(err));
+		await this.updateFeatured(exist.id, resolver).catch(err => {
+			// Permanent error implies hidden or inaccessible, which is a normal thing.
+			if (isRetryableError(err)) {
+				this.logger.error(`Error updating featured notes: ${renderInlineError(err)}`);
+			}
+		});
 
 		const updated = { ...exist, ...updates };
 
@@ -819,11 +850,12 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 
 		// Resolve to (Ordered)Collection Object
 		const collection = user.featured ? await _resolver.resolveCollection(user.featured, true, user.uri).catch(err => {
+			// Permanent error implies hidden or inaccessible, which is a normal thing.
 			if (isRetryableError(err)) {
 				this.logger.warn(`Failed to update featured notes: ${renderInlineError(err)}`);
-			} else {
-				this.logger.error('Failed to update featured notes:', err);
 			}
+
+			return null;
 		}) : null;
 		if (!collection) return;
 
