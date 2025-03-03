@@ -39,6 +39,10 @@ export interface IObject {
 	sensitive?: boolean;
 }
 
+export interface IObjectWithId extends IObject {
+	id: string;
+}
+
 /**
  * Get array of ActivityStreams Objects id
  */

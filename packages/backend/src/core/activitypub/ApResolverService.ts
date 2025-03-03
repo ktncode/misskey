@@ -19,7 +19,7 @@ import { fromTuple } from '@/misc/from-tuple.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { ApLogService, calculateDurationSince, extractObjectContext } from '@/core/ApLogService.js';
 import { ApUtilityService } from '@/core/activitypub/ApUtilityService.js';
-import { getApId, getNullableApId, isCollectionOrOrderedCollection } from './type.js';
+import { getApId, getNullableApId, IObjectWithId, isCollectionOrOrderedCollection } from './type.js';
 import { ApDbResolverService } from './ApDbResolverService.js';
 import { ApRendererService } from './ApRendererService.js';
 import { ApRequestService } from './ApRequestService.js';
@@ -82,7 +82,7 @@ export class Resolver {
 	 * In all other cases, the object is re-fetched from remote by input string or object ID.
 	 */
 	@bindThis
-	public async secureResolve(input: ApObject, sentFromUri: string): Promise<IObject> {
+	public async secureResolve(input: ApObject, sentFromUri: string): Promise<IObjectWithId> {
 		// Unpack arrays to get the value element.
 		const value = fromTuple(input);
 		if (value == null) {
@@ -96,13 +96,15 @@ export class Resolver {
 		// Our security requires that the object ID matches the host authority that sent it, otherwise it can't be trusted.
 		// A mismatch isn't necessarily malicious, it just means we can't use the object we were given.
 		if (typeof(value) === 'object' && this.apUtilityService.haveSameAuthority(id, sentFromUri)) {
-			return value;
+			return value as IObjectWithId;
 		}
 
 		// If the checks didn't pass, then we must fetch the object and use that.
 		return await this.resolve(id);
 	}
 
+	public async resolve(value: string | [string]): Promise<IObjectWithId>;
+	public async resolve(value: string | IObject | [string | IObject]): Promise<IObject>;
 	@bindThis
 	public async resolve(value: string | IObject | [string | IObject]): Promise<IObject> {
 		// eslint-disable-next-line no-param-reassign
@@ -120,7 +122,7 @@ export class Resolver {
 		}
 	}
 
-	private async _resolveLogged(requestUri: string, host: string): Promise<IObject> {
+	private async _resolveLogged(requestUri: string, host: string): Promise<IObjectWithId> {
 		const startTime = process.hrtime.bigint();
 
 		const log = await this.apLogService.createFetchLog({
@@ -149,7 +151,7 @@ export class Resolver {
 		}
 	}
 
-	private async _resolve(value: string, host: string, log?: SkApFetchLog): Promise<IObject> {
+	private async _resolve(value: string, host: string, log?: SkApFetchLog): Promise<IObjectWithId> {
 		if (value.includes('#')) {
 			// URLs with fragment parts cannot be resolved correctly because
 			// the fragment part does not get transmitted over HTTP(S).
@@ -168,7 +170,7 @@ export class Resolver {
 		this.history.add(value);
 
 		if (this.utilityService.isSelfHost(host)) {
-			return await this.resolveLocal(value);
+			return await this.resolveLocal(value) as IObjectWithId;
 		}
 
 		if (!this.utilityService.isFederationAllowedHost(host)) {
@@ -180,8 +182,8 @@ export class Resolver {
 		}
 
 		const object = (this.user
-			? await this.apRequestService.signedGet(value, this.user) as IObject
-			: await this.httpRequestService.getActivityJson(value)) as IObject;
+			? await this.apRequestService.signedGet(value, this.user)
+			: await this.httpRequestService.getActivityJson(value));
 
 		if (log) {
 			const { object: objectOnly, context, contextHash } = extractObjectContext(object);
@@ -226,7 +228,7 @@ export class Resolver {
 	}
 
 	@bindThis
-	private resolveLocal(url: string): Promise<IObject> {
+	private resolveLocal(url: string): Promise<IObjectWithId> {
 		const parsed = this.apDbResolverService.parseUri(url);
 		if (!parsed.local) throw new IdentifiableError('02b40cd0-fa92-4b0c-acc9-fb2ada952ab8', `resolveLocal - not a local URL: ${url}`);
 
@@ -241,7 +243,7 @@ export class Resolver {
 						} else {
 							return this.apRendererService.renderNote(note, author);
 						}
-					});
+					}) as Promise<IObjectWithId>;
 			case 'users':
 				return this.usersRepository.findOneByOrFail({ id: parsed.id })
 					.then(user => this.apRendererService.renderPerson(user as MiLocalUser));
@@ -251,7 +253,7 @@ export class Resolver {
 					this.notesRepository.findOneByOrFail({ id: parsed.id }),
 					this.pollsRepository.findOneByOrFail({ noteId: parsed.id }),
 				])
-					.then(([note, poll]) => this.apRendererService.renderQuestion({ id: note.userId }, note, poll));
+					.then(([note, poll]) => this.apRendererService.renderQuestion({ id: note.userId }, note, poll)) as Promise<IObjectWithId>;
 			case 'likes':
 				return this.noteReactionsRepository.findOneByOrFail({ id: parsed.id }).then(async reaction =>
 					this.apRendererService.addContext(await this.apRendererService.renderLike(reaction, { uri: null })));
