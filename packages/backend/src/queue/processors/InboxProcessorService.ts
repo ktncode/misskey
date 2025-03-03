@@ -32,6 +32,7 @@ import type { Config } from '@/config.js';
 import { ApLogService, calculateDurationSince } from '@/core/ApLogService.js';
 import { UpdateInstanceQueue } from '@/core/UpdateInstanceQueue.js';
 import { isRetryableError } from '@/misc/is-retryable-error.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type { InboxJobData } from '../types.js';
 
@@ -300,24 +301,8 @@ export class InboxProcessorService implements OnApplicationShutdown {
 				}
 			}
 
-			if (e instanceof StatusError && !e.isRetryable) {
-				return `skip: permanent error ${e.statusCode}`;
-			}
-
-			if (e instanceof IdentifiableError && !e.isRetryable) {
-				if (e.message) {
-					return `skip: permanent error ${e.id}: ${e.message}`;
-				} else {
-					return `skip: permanent error ${e.id}`;
-				}
-			}
-
 			if (!isRetryableError(e)) {
-				if (e instanceof Error) {
-					return `skip: permanent error ${e.name}: ${e.message}`;
-				} else {
-					return `skip: permanent error ${e}`;
-				}
+				return `skip: permanent error ${renderInlineError(e)}`;
 			}
 
 			throw e;

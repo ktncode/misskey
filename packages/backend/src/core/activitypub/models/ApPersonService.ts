@@ -55,6 +55,7 @@ import type { ApLoggerService } from '../ApLoggerService.js';
 
 import type { ApImageService } from './ApImageService.js';
 import type { IActor, ICollection, IObject, IOrderedCollection } from '../type.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 
 const nameLength = 128;
 const summaryLength = 2048;
@@ -820,11 +821,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		// Resolve to (Ordered)Collection Object
 		const collection = user.featured ? await _resolver.resolveCollection(user.featured, true, user.uri).catch(err => {
 			if (isRetryableError(err)) {
-				if (err instanceof IdentifiableError) {
-					this.logger.warn(`Failed to update featured notes: ${err.id}: ${err.message}`);
-				} else {
-					this.logger.warn(`Failed to update featured notes: ${err.name}: ${err.message}`);
-				}
+				this.logger.warn(`Failed to update featured notes: ${renderInlineError(err)}`);
 			} else {
 				this.logger.error('Failed to update featured notes:', err);
 			}
