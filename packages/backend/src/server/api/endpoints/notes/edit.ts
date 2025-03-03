@@ -454,7 +454,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					text: ps.text ?? undefined,
 					reply,
 					renote,
-					cw: ps.cw,
+					cw: ps.cw || null,
 					localOnly: ps.localOnly,
 					reactionAcceptance: ps.reactionAcceptance,
 					visibility: ps.visibility,
