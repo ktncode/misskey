@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { AbortError } from 'node-fetch';
+import { AbortError, FetchError } from 'node-fetch';
 import { UnrecoverableError } from 'bullmq';
 import { StatusError } from '@/misc/status-error.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
@@ -17,6 +17,7 @@ export function isRetryableError(e: unknown): boolean {
 	if (e instanceof IdentifiableError) return e.isRetryable;
 	if (e instanceof UnrecoverableError) return false;
 	if (e instanceof AbortError) return true;
+	if (e instanceof FetchError) return true;
 	if (e instanceof Error) return e.name === 'AbortError';
 	return true;
 }
