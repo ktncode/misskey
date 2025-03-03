@@ -71,14 +71,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<img v-for="(role, i) in appearNote.user.badgeRoles" :key="i" v-tooltip="role.name" :class="$style.noteHeaderBadgeRole" :src="role.iconUrl!"/>
 					</div>
 				</div>
-				<MkInstanceTicker v-if="showTicker" :instance="appearNote.user.instance"/>
+				<MkInstanceTicker v-if="showTicker" :host="appearNote.user.host" :instance="appearNote.user.instance"/>
 			</div>
 		</header>
 		<div :class="$style.noteContent">
-			<p v-if="appearNote.cw != null" :class="$style.cw">
+			<p v-if="mergedCW != null" :class="$style.cw">
 				<Mfm
-					v-if="appearNote.cw != ''"
-					:text="appearNote.cw"
+					v-if="mergedCW != ''"
+					:text="mergedCW"
 					:author="appearNote.user"
 					:nyaize="'respect'"
 					:enableEmojiMenu="true"
@@ -87,7 +87,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				/>
 				<MkCwButton v-model="showContent" :text="appearNote.text" :renote="appearNote.renote" :files="appearNote.files" :poll="appearNote.poll"/>
 			</p>
-			<div v-show="appearNote.cw == null || showContent">
+			<div v-show="mergedCW == null || showContent">
 				<span v-if="appearNote.isHidden" style="opacity: 0.5">({{ i18n.ts.private }})</span>
 				<MkA v-if="appearNote.replyId" :class="$style.noteReplyTarget" :to="`/notes/${appearNote.replyId}`"><i class="ph-arrow-bend-left-up ph-bold ph-lg"></i></MkA>
 				<Mfm
@@ -115,9 +115,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div v-if="appearNote.files && appearNote.files.length > 0">
 					<MkMediaList ref="galleryEl" :mediaList="appearNote.files"/>
 				</div>
-				<MkPoll v-if="appearNote.poll" ref="pollViewer" :noteId="appearNote.id" :poll="appearNote.poll" :local="!appearNote.user.host" :class="$style.poll"/>
+				<MkPoll v-if="appearNote.poll" ref="pollViewer" :noteId="appearNote.id" :poll="appearNote.poll" :local="!appearNote.user.host" :class="$style.poll" :author="appearNote.user" :emojiUrls="appearNote.emojis"/>
 				<div v-if="isEnabledUrlPreview">
-					<MkUrlPreview v-for="url in urls" :key="url" :url="url" :compact="true" :detail="true" :showAsQuote="true" style="margin-top: 6px;"/>
+					<MkUrlPreview v-for="url in urls" :key="url" :url="url" :compact="true" :detail="true" :showAsQuote="!appearNote.user.rejectQuotes" :skipNoteIds="[appearNote.renote?.id]" style="margin-top: 6px;"/>
 				</div>
 				<div v-if="appearNote.renote" :class="$style.quote"><MkNoteSimple :note="appearNote.renote" :class="$style.quoteNote" :expandAllCws="props.expandAllCws"/></div>
 			</div>
@@ -153,7 +153,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<i class="ti ti-ban"></i>
 			</button>
 			<button
-				v-if="canRenote"
+				v-if="canRenote && !$i?.rejectQuotes"
 				ref="quoteButton"
 				class="_button"
 				:class="$style.noteFooterButton"
@@ -245,6 +245,7 @@ import * as mfm from '@transfem-org/sfm-js';
 import * as Misskey from 'misskey-js';
 import { isLink } from '@@/js/is-link.js';
 import { host } from '@@/js/config.js';
+import { computeMergedCw } from '@@/js/compute-merged-cw.js';
 import MkNoteSub from '@/components/MkNoteSub.vue';
 import MkNoteSimple from '@/components/MkNoteSimple.vue';
 import MkReactionsViewer from '@/components/MkReactionsViewer.vue';
@@ -347,6 +348,8 @@ const replies = ref<Misskey.entities.Note[]>([]);
 const quotes = ref<Misskey.entities.Note[]>([]);
 const canRenote = computed(() => ['public', 'home'].includes(appearNote.value.visibility) || (appearNote.value.visibility === 'followers' && appearNote.value.userId === $i?.id));
 const defaultLike = computed(() => defaultStore.state.like ? defaultStore.state.like : null);
+
+const mergedCW = computed(() => computeMergedCw(appearNote.value));
 
 const renoteTooltip = computeRenoteTooltip(renoted);
 

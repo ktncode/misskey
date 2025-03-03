@@ -62,10 +62,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<div :class="[{ [$style.clickToOpen]: defaultStore.state.clickToOpen }]" @click.stop="defaultStore.state.clickToOpen ? noteclick(appearNote.id) : undefined">
 			<div style="container-type: inline-size;">
-				<p v-if="appearNote.cw != null" :class="$style.cw">
+				<p v-if="mergedCW != null" :class="$style.cw">
 					<Mfm
-						v-if="appearNote.cw != ''"
-						:text="appearNote.cw"
+						v-if="mergedCW != ''"
+						:text="mergedCW"
 						:author="appearNote.user"
 						:nyaize="'respect'"
 						:enableEmojiMenu="true"
@@ -74,7 +74,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					/>
 					<MkCwButton v-model="showContent" :text="appearNote.text" :renote="appearNote.renote" :files="appearNote.files" :poll="appearNote.poll" style="margin: 4px 0;" @click.stop/>
 				</p>
-				<div v-show="appearNote.cw == null || showContent" :class="[{ [$style.contentCollapsed]: collapsed }]">
+				<div v-show="mergedCW == null || showContent" :class="[{ [$style.contentCollapsed]: collapsed }]">
 					<div :class="$style.text">
 						<span v-if="appearNote.isHidden" style="opacity: 0.5">({{ i18n.ts.private }})</span>
 						<Mfm
@@ -102,9 +102,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div v-if="appearNote.files && appearNote.files.length > 0">
 						<MkMediaList ref="galleryEl" :mediaList="appearNote.files" @click.stop/>
 					</div>
-					<MkPoll v-if="appearNote.poll" :noteId="appearNote.id" :poll="appearNote.poll" :local="!appearNote.user.host" :class="$style.poll" @click.stop/>
+					<MkPoll v-if="appearNote.poll" :noteId="appearNote.id" :poll="appearNote.poll" :local="!appearNote.user.host" :author="appearNote.user" :emojiUrls="appearNote.emojis" :class="$style.poll" @click.stop/>
 					<div v-if="isEnabledUrlPreview">
-						<MkUrlPreview v-for="url in urls" :key="url" :url="url" :compact="true" :detail="false" :showAsQuote="true" :class="$style.urlPreview" @click.stop/>
+						<MkUrlPreview v-for="url in urls" :key="url" :url="url" :compact="true" :detail="false" :showAsQuote="!appearNote.user.rejectQuotes" :skipNoteIds="[appearNote.renote?.id]" :class="$style.urlPreview" @click.stop/>
 					</div>
 					<div v-if="appearNote.renote" :class="$style.quote"><SkNoteSimple :note="appearNote.renote" :class="$style.quoteNote"/></div>
 					<button v-if="isLong && collapsed" :class="$style.collapsed" class="_button" @click.stop @click="collapsed = false">
@@ -143,7 +143,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<i class="ti ti-ban"></i>
 				</button>
 				<button
-					v-if="canRenote && !props.mock"
+					v-if="canRenote && !props.mock && !$i?.rejectQuotes"
 					ref="quoteButton"
 					:class="$style.footerButton"
 					class="_button"
@@ -180,11 +180,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkA>
 		</template>
 	</I18n>
-	<I18n v-else :src="i18n.ts.userSaysSomething" tag="small">
+	<I18n v-else-if="showSoftWordMutedWord !== true" :src="i18n.ts.userSaysSomething" tag="small">
 		<template #name>
 			<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
 				<MkUserName :user="appearNote.user"/>
 			</MkA>
+		</template>
+	</I18n>
+	<I18n v-else :src="i18n.ts.userSaysSomethingAbout" tag="small">
+		<template #name>
+			<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
+				<MkUserName :user="appearNote.user"/>
+			</MkA>
+		</template>
+		<template #word>
+			{{ Array.isArray(muted) ? muted.map(words => Array.isArray(words) ? words.join() : words).slice(0, 3).join(' ') : muted }}
 		</template>
 	</I18n>
 </div>
@@ -203,6 +213,7 @@ import * as Misskey from 'misskey-js';
 import { isLink } from '@@/js/is-link.js';
 import { shouldCollapsed } from '@@/js/collapsed.js';
 import { host } from '@@/js/config.js';
+import { computeMergedCw } from '@@/js/compute-merged-cw.js';
 import type { MenuItem } from '@/types/menu.js';
 import SkNoteSub from '@/components/SkNoteSub.vue';
 import SkNoteHeader from '@/components/SkNoteHeader.vue';
@@ -319,6 +330,7 @@ const isDeleted = ref(false);
 const renoted = ref(false);
 const muted = ref(checkMute(appearNote.value, $i?.mutedWords));
 const hardMuted = ref(props.withHardMute && checkMute(appearNote.value, $i?.hardMutedWords, true));
+const showSoftWordMutedWord = computed(() => defaultStore.state.showSoftWordMutedWord);
 const translation = ref<Misskey.entities.NotesTranslateResponse | null>(null);
 const translating = ref(false);
 const showTicker = (defaultStore.state.instanceTicker === 'always') || (defaultStore.state.instanceTicker === 'remote' && appearNote.value.user.instance);
@@ -334,6 +346,8 @@ const defaultLike = computed(() => defaultStore.state.like ? defaultStore.state.
 const animated = computed(() => parsed.value ? checkAnimationFromMfm(parsed.value) : null);
 const allowAnim = ref(defaultStore.state.advancedMfm && defaultStore.state.animatedMfm ? true : false);
 
+const mergedCW = computed(() => computeMergedCw(appearNote.value));
+
 const renoteTooltip = computeRenoteTooltip(renoted);
 
 const pleaseLoginContext = computed<OpenOnRemoteOptions>(() => ({
@@ -343,13 +357,18 @@ const pleaseLoginContext = computed<OpenOnRemoteOptions>(() => ({
 
 /* Overload FunctionにLintが対応していないのでコメントアウト
 function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly: true): boolean;
-function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly: false): boolean | 'sensitiveMute';
+function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly: false): Array<string | string[]> | false | 'sensitiveMute';
 */
-function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly = false): boolean | 'sensitiveMute' {
+function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly = false): Array<string | string[]> | false | 'sensitiveMute' {
 	if (mutedWords != null) {
-		if (checkWordMute(noteToCheck, $i, mutedWords)) return true;
-		if (noteToCheck.reply && checkWordMute(noteToCheck.reply, $i, mutedWords)) return true;
-		if (noteToCheck.renote && checkWordMute(noteToCheck.renote, $i, mutedWords)) return true;
+		const result = checkWordMute(noteToCheck, $i, mutedWords);
+		if (Array.isArray(result)) return result;
+
+		const replyResult = noteToCheck.reply && checkWordMute(noteToCheck.reply, $i, mutedWords);
+		if (Array.isArray(replyResult)) return replyResult;
+
+		const renoteResult = noteToCheck.renote && checkWordMute(noteToCheck.renote, $i, mutedWords);
+		if (Array.isArray(renoteResult)) return renoteResult;
 	}
 
 	if (checkOnly) return false;
