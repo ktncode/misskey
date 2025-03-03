@@ -6,12 +6,14 @@
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Bull from 'bullmq';
 import * as Sentry from '@sentry/node';
+import { AbortError } from 'node-fetch';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
 import { CheckModeratorsActivityProcessorService } from '@/queue/processors/CheckModeratorsActivityProcessorService.js';
 import { StatusError } from '@/misc/status-error.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { UserWebhookDeliverProcessorService } from './processors/UserWebhookDeliverProcessorService.js';
 import { SystemWebhookDeliverProcessorService } from './processors/SystemWebhookDeliverProcessorService.js';
 import { EndedPollNotificationProcessorService } from './processors/EndedPollNotificationProcessorService.js';
@@ -138,8 +140,20 @@ export class QueueProcessorService implements OnApplicationShutdown {
 			// 何故かeがundefinedで来ることがある
 			if (!e) return '?';
 
-			if (e instanceof Bull.UnrecoverableError || e.name === 'AbortError' || e instanceof StatusError) {
+			if (e instanceof Bull.UnrecoverableError || e instanceof AbortError || e.name === 'AbortError') {
 				return `${e.name}: ${e.message}`;
+			}
+
+			if (e instanceof StatusError) {
+				if (e.statusMessage) {
+					return `${e.name} ${e.statusCode}: ${e.statusMessage}`;
+				} else {
+					return `${e.name} ${e.statusCode}`;
+				}
+			}
+
+			if (e instanceof IdentifiableError) {
+				return `${e.name} ${e.id}: ${e.message}`;
 			}
 
 			return {
