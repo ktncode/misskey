@@ -357,22 +357,10 @@ export class ApInboxService {
 			}
 
 			// Announce対象をresolve
-			let renote;
-			try {
-				// The target ID is verified by secureResolve, so we know it shares host authority with the actor who sent it.
-				// This means we can pass that ID to resolveNote and avoid an extra fetch, which will fail if the note is private.
-				renote = await this.apNoteService.resolveNote(target, { resolver, sentFrom: getApId(target) });
-				if (renote == null) return 'announce target is null';
-			} catch (err) {
-				// 対象が4xxならスキップ
-				if (err instanceof StatusError) {
-					if (!err.isRetryable) {
-						return `skip: ignored announce target ${target.id} - ${err.statusCode}`;
-					}
-					return `Error in announce target ${target.id} - ${err.statusCode}`;
-				}
-				throw err;
-			}
+			// The target ID is verified by secureResolve, so we know it shares host authority with the actor who sent it.
+			// This means we can pass that ID to resolveNote and avoid an extra fetch, which will fail if the note is private.
+			const renote = await this.apNoteService.resolveNote(target, { resolver, sentFrom: getApId(target) });
+			if (renote == null) return 'announce target is null';
 
 			if (!await this.noteEntityService.isVisibleForMe(renote, actor.id)) {
 				return 'skip: invalid actor for this activity';
@@ -548,12 +536,6 @@ export class ApInboxService {
 
 			await this.apNoteService.createNote(note, actor, resolver, silent);
 			return 'ok';
-		} catch (err) {
-			if (err instanceof StatusError && !err.isRetryable) {
-				return `skip: ${err.statusCode}`;
-			} else {
-				throw err;
-			}
 		} finally {
 			unlock();
 		}
