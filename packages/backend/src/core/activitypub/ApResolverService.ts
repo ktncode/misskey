@@ -23,7 +23,7 @@ import { getApId, getNullableApId, isCollectionOrOrderedCollection } from './typ
 import { ApDbResolverService } from './ApDbResolverService.js';
 import { ApRendererService } from './ApRendererService.js';
 import { ApRequestService } from './ApRequestService.js';
-import type { IObject, ICollection, IOrderedCollection } from './type.js';
+import type { IObject, ICollection, IOrderedCollection, ApObject } from './type.js';
 
 export class Resolver {
 	private history: Set<string>;
@@ -74,6 +74,33 @@ export class Resolver {
 		} else {
 			throw new IdentifiableError('f100eccf-f347-43fb-9b45-96a0831fb635', `unrecognized collection type: ${collection.type}`);
 		}
+	}
+
+	/**
+	 * Securely resolves an AP object or URL that has been sent from another instance.
+	 * An input object is trusted if and only if its ID matches the authority of sentFromUri.
+	 * In all other cases, the object is re-fetched from remote by input string or object ID.
+	 */
+	@bindThis
+	public async secureResolve(input: ApObject, sentFromUri: string): Promise<IObject> {
+		// Unpack arrays to get the value element.
+		const value = fromTuple(input);
+		if (value == null) {
+			throw new IdentifiableError('20058164-9de1-4573-8715-425753a21c1d', 'Cannot resolve null input');
+		}
+
+		// This will throw if the input has no ID, which is good because we can't verify an anonymous object anyway.
+		const id = getApId(value);
+
+		// Check if we can use the provided object as-is.
+		// Our security requires that the object ID matches the host authority that sent it, otherwise it can't be trusted.
+		// A mismatch isn't necessarily malicious, it just means we can't use the object we were given.
+		if (typeof(value) === 'object' && this.apUtilityService.haveSameAuthority(id, sentFromUri)) {
+			return value;
+		}
+
+		// If the checks didn't pass, then we must fetch the object and use that.
+		return await this.resolve(id);
 	}
 
 	@bindThis
