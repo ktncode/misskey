@@ -44,7 +44,7 @@ import { MemoryKVCache } from '@/misc/cache.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import { verifyFieldLinks } from '@/misc/verify-field-link.js';
 import { isRetryableError } from '@/misc/is-retryable-error.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import { getApId, getApType, isActor, isCollection, isCollectionOrOrderedCollection, isPropertyValue } from '../type.js';
 import { extractApHashtags } from './tag.js';
 import type { OnModuleInit } from '@nestjs/common';
@@ -55,7 +55,6 @@ import type { ApLoggerService } from '../ApLoggerService.js';
 
 import type { ApImageService } from './ApImageService.js';
 import type { IActor, ICollection, IObject, IOrderedCollection } from '../type.js';
-import { renderInlineError } from '@/misc/render-inline-error.js';
 
 const nameLength = 128;
 const summaryLength = 2048;
