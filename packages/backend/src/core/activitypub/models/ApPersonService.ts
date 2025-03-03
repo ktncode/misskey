@@ -7,7 +7,6 @@ import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import promiseLimit from 'promise-limit';
 import { DataSource } from 'typeorm';
 import { ModuleRef } from '@nestjs/core';
-import { AbortError } from 'node-fetch';
 import { UnrecoverableError } from 'bullmq';
 import { DI } from '@/di-symbols.js';
 import type { FollowingsRepository, InstancesRepository, MiMeta, UserProfilesRepository, UserPublickeysRepository, UsersRepository } from '@/models/_.js';
@@ -44,6 +43,8 @@ import { AppLockService } from '@/core/AppLockService.js';
 import { MemoryKVCache } from '@/misc/cache.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import { verifyFieldLinks } from '@/misc/verify-field-link.js';
+import { isRetryableError } from '@/misc/is-retryable-error.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { getApId, getApType, isActor, isCollection, isCollectionOrOrderedCollection, isPropertyValue } from '../type.js';
 import { extractApHashtags } from './tag.js';
 import type { OnModuleInit } from '@nestjs/common';
@@ -361,7 +362,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 			].map((p): Promise<'public' | 'private'> => p
 				.then(isPublic => isPublic ? 'public' : 'private')
 				.catch(err => {
-					if (!(err instanceof StatusError) || err.isRetryable) {
+					if (isRetryableError(err)) {
 						this.logger.error('error occurred while fetching following/followers collection', { stack: err });
 					}
 					return 'private';
@@ -493,7 +494,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 				user = u as MiRemoteUser;
 				publicKey = await this.userPublickeysRepository.findOneBy({ userId: user.id });
 			} else {
-				this.logger.error(e instanceof Error ? e : new Error(e as string));
+				this.logger.error('Error creating Person:', e instanceof Error ? e : new Error(e as string));
 				throw e;
 			}
 		}
@@ -592,7 +593,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 			].map((p): Promise<'public' | 'private' | undefined> => p
 				.then(isPublic => isPublic ? 'public' : 'private')
 				.catch(err => {
-					if (!(err instanceof StatusError) || err.isRetryable) {
+					if (isRetryableError(err)) {
 						this.logger.error('error occurred while fetching following/followers collection', { stack: err });
 						// Do not update the visibility on transient errors.
 						return undefined;
@@ -818,8 +819,12 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 
 		// Resolve to (Ordered)Collection Object
 		const collection = user.featured ? await _resolver.resolveCollection(user.featured, true, user.uri).catch(err => {
-			if (err instanceof AbortError || err instanceof StatusError) {
-				this.logger.warn(`Failed to update featured notes: ${err.name}: ${err.message}`);
+			if (isRetryableError(err)) {
+				if (err instanceof IdentifiableError) {
+					this.logger.warn(`Failed to update featured notes: ${err.id}: ${err.message}`);
+				} else {
+					this.logger.warn(`Failed to update featured notes: ${err.name}: ${err.message}`);
+				}
 			} else {
 				this.logger.error('Failed to update featured notes:', err);
 			}
