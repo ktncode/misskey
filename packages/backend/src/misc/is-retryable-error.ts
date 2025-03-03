@@ -18,6 +18,7 @@ export function isRetryableError(e: unknown): boolean {
 	if (e instanceof UnrecoverableError) return false;
 	if (e instanceof AbortError) return true;
 	if (e instanceof FetchError) return true;
+	if (e instanceof SyntaxError) return false;
 	if (e instanceof Error) return e.name === 'AbortError';
 	return true;
 }
