@@ -249,30 +249,71 @@ function save() {
 }
 
 function changeAvatar(ev) {
-	selectFile(ev.currentTarget ?? ev.target, i18n.ts.avatar).then(async (file) => {
-		let originalOrCropped = file;
+	if ($i.avatarId) {
+		os.popupMenu([{
+			text: i18n.ts._profile.updateAvatar,
+			action: async () => {
+				selectFile(ev.currentTarget ?? ev.target, i18n.ts.avatar).then(async (file) => {
+					let originalOrCropped = file;
 
-		const { canceled } = await os.confirm({
-			type: 'question',
-			text: i18n.ts.cropImageAsk,
-			okText: i18n.ts.cropYes,
-			cancelText: i18n.ts.cropNo,
-		});
+					const { canceled } = await os.confirm({
+						type: 'question',
+						text: i18n.ts.cropImageAsk,
+						okText: i18n.ts.cropYes,
+						cancelText: i18n.ts.cropNo,
+					});
 
-		if (!canceled) {
-			originalOrCropped = await os.cropImage(file, {
-				aspectRatio: 1,
+					if (!canceled) {
+						originalOrCropped = await os.cropImage(file, {
+							aspectRatio: 1,
+						});
+					}
+
+					const i = await os.apiWithDialog('i/update', {
+						avatarId: originalOrCropped.id,
+					});
+					$i.avatarId = i.avatarId;
+					$i.avatarUrl = i.avatarUrl;
+					globalEvents.emit('requestClearPageCache');
+				});
+			},
+		}, {
+			text: i18n.ts._profile.removeAvatar,
+			action: async () => {
+				const i = await os.apiWithDialog('i/update', {
+					avatarId: null,
+				});
+				$i.avatarId = i.avatarId;
+				$i.avatarUrl = i.avatarUrl;
+				globalEvents.emit('requestClearPageCache');
+			},
+		}], ev.currentTarget ?? ev.target);
+	} else {
+		selectFile(ev.currentTarget ?? ev.target, i18n.ts.avatar).then(async (file) => {
+			let originalOrCropped = file;
+
+			const { canceled } = await os.confirm({
+				type: 'question',
+				text: i18n.ts.cropImageAsk,
+				okText: i18n.ts.cropYes,
+				cancelText: i18n.ts.cropNo,
 			});
-		}
 
-		const i = await os.apiWithDialog('i/update', {
-			avatarId: originalOrCropped.id,
+			if (!canceled) {
+				originalOrCropped = await os.cropImage(file, {
+					aspectRatio: 1,
+				});
+			}
+
+			const i = await os.apiWithDialog('i/update', {
+				avatarId: originalOrCropped.id,
+			});
+			$i.avatarId = i.avatarId;
+			$i.avatarUrl = i.avatarUrl;
+			globalEvents.emit('requestClearPageCache');
+			claimAchievement('profileFilled');
 		});
-		$i.avatarId = i.avatarId;
-		$i.avatarUrl = i.avatarUrl;
-		globalEvents.emit('requestClearPageCache');
-		claimAchievement('profileFilled');
-	});
+	}
 }
 
 function changeBanner(ev) {
