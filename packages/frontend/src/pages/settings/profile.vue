@@ -313,7 +313,7 @@ function changeBackground(ev) {
 
 		if (!canceled) {
 			originalOrCropped = await os.cropImage(file, {
-				aspectRatio: 2,
+				aspectRatio: 1,
 			});
 		}
 
