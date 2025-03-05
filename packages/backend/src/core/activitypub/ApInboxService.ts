@@ -470,7 +470,7 @@ export class ApInboxService {
 	}
 
 	@bindThis
-	private async create(actor: MiRemoteUser, activity: ICreate | IUpdate, resolver?: Resolver): Promise<string | void> {
+	private async create(actor: MiRemoteUser, activity: ICreate | IUpdate, resolver?: Resolver, silent = false): Promise<string | void> {
 		const uri = getApId(activity);
 
 		this.logger.info(`Create: ${uri}`);
@@ -505,7 +505,7 @@ export class ApInboxService {
 		});
 
 		if (isPost(object)) {
-			await this.createNote(resolver, actor, object, false);
+			await this.createNote(resolver, actor, object, silent);
 		} else {
 			return `skip: Unsupported type for Create: ${getApType(object)} ${getNullableApId(object)}`;
 		}
@@ -896,7 +896,7 @@ export class ApInboxService {
 		} else if (getApType(object) === 'Question') {
 			// If we get an Update(Question) for a note that doesn't exist, then create it instead
 			if (!await this.apNoteService.hasNote(object)) {
-				return await this.create(actor, activity, resolver);
+				return await this.create(actor, activity, resolver, true);
 			}
 
 			await this.apQuestionService.updateQuestion(object, actor, resolver);
@@ -904,7 +904,7 @@ export class ApInboxService {
 		} else if (isPost(object)) {
 			// If we get an Update(Note) for a note that doesn't exist, then create it instead
 			if (!await this.apNoteService.hasNote(object)) {
-				return await this.create(actor, activity, resolver);
+				return await this.create(actor, activity, resolver, true);
 			}
 
 			await this.apNoteService.updateNote(object, actor, resolver);
