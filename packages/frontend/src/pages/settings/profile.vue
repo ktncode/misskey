@@ -271,7 +271,6 @@ function changeAvatar(ev) {
 		$i.avatarId = i.avatarId;
 		$i.avatarUrl = i.avatarUrl;
 		globalEvents.emit('requestClearPageCache');
-		claimAchievement('profileFilled');
 	});
 }
 
@@ -345,6 +344,7 @@ function changeOrRemoveAvatar(ev) {
 		}], ev.currentTarget ?? ev.target);
 	} else {
 		changeAvatar(ev);
+		claimAchievement('profileFilled');
 	}
 }
 
@@ -366,6 +366,7 @@ function changeOrRemoveBanner(ev) {
 		}], ev.currentTarget ?? ev.target);
 	} else {
 		changeBanner(ev);
+		claimAchievement('profileFilled');
 	}
 }
 
@@ -387,6 +388,7 @@ function changeOrRemoveBackground(ev) {
 		}], ev.currentTarget ?? ev.target);
 	} else {
 		changeBackground(ev);
+		claimAchievement('profileFilled');
 	}
 }
 
