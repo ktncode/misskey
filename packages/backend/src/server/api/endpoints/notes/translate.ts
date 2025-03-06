@@ -93,11 +93,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				return;
 			}
 
-			if (this.serverSettings.deeplAuthKey == null && !this.serverSettings.deeplFreeMode) {
+			if (this.serverSettings.deeplAuthKey == null && !this.serverSettings.deeplFreeMode && !this.serverSettings.libreTranslateURL) {
 				throw new ApiError(meta.errors.unavailable);
 			}
 
-			if (this.serverSettings.deeplFreeMode && !this.serverSettings.deeplFreeInstance) {
+			if (this.serverSettings.deeplFreeMode && !this.serverSettings.deeplFreeInstance && !this.serverSettings.libreTranslateURL) {
 				throw new ApiError(meta.errors.unavailable);
 			}
 
@@ -105,40 +105,76 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (targetLang.includes('-')) targetLang = targetLang.split('-')[0];
 
 			const params = new URLSearchParams();
-			if (this.serverSettings.deeplAuthKey) params.append('auth_key', this.serverSettings.deeplAuthKey);
-			params.append('text', note.text);
-			params.append('target_lang', targetLang);
 
-			const endpoint = this.serverSettings.deeplFreeMode && this.serverSettings.deeplFreeInstance ? this.serverSettings.deeplFreeInstance : this.serverSettings.deeplIsPro ? 'https://api.deepl.com/v2/translate' : 'https://api-free.deepl.com/v2/translate';
+			// DeepL/DeepLX handling
+			if (this.serverSettings.deeplAuthKey != null || this.serverSettings.deeplFreeMode) {
+				if (this.serverSettings.deeplAuthKey) params.append('auth_key', this.serverSettings.deeplAuthKey);
+				params.append('text', note.text);
+				params.append('target_lang', targetLang);
+				const endpoint = this.serverSettings.deeplFreeMode && this.serverSettings.deeplFreeInstance ? this.serverSettings.deeplFreeInstance : this.serverSettings.deeplIsPro ? 'https://api.deepl.com/v2/translate' : 'https://api-free.deepl.com/v2/translate';
 
-			const res = await this.httpRequestService.send(endpoint, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-					Accept: 'application/json, */*',
-				},
-				body: params.toString(),
-			});
-			if (this.serverSettings.deeplAuthKey) {
+				const res = await this.httpRequestService.send(endpoint, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						Accept: 'application/json, */*',
+					},
+					body: params.toString(),
+				});
+				if (this.serverSettings.deeplAuthKey) {
+					const json = (await res.json()) as {
+						translations: {
+							detected_source_language: string;
+							text: string;
+						}[];
+					};
+
+					return {
+						sourceLang: json.translations[0].detected_source_language,
+						text: json.translations[0].text,
+					};
+				} else {
+					const json = (await res.json()) as {
+						code: number,
+						message: string,
+						data: string,
+						source_lang: string,
+						target_lang: string,
+						alternatives: string[],
+					};
+
+					const languageNames = new Intl.DisplayNames(['en'], {
+						type: 'language',
+					});
+
+					return {
+						sourceLang: languageNames.of(json.source_lang),
+						text: json.data,
+					};
+				}
+			}
+
+			// LibreTranslate handling
+			if (this.serverSettings.libreTranslateURL) {
+				const res = await this.httpRequestService.send(this.serverSettings.libreTranslateURL, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Accept: 'application/json, */*',
+					},
+					body: JSON.stringify({
+						q: note.text,
+						source: 'auto',
+						target: targetLang,
+						format: 'text',
+						api_key: this.serverSettings.libreTranslateKey ?? '',
+					}),
+				});
+
 				const json = (await res.json()) as {
-					translations: {
-						detected_source_language: string;
-						text: string;
-					}[];
-				};
-
-				return {
-					sourceLang: json.translations[0].detected_source_language,
-					text: json.translations[0].text,
-				};
-			} else {
-				const json = (await res.json()) as {
-					code: number,
-					message: string,
-					data: string,
-					source_lang: string,
-					target_lang: string,
 					alternatives: string[],
+					detectedLanguage: { [key: string]: string | number },
+					translatedText: string,
 				};
 
 				const languageNames = new Intl.DisplayNames(['en'], {
@@ -146,8 +182,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				});
 
 				return {
-					sourceLang: languageNames.of(json.source_lang),
-					text: json.data,
+					sourceLang: languageNames.of(json.detectedLanguage.language as string),
+					text: json.translatedText,
 				};
 			}
 		});

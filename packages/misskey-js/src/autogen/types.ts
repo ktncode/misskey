@@ -8826,6 +8826,8 @@ export type operations = {
             deeplIsPro: boolean;
             deeplFreeMode: boolean;
             deeplFreeInstance: string | null;
+            libreTranslateURL: string | null;
+            libreTranslateKey: string | null;
             defaultDarkTheme: string | null;
             defaultLightTheme: string | null;
             description: string | null;
@@ -11401,6 +11403,8 @@ export type operations = {
           deeplIsPro?: boolean;
           deeplFreeMode?: boolean;
           deeplFreeInstance?: string | null;
+          libreTranslateURL?: string | null;
+          libreTranslateKey?: string | null;
           enableEmail?: boolean;
           email?: string | null;
           smtpSecure?: boolean;
