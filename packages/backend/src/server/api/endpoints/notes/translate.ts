@@ -93,25 +93,21 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				return;
 			}
 
-			if (this.serverSettings.deeplAuthKey == null && !this.serverSettings.deeplFreeMode && !this.serverSettings.libreTranslateURL) {
-				throw new ApiError(meta.errors.unavailable);
-			}
-
-			if (this.serverSettings.deeplFreeMode && !this.serverSettings.deeplFreeInstance && !this.serverSettings.libreTranslateURL) {
-				throw new ApiError(meta.errors.unavailable);
-			}
+			const canDeeplFree = this.serverSettings.deeplFreeMode && !!this.serverSettings.deeplFreeInstance;
+			const canDeepl = !!this.serverSettings.deeplAuthKey || canDeeplFree;
+			const canLibre = !!this.serverSettings.libreTranslateURL;
+			if (!canDeepl && !canLibre) throw new ApiError(meta.errors.unavailable);
 
 			let targetLang = ps.targetLang;
 			if (targetLang.includes('-')) targetLang = targetLang.split('-')[0];
 
-			const params = new URLSearchParams();
-
 			// DeepL/DeepLX handling
-			if (this.serverSettings.deeplAuthKey != null || this.serverSettings.deeplFreeMode) {
+			if (canDeepl) {
+				const params = new URLSearchParams();
 				if (this.serverSettings.deeplAuthKey) params.append('auth_key', this.serverSettings.deeplAuthKey);
 				params.append('text', note.text);
 				params.append('target_lang', targetLang);
-				const endpoint = this.serverSettings.deeplFreeMode && this.serverSettings.deeplFreeInstance ? this.serverSettings.deeplFreeInstance : this.serverSettings.deeplIsPro ? 'https://api.deepl.com/v2/translate' : 'https://api-free.deepl.com/v2/translate';
+				const endpoint = canDeeplFree ? this.serverSettings.deeplFreeInstance as string : this.serverSettings.deeplIsPro ? 'https://api.deepl.com/v2/translate' : 'https://api-free.deepl.com/v2/translate';
 
 				const res = await this.httpRequestService.send(endpoint, {
 					method: 'POST',
@@ -155,8 +151,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			// LibreTranslate handling
-			if (this.serverSettings.libreTranslateURL) {
-				const res = await this.httpRequestService.send(this.serverSettings.libreTranslateURL, {
+			if (canLibre) {
+				const res = await this.httpRequestService.send(this.serverSettings.libreTranslateURL as string, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
