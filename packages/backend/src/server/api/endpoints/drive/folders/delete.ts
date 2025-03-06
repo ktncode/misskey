@@ -10,6 +10,7 @@ import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '../../../error.js';
 import ms from 'ms';
+import { DriveService } from '@/core/DriveService.js';
 
 export const meta = {
 	tags: ['drive'],
@@ -25,9 +26,9 @@ export const meta = {
 			id: '1069098f-c281-440f-b085-f9932edbe091',
 		},
 
-		hasChildFilesOrFolders: {
-			message: 'This folder has child files or folders.',
-			code: 'HAS_CHILD_FILES_OR_FOLDERS',
+		hasChildFolders: {
+			message: 'This folder has child folders.',
+			code: 'HAS_CHILD_FOLDERS',
 			id: 'b0fc8a17-963c-405d-bfbc-859a487295e1',
 		},
 	},
@@ -57,6 +58,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private driveFoldersRepository: DriveFoldersRepository,
 
 		private globalEventService: GlobalEventService,
+		private driveService: DriveService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			// Get folder
@@ -69,13 +71,15 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.noSuchFolder);
 			}
 
-			const [childFoldersCount, childFilesCount] = await Promise.all([
+			const [childFoldersCount, childFiles] = await Promise.all([
 				this.driveFoldersRepository.countBy({ parentId: folder.id }),
-				this.driveFilesRepository.countBy({ folderId: folder.id }),
+				this.driveFilesRepository.find({ where: { folderId: folder.id } }),
 			]);
 
-			if (childFoldersCount !== 0 || childFilesCount !== 0) {
-				throw new ApiError(meta.errors.hasChildFilesOrFolders);
+			if (childFoldersCount !== 0) throw new ApiError(meta.errors.hasChildFolders);
+
+			for (const file of childFiles) {
+				await this.driveService.deleteFileSync(file, false, me);
 			}
 
 			await this.driveFoldersRepository.delete(folder.id);
