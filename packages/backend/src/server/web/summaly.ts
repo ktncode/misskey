@@ -46,7 +46,10 @@ const scrapeMore = {
 
 		if (!result) return result;
 
-		// here starts our custom scraping
+		/* here starts our custom scraping; $ is a "cheerio" object, works
+		 * a bit like jQuery, see
+		 * https://cheerio.js.org/docs/api/classes/Cheerio
+		*/
 
 		const $ = page.$;
 
