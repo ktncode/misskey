@@ -126,8 +126,8 @@ importers:
         specifier: 1.2.0
         version: 1.2.0
       '@misskey-dev/summaly':
-        specifier: 5.1.0
-        version: 5.1.0
+        specifier: 5.2.0
+        version: 5.2.0
       '@nestjs/common':
         specifier: 10.4.7
         version: 10.4.7(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -2022,6 +2022,9 @@ packages:
   '@canvas/image-data@1.0.0':
     resolution: {integrity: sha512-BxOqI5LgsIQP1odU5KMwV9yoijleOPzHL18/YvNqF9KFSGF2K/DLlYAbDQsWqd/1nbaFuSkYD/191dpMtNh4vw==}
 
+  '@chainsafe/is-ip@2.1.0':
+    resolution: {integrity: sha512-KIjt+6IfysQ4GCv66xihEitBjvhU/bixbbbFxdJ1sqCp4uJ0wuZiYBPhksZoy4lfaF0k9cwNzY5upEW/VWdw3w==}
+
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
@@ -2970,6 +2973,9 @@ packages:
 
   '@misskey-dev/summaly@5.1.0':
     resolution: {integrity: sha512-WAUrgX3/z4h4aI8Y/WVwmJcJ6Fa1Zf2LJCSS651t9MHoWVGABLsQ2KCXRGmlpk4i+cMDNIwweObUroosE7j8rg==}
+
+  '@misskey-dev/summaly@5.2.0':
+    resolution: {integrity: sha512-Djg6emAOdcY81a8TMTFi/qgIdTO96Z2qZfhHE+k+YRd8z9V/5MxauJr+U9z4kUVjSJJ1yzdOWqi26OsmVUaXZA==}
 
   '@mole-inc/bin-wrapper@8.0.1':
     resolution: {integrity: sha512-sTGoeZnjI8N4KS+sW2AN95gDBErhAguvkw/tWdCjeM8bvxpz5lqrnd0vOJABA1A+Ic3zED7PYoLP/RANLgVotA==}
@@ -7012,6 +7018,10 @@ packages:
     resolution: {integrity: sha512-tqiF7eSgTBwQkxb1LxsEpva8TaMYVisbhplrFVmw9GQE3855Z+MH/mnsXLLOkDxR6hZJRFMj5VTAZ8lmTF8ZOA==}
     engines: {node: '>=20'}
 
+  got@14.4.6:
+    resolution: {integrity: sha512-rnhwfM/PhMNJ1i17k3DuDqgj0cKx3IHxBKVv/WX1uDKqrhi2Gv3l7rhPThR/Cc6uU++dD97W9c8Y0qyw9x0jag==}
+    engines: {node: '>=20'}
+
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
@@ -7129,6 +7139,9 @@ packages:
 
   html-entities@2.3.2:
     resolution: {integrity: sha512-c3Ab/url5ksaT0WyleslpBEthOzWhrjQbg75y7XUsfSzi3Dgzt0l8w5e7DylRn15MTlMMD58dTfzddNS2kcAjQ==}
+
+  html-entities@2.5.2:
+    resolution: {integrity: sha512-K//PSRMQk4FZ78Kyau+mZurHn3FH0Vwr+H36eE0rPbeYkRRi9YxceYPhuN60UwWorxyKHhqoAJl2OFKa4BVtaA==}
 
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
@@ -7307,6 +7320,10 @@ packages:
   ip-regex@4.3.0:
     resolution: {integrity: sha512-B9ZWJxHHOHUhUjCPrMpLD4xEq35bUTClHM1S6CBU5ixQnkZmwipwgc96vAd7AAGM9TGHvJR+Uss+/Ak6UphK+Q==}
     engines: {node: '>=8'}
+
+  ip-regex@5.0.0:
+    resolution: {integrity: sha512-fOCG6lhoKKakwv+C6KdsOnGvgXnmgfmp0myi3bcNwj3qfwPAxRKWEuFhvEFF7ceYIz6+1jRZ+yguLFAmUNPEfw==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   ip@2.0.1:
     resolution: {integrity: sha512-lJUL9imLTNi1ZfXT+DU6rBBdbiKGBuay9B6xGSPVjUeQwaH1RIGqef8RZkUtHioLmSNpPR5M4HVKJGm1j8FWVQ==}
@@ -7764,6 +7781,10 @@ packages:
 
   jschardet@3.0.0:
     resolution: {integrity: sha512-lJH6tJ77V8Nzd5QWRkFYCLc13a3vADkh3r/Fi8HupZGWk2OVVDfnZP8V/VgQgZ+lzW0kG2UGb5hFgt3V3ndotQ==}
+    engines: {node: '>=0.1.90'}
+
+  jschardet@3.1.4:
+    resolution: {integrity: sha512-/kmVISmrwVwtyYU40iQUOp3SUPk2dhNCMsZBQX0R1/jZ8maaXJ/oZIzUOiyOqcgtLnETFKYChbJ5iDC/eWmFHg==}
     engines: {node: '>=0.1.90'}
 
   jsdoc-type-pratt-parser@4.1.0:
@@ -9283,6 +9304,10 @@ packages:
 
   private-ip@2.3.3:
     resolution: {integrity: sha512-5zyFfekIVUOTVbL92hc8LJOtE/gyGHeREHkJ2yTyByP8Q2YZVoBqLg3EfYLeF0oVvGqtaEX2t2Qovja0/gStXw==}
+
+  private-ip@3.0.2:
+    resolution: {integrity: sha512-2pkOVPGYD/4QyAg95c6E/4bLYXPthT5Xw4ocXYzIIsMBhskOMn6IwkWXmg6ZiA6K58+O6VD/n02r1hDhk7vDPw==}
+    engines: {node: '>=14.16'}
 
   probe-image-size@7.2.3:
     resolution: {integrity: sha512-HubhG4Rb2UH8YtV4ba0Vp5bQ7L78RTONYu/ujmCu5nBI8wGv24s4E9xSKBi0N1MowRpxk76pFCpJtW0KPzOK0w==}
@@ -12223,6 +12248,8 @@ snapshots:
 
   '@canvas/image-data@1.0.0': {}
 
+  '@chainsafe/is-ip@2.1.0': {}
+
   '@colors/colors@1.5.0':
     optional: true
 
@@ -13177,6 +13204,16 @@ snapshots:
       jschardet: 3.0.0
       private-ip: 2.3.3
       trace-redirect: 1.0.6
+
+  '@misskey-dev/summaly@5.2.0':
+    dependencies:
+      cheerio: 1.0.0
+      escape-regexp: 0.0.1
+      got: 14.4.6
+      html-entities: 2.5.2
+      iconv-lite: 0.6.3
+      jschardet: 3.1.4
+      private-ip: 3.0.2
 
   '@mole-inc/bin-wrapper@8.0.1':
     dependencies:
@@ -16495,7 +16532,7 @@ snapshots:
       css-what: 6.1.0
       domelementtype: 2.3.0
       domhandler: 5.0.3
-      domutils: 3.0.1
+      domutils: 3.1.0
 
   cheerio@1.0.0:
     dependencies:
@@ -16797,7 +16834,7 @@ snapshots:
       boolbase: 1.0.0
       css-what: 6.1.0
       domhandler: 5.0.3
-      domutils: 3.0.1
+      domutils: 3.1.0
       nth-check: 2.1.1
 
   css-tree@2.2.1:
@@ -18418,6 +18455,20 @@ snapshots:
       responselike: 3.0.0
       type-fest: 4.27.0
 
+  got@14.4.6:
+    dependencies:
+      '@sindresorhus/is': 7.0.1
+      '@szmarczak/http-timer': 5.0.1
+      cacheable-lookup: 7.0.0
+      cacheable-request: 12.0.1
+      decompress-response: 6.0.0
+      form-data-encoder: 4.0.2
+      http2-wrapper: 2.2.1
+      lowercase-keys: 3.0.0
+      p-cancelable: 4.0.1
+      responselike: 3.0.0
+      type-fest: 4.27.0
+
   graceful-fs@4.2.11: {}
 
   grapheme-splitter@1.0.4: {}
@@ -18526,6 +18577,8 @@ snapshots:
       whatwg-encoding: 3.1.1
 
   html-entities@2.3.2: {}
+
+  html-entities@2.5.2: {}
 
   html-escaper@2.0.2: {}
 
@@ -18716,6 +18769,8 @@ snapshots:
       ip-address: 9.0.5
 
   ip-regex@4.3.0: {}
+
+  ip-regex@5.0.0: {}
 
   ip@2.0.1: {}
 
@@ -19352,6 +19407,8 @@ snapshots:
   jsbn@1.1.0: {}
 
   jschardet@3.0.0: {}
+
+  jschardet@3.1.4: {}
 
   jsdoc-type-pratt-parser@4.1.0: {}
 
@@ -21095,6 +21152,13 @@ snapshots:
       ip-regex: 4.3.0
       ipaddr.js: 2.2.0
       is-ip: 3.1.0
+      netmask: 2.0.2
+
+  private-ip@3.0.2:
+    dependencies:
+      '@chainsafe/is-ip': 2.1.0
+      ip-regex: 5.0.0
+      ipaddr.js: 2.2.0
       netmask: 2.0.2
 
   probe-image-size@7.2.3:

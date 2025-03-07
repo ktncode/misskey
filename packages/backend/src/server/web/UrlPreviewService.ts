@@ -4,8 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import { summaly } from '@misskey-dev/summaly';
-import { SummalyResult } from '@misskey-dev/summaly/built/summary.js';
+import { skSummaly as summaly, type SkSummalyResult as SummalyResult } from './summaly.js';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
