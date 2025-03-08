@@ -128,7 +128,7 @@ async function onClick() {
 					wait.value = false;
 					return;
 				}
-				
+
 				await misskeyApi('following/requests/cancel', {
 					userId: props.user.id,
 				});
