@@ -119,6 +119,16 @@ async function onClick() {
 			}
 
 			if (hasPendingFollowRequestFromYou.value) {
+				const { canceled } = await os.confirm({
+					type: 'question',
+					text: i18n.ts.undoFollowRequestConfirm,
+				});
+
+				if (canceled) {
+					wait.value = false;
+					return;
+				}
+				
 				await misskeyApi('following/requests/cancel', {
 					userId: props.user.id,
 				});
