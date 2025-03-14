@@ -45,7 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 <div v-else-if="theNote" :class="[$style.link, { [$style.compact]: compact }]"><XNoteSimple :note="theNote" :class="$style.body"/></div>
 <div v-else-if="!hidePreview">
-	<component :is="self ? 'MkA' : 'a'" :class="[$style.link, { [$style.compact]: compact }]" :[attr]="self ? url.substring(local.length) : url" rel="nofollow noopener" :target="target" :title="url">
+	<component :is="self ? 'MkA' : 'a'" :class="[$style.link, { [$style.compact]: compact }]" :[attr]="self ? url.substring(local.length) : url" rel="nofollow noopener" :target="target" :title="url" @click.prevent="self ? true : warningExternalWebsite(url)" @click.stop>
 		<div v-if="thumbnail && !sensitive" :class="$style.thumbnail" :style="defaultStore.state.dataSaver.urlPreview ? '' : `background-image: url('${thumbnail}')`">
 		</div>
 		<article :class="$style.body">
@@ -98,6 +98,7 @@ import MkButton from '@/components/MkButton.vue';
 import { transformPlayerUrl } from '@/scripts/player-url-transform.js';
 import { defaultStore } from '@/store.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
+import { warningExternalWebsite } from '@/scripts/warning-external-website.js';
 
 const XNoteSimple = defineAsyncComponent<typeof MkNoteSimple | typeof SkNoteSimple>(() =>
 	defaultStore.state.noteDesign === 'misskey'
