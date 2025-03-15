@@ -510,6 +510,7 @@ id: "ID"
 
 mandatoryCW: "Force content warning"
 mandatoryCWDescription: "Applies a content warning to all posts created by this user. If the post already has a CW, then this is appended to the end."
+fetchLinkedNote: "Fetch linked note"
 
 _processErrors:
   quoteUnavailable: "Unable to process quote. This post may be missing context."

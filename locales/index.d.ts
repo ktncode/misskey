@@ -12221,6 +12221,10 @@ export interface Locale extends ILocale {
      * Applies a content warning to all posts created by this user. If the post already has a CW, then this is appended to the end.
      */
     "mandatoryCWDescription": string;
+    /**
+     * Fetch linked note
+     */
+    "fetchLinkedNote": string;
     "_processErrors": {
         /**
          * Unable to process quote. This post may be missing context.
