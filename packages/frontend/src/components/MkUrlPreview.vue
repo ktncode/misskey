@@ -162,31 +162,31 @@ onDeactivated(() => {
 });
 
 async function fetchNote() {
-		if (!props.showAsQuote) return;
-		if (!activityPub.value) return;
-		if (theNote.value) return;
-		if (fetchingTheNote.value) return;
+	if (!props.showAsQuote) return;
+	if (!activityPub.value) return;
+	if (theNote.value) return;
+	if (fetchingTheNote.value) return;
 
-		fetchingTheNote.value = true;
-		try {
-			const response = await misskeyApi('ap/show', { uri: activityPub.value });
-			if (response.type !== 'Note') return;
-			const theNoteId = response['object'].id;
-			if (theNoteId && props.skipNoteIds && props.skipNoteIds.includes(theNoteId)) {
-				hidePreview.value = true;
-				return;
-			}
-			theNote.value = response['object'];
-			fetchingTheNote.value = false;
-		} catch (err) {
-			if (_DEV_) {
-				console.error(`failed to extract note for preview of ${activityPub.value}`, err);
-			}
-			activityPub.value = null;
-			fetchingTheNote.value = false;
-			theNote.value = null;
+	fetchingTheNote.value = true;
+	try {
+		const response = await misskeyApi('ap/show', { uri: activityPub.value });
+		if (response.type !== 'Note') return;
+		const theNoteId = response['object'].id;
+		if (theNoteId && props.skipNoteIds && props.skipNoteIds.includes(theNoteId)) {
+			hidePreview.value = true;
+			return;
 		}
+		theNote.value = response['object'];
+		fetchingTheNote.value = false;
+	} catch (err) {
+		if (_DEV_) {
+			console.error(`failed to extract note for preview of ${activityPub.value}`, err);
+		}
+		activityPub.value = null;
+		fetchingTheNote.value = false;
+		theNote.value = null;
 	}
+}
 
 const requestUrl = new URL(props.url);
 if (!['http:', 'https:'].includes(requestUrl.protocol)) throw new Error('invalid url');
