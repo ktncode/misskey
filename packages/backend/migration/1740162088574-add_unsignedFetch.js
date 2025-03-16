@@ -12,8 +12,8 @@ export class AddUnsignedFetch1740162088574 {
 		await queryRunner.query(`CREATE TYPE "public"."user_allowunsignedfetch_enum" AS ENUM('never', 'always', 'essential', 'staff')`);
 		await queryRunner.query(`ALTER TABLE "user" ADD "allowUnsignedFetch" "public"."user_allowunsignedfetch_enum" NOT NULL DEFAULT 'staff'`);
 
-		// Special one-time migration: allow unauthorized fetch for instance actor
-		await queryRunner.query(`UPDATE "user" SET "allowUnsignedFetch" = 'always' WHERE "username" = 'instance.actor' AND "host" IS null`);
+		// Special one-time migration: allow unauthorized fetch for system accounts
+		await queryRunner.query(`UPDATE "user" SET "allowUnsignedFetch" = 'always' WHERE "username" LIKE '%.%' AND "host" IS null`);
 
 		// Special one-time migration: convert legacy config "" to meta setting ""
 		const config = await loadConfig();

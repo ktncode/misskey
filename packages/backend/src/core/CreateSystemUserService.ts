@@ -29,7 +29,7 @@ export class CreateSystemUserService {
 	}
 
 	@bindThis
-	public async createSystemUser(username: string, data?: Partial<MiUser>): Promise<MiUser> {
+	public async createSystemUser(username: string): Promise<MiUser> {
 		const password = randomUUID();
 
 		// Generate hash of password
@@ -63,7 +63,13 @@ export class CreateSystemUserService {
 				isExplorable: false,
 				approved: true,
 				isBot: true,
-				...(data ?? {}),
+				/* we always allow requests about our instance actor, because when
+				 a remote instance needs to check our signature on a request we
+				 sent, it will need to fetch information about the user that
+				 signed it (which is our instance actor), and if we try to check
+				 their signature on *that* request, we'll fetch *their* instance
+				 actor... leading to an infinite recursion */
+				allowUnsignedFetch: 'always',
 			}).then(x => transactionalEntityManager.findOneByOrFail(MiUser, x.identifiers[0]));
 
 			await transactionalEntityManager.insert(MiUserKeypair, {
