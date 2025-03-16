@@ -88,7 +88,7 @@ export class ExportMutingProcessorService {
 					await new Promise<void>((res, rej) => {
 						stream.write(content + '\n', err => {
 							if (err) {
-								this.logger.error(err);
+								this.logger.error('Error exporting mutings:', err);
 								rej(err);
 							} else {
 								res();

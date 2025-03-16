@@ -192,9 +192,7 @@ export class ImportNotesProcessorService {
 				await fsp.writeFile(destPath, '', 'binary');
 				await this.downloadUrl(file.url, destPath);
 			} catch (e) { // TODO: 何度か再試行
-				if (e instanceof Error || typeof e === 'string') {
-					this.logger.error(e);
-				}
+				this.logger.error('Error importing notes:', e as Error);
 				throw e;
 			}
 
@@ -222,9 +220,7 @@ export class ImportNotesProcessorService {
 				await fsp.writeFile(destPath, '', 'binary');
 				await this.downloadUrl(file.url, destPath);
 			} catch (e) { // TODO: 何度か再試行
-				if (e instanceof Error || typeof e === 'string') {
-					this.logger.error(e);
-				}
+				this.logger.error('Error importing notes:', e as Error);
 				throw e;
 			}
 
@@ -255,9 +251,7 @@ export class ImportNotesProcessorService {
 				await fsp.writeFile(destPath, '', 'binary');
 				await this.downloadUrl(file.url, destPath);
 			} catch (e) { // TODO: 何度か再試行
-				if (e instanceof Error || typeof e === 'string') {
-					this.logger.error(e);
-				}
+				this.logger.error('Error importing notes:', e as Error);
 				throw e;
 			}
 
@@ -313,9 +307,7 @@ export class ImportNotesProcessorService {
 				await fsp.writeFile(path, '', 'utf-8');
 				await this.downloadUrl(file.url, path);
 			} catch (e) { // TODO: 何度か再試行
-				if (e instanceof Error || typeof e === 'string') {
-					this.logger.error(e);
-				}
+				this.logger.error('Error importing notes:', e as Error);
 				throw e;
 			}
 
@@ -365,7 +357,7 @@ export class ImportNotesProcessorService {
 					try {
 						await this.downloadUrl(file.url, filePath);
 					} catch (e) { // TODO: 何度か再試行
-						this.logger.error(e instanceof Error ? e : new Error(e as string));
+						this.logger.error('Error importing notes:', e as Error);
 					}
 					const driveFile = await this.driveService.addFile({
 						user: user,
@@ -504,7 +496,7 @@ export class ImportNotesProcessorService {
 					try {
 						await this.downloadUrl(file.url, filePath);
 					} catch (e) { // TODO: 何度か再試行
-						this.logger.error(e instanceof Error ? e : new Error(e as string));
+						this.logger.error('Error importing notes:', e as Error);
 					}
 					const driveFile = await this.driveService.addFile({
 						user: user,
@@ -628,7 +620,7 @@ export class ImportNotesProcessorService {
 							try {
 								await this.downloadUrl(videos[0].url, filePath);
 							} catch (e) { // TODO: 何度か再試行
-								this.logger.error(e instanceof Error ? e : new Error(e as string));
+								this.logger.error('Error importing notes:', e as Error);
 							}
 							const driveFile = await this.driveService.addFile({
 								user: user,
@@ -653,7 +645,7 @@ export class ImportNotesProcessorService {
 							try {
 								await this.downloadUrl(file.media_url_https, filePath);
 							} catch (e) { // TODO: 何度か再試行
-								this.logger.error(e instanceof Error ? e : new Error(e as string));
+								this.logger.error('Error importing notes:', e as Error);
 							}
 
 							const driveFile = await this.driveService.addFile({
@@ -673,7 +665,7 @@ export class ImportNotesProcessorService {
 			const createdNote = await this.noteCreateService.import(user, { createdAt: date, reply: parentNote, text: text, files: files });
 			if (tweet.childNotes) this.queueService.createImportTweetsToDbJob(user, tweet.childNotes, createdNote.id);
 		} catch (e) {
-			this.logger.warn(`Error: ${e}`);
+			this.logger.error('Error importing notes:', e as Error);
 		}
 	}
 

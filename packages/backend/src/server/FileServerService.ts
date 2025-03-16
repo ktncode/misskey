@@ -32,6 +32,7 @@ import { getIpHash } from '@/misc/get-ip-hash.js';
 import { AuthenticateService } from '@/server/api/AuthenticateService.js';
 import { SkRateLimiterService } from '@/server/SkRateLimiterService.js';
 import { Keyed, RateLimit, sendRateLimitHeaders } from '@/misc/rate-limit-utils.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import type { FastifyInstance, FastifyRequest, FastifyReply, FastifyPluginOptions } from 'fastify';
 
 const _filename = fileURLToPath(import.meta.url);
@@ -120,7 +121,7 @@ export class FileServerService {
 
 	@bindThis
 	private async errorHandler(request: FastifyRequest<{ Params?: { [x: string]: any }; Querystring?: { [x: string]: any }; }>, reply: FastifyReply, err?: any) {
-		this.logger.error(`${err}`);
+		this.logger.error(`Unhandled error in file server: ${renderInlineError(err)}`);
 
 		reply.header('Cache-Control', 'max-age=300');
 

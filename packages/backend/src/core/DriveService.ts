@@ -46,6 +46,7 @@ import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { BunnyService } from '@/core/BunnyService.js';
 import { LoggerService } from './LoggerService.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 
 type AddFileArgs = {
 	/** User who wish to add file */
@@ -311,7 +312,7 @@ export class DriveService {
 					thumbnail,
 				};
 			} catch (err) {
-				this.registerLogger.warn(`GenerateVideoThumbnail failed: ${err}`);
+				this.registerLogger.warn(`GenerateVideoThumbnail failed: ${renderInlineError(err)}`);
 				return {
 					webpublic: null,
 					thumbnail: null,
@@ -344,7 +345,7 @@ export class DriveService {
 			metadata.height && metadata.height <= 2048
 			);
 		} catch (err) {
-			this.registerLogger.warn(`sharp failed: ${err}`);
+			this.registerLogger.warn(`sharp failed: ${renderInlineError(err)}`);
 			return {
 				webpublic: null,
 				thumbnail: null,
@@ -651,7 +652,7 @@ export class DriveService {
 						userId: user ? user.id : IsNull(),
 					}) as MiDriveFile;
 				} else {
-					this.registerLogger.error(err as Error);
+					this.registerLogger.error('Error in drive register', err as Error);
 					throw err;
 				}
 			}
@@ -895,7 +896,7 @@ export class DriveService {
 			this.downloaderLogger.succ(`Got: ${driveFile.id}`);
 			return driveFile!;
 		} catch (err) {
-			this.downloaderLogger.error(`Failed to create drive file: ${err}`, {
+			this.downloaderLogger.error(`Failed to create drive file: ${renderInlineError(err)}`, {
 				url: url,
 				e: err,
 			});

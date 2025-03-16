@@ -97,7 +97,7 @@ export class ImportBlockingProcessorService {
 
 			this.queueService.createBlockJob([{ from: { id: user.id }, to: { id: target.id }, silent: true }]);
 		} catch (e) {
-			this.logger.warn(`Error: ${e}`);
+			this.logger.error('Error importing blockings:', e as Error);
 		}
 	}
 }

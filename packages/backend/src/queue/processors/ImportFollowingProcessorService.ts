@@ -97,7 +97,7 @@ export class ImportFollowingProcessorService {
 
 			this.queueService.createFollowJob([{ from: user, to: { id: target.id }, silent: true, withReplies: job.data.withReplies }]);
 		} catch (e) {
-			this.logger.warn(`Error: ${e}`);
+			this.logger.error('Error importing followings:', e as Error);
 		}
 	}
 }

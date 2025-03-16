@@ -87,7 +87,7 @@ export class ExportBlockingProcessorService {
 					await new Promise<void>((res, rej) => {
 						stream.write(content + '\n', err => {
 							if (err) {
-								this.logger.error(err);
+								this.logger.error('Error exporting blocking:', err);
 								rej(err);
 							} else {
 								res();

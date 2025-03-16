@@ -14,6 +14,7 @@ import { DownloadService } from '@/core/DownloadService.js';
 import { UserMutingService } from '@/core/UserMutingService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 import type { DbUserImportJobData } from '../types.js';
@@ -92,7 +93,7 @@ export class ImportMutingProcessorService {
 
 				await this.userMutingService.mute(user, target);
 			} catch (e) {
-				this.logger.warn(`Error in line:${linenum} ${e}`);
+				this.logger.warn(`Error in line:${linenum} ${renderInlineError(e)}`);
 			}
 		}
 

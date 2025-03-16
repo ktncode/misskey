@@ -22,6 +22,7 @@ import { Packed } from '@/misc/json-schema.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { DownloadService } from '@/core/DownloadService.js';
 import { EmailService } from '@/core/EmailService.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 
@@ -113,7 +114,7 @@ export class ExportAccountDataProcessorService {
 			return new Promise<void>((res, rej) => {
 				userStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error writing user:', err);
 						rej(err);
 					} else {
 						res();
@@ -145,7 +146,7 @@ export class ExportAccountDataProcessorService {
 			return new Promise<void>((res, rej) => {
 				profileStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error writing profile:', err);
 						rej(err);
 					} else {
 						res();
@@ -179,7 +180,7 @@ export class ExportAccountDataProcessorService {
 			return new Promise<void>((res, rej) => {
 				ipStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error writing IPs:', err);
 						rej(err);
 					} else {
 						res();
@@ -214,7 +215,7 @@ export class ExportAccountDataProcessorService {
 			return new Promise<void>((res, rej) => {
 				notesStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error writing notes:', err);
 						rej(err);
 					} else {
 						res();
@@ -275,7 +276,7 @@ export class ExportAccountDataProcessorService {
 			return new Promise<void>((res, rej) => {
 				followingStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error writing following:', err);
 						rej(err);
 					} else {
 						res();
@@ -345,7 +346,7 @@ export class ExportAccountDataProcessorService {
 			return new Promise<void>((res, rej) => {
 				followerStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error writing followers:', err);
 						rej(err);
 					} else {
 						res();
@@ -406,7 +407,7 @@ export class ExportAccountDataProcessorService {
 			return new Promise<void>((res, rej) => {
 				filesStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error writing drive:', err);
 						rej(err);
 					} else {
 						res();
@@ -432,7 +433,7 @@ export class ExportAccountDataProcessorService {
 				await this.downloadService.downloadUrl(file.url, filePath);
 				downloaded = true;
 			} catch (e) {
-				this.logger.error(e instanceof Error ? e : new Error(e as string));
+				this.logger.error(`Error writing drive file ${file.id} (${file.name}): ${renderInlineError(e)}`);
 			}
 
 			if (!downloaded) {
@@ -464,7 +465,7 @@ export class ExportAccountDataProcessorService {
 			return new Promise<void>((res, rej) => {
 				mutingStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error writing mutings:', err);
 						rej(err);
 					} else {
 						res();
@@ -527,7 +528,7 @@ export class ExportAccountDataProcessorService {
 			return new Promise<void>((res, rej) => {
 				blockingStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error writing blockings:', err);
 						rej(err);
 					} else {
 						res();
@@ -589,7 +590,7 @@ export class ExportAccountDataProcessorService {
 			return new Promise<void>((res, rej) => {
 				favoriteStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error writing favorites:', err);
 						rej(err);
 					} else {
 						res();
@@ -650,7 +651,7 @@ export class ExportAccountDataProcessorService {
 			return new Promise<void>((res, rej) => {
 				antennaStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error writing antennas:', err);
 						rej(err);
 					} else {
 						res();
@@ -708,7 +709,7 @@ export class ExportAccountDataProcessorService {
 			return new Promise<void>((res, rej) => {
 				listStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error writing lists:', err);
 						rej(err);
 					} else {
 						res();

@@ -15,6 +15,7 @@ import { UserListService } from '@/core/UserListService.js';
 import { IdService } from '@/core/IdService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 import type { DbUserImportJobData } from '../types.js';
@@ -102,7 +103,7 @@ export class ImportUserListsProcessorService {
 
 				this.userListService.addMember(target, list!, user);
 			} catch (e) {
-				this.logger.warn(`Error in line:${linenum} ${e}`);
+				this.logger.warn(`Error in line:${linenum} ${renderInlineError(e)}`);
 			}
 		}
 

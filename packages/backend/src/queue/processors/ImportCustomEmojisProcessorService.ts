@@ -16,6 +16,7 @@ import { DriveService } from '@/core/DriveService.js';
 import { DownloadService } from '@/core/DownloadService.js';
 import { bindThis } from '@/decorators.js';
 import type { Config } from '@/config.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 import type { DbUserImportJobData } from '../types.js';
@@ -65,7 +66,7 @@ export class ImportCustomEmojisProcessorService {
 			await this.downloadService.downloadUrl(file.url, destPath, { operationTimeout: this.config.import?.downloadTimeout, maxSize: this.config.import?.maxFileSize });
 		} catch (e) { // TODO: 何度か再試行
 			if (e instanceof Error || typeof e === 'string') {
-				this.logger.error(e);
+				this.logger.error('Error importing custom emojis:', e as Error);
 			}
 			throw e;
 		}
@@ -117,7 +118,7 @@ export class ImportCustomEmojisProcessorService {
 					});
 				} catch (e) {
 					if (e instanceof Error || typeof e === 'string') {
-						this.logger.error(`couldn't import ${emojiPath} for ${emojiInfo.name}: ${e}`);
+						this.logger.error(`couldn't import ${emojiPath} for ${emojiInfo.name}: ${renderInlineError(e)}`);
 					}
 					continue;
 				}
@@ -127,9 +128,7 @@ export class ImportCustomEmojisProcessorService {
 
 			this.logger.succ('Imported');
 		} catch (e) {
-			if (e instanceof Error || typeof e === 'string') {
-				this.logger.error(e);
-			}
+			this.logger.error('Error importing custom emojis:', e as Error);
 			cleanup();
 			throw e;
 		}

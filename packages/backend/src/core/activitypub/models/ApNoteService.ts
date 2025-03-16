@@ -26,6 +26,7 @@ import { bindThis } from '@/decorators.js';
 import { checkHttps } from '@/misc/check-https.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { isRetryableError } from '@/misc/is-retryable-error.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import { getOneApId, getApId, validPost, isEmoji, getApType, isApObject, isDocument, IApDocument } from '../type.js';
 import { ApLoggerService } from '../ApLoggerService.js';
 import { ApMfmService } from '../ApMfmService.js';
@@ -161,7 +162,7 @@ export class ApNoteService {
 		const entryUri = getApId(value);
 		const err = this.validateNote(object, entryUri, actor);
 		if (err) {
-			this.logger.error(err.message, {
+			this.logger.error(`Error creating note: ${renderInlineError(err)}`, {
 				resolver: { history: resolver.getHistory() },
 				value,
 				object,
@@ -269,14 +270,14 @@ export class ApNoteService {
 			? await this.resolveNote(note.inReplyTo, { resolver })
 				.then(x => {
 					if (x == null) {
-						this.logger.warn('Specified inReplyTo, but not found');
+						this.logger.warn(`Specified inReplyTo "${note.inReplyTo}", but not found`);
 						throw new Error(`could not fetch inReplyTo ${note.inReplyTo} for note ${entryUri}`);
 					}
 
 					return x;
 				})
 				.catch(async err => {
-					this.logger.warn(`error ${err.statusCode ?? err} fetching inReplyTo ${note.inReplyTo} for note ${entryUri}`);
+					this.logger.warn(`error ${renderInlineError(err)} fetching inReplyTo ${note.inReplyTo} for note ${entryUri}`);
 					throw err;
 				})
 			: null;
@@ -379,7 +380,7 @@ export class ApNoteService {
 		const entryUri = getApId(value);
 		const err = this.validateNote(object, entryUri, actor, user);
 		if (err) {
-			this.logger.error(err.message, {
+			this.logger.error(`Error updating note: ${renderInlineError(err)}`, {
 				resolver: { history: resolver.getHistory() },
 				value,
 				object,
@@ -473,14 +474,14 @@ export class ApNoteService {
 			? await this.resolveNote(note.inReplyTo, { resolver })
 				.then(x => {
 					if (x == null) {
-						this.logger.warn('Specified inReplyTo, but not found');
+						this.logger.warn(`Specified inReplyTo "${note.inReplyTo}", but not found`);
 						throw new Error(`could not fetch inReplyTo ${note.inReplyTo} for note ${entryUri}`);
 					}
 
 					return x;
 				})
 				.catch(async err => {
-					this.logger.warn(`error ${err.statusCode ?? err} fetching inReplyTo ${note.inReplyTo} for note ${entryUri}`);
+					this.logger.warn(`error ${renderInlineError(err)} fetching inReplyTo ${note.inReplyTo} for note ${entryUri}`);
 					throw err;
 				})
 			: null;
@@ -685,18 +686,13 @@ export class ApNoteService {
 				const quote = await this.resolveNote(uri, { resolver });
 
 				if (quote == null) {
-					this.logger.warn(`Failed to resolve quote "${uri}" for note "${entryUri}": request error`);
+					this.logger.warn(`Failed to resolve quote "${uri}" for note "${entryUri}": fetch failed`);
 					return false;
 				}
 
 				return quote;
 			} catch (e) {
-				if (e instanceof Error) {
-					this.logger.warn(`Failed to resolve quote "${uri}" for note "${entryUri}":`, e);
-				} else {
-					this.logger.warn(`Failed to resolve quote "${uri}" for note "${entryUri}": ${e}`);
-				}
-
+				this.logger.warn(`Failed to resolve quote "${uri}" for note "${entryUri}": ${renderInlineError(e)}`);
 				return isRetryableError(e);
 			}
 		};

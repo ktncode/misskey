@@ -32,6 +32,7 @@ import { AbuseReportService } from '@/core/AbuseReportService.js';
 import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
 import { fromTuple } from '@/misc/from-tuple.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import InstanceChart from '@/core/chart/charts/instance.js';
 import FederationChart from '@/core/chart/charts/federation.js';
 import { FetchInstanceMetadataService } from '@/core/FetchInstanceMetadataService.js';
@@ -127,7 +128,7 @@ export class ApInboxService {
 					results.push([id, result]);
 				} catch (err) {
 					if (err instanceof Error || typeof err === 'string') {
-						this.logger.error(err);
+						this.logger.error(`Unhandled error in activity ${getNullableApId(item || 'undefined')}:`, err);
 					} else {
 						throw err;
 					}
@@ -253,7 +254,7 @@ export class ApInboxService {
 		resolver ??= this.apResolverService.createResolver();
 
 		const object = await resolver.resolve(activity.object).catch(err => {
-			this.logger.error(`Resolution failed: ${err}`);
+			this.logger.error(`Resolution failed: ${renderInlineError(err)}`);
 			throw err;
 		});
 
@@ -326,7 +327,7 @@ export class ApInboxService {
 		if (targetUri.startsWith('bear:')) return 'skip: bearcaps url not supported.';
 
 		const target = await resolver.secureResolve(activityObject, uri).catch(e => {
-			this.logger.error(`Resolution failed: ${e}`);
+			this.logger.error(`Resolution failed: ${renderInlineError(e)}`);
 			throw e;
 		});
 
@@ -499,7 +500,7 @@ export class ApInboxService {
 		resolver ??= this.apResolverService.createResolver();
 
 		const object = await resolver.resolve(activityObject).catch(e => {
-			this.logger.error(`Resolution failed: ${e}`);
+			this.logger.error(`Resolution failed: ${renderInlineError(e)}`);
 			throw e;
 		});
 
@@ -668,7 +669,7 @@ export class ApInboxService {
 		resolver ??= this.apResolverService.createResolver();
 
 		const object = await resolver.resolve(activity.object).catch(e => {
-			this.logger.error(`Resolution failed: ${e}`);
+			this.logger.error(`Resolution failed: ${renderInlineError(e)}`);
 			throw e;
 		});
 
@@ -740,7 +741,7 @@ export class ApInboxService {
 		resolver ??= this.apResolverService.createResolver();
 
 		const object = await resolver.resolve(activity.object).catch(e => {
-			this.logger.error(`Resolution failed: ${e}`);
+			this.logger.error(`Resolution failed: ${renderInlineError(e)}`);
 			throw e;
 		});
 
@@ -872,7 +873,7 @@ export class ApInboxService {
 		resolver ??= this.apResolverService.createResolver();
 
 		const object = await resolver.resolve(activity.object).catch(e => {
-			this.logger.error(`Resolution failed: ${e}`);
+			this.logger.error(`Resolution failed: ${renderInlineError(e)}`);
 			throw e;
 		});
 

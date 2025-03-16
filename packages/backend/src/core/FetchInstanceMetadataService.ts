@@ -15,6 +15,7 @@ import { LoggerService } from '@/core/LoggerService.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import { bindThis } from '@/decorators.js';
 import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import type { CheerioAPI } from 'cheerio';
 
 type NodeInfo = {
@@ -130,7 +131,7 @@ export class FetchInstanceMetadataService {
 
 			this.logger.succ(`Successfuly updated metadata of ${instance.host}`);
 		} catch (e) {
-			this.logger.error(`Failed to update metadata of ${instance.host}: ${e}`);
+			this.logger.error(`Failed to update metadata of ${instance.host}: ${renderInlineError(e)}`);
 		} finally {
 			await this.unlock(host);
 		}

@@ -20,6 +20,7 @@ import { RoleService } from '@/core/RoleService.js';
 import type { Config } from '@/config.js';
 import { sendRateLimitHeaders } from '@/misc/rate-limit-utils.js';
 import { SkRateLimiterService } from '@/server/SkRateLimiterService.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import { ApiError } from './error.js';
 import { ApiLoggerService } from './ApiLoggerService.js';
 import { AuthenticateService, AuthenticationError } from './AuthenticateService.js';
@@ -100,7 +101,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			throw err;
 		} else {
 			const errId = randomUUID();
-			this.logger.error(`Internal error occurred in ${ep.name}: ${err.message}`, {
+			this.logger.error(`Internal error occurred in ${ep.name}: ${renderInlineError(err)}`, {
 				ep: ep.name,
 				ps: data,
 				e: {
@@ -112,7 +113,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			});
 
 			if (this.config.sentryForBackend) {
-				Sentry.captureMessage(`Internal error occurred in ${ep.name}: ${err.message}`, {
+				Sentry.captureMessage(`Internal error occurred in ${ep.name}: ${renderInlineError(err)}`, {
 					level: 'error',
 					user: {
 						id: userId,

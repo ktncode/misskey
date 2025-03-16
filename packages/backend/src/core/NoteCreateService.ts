@@ -549,8 +549,6 @@ export class NoteCreateService implements OnApplicationShutdown {
 				throw err;
 			}
 
-			console.error(e);
-
 			throw e;
 		}
 	}

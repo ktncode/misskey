@@ -98,7 +98,7 @@ export class ExportFollowingProcessorService {
 					await new Promise<void>((res, rej) => {
 						stream.write(content + '\n', err => {
 							if (err) {
-								this.logger.error(err);
+								this.logger.error('Error exporting following:', err);
 								rej(err);
 							} else {
 								res();

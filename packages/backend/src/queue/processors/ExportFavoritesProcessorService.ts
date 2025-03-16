@@ -64,7 +64,7 @@ export class ExportFavoritesProcessorService {
 				return new Promise<void>((res, rej) => {
 					stream.write(text, err => {
 						if (err) {
-							this.logger.error(err);
+							this.logger.error('Error exporting favorites:', err);
 							rej(err);
 						} else {
 							res();

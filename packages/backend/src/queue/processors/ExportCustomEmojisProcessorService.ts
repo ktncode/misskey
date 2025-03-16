@@ -66,7 +66,7 @@ export class ExportCustomEmojisProcessorService {
 			return new Promise<void>((res, rej) => {
 				metaStream.write(text, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error exporting custom emojis:', err);
 						rej(err);
 					} else {
 						res();
@@ -101,7 +101,7 @@ export class ExportCustomEmojisProcessorService {
 				await this.downloadService.downloadUrl(emoji.originalUrl, emojiPath);
 				downloaded = true;
 			} catch (e) { // TODO: 何度か再試行
-				this.logger.error(e instanceof Error ? e : new Error(e as string));
+				this.logger.error('Error exporting custom emojis:', e as Error);
 			}
 
 			if (!downloaded) {

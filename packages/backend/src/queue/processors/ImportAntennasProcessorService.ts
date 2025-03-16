@@ -73,7 +73,7 @@ export class ImportAntennasProcessorService {
 			for (const antenna of job.data.antenna) {
 				if (antenna.keywords.length === 0 || antenna.keywords[0].every(x => x === '')) continue;
 				if (!validate(antenna)) {
-					this.logger.warn('Validation Failed');
+					this.logger.warn('Antenna validation failed');
 					continue;
 				}
 				const result = await this.antennasRepository.insertOne({
@@ -96,7 +96,7 @@ export class ImportAntennasProcessorService {
 				this.globalEventService.publishInternalEvent('antennaCreated', result);
 			}
 		} catch (err: any) {
-			this.logger.error(err);
+			this.logger.error('Error importing antennas:', err);
 		}
 	}
 }

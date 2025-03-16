@@ -172,7 +172,7 @@ function loadConfigBoot(): Config {
 		config = loadConfig();
 	} catch (exception) {
 		if (typeof exception === 'string') {
-			configLogger.error(exception);
+			configLogger.error('Exception loading config:', exception);
 			process.exit(1);
 		} else if ((exception as any).code === 'ENOENT') {
 			configLogger.error('Configuration file not found', null, true);

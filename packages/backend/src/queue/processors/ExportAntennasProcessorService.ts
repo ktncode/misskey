@@ -53,7 +53,7 @@ export class ExportAntennasProcessorService {
 			return new Promise((resolve, reject) => {
 				stream.write(input, err => {
 					if (err) {
-						this.logger.error(err);
+						this.logger.error('Error exporting antennas:', err);
 						reject();
 					} else {
 						resolve();
