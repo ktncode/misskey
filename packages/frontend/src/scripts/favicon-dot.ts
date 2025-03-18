@@ -90,7 +90,7 @@ class FavIconDot {
 		if (this.faviconEL) {
 			try {
 				URL.revokeObjectURL(this.faviconEL.href);
-			} catch (error) {
+			} catch {
 				// the href was probably not an object URL
 			}
 			this.canvas.toBlob((blob) => {
@@ -133,7 +133,7 @@ export async function setFavIconDot(visible: boolean) {
 		try {
 			(icon as FavIconDot).setVisible(visible);
 		} catch (error) {
-			//Probably failed due to CORS and a dirty canvas
+			console.error('error setting notification dot', error);
 		}
 	};
 
