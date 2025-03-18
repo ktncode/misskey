@@ -78,7 +78,7 @@ export class StreamingApiServerService {
 	public attach(server: http.Server): void {
 		this.#wss = new WebSocket.WebSocketServer({
 			noServer: true,
-			perMessageDeflate: this.config.websocketCompression ?? false,
+			perMessageDeflate: this.config.websocketCompression,
 		});
 
 		server.on('upgrade', async (request, socket, head) => {
