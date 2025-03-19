@@ -32,7 +32,6 @@ import { IdService } from '@/core/IdService.js';
 import { MockResolver } from '../misc/mock-resolver.js';
 import { UserKeypairService } from '@/core/UserKeypairService.js';
 import { MemoryKVCache, RedisKVCache } from '@/misc/cache.js';
-import { IdService } from '@/core/IdService.js';
 
 const host = 'https://host1.test';
 
