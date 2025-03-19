@@ -419,3 +419,9 @@ attachLdSignatureForRelays: true
   # How long to save each log entry before deleting it.
   # Default: 2592000000 (1 week)
   #maxAge: 2592000000
+
+# Transparently compress every websocket message on clients that support it.
+# Trades server CPU usage for reduced bandwidth usage and a faster frontend on the client.
+# If you're not using jemalloc, this may cause memory fragmentation and performance issues! (https://www.npmjs.com/package/ws#websocket-compression)
+# jemalloc is used by default in the Sharkey Docker image and may be set up manually otherwise: https://github.com/jemalloc/jemalloc/wiki/getting-started
+websocketCompression: false

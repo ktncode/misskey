@@ -136,6 +136,8 @@ type Source = {
 		preSave?: boolean;
 		maxAge?: number;
 	};
+
+	websocketCompression?: boolean;
 };
 
 export type Config = {
@@ -253,6 +255,8 @@ export type Config = {
 		preSave: boolean;
 		maxAge: number;
 	};
+
+	websocketCompression?: boolean;
 };
 
 export type FulltextSearchProvider = 'sqlLike' | 'sqlPgroonga' | 'meilisearch' | 'sqlTsvector';
@@ -401,6 +405,7 @@ export function loadConfig(): Config {
 			preSave: config.activityLogging?.preSave ?? false,
 			maxAge: config.activityLogging?.maxAge ?? (1000 * 60 * 60 * 24 * 30),
 		},
+		websocketCompression: config.websocketCompression ?? false,
 	};
 }
 
@@ -535,7 +540,7 @@ function applyEnvOverrides(config: Source) {
 
 	// these are all the settings that can be overridden
 
-	_apply_top([['url', 'port', 'address', 'socket', 'chmodSocket', 'disableHsts', 'id', 'dbReplications']]);
+	_apply_top([['url', 'port', 'address', 'socket', 'chmodSocket', 'disableHsts', 'id', 'dbReplications', 'websocketCompression']]);
 	_apply_top(['db', ['host', 'port', 'db', 'user', 'pass', 'disableCache']]);
 	_apply_top(['dbSlaves', Array.from((config.dbSlaves ?? []).keys()), ['host', 'port', 'db', 'user', 'pass']]);
 	_apply_top([
