@@ -26,7 +26,7 @@ export interface IObject {
 	attributedTo?: ApObject;
 	attachment?: any[];
 	inReplyTo?: any;
-	replies?: ICollection;
+	replies?: ICollection | IOrderedCollection | string;
 	content?: string | null;
 	startTime?: Date;
 	endTime?: Date;
@@ -125,6 +125,8 @@ export interface ICollection extends IObject {
 	type: 'Collection';
 	totalItems: number;
 	first?: IObject | string;
+	last?: IObject | string;
+	current?: IObject | string;
 	items?: ApObject;
 }
 
@@ -132,6 +134,32 @@ export interface IOrderedCollection extends IObject {
 	type: 'OrderedCollection';
 	totalItems: number;
 	first?: IObject | string;
+	last?: IObject | string;
+	current?: IObject | string;
+	orderedItems?: ApObject;
+}
+
+export interface ICollectionPage extends IObject {
+	type: 'CollectionPage';
+	totalItems: number;
+	first?: IObject | string;
+	last?: IObject | string;
+	current?: IObject | string;
+	partOf?: IObject | string;
+	next?: IObject | string;
+	prev?: IObject | string;
+	items?: ApObject;
+}
+
+export interface IOrderedCollectionPage extends IObject {
+	type: 'OrderedCollectionPage';
+	totalItems: number;
+	first?: IObject | string;
+	last?: IObject | string;
+	current?: IObject | string;
+	partOf?: IObject | string;
+	next?: IObject | string;
+	prev?: IObject | string;
 	orderedItems?: ApObject;
 }
 
@@ -231,8 +259,14 @@ export const isCollection = (object: IObject): object is ICollection =>
 export const isOrderedCollection = (object: IObject): object is IOrderedCollection =>
 	getApType(object) === 'OrderedCollection';
 
+export const isCollectionPage = (object: IObject): object is ICollectionPage =>
+	getApType(object) === 'CollectionPage';
+
+export const isOrderedCollectionPage = (object: IObject): object is IOrderedCollectionPage =>
+	getApType(object) === 'OrderedCollectionPage';
+
 export const isCollectionOrOrderedCollection = (object: IObject): object is ICollection | IOrderedCollection =>
-	isCollection(object) || isOrderedCollection(object);
+	isCollection(object) || isOrderedCollection(object) || isCollectionPage(object) || isOrderedCollectionPage(object);
 
 export interface IApPropertyValue extends IObject {
 	type: 'PropertyValue';
