@@ -68,7 +68,6 @@ export class MastoConverters {
 
 	private encode(u: MiUser, m: IMentionedRemoteUsers): MastodonEntity.Mention {
 		let acct = u.username;
-		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 		let acctUrl = `https://${u.host || this.config.host}/@${u.username}`;
 		let url: string | null = null;
 		if (u.host) {
@@ -161,7 +160,6 @@ export class MastoConverters {
 		});
 		const fqn = `${user.username}@${user.host ?? this.config.hostname}`;
 		let acct = user.username;
-		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 		let acctUrl = `https://${user.host || this.config.host}/@${user.username}`;
 		const acctUri = `https://${this.config.host}/users/${user.id}`;
 		if (user.host) {
@@ -265,7 +263,6 @@ export class MastoConverters {
 		});
 
 		// This must mirror the usual isQuote / isPureRenote logic used elsewhere.
-		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 		const isQuote = note.renoteId && (note.text || note.cw || note.fileIds.length > 0 || note.hasPoll || note.replyId);
 
 		const renote: Promise<MiNote> | null = note.renoteId ? this.mastodonDataService.requireNote(note.renoteId, me) : null;

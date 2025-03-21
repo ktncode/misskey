@@ -7,6 +7,15 @@ import { Module } from '@nestjs/common';
 import { EndpointsModule } from '@/server/api/EndpointsModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import { SkRateLimiterService } from '@/server/SkRateLimiterService.js';
+import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
+import { ApiNotificationsMastodon } from '@/server/api/mastodon/endpoints/notifications.js';
+import { ApiAccountMastodon } from '@/server/api/mastodon/endpoints/account.js';
+import { ApiFilterMastodon } from '@/server/api/mastodon/endpoints/filter.js';
+import { ApiSearchMastodon } from '@/server/api/mastodon/endpoints/search.js';
+import { ApiTimelineMastodon } from '@/server/api/mastodon/endpoints/timeline.js';
+import { ApiAppsMastodon } from '@/server/api/mastodon/endpoints/apps.js';
+import { ApiInstanceMastodon } from '@/server/api/mastodon/endpoints/instance.js';
+import { ApiStatusMastodon } from '@/server/api/mastodon/endpoints/status.js';
 import { ApiCallService } from './api/ApiCallService.js';
 import { FileServerService } from './FileServerService.js';
 import { HealthServerService } from './HealthServerService.js';
@@ -107,6 +116,15 @@ import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.j
 		MastoConverters,
 		MastodonLogger,
 		MastodonDataService,
+		MastodonClientService,
+		ApiAccountMastodon,
+		ApiAppsMastodon,
+		ApiFilterMastodon,
+		ApiInstanceMastodon,
+		ApiNotificationsMastodon,
+		ApiSearchMastodon,
+		ApiStatusMastodon,
+		ApiTimelineMastodon,
 	],
 	exports: [
 		ServerService,
