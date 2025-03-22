@@ -286,6 +286,7 @@ namespace MisskeyAPI {
         plain_content: n.text ? n.text : null,
         created_at: n.createdAt,
         edited_at: n.updatedAt || null,
+				// TODO this is probably wrong
         emojis: mapEmojis(n.emojis).concat(mapReactionEmojis(n.reactionEmojis)),
         replies_count: n.repliesCount,
         reblogs_count: n.renoteCount,
@@ -304,7 +305,7 @@ namespace MisskeyAPI {
         application: null,
         language: null,
         pinned: null,
-        emoji_reactions: typeof n.reactions === 'object' ? mapReactions(n.reactions, n.myReaction) : [],
+        emoji_reactions: typeof n.reactions === 'object' ? mapReactions(n.reactions, n.reactionEmojis, n.myReaction) : [],
         bookmarked: false,
         quote: n.renote && n.text ? note(n.renote, n.user.host ? n.user.host : host ? host : null) : null
       }
@@ -334,23 +335,20 @@ namespace MisskeyAPI {
 				) : 0;
 		};
 
-    export const mapReactions = (r: { [key: string]: number }, myReaction?: string): Array<MegalodonEntity.Reaction> => {
+    export const mapReactions = (r: { [key: string]: number }, e: Record<string, string | undefined>, myReaction?: string): Array<MegalodonEntity.Reaction> => {
       return Object.keys(r).map(key => {
-        if (myReaction && key === myReaction) {
-          return {
-            count: r[key],
-            me: true,
-            name: key
-          }
-        }
-        return {
-          count: r[key],
-          me: false,
-          name: key
-        }
+				const me = myReaction != null && key === myReaction;
+				return {
+					count: r[key],
+					me,
+					name: key,
+					url: e[key],
+					static_url: e[key],
+				}
       })
     }
 
+		// TODO implement other properties
     const mapReactionEmojis = (r: { [key: string]: string }): Array<MegalodonEntity.Emoji> => {
       return Object.keys(r).map(key => ({
         shortcode: key,
@@ -371,7 +369,7 @@ namespace MisskeyAPI {
           result.push({
             count: 1,
             me: false,
-            name: e.type
+            name: e.type,
           })
         }
       })

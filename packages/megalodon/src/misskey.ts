@@ -2555,6 +2555,7 @@ export default class Misskey implements MegalodonInterface {
       }))
   }
 
+	// TODO implement
   public async getEmojiReaction(_id: string, _emoji: string): Promise<Response<Entity.Reaction>> {
     return new Promise((_, reject) => {
       const err = new NoImplementedError('misskey does not support')

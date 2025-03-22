@@ -29,13 +29,17 @@ export class ApiNotificationsMastodon {
 		fastify.get<ApiNotifyMastodonRoute>('/v1/notifications', async (request, reply) => {
 			const { client, me } = await this.clientService.getAuthClient(request);
 			const data = await client.getNotifications(parseTimelineArgs(request.query));
-			const response = await Promise.all(data.data.map(async n => {
-				const converted = await this.mastoConverters.convertNotification(n, me);
-				if (converted.type === 'reaction') {
-					converted.type = 'favourite';
+			const notifications = await Promise.all(data.data.map(n => this.mastoConverters.convertNotification(n, me)));
+			const response: MastodonEntity.Notification[] = [];
+			for (const notification of notifications) {
+				response.push(notification);
+				if (notification.type === 'reaction') {
+					response.push({
+						...notification,
+						type: 'favourite',
+					});
 				}
-				return converted;
-			}));
+			}
 
 			attachMinMaxPagination(request, reply, response);
 			reply.send(response);
@@ -46,12 +50,9 @@ export class ApiNotificationsMastodon {
 
 			const { client, me } = await this.clientService.getAuthClient(_request);
 			const data = await client.getNotification(_request.params.id);
-			const converted = await this.mastoConverters.convertNotification(data.data, me);
-			if (converted.type === 'reaction') {
-				converted.type = 'favourite';
-			}
+			const response = await this.mastoConverters.convertNotification(data.data, me);
 
-			reply.send(converted);
+			reply.send(response);
 		});
 
 		fastify.post<ApiNotifyMastodonRoute & { Params: { id?: string } }>('/v1/notification/:id/dismiss', { preHandler: upload.single('none') }, async (_request, reply) => {

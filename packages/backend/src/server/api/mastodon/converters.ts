@@ -180,10 +180,10 @@ export class MastoConverters {
 			note: profile?.description ?? '',
 			url: user.uri ?? acctUrl,
 			uri: user.uri ?? acctUri,
-			avatar: user.avatarUrl ? user.avatarUrl : 'https://dev.joinsharkey.org/static-assets/avatar.png',
-			avatar_static: user.avatarUrl ? user.avatarUrl : 'https://dev.joinsharkey.org/static-assets/avatar.png',
-			header: user.bannerUrl ? user.bannerUrl : 'https://dev.joinsharkey.org/static-assets/transparent.png',
-			header_static: user.bannerUrl ? user.bannerUrl : 'https://dev.joinsharkey.org/static-assets/transparent.png',
+			avatar: user.avatarUrl ?? 'https://dev.joinsharkey.org/static-assets/avatar.png',
+			avatar_static: user.avatarUrl ?? 'https://dev.joinsharkey.org/static-assets/avatar.png',
+			header: user.bannerUrl ?? 'https://dev.joinsharkey.org/static-assets/transparent.png',
+			header_static: user.bannerUrl ?? 'https://dev.joinsharkey.org/static-assets/transparent.png',
 			emojis: emoji,
 			moved: null, //FIXME
 			fields: profile?.fields.map(p => this.encodeField(p)) ?? [],
@@ -196,7 +196,7 @@ export class MastoConverters {
 		});
 	}
 
-	public async getEdits(id: string, me?: MiLocalUser | null): Promise<StatusEdit[]> {
+	public async getEdits(id: string, me: MiLocalUser | null): Promise<StatusEdit[]> {
 		const note = await this.mastodonDataService.getNote(id, me);
 		if (!note) {
 			return [];
@@ -213,7 +213,7 @@ export class MastoConverters {
 				account: noteUser,
 				content: this.mfmService.toMastoApiHtml(mfm.parse(edit.newText ?? ''), JSON.parse(note.mentionedRemoteUsers)) ?? '',
 				created_at: lastDate.toISOString(),
-				emojis: [],
+				emojis: [], //FIXME
 				sensitive: edit.cw != null && edit.cw.length > 0,
 				spoiler_text: edit.cw ?? '',
 				media_attachments: files.length > 0 ? files.map((f) => this.encodeFile(f)) : [],
@@ -222,15 +222,15 @@ export class MastoConverters {
 			history.push(item);
 		}
 
-		return await Promise.all(history);
+		return history;
 	}
 
-	private async convertReblog(status: Entity.Status | null, me?: MiLocalUser | null): Promise<MastodonEntity.Status | null> {
+	private async convertReblog(status: Entity.Status | null, me: MiLocalUser | null): Promise<MastodonEntity.Status | null> {
 		if (!status) return null;
 		return await this.convertStatus(status, me);
 	}
 
-	public async convertStatus(status: Entity.Status, me?: MiLocalUser | null): Promise<MastodonEntity.Status> {
+	public async convertStatus(status: Entity.Status, me: MiLocalUser | null): Promise<MastodonEntity.Status> {
 		const convertedAccount = this.convertAccount(status.account);
 		const note = await this.mastodonDataService.requireNote(status.id, me);
 		const noteUser = await this.getUser(status.account.id);
@@ -279,7 +279,6 @@ export class MastoConverters {
 			: '';
 
 		const reblogged = await this.mastodonDataService.hasReblog(note.id, me);
-		const reactions = await Promise.all(status.emoji_reactions.map(r => this.convertReaction(r)));
 
 		// noinspection ES6MissingAwait
 		return await awaitAll({
@@ -289,11 +288,12 @@ export class MastoConverters {
 			account: convertedAccount,
 			in_reply_to_id: note.replyId,
 			in_reply_to_account_id: note.replyUserId,
-			reblog: !isQuote ? await this.convertReblog(status.reblog, me) : null,
+			reblog: !isQuote ? this.convertReblog(status.reblog, me) : null,
 			content: content,
 			content_type: 'text/x.misskeymarkdown',
 			text: note.text,
 			created_at: status.created_at,
+			edited_at: note.updatedAt?.toISOString() ?? null,
 			emojis: emoji,
 			replies_count: note.repliesCount,
 			reblogs_count: note.renoteCount,
@@ -301,7 +301,7 @@ export class MastoConverters {
 			reblogged,
 			favourited: status.favourited,
 			muted: status.muted,
-			sensitive: status.sensitive,
+			sensitive: status.sensitive || !!note.cw,
 			spoiler_text: note.cw ?? '',
 			visibility: status.visibility,
 			media_attachments: status.media_attachments.map(a => convertAttachment(a)),
@@ -312,15 +312,14 @@ export class MastoConverters {
 			application: null, //FIXME
 			language: null, //FIXME
 			pinned: false, //FIXME
-			reactions,
-			emoji_reactions: reactions,
 			bookmarked: false, //FIXME
-			quote: isQuote ? await this.convertReblog(status.reblog, me) : null,
-			edited_at: note.updatedAt?.toISOString() ?? null,
+			quote_id: isQuote ? status.reblog?.id : undefined,
+			quote: isQuote ? this.convertReblog(status.reblog, me) : null,
+			reactions: status.emoji_reactions,
 		});
 	}
 
-	public async convertConversation(conversation: Entity.Conversation, me?: MiLocalUser | null): Promise<MastodonEntity.Conversation> {
+	public async convertConversation(conversation: Entity.Conversation, me: MiLocalUser | null): Promise<MastodonEntity.Conversation> {
 		return {
 			id: conversation.id,
 			accounts: await Promise.all(conversation.accounts.map(a => this.convertAccount(a))),
@@ -329,7 +328,7 @@ export class MastoConverters {
 		};
 	}
 
-	public async convertNotification(notification: Entity.Notification, me?: MiLocalUser | null): Promise<MastodonEntity.Notification> {
+	public async convertNotification(notification: Entity.Notification, me: MiLocalUser | null): Promise<MastodonEntity.Notification> {
 		return {
 			account: await this.convertAccount(notification.account),
 			created_at: notification.created_at,
@@ -339,12 +338,23 @@ export class MastoConverters {
 		};
 	}
 
-	public async convertReaction(reaction: Entity.Reaction): Promise<Entity.Reaction> {
-		if (reaction.accounts) {
-			reaction.accounts = await Promise.all(reaction.accounts.map(a => this.convertAccount(a)));
-		}
-		return reaction;
-	}
+	// public convertEmoji(emoji: string): MastodonEntity.Emoji {
+	// 	const reaction: MastodonEntity.Reaction = {
+	// 		name: emoji,
+	// 		count: 1,
+	// 	};
+	//
+	// 	if (emoji.startsWith(':')) {
+	// 		const [, name] = emoji.match(/^:([^@:]+(?:@[^@:]+)?):$/) ?? [];
+	// 		if (name) {
+	// 			const url = `${this.config.url}/emoji/${name}.webp`;
+	// 			reaction.url = url;
+	// 			reaction.static_url = url;
+	// 		}
+	// 	}
+	//
+	// 	return reaction;
+	// }
 }
 
 function simpleConvert<T>(data: T): T {
@@ -423,7 +433,3 @@ export function convertRelationship(relationship: Partial<Entity.Relationship> &
 	};
 }
 
-// noinspection JSUnusedGlobalSymbols
-export function convertStatusSource(status: Entity.StatusSource): MastodonEntity.StatusSource {
-	return simpleConvert(status);
-}
