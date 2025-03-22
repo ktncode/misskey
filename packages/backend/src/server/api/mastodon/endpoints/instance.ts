@@ -54,7 +54,7 @@ export class ApiInstanceMastodon {
 				title: this.meta.name || 'Sharkey',
 				description: this.meta.description || 'This is a vanilla Sharkey Instance. It doesn\'t seem to have a description.',
 				email: instance.email || '',
-				version: `3.0.0 (compatible; Sharkey ${this.config.version})`,
+				version: `3.0.0 (compatible; Sharkey ${this.config.version}; like Akkoma)`,
 				urls: instance.urls,
 				stats: {
 					user_count: instance.stats.user_count,
