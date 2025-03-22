@@ -303,8 +303,8 @@ export default class Misskey implements MegalodonInterface {
       max_id?: string
       since_id?: string
       pinned?: boolean
-      exclude_replies: boolean
-      exclude_reblogs: boolean
+      exclude_replies?: boolean
+      exclude_reblogs?: boolean
       only_media?: boolean
     }
   ): Promise<Response<Array<Entity.Status>>> {
@@ -2352,6 +2352,18 @@ export default class Misskey implements MegalodonInterface {
           }
         }))
       }
+			default: {
+				return {
+					status: 400,
+					statusText: 'bad request',
+					headers: {},
+					data: {
+						accounts: [],
+						statuses: [],
+						hashtags: [],
+					}
+				}
+			}
     }
   }
 

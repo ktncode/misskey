@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { megalodon, MegalodonInterface } from 'megalodon';
+import { Misskey } from 'megalodon';
 import { Injectable } from '@nestjs/common';
 import { MiLocalUser } from '@/models/User.js';
 import { AuthenticateService } from '@/server/api/AuthenticateService.js';
@@ -18,7 +18,7 @@ export class MastodonClientService {
 	/**
 	 * Gets the authenticated user and API client for a request.
 	 */
-	public async getAuthClient(request: FastifyRequest, accessToken?: string | null): Promise<{ client: MegalodonInterface, me: MiLocalUser | null }> {
+	public async getAuthClient(request: FastifyRequest, accessToken?: string | null): Promise<{ client: Misskey, me: MiLocalUser | null }> {
 		const authorization = request.headers.authorization;
 		accessToken = accessToken !== undefined ? accessToken : getAccessToken(authorization);
 
@@ -41,14 +41,14 @@ export class MastodonClientService {
 	/**
 	 * Creates an authenticated API client for a request.
 	 */
-	public getClient(request: FastifyRequest, accessToken?: string | null): MegalodonInterface {
+	public getClient(request: FastifyRequest, accessToken?: string | null): Misskey {
 		const authorization = request.headers.authorization;
 		accessToken = accessToken !== undefined ? accessToken : getAccessToken(authorization);
 
 		// TODO pass agent?
 		const baseUrl = this.getBaseUrl(request);
 		const userAgent = request.headers['user-agent'];
-		return megalodon('misskey', baseUrl, accessToken, userAgent);
+		return new Misskey(baseUrl, accessToken, userAgent);
 	}
 
 	/**
