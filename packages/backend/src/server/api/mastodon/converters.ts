@@ -135,10 +135,10 @@ export class MastoConverters {
 		});
 	}
 
-	private async encodeField(f: Entity.Field): Promise<MastodonEntity.Field> {
+	private encodeField(f: Entity.Field): MastodonEntity.Field {
 		return {
 			name: f.name,
-			value: await this.mfmService.toMastoApiHtml(mfm.parse(f.value), [], true) ?? escapeMFM(f.value),
+			value: this.mfmService.toMastoApiHtml(mfm.parse(f.value), [], true) ?? escapeMFM(f.value),
 			verified_at: null,
 		};
 	}
@@ -186,7 +186,7 @@ export class MastoConverters {
 			header_static: user.bannerUrl ? user.bannerUrl : 'https://dev.joinsharkey.org/static-assets/transparent.png',
 			emojis: emoji,
 			moved: null, //FIXME
-			fields: Promise.all(profile?.fields.map(async p => this.encodeField(p)) ?? []),
+			fields: profile?.fields.map(p => this.encodeField(p)) ?? [],
 			bot: user.isBot,
 			discoverable: user.isExplorable,
 			noindex: user.noindex,
@@ -203,23 +203,23 @@ export class MastoConverters {
 		}
 		const noteUser = await this.getUser(note.userId).then(async (p) => await this.convertAccount(p));
 		const edits = await this.noteEditRepository.find({ where: { noteId: note.id }, order: { id: 'ASC' } });
-		const history: Promise<StatusEdit>[] = [];
+		const history: StatusEdit[] = [];
 
 		// TODO this looks wrong, according to mastodon docs
 		let lastDate = this.idService.parse(note.id).date;
 		for (const edit of edits) {
-			const files = this.driveFileEntityService.packManyByIds(edit.fileIds);
+			const files = await this.driveFileEntityService.packManyByIds(edit.fileIds);
 			const item = {
 				account: noteUser,
-				content: this.mfmService.toMastoApiHtml(mfm.parse(edit.newText ?? ''), JSON.parse(note.mentionedRemoteUsers)).then(p => p ?? ''),
+				content: this.mfmService.toMastoApiHtml(mfm.parse(edit.newText ?? ''), JSON.parse(note.mentionedRemoteUsers)) ?? '',
 				created_at: lastDate.toISOString(),
 				emojis: [],
 				sensitive: edit.cw != null && edit.cw.length > 0,
 				spoiler_text: edit.cw ?? '',
-				media_attachments: files.then(files => files.length > 0 ? files.map((f) => this.encodeFile(f)) : []),
+				media_attachments: files.length > 0 ? files.map((f) => this.encodeFile(f)) : [],
 			};
 			lastDate = edit.updatedAt;
-			history.push(awaitAll(item));
+			history.push(item);
 		}
 
 		return await Promise.all(history);
@@ -275,8 +275,7 @@ export class MastoConverters {
 		const text = note.text;
 		const content = text !== null
 			? quoteUri
-				.then(quoteUri => this.mfmService.toMastoApiHtml(mfm.parse(text), mentionedRemoteUsers, false, quoteUri))
-				.then(p => p ?? escapeMFM(text))
+				.then(quoteUri => this.mfmService.toMastoApiHtml(mfm.parse(text), mentionedRemoteUsers, false, quoteUri) ?? escapeMFM(text))
 			: '';
 
 		const reblogged = await this.mastodonDataService.hasReblog(note.id, me);
