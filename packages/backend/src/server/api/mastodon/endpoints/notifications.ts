@@ -28,7 +28,7 @@ export class ApiNotificationsMastodon {
 		fastify.get<ApiNotifyMastodonRoute>('/v1/notifications', async (_request, reply) => {
 			const { client, me } = await this.clientService.getAuthClient(_request);
 			const data = await client.getNotifications(parseTimelineArgs(_request.query));
-			const response = Promise.all(data.data.map(async n => {
+			const response = await Promise.all(data.data.map(async n => {
 				const converted = await this.mastoConverters.convertNotification(n, me);
 				if (converted.type === 'reaction') {
 					converted.type = 'favourite';
