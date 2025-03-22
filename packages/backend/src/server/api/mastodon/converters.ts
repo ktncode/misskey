@@ -196,7 +196,7 @@ export class MastoConverters {
 		});
 	}
 
-	public async getEdits(id: string, me?: MiLocalUser | null) {
+	public async getEdits(id: string, me?: MiLocalUser | null): Promise<StatusEdit[]> {
 		const note = await this.mastodonDataService.getNote(id, me);
 		if (!note) {
 			return [];
@@ -280,6 +280,7 @@ export class MastoConverters {
 			: '';
 
 		const reblogged = await this.mastodonDataService.hasReblog(note.id, me);
+		const reactions = await Promise.all(status.emoji_reactions.map(r => this.convertReaction(r)));
 
 		// noinspection ES6MissingAwait
 		return await awaitAll({
@@ -312,8 +313,8 @@ export class MastoConverters {
 			application: null, //FIXME
 			language: null, //FIXME
 			pinned: false, //FIXME
-			reactions: status.emoji_reactions,
-			emoji_reactions: status.emoji_reactions,
+			reactions,
+			emoji_reactions: reactions,
 			bookmarked: false, //FIXME
 			quote: isQuote ? await this.convertReblog(status.reblog, me) : null,
 			edited_at: note.updatedAt?.toISOString() ?? null,
@@ -338,6 +339,13 @@ export class MastoConverters {
 			type: notification.type,
 		};
 	}
+
+	public async convertReaction(reaction: Entity.Reaction): Promise<Entity.Reaction> {
+		if (reaction.accounts) {
+			reaction.accounts = await Promise.all(reaction.accounts.map(a => this.convertAccount(a)));
+		}
+		return reaction;
+	}
 }
 
 function simpleConvert<T>(data: T): T {
@@ -345,12 +353,13 @@ function simpleConvert<T>(data: T): T {
 	return Object.assign({}, data);
 }
 
-export function convertAccount(account: Entity.Account) {
-	return simpleConvert(account);
+export function convertAnnouncement(announcement: Entity.Announcement): MastodonEntity.Announcement {
+	return {
+		...announcement,
+		updated_at: announcement.updated_at ?? announcement.published_at,
+	};
 }
-export function convertAnnouncement(announcement: Entity.Announcement) {
-	return simpleConvert(announcement);
-}
+
 export function convertAttachment(attachment: Entity.Attachment): MastodonEntity.Attachment {
 	const { width, height } = attachment.meta?.original ?? attachment.meta ?? {};
 	const size = (width && height) ? `${width}x${height}` : undefined;
@@ -376,26 +385,22 @@ export function convertAttachment(attachment: Entity.Attachment): MastodonEntity
 		} : null,
 	};
 }
-export function convertFilter(filter: Entity.Filter) {
+export function convertFilter(filter: Entity.Filter): MastodonEntity.Filter {
 	return simpleConvert(filter);
 }
-export function convertList(list: Entity.List) {
-	return simpleConvert(list);
+export function convertList(list: Entity.List): MastodonEntity.List {
+	return {
+		id: list.id,
+		title: list.title,
+		replies_policy: list.replies_policy ?? 'followed',
+	};
 }
-export function convertFeaturedTag(tag: Entity.FeaturedTag) {
+export function convertFeaturedTag(tag: Entity.FeaturedTag): MastodonEntity.FeaturedTag {
 	return simpleConvert(tag);
 }
 
-export function convertPoll(poll: Entity.Poll) {
+export function convertPoll(poll: Entity.Poll): MastodonEntity.Poll {
 	return simpleConvert(poll);
-}
-
-// noinspection JSUnusedGlobalSymbols
-export function convertReaction(reaction: Entity.Reaction) {
-	if (reaction.accounts) {
-		reaction.accounts = reaction.accounts.map(convertAccount);
-	}
-	return reaction;
 }
 
 // Megalodon sometimes returns broken / stubbed relationship data
@@ -420,6 +425,6 @@ export function convertRelationship(relationship: Partial<Entity.Relationship> &
 }
 
 // noinspection JSUnusedGlobalSymbols
-export function convertStatusSource(status: Entity.StatusSource) {
+export function convertStatusSource(status: Entity.StatusSource): MastodonEntity.StatusSource {
 	return simpleConvert(status);
 }
