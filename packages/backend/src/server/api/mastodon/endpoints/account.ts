@@ -143,7 +143,7 @@ export class ApiAccountMastodon {
 		});
 
 		fastify.get<{ Querystring: { acct?: string }}>('/v1/accounts/lookup', async (_request, reply) => {
-			if (!_request.query.acct) return reply.code(400).send({ error: 'Missing required property "acct"' });
+			if (!_request.query.acct) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required property "acct"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.search(_request.query.acct, { type: 'accounts' });
@@ -168,7 +168,7 @@ export class ApiAccountMastodon {
 		});
 
 		fastify.get<{ Params: { id?: string } }>('/v1/accounts/:id', async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.getAccount(_request.params.id);
@@ -178,17 +178,18 @@ export class ApiAccountMastodon {
 		});
 
 		fastify.get<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/statuses', async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const { client, me } = await this.clientService.getAuthClient(_request);
-			const data = await client.getAccountStatuses(_request.params.id, parseTimelineArgs(_request.query));
+			const args = parseTimelineArgs(_request.query);
+			const data = await client.getAccountStatuses(_request.params.id, args);
 			const response = await Promise.all(data.data.map(async (status) => await this.mastoConverters.convertStatus(status, me)));
 
 			reply.send(response);
 		});
 
 		fastify.get<{ Params: { id?: string } }>('/v1/accounts/:id/featured_tags', async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.getFeaturedTags();
@@ -198,7 +199,7 @@ export class ApiAccountMastodon {
 		});
 
 		fastify.get<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/followers', async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.getAccountFollowers(
@@ -211,7 +212,7 @@ export class ApiAccountMastodon {
 		});
 
 		fastify.get<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/following', async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.getAccountFollowing(
@@ -224,7 +225,7 @@ export class ApiAccountMastodon {
 		});
 
 		fastify.get<{ Params: { id?: string } }>('/v1/accounts/:id/lists', async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.getAccountLists(_request.params.id);
@@ -234,7 +235,7 @@ export class ApiAccountMastodon {
 		});
 
 		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/follow', { preHandler: upload.single('none') }, async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.followAccount(_request.params.id);
@@ -245,7 +246,7 @@ export class ApiAccountMastodon {
 		});
 
 		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/unfollow', { preHandler: upload.single('none') }, async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.unfollowAccount(_request.params.id);
@@ -256,7 +257,7 @@ export class ApiAccountMastodon {
 		});
 
 		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/block', { preHandler: upload.single('none') }, async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.blockAccount(_request.params.id);
@@ -266,7 +267,7 @@ export class ApiAccountMastodon {
 		});
 
 		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/unblock', { preHandler: upload.single('none') }, async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.unblockAccount(_request.params.id);
@@ -276,7 +277,7 @@ export class ApiAccountMastodon {
 		});
 
 		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/mute', { preHandler: upload.single('none') }, async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.muteAccount(
@@ -289,7 +290,7 @@ export class ApiAccountMastodon {
 		});
 
 		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/unmute', { preHandler: upload.single('none') }, async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.unmuteAccount(_request.params.id);

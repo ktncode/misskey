@@ -128,7 +128,7 @@ export class OAuth2ProviderService {
 
 		for (const url of ['/authorize', '/authorize/']) {
 			fastify.get<{ Querystring: Record<string, string | string[] | undefined> }>(url, async (request, reply) => {
-				if (typeof(request.query.client_id) !== 'string') return reply.code(400).send({ error: 'Missing required query "client_id"' });
+				if (typeof(request.query.client_id) !== 'string') return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required query "client_id"' });
 
 				const redirectUri = new URL(Buffer.from(request.query.client_id, 'base64').toString());
 				redirectUri.searchParams.set('mastodon', 'true');
@@ -153,7 +153,7 @@ export class OAuth2ProviderService {
 			}
 
 			try {
-				if (!body.client_secret) return reply.code(400).send({ error: 'Missing required query "client_secret"' });
+				if (!body.client_secret) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required query "client_secret"' });
 
 				const clientId = body.client_id ? String(body.clientId) : null;
 				const secret = String(body.client_secret);

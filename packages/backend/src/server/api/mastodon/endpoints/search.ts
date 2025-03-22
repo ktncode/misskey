@@ -27,7 +27,8 @@ export class ApiSearchMastodon {
 
 	public register(fastify: FastifyInstance): void {
 		fastify.get<ApiSearchMastodonRoute>('/v1/search', async (_request, reply) => {
-			if (!_request.query.q) return reply.code(400).send({ error: 'Missing required property "q"' });
+			if (!_request.query.q) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required property "q"' });
+			if (!_request.query.type) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required property "type"' });
 
 			const query = parseTimelineArgs(_request.query);
 			const client = this.clientService.getClient(_request);
@@ -37,7 +38,7 @@ export class ApiSearchMastodon {
 		});
 
 		fastify.get<ApiSearchMastodonRoute>('/v2/search', async (_request, reply) => {
-			if (!_request.query.q) return reply.code(400).send({ error: 'Missing required property "q"' });
+			if (!_request.query.q) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required property "q"' });
 
 			const query = parseTimelineArgs(_request.query);
 			const type = _request.query.type;

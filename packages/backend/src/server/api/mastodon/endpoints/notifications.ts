@@ -40,7 +40,7 @@ export class ApiNotificationsMastodon {
 		});
 
 		fastify.get<ApiNotifyMastodonRoute & { Params: { id?: string } }>('/v1/notification/:id', async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const { client, me } = await this.clientService.getAuthClient(_request);
 			const data = await client.getNotification(_request.params.id);
@@ -53,7 +53,7 @@ export class ApiNotificationsMastodon {
 		});
 
 		fastify.post<ApiNotifyMastodonRoute & { Params: { id?: string } }>('/v1/notification/:id/dismiss', { preHandler: upload.single('none') }, async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.dismissNotification(_request.params.id);

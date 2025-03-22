@@ -110,7 +110,7 @@ export class MastodonApiServerService {
 		});
 
 		fastify.post<{ Body: { id?: string } }>('/v1/announcements/:id/dismiss', async (_request, reply) => {
-			if (!_request.body.id) return reply.code(400).send({ error: 'Missing required payload "id"' });
+			if (!_request.body.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required payload "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.dismissInstanceAnnouncement(_request.body.id);
@@ -222,7 +222,7 @@ export class MastodonApiServerService {
 		});
 
 		fastify.post<{ Querystring: TimelineArgs, Params: { id?: string } }>('/v1/follow_requests/:id/authorize', { preHandler: upload.single('none') }, async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.acceptFollowRequest(_request.params.id);
@@ -232,7 +232,7 @@ export class MastodonApiServerService {
 		});
 
 		fastify.post<{ Querystring: TimelineArgs, Params: { id?: string } }>('/v1/follow_requests/:id/reject', { preHandler: upload.single('none') }, async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
 			const data = await client.rejectFollowRequest(_request.params.id);
@@ -253,7 +253,7 @@ export class MastodonApiServerService {
 				is_sensitive?: string,
 			},
 		}>('/v1/media/:id', { preHandler: upload.none() }, async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const options = {
 				..._request.body,

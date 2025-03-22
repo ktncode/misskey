@@ -65,9 +65,9 @@ export class ApiAppsMastodon {
 	public register(fastify: FastifyInstance, upload: ReturnType<typeof multer>): void {
 		fastify.post<AuthMastodonRoute>('/v1/apps', { preHandler: upload.single('none') }, async (_request, reply) => {
 			const body = _request.body ?? _request.query;
-			if (!body.scopes) return reply.code(400).send({ error: 'Missing required payload "scopes"' });
-			if (!body.redirect_uris) return reply.code(400).send({ error: 'Missing required payload "redirect_uris"' });
-			if (!body.client_name) return reply.code(400).send({ error: 'Missing required payload "client_name"' });
+			if (!body.scopes) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required payload "scopes"' });
+			if (!body.redirect_uris) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required payload "redirect_uris"' });
+			if (!body.client_name) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required payload "client_name"' });
 
 			let scope = body.scopes;
 			if (typeof scope === 'string') {
