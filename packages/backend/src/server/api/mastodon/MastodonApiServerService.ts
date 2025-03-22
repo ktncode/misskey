@@ -250,7 +250,7 @@ export class MastodonApiServerService {
 			const client = this.clientService.getClient(_request);
 
 			const data = await client.getBlocks(parseTimelineArgs(_request.query));
-			const response = Promise.all(data.data.map((account) => this.mastoConverters.convertAccount(account)));
+			const response = await Promise.all(data.data.map((account) => this.mastoConverters.convertAccount(account)));
 
 			reply.send(response);
 		});
