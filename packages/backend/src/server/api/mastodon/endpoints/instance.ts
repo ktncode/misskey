@@ -11,7 +11,9 @@ import { DI } from '@/di-symbols.js';
 import type { MiMeta, UsersRepository } from '@/models/_.js';
 import { MastoConverters } from '@/server/api/mastodon/converters.js';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
+import { RoleService } from '@/core/RoleService.js';
 import type { FastifyInstance } from 'fastify';
+import type { MastodonEntity } from 'megalodon';
 
 @Injectable()
 export class ApiInstanceMastodon {
@@ -27,11 +29,12 @@ export class ApiInstanceMastodon {
 
 		private readonly mastoConverters: MastoConverters,
 		private readonly clientService: MastodonClientService,
+		private readonly roleService: RoleService,
 	) {}
 
 	public register(fastify: FastifyInstance): void {
 		fastify.get('/v1/instance', async (_request, reply) => {
-			const client = this.clientService.getClient(_request);
+			const { client, me } = await this.clientService.getAuthClient(_request);
 			const data = await client.getInstance();
 			const instance = data.data;
 			const admin = await this.usersRepository.findOne({
@@ -44,11 +47,11 @@ export class ApiInstanceMastodon {
 				order: { id: 'ASC' },
 			});
 			const contact = admin == null ? null : await this.mastoConverters.convertAccount((await client.getAccount(admin.id)).data);
+			const roles = await this.roleService.getUserPolicies(me?.id ?? null);
 
-			const response = {
+			const response: MastodonEntity.Instance = {
 				uri: this.config.url,
 				title: this.meta.name || 'Sharkey',
-				short_description: this.meta.description || 'This is a vanilla Sharkey Instance. It doesn\'t seem to have a description.',
 				description: this.meta.description || 'This is a vanilla Sharkey Instance. It doesn\'t seem to have a description.',
 				email: instance.email || '',
 				version: `3.0.0 (compatible; Sharkey ${this.config.version})`,
@@ -66,6 +69,7 @@ export class ApiInstanceMastodon {
 				configuration: {
 					accounts: {
 						max_featured_tags: 20,
+						max_pinned_statuses: roles.pinLimit,
 					},
 					statuses: {
 						max_characters: this.config.maxNoteLength,
@@ -77,7 +81,7 @@ export class ApiInstanceMastodon {
 						image_size_limit: 10485760,
 						image_matrix_limit: 16777216,
 						video_size_limit: 41943040,
-						video_frame_rate_limit: 60,
+						video_frame_limit: 60,
 						video_matrix_limit: 2304000,
 					},
 					polls: {
@@ -91,7 +95,7 @@ export class ApiInstanceMastodon {
 					},
 				},
 				contact_account: contact,
-				rules: [],
+				rules: instance.rules ?? [],
 			};
 
 			reply.send(response);
