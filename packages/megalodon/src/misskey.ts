@@ -691,36 +691,48 @@ export default class Misskey implements MegalodonInterface {
 		})
   }
 
+	/**
+	 * POST /api/users/reactions
+	 */
+	public async getReactions(userId: string, options?: { limit?: number; max_id?: string; min_id?: string }): Promise<Response<MisskeyEntity.NoteReaction[]>> {
+		let params = {
+			userId,
+		};
+		if (options) {
+			if (options.limit) {
+				params = Object.assign(params, {
+					limit: options.limit
+				})
+			}
+			if (options.max_id) {
+				params = Object.assign(params, {
+					untilId: options.max_id
+				})
+			}
+			if (options.min_id) {
+				params = Object.assign(params, {
+					sinceId: options.min_id
+				})
+			}
+		}
+		return this.client.post<MisskeyAPI.Entity.NoteReaction[]>('/api/users/reactions', params);
+	}
+
   // ======================================
   //  accounts/favourites
   // ======================================
   /**
-   * POST /api/i/favorites
+   * POST /api/users/reactions
    */
-  public async getFavourites(options?: { limit?: number; max_id?: string; min_id?: string }): Promise<Response<Array<Entity.Status>>> {
-    let params = {}
-    if (options) {
-      if (options.limit) {
-        params = Object.assign(params, {
-          limit: options.limit
-        })
-      }
-      if (options.max_id) {
-        params = Object.assign(params, {
-          untilId: options.max_id
-        })
-      }
-      if (options.min_id) {
-        params = Object.assign(params, {
-          sinceId: options.min_id
-        })
-      }
-    }
-    return this.client.post<Array<MisskeyAPI.Entity.Favorite>>('/api/i/favorites', params).then(res => {
-      return Object.assign(res, {
-        data: res.data.map(fav => MisskeyAPI.Converter.note(fav.note, this.baseUrl))
-      })
-    })
+  public async getFavourites(options?: { limit?: number; max_id?: string; min_id?: string; userId?: string }): Promise<Response<Array<Entity.Status>>> {
+		const userId = options?.userId ?? (await this.verifyAccountCredentials()).data.id;
+
+		const response = await this.getReactions(userId, options);
+
+		return {
+			...response,
+			data: response.data.map(r => MisskeyAPI.Converter.note(r.note, this.baseUrl)),
+		};
   }
 
   // ======================================

@@ -32,6 +32,7 @@ namespace MisskeyAPI {
     export type Notification = MisskeyEntity.Notification
     export type Poll = MisskeyEntity.Poll
     export type Reaction = MisskeyEntity.Reaction
+		export type NoteReaction = MisskeyEntity.NoteReaction
     export type Relation = MisskeyEntity.Relation
     export type User = MisskeyEntity.User
     export type UserDetail = MisskeyEntity.UserDetail

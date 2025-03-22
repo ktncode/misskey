@@ -19,6 +19,7 @@ import { ApiStatusMastodon } from '@/server/api/mastodon/endpoints/status.js';
 import { ApiNotificationsMastodon } from '@/server/api/mastodon/endpoints/notifications.js';
 import { ApiTimelineMastodon } from '@/server/api/mastodon/endpoints/timeline.js';
 import { ApiSearchMastodon } from '@/server/api/mastodon/endpoints/search.js';
+import { ApiError } from '@/server/api/error.js';
 import { parseTimelineArgs, TimelineArgs, toBoolean } from './argsUtils.js';
 import { convertAnnouncement, convertAttachment, MastoConverters, convertRelationship } from './converters.js';
 import type { Entity } from 'megalodon';
@@ -231,8 +232,21 @@ export class MastodonApiServerService {
 		fastify.get<{ Querystring: TimelineArgs }>('/v1/favourites', async (_request, reply) => {
 			const { client, me } = await this.clientService.getAuthClient(_request);
 
-			const data = await client.getFavourites(parseTimelineArgs(_request.query));
-			const response = Promise.all(data.data.map((status) => this.mastoConverters.convertStatus(status, me)));
+			if (!me) {
+				throw new ApiError({
+					message: 'Credential required.',
+					code: 'CREDENTIAL_REQUIRED',
+					id: '1384574d-a912-4b81-8601-c7b1c4085df1',
+					httpStatusCode: 401,
+				});
+			}
+
+			const args = {
+				...parseTimelineArgs(_request.query),
+				userId: me.id,
+			};
+			const data = await client.getFavourites(args);
+			const response = await Promise.all(data.data.map((status) => this.mastoConverters.convertStatus(status, me)));
 
 			reply.send(response);
 		});
