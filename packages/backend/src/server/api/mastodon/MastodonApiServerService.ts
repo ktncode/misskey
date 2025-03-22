@@ -74,6 +74,50 @@ export class MastodonApiServerService {
 			payload.on('error', done);
 		});
 
+		// Remove trailing "[]" from query params
+		fastify.addHook('preValidation', (request, _reply, done) => {
+			if (!request.query || typeof(request.query) !== 'object') {
+				return done();
+			}
+
+			// Same object aliased with a different type
+			const query = request.query as Record<string, string | string[] | undefined>;
+
+			for (const key of Object.keys(query)) {
+				if (!key.endsWith('[]')) {
+					continue;
+				}
+				if (query[key] == null) {
+					continue;
+				}
+
+				const newKey = key.substring(0, key.length - 2);
+				const newValue = query[key];
+				const oldValue = query[newKey];
+
+				// Move the value to the correct key
+				if (oldValue != null) {
+					if (Array.isArray(oldValue)) {
+						// Works for both array and single values
+						query[newKey] = oldValue.concat(newValue);
+					} else if (Array.isArray(newValue)) {
+						// Preserve order
+						query[newKey] = [oldValue, ...newValue];
+					} else {
+						// Preserve order
+						query[newKey] = [oldValue, newValue];
+					}
+				} else {
+					query[newKey] = newValue;
+				}
+
+				// Remove the invalid key
+				delete query[key];
+			}
+
+			return done();
+		});
+
 		fastify.setErrorHandler((error, request, reply) => {
 			const data = getErrorData(error);
 			const status = getErrorStatus(error);
