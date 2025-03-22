@@ -104,13 +104,17 @@ export class MastodonApiServerService {
 		fastify.get('/v1/announcements', async (_request, reply) => {
 			const client = this.clientService.getClient(_request);
 			const data = await client.getInstanceAnnouncements();
-			reply.send(data.data.map((announcement) => convertAnnouncement(announcement)));
+			const response = data.data.map((announcement) => convertAnnouncement(announcement));
+
+			reply.send(response);
 		});
 
 		fastify.post<{ Body: { id?: string } }>('/v1/announcements/:id/dismiss', async (_request, reply) => {
 			if (!_request.body.id) return reply.code(400).send({ error: 'Missing required payload "id"' });
+
 			const client = this.clientService.getClient(_request);
-			const data = await client.dismissInstanceAnnouncement(_request.body['id']);
+			const data = await client.dismissInstanceAnnouncement(_request.body.id);
+
 			reply.send(data.data);
 		});
 
@@ -120,9 +124,12 @@ export class MastodonApiServerService {
 				reply.code(401).send({ error: 'No image' });
 				return;
 			}
+
 			const client = this.clientService.getClient(_request);
 			const data = await client.uploadMedia(multipartData);
-			reply.send(convertAttachment(data.data as Entity.Attachment));
+			const response = convertAttachment(data.data as Entity.Attachment);
+
+			reply.send(response);
 		});
 
 		fastify.post<{ Body: { description?: string; focus?: string }}>('/v2/media', { preHandler: upload.single('file') }, async (_request, reply) => {
@@ -131,9 +138,12 @@ export class MastodonApiServerService {
 				reply.code(401).send({ error: 'No image' });
 				return;
 			}
+
 			const client = this.clientService.getClient(_request);
 			const data = await client.uploadMedia(multipartData, _request.body);
-			reply.send(convertAttachment(data.data as Entity.Attachment));
+			const response = convertAttachment(data.data as Entity.Attachment);
+
+			reply.send(response);
 		});
 
 		fastify.get('/v1/trends', async (_request, reply) => {
