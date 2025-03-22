@@ -591,12 +591,12 @@ export default class Misskey implements MegalodonInterface {
    */
   public async getRelationship(id: string): Promise<Response<Entity.Relationship>> {
     return this.client
-      .post<MisskeyAPI.Entity.Relation>('/api/users/relation', {
+      .post<MisskeyAPI.Entity.Relation[]>('/api/users/relation', {
         userId: id
       })
       .then(res => {
         return Object.assign(res, {
-          data: MisskeyAPI.Converter.relation(res.data)
+          data: MisskeyAPI.Converter.relation(res.data[0])
         })
       })
   }
