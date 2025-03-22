@@ -4,11 +4,12 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
+import { FastifyRequest } from 'fastify';
 import Logger from '@/logger.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { ApiError } from '@/server/api/error.js';
 import { EnvService } from '@/core/EnvService.js';
-import { FastifyRequest } from 'fastify';
+import { getBaseUrl } from '@/server/api/mastodon/MastodonClientService.js';
 
 @Injectable()
 export class MastodonLogger {
@@ -25,7 +26,8 @@ export class MastodonLogger {
 
 	public error(request: FastifyRequest, error: MastodonError, status: number): void {
 		if ((status < 400 && status > 499) || this.envService.env.NODE_ENV === 'development') {
-			this.logger.error(`Error in mastodon endpoint ${request.method} ${request.url}:`, error);
+			const path = new URL(request.url, getBaseUrl(request)).pathname;
+			this.logger.error(`Error in mastodon endpoint ${request.method} ${path}:`, error);
 		}
 	}
 }
