@@ -4,7 +4,6 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { getErrorData, MastodonLogger } from '@/server/api/mastodon/MastodonLogger.js';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
 import type { FastifyInstance } from 'fastify';
 import type multer from 'fastify-multer';
@@ -61,60 +60,53 @@ type AuthMastodonRoute = { Body?: AuthPayload, Querystring: AuthPayload };
 export class ApiAppsMastodon {
 	constructor(
 		private readonly clientService: MastodonClientService,
-		private readonly logger: MastodonLogger,
 	) {}
 
 	public register(fastify: FastifyInstance, upload: ReturnType<typeof multer>): void {
 		fastify.post<AuthMastodonRoute>('/v1/apps', { preHandler: upload.single('none') }, async (_request, reply) => {
-			try {
-				const body = _request.body ?? _request.query;
-				if (!body.scopes) return reply.code(400).send({ error: 'Missing required payload "scopes"' });
-				if (!body.redirect_uris) return reply.code(400).send({ error: 'Missing required payload "redirect_uris"' });
-				if (!body.client_name) return reply.code(400).send({ error: 'Missing required payload "client_name"' });
+			const body = _request.body ?? _request.query;
+			if (!body.scopes) return reply.code(400).send({ error: 'Missing required payload "scopes"' });
+			if (!body.redirect_uris) return reply.code(400).send({ error: 'Missing required payload "redirect_uris"' });
+			if (!body.client_name) return reply.code(400).send({ error: 'Missing required payload "client_name"' });
 
-				let scope = body.scopes;
-				if (typeof scope === 'string') {
-					scope = scope.split(/[ +]/g);
-				}
-
-				const pushScope = new Set<string>();
-				for (const s of scope) {
-					if (s.match(/^read/)) {
-						for (const r of readScope) {
-							pushScope.add(r);
-						}
-					}
-					if (s.match(/^write/)) {
-						for (const r of writeScope) {
-							pushScope.add(r);
-						}
-					}
-				}
-
-				const red = body.redirect_uris;
-
-				const client = this.clientService.getClient(_request);
-				const appData = await client.registerApp(body.client_name, {
-					scopes: Array.from(pushScope),
-					redirect_uris: red,
-					website: body.website,
-				});
-
-				const response = {
-					id: Math.floor(Math.random() * 100).toString(),
-					name: appData.name,
-					website: body.website,
-					redirect_uri: red,
-					client_id: Buffer.from(appData.url || '').toString('base64'),
-					client_secret: appData.clientSecret,
-				};
-
-				reply.send(response);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/apps', data);
-				reply.code(401).send(data);
+			let scope = body.scopes;
+			if (typeof scope === 'string') {
+				scope = scope.split(/[ +]/g);
 			}
+
+			const pushScope = new Set<string>();
+			for (const s of scope) {
+				if (s.match(/^read/)) {
+					for (const r of readScope) {
+						pushScope.add(r);
+					}
+				}
+				if (s.match(/^write/)) {
+					for (const r of writeScope) {
+						pushScope.add(r);
+					}
+				}
+			}
+
+			const red = body.redirect_uris;
+
+			const client = this.clientService.getClient(_request);
+			const appData = await client.registerApp(body.client_name, {
+				scopes: Array.from(pushScope),
+				redirect_uris: red,
+				website: body.website,
+			});
+
+			const response = {
+				id: Math.floor(Math.random() * 100).toString(),
+				name: appData.name,
+				website: body.website,
+				redirect_uri: red,
+				client_id: Buffer.from(appData.url || '').toString('base64'),
+				client_secret: appData.clientSecret,
+			};
+
+			reply.send(response);
 		});
 	}
 }

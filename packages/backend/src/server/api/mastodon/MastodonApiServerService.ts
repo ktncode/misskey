@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import type { Config } from '@/config.js';
-import { getErrorData, MastodonLogger } from '@/server/api/mastodon/MastodonLogger.js';
+import { getErrorData, getErrorStatus, MastodonLogger } from '@/server/api/mastodon/MastodonLogger.js';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
 import { ApiAccountMastodon } from '@/server/api/mastodon/endpoints/account.js';
 import { ApiAppsMastodon } from '@/server/api/mastodon/endpoints/apps.js';
@@ -74,6 +74,15 @@ export class MastodonApiServerService {
 			payload.on('error', done);
 		});
 
+		fastify.setErrorHandler((error, request, reply) => {
+			const data = getErrorData(error);
+			const status = getErrorStatus(error);
+
+			this.logger.error(request, data, status);
+
+			reply.code(status).send(data);
+		});
+
 		fastify.register(multer.contentParser);
 
 		// External endpoints
@@ -87,98 +96,56 @@ export class MastodonApiServerService {
 		this.apiTimelineMastodon.register(fastify);
 
 		fastify.get('/v1/custom_emojis', async (_request, reply) => {
-			try {
-				const client = this.clientService.getClient(_request);
-				const data = await client.getInstanceCustomEmojis();
-				reply.send(data.data);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/custom_emojis', data);
-				reply.code(401).send(data);
-			}
+			const client = this.clientService.getClient(_request);
+			const data = await client.getInstanceCustomEmojis();
+			reply.send(data.data);
 		});
 
 		fastify.get('/v1/announcements', async (_request, reply) => {
-			try {
-				const client = this.clientService.getClient(_request);
-				const data = await client.getInstanceAnnouncements();
-				reply.send(data.data.map((announcement) => convertAnnouncement(announcement)));
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/announcements', data);
-				reply.code(401).send(data);
-			}
+			const client = this.clientService.getClient(_request);
+			const data = await client.getInstanceAnnouncements();
+			reply.send(data.data.map((announcement) => convertAnnouncement(announcement)));
 		});
 
 		fastify.post<{ Body: { id?: string } }>('/v1/announcements/:id/dismiss', async (_request, reply) => {
-			try {
-				if (!_request.body.id) return reply.code(400).send({ error: 'Missing required payload "id"' });
-				const client = this.clientService.getClient(_request);
-				const data = await client.dismissInstanceAnnouncement(_request.body['id']);
-				reply.send(data.data);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error(`POST /v1/announcements/${_request.body.id}/dismiss`, data);
-				reply.code(401).send(data);
-			}
+			if (!_request.body.id) return reply.code(400).send({ error: 'Missing required payload "id"' });
+			const client = this.clientService.getClient(_request);
+			const data = await client.dismissInstanceAnnouncement(_request.body['id']);
+			reply.send(data.data);
 		});
 
 		fastify.post('/v1/media', { preHandler: upload.single('file') }, async (_request, reply) => {
-			try {
-				const multipartData = await _request.file();
-				if (!multipartData) {
-					reply.code(401).send({ error: 'No image' });
-					return;
-				}
-				const client = this.clientService.getClient(_request);
-				const data = await client.uploadMedia(multipartData);
-				reply.send(convertAttachment(data.data as Entity.Attachment));
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('POST /v1/media', data);
-				reply.code(401).send(data);
+			const multipartData = await _request.file();
+			if (!multipartData) {
+				reply.code(401).send({ error: 'No image' });
+				return;
 			}
+			const client = this.clientService.getClient(_request);
+			const data = await client.uploadMedia(multipartData);
+			reply.send(convertAttachment(data.data as Entity.Attachment));
 		});
 
 		fastify.post<{ Body: { description?: string; focus?: string }}>('/v2/media', { preHandler: upload.single('file') }, async (_request, reply) => {
-			try {
-				const multipartData = await _request.file();
-				if (!multipartData) {
-					reply.code(401).send({ error: 'No image' });
-					return;
-				}
-				const client = this.clientService.getClient(_request);
-				const data = await client.uploadMedia(multipartData, _request.body);
-				reply.send(convertAttachment(data.data as Entity.Attachment));
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('POST /v2/media', data);
-				reply.code(401).send(data);
+			const multipartData = await _request.file();
+			if (!multipartData) {
+				reply.code(401).send({ error: 'No image' });
+				return;
 			}
+			const client = this.clientService.getClient(_request);
+			const data = await client.uploadMedia(multipartData, _request.body);
+			reply.send(convertAttachment(data.data as Entity.Attachment));
 		});
 
 		fastify.get('/v1/trends', async (_request, reply) => {
-			try {
-				const client = this.clientService.getClient(_request);
-				const data = await client.getInstanceTrends();
-				reply.send(data.data);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/trends', data);
-				reply.code(401).send(data);
-			}
+			const client = this.clientService.getClient(_request);
+			const data = await client.getInstanceTrends();
+			reply.send(data.data);
 		});
 
 		fastify.get('/v1/trends/tags', async (_request, reply) => {
-			try {
-				const client = this.clientService.getClient(_request);
-				const data = await client.getInstanceTrends();
-				reply.send(data.data);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/trends/tags', data);
-				reply.code(401).send(data);
-			}
+			const client = this.clientService.getClient(_request);
+			const data = await client.getInstanceTrends();
+			reply.send(data.data);
 		});
 
 		fastify.get('/v1/trends/links', async (_request, reply) => {
@@ -187,132 +154,81 @@ export class MastodonApiServerService {
 		});
 
 		fastify.get('/v1/preferences', async (_request, reply) => {
-			try {
-				const client = this.clientService.getClient(_request);
-				const data = await client.getPreferences();
-				reply.send(data.data);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/preferences', data);
-				reply.code(401).send(data);
-			}
+			const client = this.clientService.getClient(_request);
+			const data = await client.getPreferences();
+			reply.send(data.data);
 		});
 
 		fastify.get('/v1/followed_tags', async (_request, reply) => {
-			try {
-				const client = this.clientService.getClient(_request);
-				const data = await client.getFollowedTags();
-				reply.send(data.data);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/followed_tags', data);
-				reply.code(401).send(data);
-			}
+			const client = this.clientService.getClient(_request);
+			const data = await client.getFollowedTags();
+			reply.send(data.data);
 		});
 
 		fastify.get<{ Querystring: TimelineArgs }>('/v1/bookmarks', async (_request, reply) => {
-			try {
-				const { client, me } = await this.clientService.getAuthClient(_request);
+			const { client, me } = await this.clientService.getAuthClient(_request);
 
-				const data = await client.getBookmarks(parseTimelineArgs(_request.query));
-				const response = await Promise.all(data.data.map((status) => this.mastoConverters.convertStatus(status, me)));
+			const data = await client.getBookmarks(parseTimelineArgs(_request.query));
+			const response = await Promise.all(data.data.map((status) => this.mastoConverters.convertStatus(status, me)));
 
-				reply.send(response);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/bookmarks', data);
-				reply.code(401).send(data);
-			}
+			reply.send(response);
 		});
 
 		fastify.get<{ Querystring: TimelineArgs }>('/v1/favourites', async (_request, reply) => {
-			try {
-				const { client, me } = await this.clientService.getAuthClient(_request);
+			const { client, me } = await this.clientService.getAuthClient(_request);
 
-				const data = await client.getFavourites(parseTimelineArgs(_request.query));
-				const response = Promise.all(data.data.map((status) => this.mastoConverters.convertStatus(status, me)));
+			const data = await client.getFavourites(parseTimelineArgs(_request.query));
+			const response = Promise.all(data.data.map((status) => this.mastoConverters.convertStatus(status, me)));
 
-				reply.send(response);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/favourites', data);
-				reply.code(401).send(data);
-			}
+			reply.send(response);
 		});
 
 		fastify.get<{ Querystring: TimelineArgs }>('/v1/mutes', async (_request, reply) => {
-			try {
-				const client = this.clientService.getClient(_request);
+			const client = this.clientService.getClient(_request);
 
-				const data = await client.getMutes(parseTimelineArgs(_request.query));
-				const response = Promise.all(data.data.map((account) => this.mastoConverters.convertAccount(account)));
+			const data = await client.getMutes(parseTimelineArgs(_request.query));
+			const response = Promise.all(data.data.map((account) => this.mastoConverters.convertAccount(account)));
 
-				reply.send(response);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/mutes', data);
-				reply.code(401).send(data);
-			}
+			reply.send(response);
 		});
 
 		fastify.get<{ Querystring: TimelineArgs }>('/v1/blocks', async (_request, reply) => {
-			try {
-				const client = this.clientService.getClient(_request);
+			const client = this.clientService.getClient(_request);
 
-				const data = await client.getBlocks(parseTimelineArgs(_request.query));
-				const response = Promise.all(data.data.map((account) => this.mastoConverters.convertAccount(account)));
+			const data = await client.getBlocks(parseTimelineArgs(_request.query));
+			const response = Promise.all(data.data.map((account) => this.mastoConverters.convertAccount(account)));
 
-				reply.send(response);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/blocks', data);
-				reply.code(401).send(data);
-			}
+			reply.send(response);
 		});
 
 		fastify.get<{ Querystring: { limit?: string }}>('/v1/follow_requests', async (_request, reply) => {
-			try {
-				const client = this.clientService.getClient(_request);
-				const limit = _request.query.limit ? parseInt(_request.query.limit) : 20;
-				const data = await client.getFollowRequests(limit);
-				reply.send(await Promise.all(data.data.map(async (account) => await this.mastoConverters.convertAccount(account as Entity.Account))));
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/follow_requests', data);
-				reply.code(401).send(data);
-			}
+			const client = this.clientService.getClient(_request);
+
+			const limit = _request.query.limit ? parseInt(_request.query.limit) : 20;
+			const data = await client.getFollowRequests(limit);
+			const response = await Promise.all(data.data.map((account) => this.mastoConverters.convertAccount(account as Entity.Account)));
+
+			reply.send(response);
 		});
 
 		fastify.post<{ Querystring: TimelineArgs, Params: { id?: string } }>('/v1/follow_requests/:id/authorize', { preHandler: upload.single('none') }, async (_request, reply) => {
-			try {
-				if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
 
-				const client = this.clientService.getClient(_request);
-				const data = await client.acceptFollowRequest(_request.params.id);
-				const response = convertRelationship(data.data);
+			const client = this.clientService.getClient(_request);
+			const data = await client.acceptFollowRequest(_request.params.id);
+			const response = convertRelationship(data.data);
 
-				reply.send(response);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error(`POST /v1/follow_requests/${_request.params.id}/authorize`, data);
-				reply.code(401).send(data);
-			}
+			reply.send(response);
 		});
 
 		fastify.post<{ Querystring: TimelineArgs, Params: { id?: string } }>('/v1/follow_requests/:id/reject', { preHandler: upload.single('none') }, async (_request, reply) => {
-			try {
-				if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
 
-				const client = this.clientService.getClient(_request);
-				const data = await client.rejectFollowRequest(_request.params.id);
-				const response = convertRelationship(data.data);
+			const client = this.clientService.getClient(_request);
+			const data = await client.rejectFollowRequest(_request.params.id);
+			const response = convertRelationship(data.data);
 
-				reply.send(response);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error(`POST /v1/follow_requests/${_request.params.id}/reject`, data);
-				reply.code(401).send(data);
-			}
+			reply.send(response);
 		});
 		//#endregion
 
@@ -327,23 +243,17 @@ export class MastodonApiServerService {
 				is_sensitive?: string,
 			},
 		}>('/v1/media/:id', { preHandler: upload.none() }, async (_request, reply) => {
-			try {
-				if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
 
-				const options = {
-					..._request.body,
-					is_sensitive: toBoolean(_request.body.is_sensitive),
-				};
-				const client = this.clientService.getClient(_request);
-				const data = await client.updateMedia(_request.params.id, options);
-				const response = convertAttachment(data.data);
+			const options = {
+				..._request.body,
+				is_sensitive: toBoolean(_request.body.is_sensitive),
+			};
+			const client = this.clientService.getClient(_request);
+			const data = await client.updateMedia(_request.params.id, options);
+			const response = convertAttachment(data.data);
 
-				reply.send(response);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error(`PUT /v1/media/${_request.params.id}`, data);
-				reply.code(401).send(data);
-			}
+			reply.send(response);
 		});
 
 		done();

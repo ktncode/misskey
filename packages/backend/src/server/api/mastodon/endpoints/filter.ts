@@ -6,7 +6,6 @@
 import { Injectable } from '@nestjs/common';
 import { toBoolean } from '@/server/api/mastodon/argsUtils.js';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
-import { getErrorData, MastodonLogger } from '@/server/api/mastodon/MastodonLogger.js';
 import { convertFilter } from '../converters.js';
 import type { FastifyInstance } from 'fastify';
 import type multer from 'fastify-multer';
@@ -28,105 +27,74 @@ interface ApiFilterMastodonRoute {
 export class ApiFilterMastodon {
 	constructor(
 		private readonly clientService: MastodonClientService,
-		private readonly logger: MastodonLogger,
 	) {}
 
 	public register(fastify: FastifyInstance, upload: ReturnType<typeof multer>): void {
 		fastify.get('/v1/filters', async (_request, reply) => {
-			try {
-				const client = this.clientService.getClient(_request);
+			const client = this.clientService.getClient(_request);
 
-				const data = await client.getFilters();
-				const response = data.data.map((filter) => convertFilter(filter));
+			const data = await client.getFilters();
+			const response = data.data.map((filter) => convertFilter(filter));
 
-				reply.send(response);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('GET /v1/filters', data);
-				reply.code(401).send(data);
-			}
+			reply.send(response);
 		});
 
 		fastify.get<ApiFilterMastodonRoute & { Params: { id?: string } }>('/v1/filters/:id', async (_request, reply) => {
-			try {
-				if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
 
-				const client = this.clientService.getClient(_request);
-				const data = await client.getFilter(_request.params.id);
-				const response = convertFilter(data.data);
+			const client = this.clientService.getClient(_request);
+			const data = await client.getFilter(_request.params.id);
+			const response = convertFilter(data.data);
 
-				reply.send(response);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error(`GET /v1/filters/${_request.params.id}`, data);
-				reply.code(401).send(data);
-			}
+			reply.send(response);
 		});
 
 		fastify.post<ApiFilterMastodonRoute>('/v1/filters', { preHandler: upload.single('none') }, async (_request, reply) => {
-			try {
-				if (!_request.body.phrase) return reply.code(400).send({ error: 'Missing required payload "phrase"' });
-				if (!_request.body.context) return reply.code(400).send({ error: 'Missing required payload "context"' });
+			if (!_request.body.phrase) return reply.code(400).send({ error: 'Missing required payload "phrase"' });
+			if (!_request.body.context) return reply.code(400).send({ error: 'Missing required payload "context"' });
 
-				const options = {
-					phrase: _request.body.phrase,
-					context: _request.body.context,
-					irreversible: toBoolean(_request.body.irreversible),
-					whole_word: toBoolean(_request.body.whole_word),
-					expires_in: _request.body.expires_in,
-				};
+			const options = {
+				phrase: _request.body.phrase,
+				context: _request.body.context,
+				irreversible: toBoolean(_request.body.irreversible),
+				whole_word: toBoolean(_request.body.whole_word),
+				expires_in: _request.body.expires_in,
+			};
 
-				const client = this.clientService.getClient(_request);
-				const data = await client.createFilter(_request.body.phrase, _request.body.context, options);
-				const response = convertFilter(data.data);
+			const client = this.clientService.getClient(_request);
+			const data = await client.createFilter(_request.body.phrase, _request.body.context, options);
+			const response = convertFilter(data.data);
 
-				reply.send(response);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error('POST /v1/filters', data);
-				reply.code(401).send(data);
-			}
+			reply.send(response);
 		});
 
 		fastify.post<ApiFilterMastodonRoute & { Params: { id?: string } }>('/v1/filters/:id', { preHandler: upload.single('none') }, async (_request, reply) => {
-			try {
-				if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
-				if (!_request.body.phrase) return reply.code(400).send({ error: 'Missing required payload "phrase"' });
-				if (!_request.body.context) return reply.code(400).send({ error: 'Missing required payload "context"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.body.phrase) return reply.code(400).send({ error: 'Missing required payload "phrase"' });
+			if (!_request.body.context) return reply.code(400).send({ error: 'Missing required payload "context"' });
 
-				const options = {
-					phrase: _request.body.phrase,
-					context: _request.body.context,
-					irreversible: toBoolean(_request.body.irreversible),
-					whole_word: toBoolean(_request.body.whole_word),
-					expires_in: _request.body.expires_in,
-				};
+			const options = {
+				phrase: _request.body.phrase,
+				context: _request.body.context,
+				irreversible: toBoolean(_request.body.irreversible),
+				whole_word: toBoolean(_request.body.whole_word),
+				expires_in: _request.body.expires_in,
+			};
 
-				const client = this.clientService.getClient(_request);
-				const data = await client.updateFilter(_request.params.id, _request.body.phrase, _request.body.context, options);
-				const response = convertFilter(data.data);
+			const client = this.clientService.getClient(_request);
+			const data = await client.updateFilter(_request.params.id, _request.body.phrase, _request.body.context, options);
+			const response = convertFilter(data.data);
 
-				reply.send(response);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error(`POST /v1/filters/${_request.params.id}`, data);
-				reply.code(401).send(data);
-			}
+			reply.send(response);
 		});
 
 		fastify.delete<ApiFilterMastodonRoute & { Params: { id?: string } }>('/v1/filters/:id', async (_request, reply) => {
-			try {
-				if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
+			if (!_request.params.id) return reply.code(400).send({ error: 'Missing required parameter "id"' });
 
-				const client = this.clientService.getClient(_request);
-				const data = await client.deleteFilter(_request.params.id);
+			const client = this.clientService.getClient(_request);
+			const data = await client.deleteFilter(_request.params.id);
 
-				reply.send(data.data);
-			} catch (e) {
-				const data = getErrorData(e);
-				this.logger.error(`DELETE /v1/filters/${_request.params.id}`, data);
-				reply.code(401).send(data);
-			}
+			reply.send(data.data);
 		});
 	}
 }
