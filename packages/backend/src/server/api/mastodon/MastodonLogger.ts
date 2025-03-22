@@ -90,6 +90,7 @@ function convertApiError(apiError: ApiError): MastodonError {
 
 	delete mastoError.code;
 	delete mastoError.message;
+	delete mastoError.httpStatusCode;
 
 	return mastoError;
 }
