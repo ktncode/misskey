@@ -35,15 +35,14 @@ export class ApiAccountMastodon {
 
 	public register(fastify: FastifyInstance, upload: ReturnType<typeof multer>): void {
 		fastify.get<ApiAccountMastodonRoute>('/v1/accounts/verify_credentials', async (_request, reply) => {
-			const client = await this.clientService.getClient(_request);
+			const client = this.clientService.getClient(_request);
 			const data = await client.verifyAccountCredentials();
 			const acct = await this.mastoConverters.convertAccount(data.data);
 			const response = Object.assign({}, acct, {
 				source: {
-					// TODO move these into the convertAccount logic directly
 					note: acct.note,
 					fields: acct.fields,
-					privacy: '',
+					privacy: 'public',
 					sensitive: false,
 					language: '',
 				},
