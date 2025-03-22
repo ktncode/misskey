@@ -6,6 +6,7 @@
 import { Injectable } from '@nestjs/common';
 import { parseTimelineArgs, TimelineArgs } from '@/server/api/mastodon/argsUtils.js';
 import { MastoConverters } from '@/server/api/mastodon/converters.js';
+import { attachMinMaxPagination } from '@/server/api/mastodon/pagination.js';
 import { MastodonClientService } from '../MastodonClientService.js';
 import type { FastifyInstance } from 'fastify';
 import type multer from 'fastify-multer';
@@ -25,9 +26,9 @@ export class ApiNotificationsMastodon {
 	) {}
 
 	public register(fastify: FastifyInstance, upload: ReturnType<typeof multer>): void {
-		fastify.get<ApiNotifyMastodonRoute>('/v1/notifications', async (_request, reply) => {
-			const { client, me } = await this.clientService.getAuthClient(_request);
-			const data = await client.getNotifications(parseTimelineArgs(_request.query));
+		fastify.get<ApiNotifyMastodonRoute>('/v1/notifications', async (request, reply) => {
+			const { client, me } = await this.clientService.getAuthClient(request);
+			const data = await client.getNotifications(parseTimelineArgs(request.query));
 			const response = await Promise.all(data.data.map(async n => {
 				const converted = await this.mastoConverters.convertNotification(n, me);
 				if (converted.type === 'reaction') {
@@ -36,6 +37,7 @@ export class ApiNotificationsMastodon {
 				return converted;
 			}));
 
+			attachMinMaxPagination(request, reply, response);
 			reply.send(response);
 		});
 

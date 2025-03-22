@@ -5,6 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
+import { attachMinMaxPagination } from '@/server/api/mastodon/pagination.js';
 import { convertList, MastoConverters } from '../converters.js';
 import { parseTimelineArgs, TimelineArgs, toBoolean } from '../argsUtils.js';
 import type { Entity } from 'megalodon';
@@ -18,55 +19,60 @@ export class ApiTimelineMastodon {
 	) {}
 
 	public register(fastify: FastifyInstance): void {
-		fastify.get<{ Querystring: TimelineArgs }>('/v1/timelines/public', async (_request, reply) => {
-			const { client, me } = await this.clientService.getAuthClient(_request);
-			const query = parseTimelineArgs(_request.query);
-			const data = toBoolean(_request.query.local)
+		fastify.get<{ Querystring: TimelineArgs }>('/v1/timelines/public', async (request, reply) => {
+			const { client, me } = await this.clientService.getAuthClient(request);
+			const query = parseTimelineArgs(request.query);
+			const data = toBoolean(request.query.local)
 				? await client.getLocalTimeline(query)
 				: await client.getPublicTimeline(query);
 			const response = await Promise.all(data.data.map((status: Entity.Status) => this.mastoConverters.convertStatus(status, me)));
 
+			attachMinMaxPagination(request, reply, response);
 			reply.send(response);
 		});
 
-		fastify.get<{ Querystring: TimelineArgs }>('/v1/timelines/home', async (_request, reply) => {
-			const { client, me } = await this.clientService.getAuthClient(_request);
-			const query = parseTimelineArgs(_request.query);
+		fastify.get<{ Querystring: TimelineArgs }>('/v1/timelines/home', async (request, reply) => {
+			const { client, me } = await this.clientService.getAuthClient(request);
+			const query = parseTimelineArgs(request.query);
 			const data = await client.getHomeTimeline(query);
 			const response = await Promise.all(data.data.map((status: Entity.Status) => this.mastoConverters.convertStatus(status, me)));
 
+			attachMinMaxPagination(request, reply, response);
 			reply.send(response);
 		});
 
-		fastify.get<{ Params: { hashtag?: string }, Querystring: TimelineArgs }>('/v1/timelines/tag/:hashtag', async (_request, reply) => {
-			if (!_request.params.hashtag) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "hashtag"' });
+		fastify.get<{ Params: { hashtag?: string }, Querystring: TimelineArgs }>('/v1/timelines/tag/:hashtag', async (request, reply) => {
+			if (!request.params.hashtag) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "hashtag"' });
 
-			const { client, me } = await this.clientService.getAuthClient(_request);
-			const query = parseTimelineArgs(_request.query);
-			const data = await client.getTagTimeline(_request.params.hashtag, query);
+			const { client, me } = await this.clientService.getAuthClient(request);
+			const query = parseTimelineArgs(request.query);
+			const data = await client.getTagTimeline(request.params.hashtag, query);
 			const response = await Promise.all(data.data.map((status: Entity.Status) => this.mastoConverters.convertStatus(status, me)));
 
+			attachMinMaxPagination(request, reply, response);
 			reply.send(response);
 		});
 
-		fastify.get<{ Params: { id?: string }, Querystring: TimelineArgs }>('/v1/timelines/list/:id', async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
+		fastify.get<{ Params: { id?: string }, Querystring: TimelineArgs }>('/v1/timelines/list/:id', async (request, reply) => {
+			if (!request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
-			const { client, me } = await this.clientService.getAuthClient(_request);
-			const query = parseTimelineArgs(_request.query);
-			const data = await client.getListTimeline(_request.params.id, query);
+			const { client, me } = await this.clientService.getAuthClient(request);
+			const query = parseTimelineArgs(request.query);
+			const data = await client.getListTimeline(request.params.id, query);
 			const response = await Promise.all(data.data.map(async (status: Entity.Status) => await this.mastoConverters.convertStatus(status, me)));
 
+			attachMinMaxPagination(request, reply, response);
 			reply.send(response);
 		});
 
-		fastify.get<{ Querystring: TimelineArgs }>('/v1/conversations', async (_request, reply) => {
-			const { client, me } = await this.clientService.getAuthClient(_request);
-			const query = parseTimelineArgs(_request.query);
+		fastify.get<{ Querystring: TimelineArgs }>('/v1/conversations', async (request, reply) => {
+			const { client, me } = await this.clientService.getAuthClient(request);
+			const query = parseTimelineArgs(request.query);
 			const data = await client.getConversationTimeline(query);
-			const conversations = await Promise.all(data.data.map((conversation: Entity.Conversation) => this.mastoConverters.convertConversation(conversation, me)));
+			const response = await Promise.all(data.data.map((conversation: Entity.Conversation) => this.mastoConverters.convertConversation(conversation, me)));
 
-			reply.send(conversations);
+			attachMinMaxPagination(request, reply, response);
+			reply.send(response);
 		});
 
 		fastify.get<{ Params: { id?: string } }>('/v1/lists/:id', async (_request, reply) => {
@@ -79,22 +85,24 @@ export class ApiTimelineMastodon {
 			reply.send(response);
 		});
 
-		fastify.get('/v1/lists', async (_request, reply) => {
-			const client = this.clientService.getClient(_request);
+		fastify.get('/v1/lists', async (request, reply) => {
+			const client = this.clientService.getClient(request);
 			const data = await client.getLists();
 			const response = data.data.map((list: Entity.List) => convertList(list));
 
+			attachMinMaxPagination(request, reply, response);
 			reply.send(response);
 		});
 
-		fastify.get<{ Params: { id?: string }, Querystring: { limit?: number, max_id?: string, since_id?: string } }>('/v1/lists/:id/accounts', async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
+		fastify.get<{ Params: { id?: string }, Querystring: TimelineArgs }>('/v1/lists/:id/accounts', async (request, reply) => {
+			if (!request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
-			const client = this.clientService.getClient(_request);
-			const data = await client.getAccountsInList(_request.params.id, _request.query);
-			const accounts = await Promise.all(data.data.map((account: Entity.Account) => this.mastoConverters.convertAccount(account)));
+			const client = this.clientService.getClient(request);
+			const data = await client.getAccountsInList(request.params.id, parseTimelineArgs(request.query));
+			const response = await Promise.all(data.data.map((account: Entity.Account) => this.mastoConverters.convertAccount(account)));
 
-			reply.send(accounts);
+			attachMinMaxPagination(request, reply, response);
+			reply.send(response);
 		});
 
 		fastify.post<{ Params: { id?: string }, Querystring: { accounts_id?: string[] } }>('/v1/lists/:id/accounts', async (_request, reply) => {

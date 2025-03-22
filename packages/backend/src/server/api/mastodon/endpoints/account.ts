@@ -9,6 +9,7 @@ import { MastodonClientService } from '@/server/api/mastodon/MastodonClientServi
 import { DriveService } from '@/core/DriveService.js';
 import { DI } from '@/di-symbols.js';
 import type { AccessTokensRepository, UserProfilesRepository } from '@/models/_.js';
+import { attachMinMaxPagination } from '@/server/api/mastodon/pagination.js';
 import { MastoConverters, convertRelationship, convertFeaturedTag, convertList } from '../converters.js';
 import type multer from 'fastify-multer';
 import type { FastifyInstance } from 'fastify';
@@ -173,14 +174,15 @@ export class ApiAccountMastodon {
 			reply.send(account);
 		});
 
-		fastify.get<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/statuses', async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
+		fastify.get<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/statuses', async (request, reply) => {
+			if (!request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
-			const { client, me } = await this.clientService.getAuthClient(_request);
-			const args = parseTimelineArgs(_request.query);
-			const data = await client.getAccountStatuses(_request.params.id, args);
+			const { client, me } = await this.clientService.getAuthClient(request);
+			const args = parseTimelineArgs(request.query);
+			const data = await client.getAccountStatuses(request.params.id, args);
 			const response = await Promise.all(data.data.map(async (status) => await this.mastoConverters.convertStatus(status, me)));
 
+			attachMinMaxPagination(request, reply, response);
 			reply.send(response);
 		});
 
@@ -194,29 +196,31 @@ export class ApiAccountMastodon {
 			reply.send(response);
 		});
 
-		fastify.get<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/followers', async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
+		fastify.get<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/followers', async (request, reply) => {
+			if (!request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
-			const client = this.clientService.getClient(_request);
+			const client = this.clientService.getClient(request);
 			const data = await client.getAccountFollowers(
-				_request.params.id,
-				parseTimelineArgs(_request.query),
+				request.params.id,
+				parseTimelineArgs(request.query),
 			);
 			const response = await Promise.all(data.data.map(async (account) => await this.mastoConverters.convertAccount(account)));
 
+			attachMinMaxPagination(request, reply, response);
 			reply.send(response);
 		});
 
-		fastify.get<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/following', async (_request, reply) => {
-			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
+		fastify.get<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/following', async (request, reply) => {
+			if (!request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
-			const client = this.clientService.getClient(_request);
+			const client = this.clientService.getClient(request);
 			const data = await client.getAccountFollowing(
-				_request.params.id,
-				parseTimelineArgs(_request.query),
+				request.params.id,
+				parseTimelineArgs(request.query),
 			);
 			const response = await Promise.all(data.data.map(async (account) => await this.mastoConverters.convertAccount(account)));
 
+			attachMinMaxPagination(request, reply, response);
 			reply.send(response);
 		});
 
@@ -236,7 +240,7 @@ export class ApiAccountMastodon {
 			const client = this.clientService.getClient(_request);
 			const data = await client.followAccount(_request.params.id);
 			const acct = convertRelationship(data.data);
-			acct.following = true;
+			acct.following = true; // TODO this is wrong, follow may not have processed immediately
 
 			reply.send(acct);
 		});

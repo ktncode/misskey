@@ -51,12 +51,14 @@ export class MastodonClientService {
 		return new Misskey(baseUrl, accessToken, userAgent);
 	}
 
-	/**
-	 * Gets the base URL (origin) of the incoming request
-	 */
-	public getBaseUrl(request: FastifyRequest): string {
-		return `${request.protocol}://${request.host}`;
-	}
+	readonly getBaseUrl = getBaseUrl;
+}
+
+/**
+ * Gets the base URL (origin) of the incoming request
+ */
+export function getBaseUrl(request: FastifyRequest): string {
+	return `${request.protocol}://${request.host}`;
 }
 
 /**
