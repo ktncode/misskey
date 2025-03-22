@@ -342,7 +342,7 @@ export interface MegalodonInterface {
    * @param ids Array of account IDs.
    * @return Array of Relationship.
    */
-  getRelationships(ids: Array<string>): Promise<Response<Array<Entity.Relationship>>>
+  getRelationships(ids: string | Array<string>): Promise<Response<Array<Entity.Relationship>>>
   /**
    * Search for matching accounts by username or display name.
    *
