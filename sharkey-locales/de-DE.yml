@@ -4,9 +4,9 @@ poweredByMisskeyDescription: "{name} wird durch die Open-Source-Plattform <b>Sha
 renotedBy: "Geboostet von {user}"
 approvals: "Genehmigungen"
 copyLinkRenote: "Boost-Link kopieren"
-trustedLinkUrlPatterns: "Link zur Ausschlussliste für Warnungen vor externen Websites"
+trustedLinkUrlPatterns: "Link zur Ausschlussliste für Warnungen vor externen Webseiten"
 trustedLinkUrlPatternsDescription: "Trenne mit Leerzeichen für eine UND-Bedingung oder mit Zeilenumbrüchen für eine ODER-Bedingung. Wenn du die Schlüsselwörter mit Schrägstrichen umgibst, werden sie zu einem regulären Ausdruck. Wenn du nur den Domain-Namen einträgst, erfolgt eine Rückwärtsübereinstimmung."
-mutuals: "Gegenseitig"
+mutuals: "Gegenseitig gefolgt"
 emailDestination: "Zieladresse"
 renote: "Boost"
 unrenote: "Boost zurücknehmen"
@@ -145,7 +145,7 @@ _initialTutorial:
   _done:
     description: "Die hier beschriebenen Funktionen sind nur ein kleiner Teil dessen, was Sharkey zu bieten hat; um mehr darüber zu erfahren, wie du Sharkey verwenden kannst, besuche bitte {link}."
 _timelineDescription:
-  bubble: "In der Bubble Chronik kannst Notizen von verbundenen Servern ansehen, die von deinen Administratoren ausgewählt wurden."
+  bubble: "In der Bubble Chronik kannst du Notizen von verbundenen Servern ansehen, die von deinen Administratoren ausgewählt wurden."
 _serverSettings:
   sidebarLogoUrl: "Logo-URL"
   sidebarLogoDescription: "Gibt das Logo an, das in Szenarien mit hoher Auflösung und dynamischer Breite anstelle des normalen Symbols verwendet werden soll."
