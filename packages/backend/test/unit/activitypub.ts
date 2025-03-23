@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+
 process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
@@ -27,10 +28,10 @@ import { DI } from '@/di-symbols.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
 import { DownloadService } from '@/core/DownloadService.js';
 import { genAidx } from '@/misc/id/aidx.js';
+import { IdService } from '@/core/IdService.js';
 import { MockResolver } from '../misc/mock-resolver.js';
 import { UserKeypairService } from '@/core/UserKeypairService.js';
 import { MemoryKVCache, RedisKVCache } from '@/misc/cache.js';
-import { IdService } from '@/core/IdService.js';
 
 const host = 'https://host1.test';
 
