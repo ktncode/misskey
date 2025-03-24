@@ -32,6 +32,12 @@ export class ApiStatusMastodon {
 			const data = await client.getStatus(_request.params.id);
 			const response = await this.mastoConverters.convertStatus(data.data, me);
 
+			// Fixup - Discord ignores CWs and renders the entire post.
+			if (response.sensitive && _request.headers['user-agent']?.match(/\bDiscordbot\//)) {
+				response.content = '(preview disabled for sensitive content)';
+				response.media_attachments = [];
+			}
+
 			reply.send(response);
 		});
 
