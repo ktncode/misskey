@@ -55,7 +55,22 @@ export class MastodonApiServerService {
 		});
 
 		fastify.addHook('onRequest', (_, reply, done) => {
+			// Allow web-based clients to connect from other origins.
 			reply.header('Access-Control-Allow-Origin', '*');
+
+			// Mastodon uses all types of request methods.
+			reply.header('Access-Control-Allow-Methods', '*');
+
+			// Allow web-based clients to access Link header - required for mastodon pagination.
+			// https://stackoverflow.com/a/54928828
+			// https://docs.joinmastodon.org/api/guidelines/#pagination
+			// https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Expose-Headers
+			reply.header('Access-Control-Expose-Headers', 'Link');
+
+			// Cache to avoid extra pre-flight requests
+			// https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Max-Age
+			reply.header('Access-Control-Max-Age', 60 * 60 * 24); // 1 day in seconds
+
 			done();
 		});
 
