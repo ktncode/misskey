@@ -8,6 +8,7 @@ import { MastodonClientService } from '@/server/api/mastodon/MastodonClientServi
 import { attachMinMaxPagination, attachOffsetPagination } from '@/server/api/mastodon/pagination.js';
 import { MastodonConverters } from '../MastodonConverters.js';
 import { parseTimelineArgs, TimelineArgs, toBoolean, toInt } from '../argsUtils.js';
+import { ApiError } from '../../error.js';
 import Account = Entity.Account;
 import Status = Entity.Status;
 import type { FastifyInstance } from 'fastify';
@@ -118,6 +119,9 @@ export class ApiSearchMastodon {
 					},
 					body: '{}',
 				});
+
+			await verifyResponse(res);
+
 			const data = await res.json() as Status[];
 			const me = await this.clientService.getAuth(request);
 			const response = await Promise.all(data.map(status => this.mastoConverters.convertStatus(status, me)));
@@ -143,6 +147,9 @@ export class ApiSearchMastodon {
 						state: 'alive',
 					}),
 				});
+
+			await verifyResponse(res);
+
 			const data = await res.json() as Account[];
 			const response = await Promise.all(data.map(async entry => {
 				return {
@@ -155,4 +162,30 @@ export class ApiSearchMastodon {
 			reply.send(response);
 		});
 	}
+}
+
+async function verifyResponse(res: Response): Promise<void> {
+	if (res.ok) return;
+
+	const text = await res.text();
+
+	if (res.headers.get('content-type') === 'application/json') {
+		try {
+			const json = JSON.parse(text);
+
+			if (json && typeof(json) === 'object') {
+				json.httpStatusCode = res.status;
+				return json;
+			}
+		} catch { /* ignore */ }
+	}
+
+	// Response is not a JSON object; treat as string
+	throw new ApiError({
+		code: 'INTERNAL_ERROR',
+		message: text || 'Internal error occurred. Please contact us if the error persists.',
+		id: '5d37dbcb-891e-41ca-a3d6-e690c97775ac',
+		kind: 'server',
+		httpStatusCode: res.status,
+	});
 }
