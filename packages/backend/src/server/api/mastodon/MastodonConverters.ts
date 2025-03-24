@@ -168,6 +168,9 @@ export class MastodonConverters {
 			acct = `${user.username}@${user.host}`;
 			acctUrl = `https://${user.host}/@${user.username}`;
 		}
+
+		const bioText = profile?.description && this.mfmService.toMastoApiHtml(mfm.parse(profile.description));
+
 		return awaitAll({
 			id: account.id,
 			username: user.username,
@@ -179,7 +182,7 @@ export class MastodonConverters {
 			followers_count: profile?.followersVisibility === 'public' ? user.followersCount : 0,
 			following_count: profile?.followingVisibility === 'public' ? user.followingCount : 0,
 			statuses_count: user.notesCount,
-			note: profile?.description ?? '',
+			note: bioText ?? '',
 			url: user.uri ?? acctUrl,
 			uri: user.uri ?? acctUri,
 			avatar: user.avatarUrl ?? 'https://dev.joinsharkey.org/static-assets/avatar.png',
