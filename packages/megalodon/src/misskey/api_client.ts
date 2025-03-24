@@ -336,14 +336,18 @@ namespace MisskeyAPI {
 		};
 
     export const mapReactions = (r: { [key: string]: number }, e: Record<string, string | undefined>, myReaction?: string): Array<MegalodonEntity.Reaction> => {
-      return Object.keys(r).map(key => {
+      return Object.entries(r).map(([key, count]) => {
 				const me = myReaction != null && key === myReaction;
+
+				// Translate the emoji name - "r" mapping includes a leading/trailing ":"
+				const [,name] = key.match(/^:([^@:]+(?:@[^:]+)?):$/) ?? [null,key];
+
 				return {
-					count: r[key],
+					count,
 					me,
-					name: key,
-					url: e[key],
-					static_url: e[key],
+					name,
+					url: e[name],
+					static_url: e[name],
 				}
       })
     }
