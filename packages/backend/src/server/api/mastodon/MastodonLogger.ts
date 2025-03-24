@@ -39,48 +39,50 @@ export interface MastodonError {
 }
 
 export function getErrorData(error: unknown): MastodonError {
+	// Axios wraps errors from the backend
+	error = unpackAxiosError(error);
+
+	if (!error || typeof(error) !== 'object') {
+		return {
+			error: 'UNKNOWN_ERROR',
+			error_description: String(error),
+		};
+	}
+
+	if (error instanceof ApiError) {
+		return convertApiError(error);
+	}
+
+	if ('code' in error && typeof (error.code) === 'string') {
+		if ('message' in error && typeof (error.message) === 'string') {
+			return convertApiError(error as ApiError);
+		}
+	}
+
+	if (error instanceof Error) {
+		return convertGenericError(error);
+	}
+
+	return convertUnknownError(error);
+}
+
+function unpackAxiosError(error: unknown): unknown {
 	if (error && typeof(error) === 'object') {
-		// AxiosError, comes from the backend
-		if ('response' in error) {
-			if (typeof(error.response) === 'object' && error.response) {
-				if ('data' in error.response) {
-					if (typeof(error.response.data) === 'object' && error.response.data) {
-						if ('error' in error.response.data) {
-							if (typeof(error.response.data.error) === 'object' && error.response.data.error) {
-								if ('code' in error.response.data.error) {
-									if (typeof(error.response.data.error.code) === 'string') {
-										return convertApiError(error.response.data.error as ApiError);
-									}
-								}
-
-								return convertUnknownError(error.response.data.error);
-							}
-						}
-
-						return convertUnknownError(error.response.data);
-					}
+		if ('response' in error && error.response && typeof (error.response) === 'object') {
+			if ('data' in error.response && error.response.data && typeof (error.response.data) === 'object') {
+				if ('error' in error.response.data && error.response.data.error && typeof(error.response.data.error) === 'object') {
+					return error.response.data.error;
 				}
+
+				return error.response.data;
 			}
 
 			// No data - this is a fallback to avoid leaking request/response details in the error
-			return convertUnknownError();
+			return undefined;
 		}
-
-		if (error instanceof ApiError) {
-			return convertApiError(error);
-		}
-
-		if (error instanceof Error) {
-			return convertGenericError(error);
-		}
-
-		return convertUnknownError(error);
 	}
 
-	return {
-		error: 'UNKNOWN_ERROR',
-		error_description: String(error),
-	};
+	return error;
 }
 
 function convertApiError(apiError: ApiError): MastodonError {
@@ -121,21 +123,17 @@ function convertGenericError(error: Error): MastodonError {
 }
 
 export function getErrorStatus(error: unknown): number {
-	// AxiosError, comes from the backend
-	if (typeof(error) === 'object' && error) {
-		if ('response' in error) {
-			if (typeof (error.response) === 'object' && error.response) {
-				if ('status' in error.response) {
-					if (typeof(error.response.status) === 'number') {
-						return error.response.status;
-					}
-				}
+	if (error && typeof(error) === 'object') {
+		// Axios wraps errors from the backend
+		if ('response' in error && typeof (error.response) === 'object' && error.response) {
+			if ('status' in error.response && typeof(error.response.status) === 'number') {
+				return error.response.status;
 			}
 		}
-	}
 
-	if (error instanceof ApiError && error.httpStatusCode) {
-		return error.httpStatusCode;
+		if ('httpStatusCode' in error && typeof(error.httpStatusCode) === 'number') {
+			return error.httpStatusCode;
+		}
 	}
 
 	return 500;
