@@ -6,6 +6,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Entity } from 'megalodon';
 import mfm from '@transfem-org/sfm-js';
+import { MastodonNotificationType } from 'megalodon/lib/src/mastodon/notification.js';
+import { NotificationType } from 'megalodon/lib/src/notification.js';
 import { DI } from '@/di-symbols.js';
 import { MfmService } from '@/core/MfmService.js';
 import type { Config } from '@/config.js';
@@ -355,32 +357,27 @@ export class MastodonConverters {
 			created_at: notification.created_at,
 			id: notification.id,
 			status: notification.status ? await this.convertStatus(notification.status, me) : undefined,
-			type: notification.type,
+			type: convertNotificationType(notification.type as NotificationType),
 		};
 	}
-
-	// public convertEmoji(emoji: string): MastodonEntity.Emoji {
-	// 	const reaction: MastodonEntity.Reaction = {
-	// 		name: emoji,
-	// 		count: 1,
-	// 	};
-	//
-	// 	if (emoji.startsWith(':')) {
-	// 		const [, name] = emoji.match(/^:([^@:]+(?:@[^@:]+)?):$/) ?? [];
-	// 		if (name) {
-	// 			const url = `${this.config.url}/emoji/${name}.webp`;
-	// 			reaction.url = url;
-	// 			reaction.static_url = url;
-	// 		}
-	// 	}
-	//
-	// 	return reaction;
-	// }
 }
 
 function simpleConvert<T>(data: T): T {
 	// copy the object to bypass weird pass by reference bugs
 	return Object.assign({}, data);
+}
+
+function convertNotificationType(type: NotificationType): MastodonNotificationType {
+	switch (type) {
+		case 'emoji_reaction': return 'reaction';
+		case 'poll_vote':
+		case 'poll_expired':
+			return 'poll';
+		// Not supported by mastodon
+		case 'move':
+			return type as MastodonNotificationType;
+		default: return type;
+	}
 }
 
 export function convertAnnouncement(announcement: Entity.Announcement): MastodonEntity.Announcement {

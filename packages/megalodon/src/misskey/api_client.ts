@@ -9,7 +9,8 @@ import MisskeyEntity from './entity'
 import MegalodonEntity from '../entity'
 import WebSocket from './web_socket'
 import MisskeyNotificationType from './notification'
-import NotificationType, { UnknownNotificationTypeError } from '../notification'
+import * as NotificationType from '../notification'
+import { UnknownNotificationTypeError } from '../notification';
 
 namespace MisskeyAPI {
   export namespace Entity {

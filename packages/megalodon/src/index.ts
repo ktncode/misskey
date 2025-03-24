@@ -6,7 +6,7 @@ import { MegalodonInterface, WebSocketInterface } from './megalodon'
 import { detector } from './detector'
 import Misskey from './misskey'
 import Entity from './entity'
-import NotificationType from './notification'
+import * as NotificationType from './notification'
 import FilterContext from './filter_context'
 import Converter from './converter'
 import MastodonEntity from './mastodon/entity';
