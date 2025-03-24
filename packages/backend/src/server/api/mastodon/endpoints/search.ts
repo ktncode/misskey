@@ -6,7 +6,7 @@
 import { Injectable } from '@nestjs/common';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
 import { attachMinMaxPagination, attachOffsetPagination } from '@/server/api/mastodon/pagination.js';
-import { MastoConverters } from '../converters.js';
+import { MastodonConverters } from '../MastodonConverters.js';
 import { parseTimelineArgs, TimelineArgs, toBoolean, toInt } from '../argsUtils.js';
 import Account = Entity.Account;
 import Status = Entity.Status;
@@ -23,7 +23,7 @@ interface ApiSearchMastodonRoute {
 @Injectable()
 export class ApiSearchMastodon {
 	constructor(
-		private readonly mastoConverters: MastoConverters,
+		private readonly mastoConverters: MastodonConverters,
 		private readonly clientService: MastodonClientService,
 	) {}
 

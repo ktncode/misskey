@@ -8,7 +8,7 @@ import { Injectable } from '@nestjs/common';
 import { emojiRegexAtStartToEnd } from '@/misc/emoji-regex.js';
 import { parseTimelineArgs, TimelineArgs, toBoolean, toInt } from '@/server/api/mastodon/argsUtils.js';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
-import { convertAttachment, convertPoll, MastoConverters } from '../converters.js';
+import { convertAttachment, convertPoll, MastodonConverters } from '../MastodonConverters.js';
 import type { Entity } from 'megalodon';
 import type { FastifyInstance } from 'fastify';
 
@@ -20,7 +20,7 @@ function normalizeQuery(data: Record<string, unknown>) {
 @Injectable()
 export class ApiStatusMastodon {
 	constructor(
-		private readonly mastoConverters: MastoConverters,
+		private readonly mastoConverters: MastodonConverters,
 		private readonly clientService: MastodonClientService,
 	) {}
 

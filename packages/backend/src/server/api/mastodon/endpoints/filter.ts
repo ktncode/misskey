@@ -6,7 +6,7 @@
 import { Injectable } from '@nestjs/common';
 import { toBoolean } from '@/server/api/mastodon/argsUtils.js';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
-import { convertFilter } from '../converters.js';
+import { convertFilter } from '../MastodonConverters.js';
 import type { FastifyInstance } from 'fastify';
 import type multer from 'fastify-multer';
 

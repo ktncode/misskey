@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { parseTimelineArgs, TimelineArgs } from '@/server/api/mastodon/argsUtils.js';
-import { MastoConverters } from '@/server/api/mastodon/converters.js';
+import { MastodonConverters } from '@/server/api/mastodon/MastodonConverters.js';
 import { attachMinMaxPagination } from '@/server/api/mastodon/pagination.js';
 import { MastodonClientService } from '../MastodonClientService.js';
 import type { FastifyInstance } from 'fastify';
@@ -21,7 +21,7 @@ interface ApiNotifyMastodonRoute {
 @Injectable()
 export class ApiNotificationsMastodon {
 	constructor(
-		private readonly mastoConverters: MastoConverters,
+		private readonly mastoConverters: MastodonConverters,
 		private readonly clientService: MastodonClientService,
 	) {}
 

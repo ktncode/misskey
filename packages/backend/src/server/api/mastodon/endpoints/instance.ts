@@ -9,7 +9,7 @@ import { FILE_TYPE_BROWSERSAFE } from '@/const.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta, UsersRepository } from '@/models/_.js';
-import { MastoConverters } from '@/server/api/mastodon/converters.js';
+import { MastodonConverters } from '@/server/api/mastodon/MastodonConverters.js';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
 import { RoleService } from '@/core/RoleService.js';
 import type { FastifyInstance } from 'fastify';
@@ -27,7 +27,7 @@ export class ApiInstanceMastodon {
 		@Inject(DI.config)
 		private readonly config: Config,
 
-		private readonly mastoConverters: MastoConverters,
+		private readonly mastoConverters: MastodonConverters,
 		private readonly clientService: MastodonClientService,
 		private readonly roleService: RoleService,
 	) {}

@@ -47,7 +47,7 @@ export const escapeMFM = (text: string): string => text
 	.replace(/\r?\n/g, '<br>');
 
 @Injectable()
-export class MastoConverters {
+export class MastodonConverters {
 	constructor(
 		@Inject(DI.config)
 		private readonly config: Config,

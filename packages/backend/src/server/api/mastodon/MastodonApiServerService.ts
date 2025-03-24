@@ -21,7 +21,7 @@ import { ApiTimelineMastodon } from '@/server/api/mastodon/endpoints/timeline.js
 import { ApiSearchMastodon } from '@/server/api/mastodon/endpoints/search.js';
 import { ApiError } from '@/server/api/error.js';
 import { parseTimelineArgs, TimelineArgs, toBoolean } from './argsUtils.js';
-import { convertAnnouncement, convertAttachment, MastoConverters, convertRelationship } from './converters.js';
+import { convertAnnouncement, convertAttachment, MastodonConverters, convertRelationship } from './MastodonConverters.js';
 import type { Entity } from 'megalodon';
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
@@ -31,7 +31,7 @@ export class MastodonApiServerService {
 		@Inject(DI.config)
 		private readonly config: Config,
 
-		private readonly mastoConverters: MastoConverters,
+		private readonly mastoConverters: MastodonConverters,
 		private readonly logger: MastodonLogger,
 		private readonly clientService: MastodonClientService,
 		private readonly apiAccountMastodon: ApiAccountMastodon,

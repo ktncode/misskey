@@ -6,7 +6,7 @@
 import { Injectable } from '@nestjs/common';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
 import { attachMinMaxPagination } from '@/server/api/mastodon/pagination.js';
-import { convertList, MastoConverters } from '../converters.js';
+import { convertList, MastodonConverters } from '../MastodonConverters.js';
 import { parseTimelineArgs, TimelineArgs, toBoolean } from '../argsUtils.js';
 import type { Entity } from 'megalodon';
 import type { FastifyInstance } from 'fastify';
@@ -15,7 +15,7 @@ import type { FastifyInstance } from 'fastify';
 export class ApiTimelineMastodon {
 	constructor(
 		private readonly clientService: MastodonClientService,
-		private readonly mastoConverters: MastoConverters,
+		private readonly mastoConverters: MastodonConverters,
 	) {}
 
 	public register(fastify: FastifyInstance): void {

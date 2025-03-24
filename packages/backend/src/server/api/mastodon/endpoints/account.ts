@@ -10,7 +10,7 @@ import { DriveService } from '@/core/DriveService.js';
 import { DI } from '@/di-symbols.js';
 import type { AccessTokensRepository, UserProfilesRepository } from '@/models/_.js';
 import { attachMinMaxPagination } from '@/server/api/mastodon/pagination.js';
-import { MastoConverters, convertRelationship, convertFeaturedTag, convertList } from '../converters.js';
+import { MastodonConverters, convertRelationship, convertFeaturedTag, convertList } from '../MastodonConverters.js';
 import type multer from 'fastify-multer';
 import type { FastifyInstance } from 'fastify';
 
@@ -30,7 +30,7 @@ export class ApiAccountMastodon {
 		private readonly accessTokensRepository: AccessTokensRepository,
 
 		private readonly clientService: MastodonClientService,
-		private readonly mastoConverters: MastoConverters,
+		private readonly mastoConverters: MastodonConverters,
 		private readonly driveService: DriveService,
 	) {}
 
