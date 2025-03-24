@@ -340,8 +340,21 @@ namespace MisskeyAPI {
       return Object.entries(r).map(([key, count]) => {
 				const me = myReaction != null && key === myReaction;
 
-				// Translate the emoji name - "r" mapping includes a leading/trailing ":"
-				const [,name] = key.match(/^:([^@:]+(?:@[^:]+)?):$/) ?? [null,key];
+				// Name is equal to the key for native emoji reactions, and as a fallback.
+				let name = key;
+
+				// Custom emoji have a leading / trailing ":", which we need to remove.
+				const match = key.match(/^:([^@:]+)(@[^:]+)?:$/);
+				if (match) {
+					const [, prefix, host] = match;
+
+					// Local custom emoji end in "@.", which we need to remove.
+					if (host && host !== '@.') {
+						name = prefix + host;
+					} else {
+						name = prefix;
+					}
+				}
 
 				return {
 					count,
