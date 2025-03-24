@@ -19,6 +19,8 @@ import { IdService } from '@/core/IdService.js';
 import type { Packed } from '@/misc/json-schema.js';
 import { MastodonDataService } from '@/server/api/mastodon/MastodonDataService.js';
 import { GetterService } from '@/server/api/GetterService.js';
+import { appendContentWarning } from '@/misc/append-content-warning.js';
+import { isRenote } from '@/misc/is-renote.js';
 
 // Missing from Megalodon apparently
 // https://docs.joinmastodon.org/entities/StatusEdit/
@@ -201,21 +203,37 @@ export class MastodonConverters {
 		if (!note) {
 			return [];
 		}
-		const noteUser = await this.getUser(note.userId).then(async (p) => await this.convertAccount(p));
+
+		const noteUser = await this.getUser(note.userId);
+		const account = await this.convertAccount(noteUser);
 		const edits = await this.noteEditRepository.find({ where: { noteId: note.id }, order: { id: 'ASC' } });
 		const history: StatusEdit[] = [];
 
+		const mentionedRemoteUsers = JSON.parse(note.mentionedRemoteUsers);
+		const renote = isRenote(note) ? await this.mastodonDataService.requireNote(note.renoteId, me) : null;
+
 		// TODO this looks wrong, according to mastodon docs
 		let lastDate = this.idService.parse(note.id).date;
+
 		for (const edit of edits) {
+			// TODO avoid re-packing files for each edit
 			const files = await this.driveFileEntityService.packManyByIds(edit.fileIds);
+
+			const cwMFM = appendContentWarning(edit.cw, noteUser.mandatoryCW);
+			const cw = (cwMFM && this.mfmService.toMastoApiHtml(mfm.parse(cwMFM), mentionedRemoteUsers, true)) ?? '';
+
+			const isQuote = renote && (edit.cw || edit.newText || edit.fileIds.length > 0 || note.replyId);
+			const quoteUri = isQuote
+				? renote.url ?? renote.uri ?? `${this.config.url}/notes/${renote.id}`
+				: null;
+
 			const item = {
-				account: noteUser,
-				content: this.mfmService.toMastoApiHtml(mfm.parse(edit.newText ?? ''), JSON.parse(note.mentionedRemoteUsers)) ?? '',
+				account: account,
+				content: this.mfmService.toMastoApiHtml(mfm.parse(edit.newText ?? ''), mentionedRemoteUsers, false, quoteUri) ?? '',
 				created_at: lastDate.toISOString(),
 				emojis: [], //FIXME
-				sensitive: edit.cw != null && edit.cw.length > 0,
-				spoiler_text: edit.cw ?? '',
+				sensitive: !!cw,
+				spoiler_text: cw,
 				media_attachments: files.length > 0 ? files.map((f) => this.encodeFile(f)) : [],
 			};
 			lastDate = edit.updatedAt;
@@ -274,9 +292,11 @@ export class MastodonConverters {
 
 		const text = note.text;
 		const content = text !== null
-			? quoteUri
-				.then(quoteUri => this.mfmService.toMastoApiHtml(mfm.parse(text), mentionedRemoteUsers, false, quoteUri) ?? escapeMFM(text))
+			? quoteUri.then(quote => this.mfmService.toMastoApiHtml(mfm.parse(text), mentionedRemoteUsers, false, quote) ?? escapeMFM(text))
 			: '';
+
+		const cwMFM = appendContentWarning(note.cw, noteUser.mandatoryCW);
+		const cw = (cwMFM && this.mfmService.toMastoApiHtml(mfm.parse(cwMFM), mentionedRemoteUsers, true)) ?? '';
 
 		const reblogged = await this.mastodonDataService.hasReblog(note.id, me);
 
@@ -301,8 +321,8 @@ export class MastodonConverters {
 			reblogged,
 			favourited: status.favourited,
 			muted: status.muted,
-			sensitive: status.sensitive || !!note.cw,
-			spoiler_text: note.cw ?? '',
+			sensitive: status.sensitive || !!cw,
+			spoiler_text: cw,
 			visibility: status.visibility,
 			media_attachments: status.media_attachments.map(a => convertAttachment(a)),
 			mentions: mentions,
