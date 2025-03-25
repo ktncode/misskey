@@ -530,3 +530,7 @@ _authorizedFetchValueDescription:
   essential: "Allow some limited unsigned requests. Provides a hybrid between \"Never\" and \"Always\" by exposing only the minimum profile metadata that is required for federation with older software."
   staff: "Use the default value of \"{value}\" recommended by the instance staff."
 authorizedFetchLegacyWarning: "The configuration property 'checkActivityPubGetSignature' has been deprecated and replaced with the new Authorized Fetch setting. Please remove it from your configuration file."
+
+_followRequest:
+  recieved: "Received"
+  sent: "Sent"

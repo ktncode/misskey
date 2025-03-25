@@ -12,7 +12,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			<div class="profile _gaps">
 				<MkAccountMoved v-if="user.movedTo" :movedTo="user.movedTo"/>
-				<MkRemoteCaution v-if="user.host != null" :href="user.url ?? user.uri!" class="warn"/>
+				<MkRemoteCaution v-if="user.host != null" :href="user.url ?? user.uri!"/>
+				<MkInfo v-if="user.host == null && user.username.includes('.')">{{ i18n.ts.isSystemAccount }}</MkInfo>
 
 				<div :key="user.id" class="main _panel">
 					<div class="banner-container" :class="{ [$style.bannerContainerTall]: useTallBanner }">
@@ -58,7 +59,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 					</div>
 					<div v-if="user.followedMessage != null" class="followedMessage">
-						<MkFukidashi class="fukidashi" :tail="narrow ? 'none' : 'left'" negativeMargin shadow>
+						<MkFukidashi class="fukidashi" :tail="narrow ? 'none' : 'left'" negativeMargin>
 							<div class="messageHeader">{{ i18n.ts.messageToFollower }}</div>
 							<div><MkSparkle><Mfm :plain="true" :text="user.followedMessage" :author="user"/></MkSparkle></div>
 						</MkFukidashi>
@@ -205,21 +206,21 @@ import MkRemoteCaution from '@/components/MkRemoteCaution.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkButton from '@/components/MkButton.vue';
-import { getUserMenu } from '@/scripts/get-user-menu.js';
+import { getUserMenu } from '@/utility/get-user-menu.js';
 import number from '@/filters/number.js';
 import { userPage } from '@/filters/user.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
-import { defaultStore } from '@/store.js';
-import { $i, iAmModerator } from '@/account.js';
+import { $i, iAmModerator } from '@/i.js';
 import { dateString } from '@/filters/date.js';
-import { confetti } from '@/scripts/confetti.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
-import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@/scripts/isFfVisibleForMe.js';
-import { useRouter } from '@/router/supplier.js';
-import { getStaticImageUrl } from '@/scripts/media-proxy.js';
+import { confetti } from '@/utility/confetti.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
+import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@/utility/isFfVisibleForMe.js';
+import { useRouter } from '@/router.js';
+import { getStaticImageUrl } from '@/utility/media-proxy.js';
 import { infoImageUrl } from '@/instance.js';
 import MkSparkle from '@/components/MkSparkle.vue';
+import { prefer } from '@/preferences.js';
 
 const MkNote = defineAsyncComponent(() =>
 	defaultStore.state.noteDesign === 'sharkey'
@@ -331,7 +332,7 @@ const AllPagination = {
 
 const style = computed(() => {
 	if (props.user.bannerUrl == null) return {};
-	if (defaultStore.state.disableShowingAnimatedImages) {
+	if (prefer.s.disableShowingAnimatedImages) {
 		return {
 			backgroundImage: `url(${ getStaticImageUrl(props.user.bannerUrl) })`,
 		};

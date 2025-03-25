@@ -33,8 +33,8 @@ export const permissions = [
 	'write:favorites',
 	'read:following',
 	'write:following',
-	'read:messaging',
-	'write:messaging',
+	'read:messaging', // deprecated
+	'write:messaging', // deprecated
 	'read:mutes',
 	'write:mutes',
 	'write:notes',
@@ -116,6 +116,8 @@ export const permissions = [
 	'read:clip-favorite',
 	'read:federation',
 	'write:report-abuse',
+	'write:chat',
+	'read:chat',
 ] as const;
 
 export const moderationLogTypes = [

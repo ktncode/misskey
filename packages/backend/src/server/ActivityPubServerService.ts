@@ -252,6 +252,11 @@ export class ActivityPubServerService {
 
 	@bindThis
 	private inbox(request: FastifyRequest, reply: FastifyReply) {
+		if (this.meta.federation === 'none') {
+			reply.code(403);
+			return;
+		}
+
 		let signature;
 
 		try {
@@ -323,6 +328,11 @@ export class ActivityPubServerService {
 		request: FastifyRequest<{ Params: { user: string; }; Querystring: { cursor?: string; page?: string; }; }>,
 		reply: FastifyReply,
 	) {
+		if (this.meta.federation === 'none') {
+			reply.code(403);
+			return;
+		}
+
 		const { reject } = await this.checkAuthorizedFetch(request, reply, request.params.user);
 		if (reject) return;
 
@@ -415,6 +425,11 @@ export class ActivityPubServerService {
 		request: FastifyRequest<{ Params: { user: string; }; Querystring: { cursor?: string; page?: string; }; }>,
 		reply: FastifyReply,
 	) {
+		if (this.meta.federation === 'none') {
+			reply.code(403);
+			return;
+		}
+
 		const { reject } = await this.checkAuthorizedFetch(request, reply, request.params.user);
 		if (reject) return;
 
@@ -504,6 +519,11 @@ export class ActivityPubServerService {
 
 	@bindThis
 	private async featured(request: FastifyRequest<{ Params: { user: string; }; }>, reply: FastifyReply) {
+		if (this.meta.federation === 'none') {
+			reply.code(403);
+			return;
+		}
+
 		const { reject } = await this.checkAuthorizedFetch(request, reply, request.params.user);
 		if (reject) return;
 
@@ -550,6 +570,11 @@ export class ActivityPubServerService {
 		}>,
 		reply: FastifyReply,
 	) {
+		if (this.meta.federation === 'none') {
+			reply.code(403);
+			return;
+		}
+
 		const { reject } = await this.checkAuthorizedFetch(request, reply, request.params.user);
 		if (reject) return;
 
@@ -636,6 +661,11 @@ export class ActivityPubServerService {
 
 	@bindThis
 	private async userInfo(request: FastifyRequest, reply: FastifyReply, user: MiUser | null, redact = false) {
+		if (this.meta.federation === 'none') {
+			reply.code(403);
+			return;
+		}
+
 		if (user == null) {
 			reply.code(404);
 			return;
@@ -728,6 +758,11 @@ export class ActivityPubServerService {
 		fastify.get<{ Params: { note: string; } }>('/notes/:note', { constraints: { apOrHtml: 'ap' } }, async (request, reply) => {
 			vary(reply.raw, 'Accept');
 
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
+
 			const note = await this.notesRepository.findOneBy({
 				id: request.params.note,
 				visibility: In(['public', 'home']),
@@ -761,6 +796,11 @@ export class ActivityPubServerService {
 		// note activity
 		fastify.get<{ Params: { note: string; } }>('/notes/:note/activity', async (request, reply) => {
 			vary(reply.raw, 'Accept');
+
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
 
 			const note = await this.notesRepository.findOneBy({
 				id: request.params.note,
@@ -852,6 +892,11 @@ export class ActivityPubServerService {
 
 		// publickey
 		fastify.get<{ Params: { user: string; } }>('/users/:user/publickey', async (request, reply) => {
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
+
 			const { reject } = await this.checkAuthorizedFetch(request, reply, request.params.user, true);
 			if (reject) return;
 
@@ -884,6 +929,11 @@ export class ActivityPubServerService {
 
 			vary(reply.raw, 'Accept');
 
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
+
 			const userId = request.params.user;
 
 			const user = await this.usersRepository.findOneBy({
@@ -896,6 +946,11 @@ export class ActivityPubServerService {
 
 		fastify.get<{ Params: { acct: string; } }>('/@:acct', { constraints: { apOrHtml: 'ap' } }, async (request, reply) => {
 			vary(reply.raw, 'Accept');
+
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
 
 			const acct = Acct.parse(request.params.acct);
 
@@ -914,6 +969,11 @@ export class ActivityPubServerService {
 
 		// emoji
 		fastify.get<{ Params: { emoji: string; } }>('/emojis/:emoji', async (request, reply) => {
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
+
 			const { reject } = await this.checkAuthorizedFetch(request, reply);
 			if (reject) return;
 
@@ -933,6 +993,11 @@ export class ActivityPubServerService {
 
 		// like
 		fastify.get<{ Params: { like: string; } }>('/likes/:like', async (request, reply) => {
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
+
 			const reaction = await this.noteReactionsRepository.findOneBy({ id: request.params.like });
 
 			const { reject } = await this.checkAuthorizedFetch(request, reply, reaction?.userId);
@@ -956,6 +1021,11 @@ export class ActivityPubServerService {
 
 		// follow
 		fastify.get<{ Params: { follower: string; followee: string; } }>('/follows/:follower/:followee', async (request, reply) => {
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
+
 			const { reject } = await this.checkAuthorizedFetch(request, reply, request.params.follower);
 			if (reject) return;
 
@@ -983,7 +1053,12 @@ export class ActivityPubServerService {
 		});
 
 		// follow
-		fastify.get<{ Params: { followRequestId: string ; } }>('/follows/:followRequestId', async (request, reply) => {
+		fastify.get<{ Params: { followRequestId: string; } }>('/follows/:followRequestId', async (request, reply) => {
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
+
 			// This may be used before the follow is completed, so we do not
 			// check if the following exists and only check if the follow request exists.
 

@@ -30,6 +30,7 @@ import { CustomEmojiService } from '@/core/CustomEmojiService.js';
 import { IdService } from '@/core/IdService.js';
 import { appendContentWarning } from '@/misc/append-content-warning.js';
 import { QueryService } from '@/core/QueryService.js';
+import { UtilityService } from '@/core/UtilityService.js';
 import { JsonLdService } from './JsonLdService.js';
 import { ApMfmService } from './ApMfmService.js';
 import { CONTEXT } from './misc/contexts.js';
@@ -72,6 +73,7 @@ export class ApRendererService {
 		private mfmService: MfmService,
 		private idService: IdService,
 		private readonly queryService: QueryService,
+		private utilityService: UtilityService,
 	) {
 	}
 
@@ -263,6 +265,49 @@ export class ApRendererService {
 			url: this.driveFileEntityService.getPublicUrl(file),
 			sensitive: file.isSensitive,
 			name: file.comment,
+		};
+	}
+
+	@bindThis
+	public renderIdenticon(user: MiLocalUser): IApImage {
+		return {
+			type: 'Image',
+			url: this.userEntityService.getIdenticonUrl(user),
+			sensitive: false,
+			name: null,
+		};
+	}
+
+	@bindThis
+	public renderSystemAvatar(user: MiLocalUser): IApImage {
+		if (this.meta.iconUrl == null) return this.renderIdenticon(user);
+		return {
+			type: 'Image',
+			url: this.meta.iconUrl,
+			sensitive: false,
+			name: null,
+		};
+	}
+
+	@bindThis
+	public renderSystemBanner(): IApImage | null {
+		if (this.meta.bannerUrl == null) return null;
+		return {
+			type: 'Image',
+			url: this.meta.bannerUrl,
+			sensitive: false,
+			name: null,
+		};
+	}
+
+	@bindThis
+	public renderSystemBackground(): IApImage | null {
+		if (this.meta.backgroundImageUrl == null) return null;
+		return {
+			type: 'Image',
+			url: this.meta.backgroundImageUrl,
+			sensitive: false,
+			name: null,
 		};
 	}
 
@@ -503,11 +548,28 @@ export class ApRendererService {
 			this.userProfilesRepository.findOneByOrFail({ userId: user.id }),
 		]);
 
+		const tryRewriteUrl = (maybeUrl: string) => {
+			const urlSafeRegex = /^(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
+			try {
+				const match = maybeUrl.match(urlSafeRegex);
+				if (!match) {
+					return maybeUrl;
+				}
+				const urlPart = match[0];
+				const urlPartParsed = new URL(urlPart);
+				const restPart = maybeUrl.slice(match[0].length);
+
+				return `<a href="${urlPartParsed.href}" rel="me nofollow noopener" target="_blank">${urlPart}</a>${restPart}`;
+			} catch (e) {
+				return maybeUrl;
+			}
+		};
+
 		const attachment = profile.fields.map(field => ({
 			type: 'PropertyValue',
 			name: field.name,
 			value: (field.value.startsWith('http://') || field.value.startsWith('https://'))
-				? `<a href="${new URL(field.value).href}" rel="me nofollow noopener" target="_blank">${new URL(field.value).href}</a>`
+				? tryRewriteUrl(field.value)
 				: field.value,
 		}));
 
@@ -542,9 +604,9 @@ export class ApRendererService {
 			_misskey_requireSigninToViewContents: user.requireSigninToViewContents,
 			_misskey_makeNotesFollowersOnlyBefore: user.makeNotesFollowersOnlyBefore,
 			_misskey_makeNotesHiddenBefore: user.makeNotesHiddenBefore,
-			icon: avatar ? this.renderImage(avatar) : null,
-			image: banner ? this.renderImage(banner) : null,
-			backgroundUrl: background ? this.renderImage(background) : null,
+			icon: avatar ? this.renderImage(avatar) : isSystem ? this.renderSystemAvatar(user) : this.renderIdenticon(user),
+			image: banner ? this.renderImage(banner) : isSystem ? this.renderSystemBanner() : null,
+			backgroundUrl: background ? this.renderImage(background) : isSystem ? this.renderSystemBackground() : null,
 			tag,
 			manuallyApprovesFollowers: user.isLocked,
 			discoverable: user.isExplorable,
@@ -660,7 +722,7 @@ export class ApRendererService {
 
 	@bindThis
 	public renderUndo(object: string | IObject, user: { id: MiUser['id'] }): IUndo {
-		const id = typeof object !== 'string' && typeof object.id === 'string' && object.id.startsWith(this.config.url) ? `${object.id}/undo` : undefined;
+		const id = typeof object !== 'string' && typeof object.id === 'string' && this.utilityService.isUriLocal(object.id) ? `${object.id}/undo` : undefined;
 
 		return {
 			type: 'Undo',

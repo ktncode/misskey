@@ -9,7 +9,6 @@ import type { NotesRepository, FollowingsRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { NoteReadService } from '@/core/NoteReadService.js';
 import { DI } from '@/di-symbols.js';
 
 export const meta = {
@@ -58,7 +57,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 		private noteEntityService: NoteEntityService,
 		private queryService: QueryService,
-		private noteReadService: NoteReadService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const followingQuery = this.followingsRepository.createQueryBuilder('following')
@@ -94,8 +92,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			const mentions = await query.limit(ps.limit).getMany();
-
-			this.noteReadService.read(me.id, mentions);
 
 			return await this.noteEntityService.packMany(mentions, me);
 		});

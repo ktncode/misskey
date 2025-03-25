@@ -1119,6 +1119,8 @@ pullDownToRefresh: "Kéo xuống để làm mới"
 cwNotationRequired: "Nếu \"Ẩn nội dung\" được bật thì cần phải có chú thích."
 lastNDays: "{n} ngày trước"
 surrender: "Từ chối"
+postForm: "Mẫu đăng"
+information: "Giới thiệu"
 _delivery:
   stop: "Đã vô hiệu hóa"
   _type:
@@ -1930,3 +1932,7 @@ _reversi:
 _remoteLookupErrors:
   _noSuchObject:
     title: "Không tìm thấy"
+_search:
+  searchScopeAll: "Tất cả"
+  searchScopeLocal: "Máy chủ này"
+  searchScopeUser: "Người dùng chỉ định"

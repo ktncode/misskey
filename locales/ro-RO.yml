@@ -646,6 +646,7 @@ show: "Arată"
 icon: "Avatar"
 replies: "Răspunde"
 renotes: "Re-notează"
+information: "Despre"
 _delivery:
   stop: "Suspendat"
   _type:
@@ -736,3 +737,5 @@ _reversi:
 _remoteLookupErrors:
   _noSuchObject:
     title: "Nu a fost găsit"
+_search:
+  searchScopeAll: "Tot"

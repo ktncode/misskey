@@ -10,6 +10,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<FormSuspense :p="init">
 			<div class="_gaps_m">
 				<MkFolder>
+					<template #label>Google Analytics<span class="_beta">{{ i18n.ts.beta }}</span></template>
+
+					<div class="_gaps_m">
+						<MkInput v-model="googleAnalyticsMeasurementId">
+							<template #prefix><i class="ti ti-key"></i></template>
+							<template #label>Measurement ID</template>
+						</MkInput>
+						<MkButton primary @click="save_googleAnalytics">Save</MkButton>
+					</div>
+				</MkFolder>
+
+				<MkFolder>
 					<template #label>DeepL Translation</template>
 
 					<div class="_gaps_m">
@@ -65,10 +77,10 @@ import MkButton from '@/components/MkButton.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import FormSuspense from '@/components/form/suspense.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePage } from '@/page.js';
 import MkFolder from '@/components/MkFolder.vue';
 
 const deeplAuthKey = ref<string | null>('');
@@ -78,14 +90,17 @@ const deeplFreeInstance = ref<string | null>('');
 const libreTranslateURL = ref<string | null>('');
 const libreTranslateKey = ref<string | null>('');
 
+const googleAnalyticsMeasurementId = ref<string>('');
+
 async function init() {
 	const meta = await misskeyApi('admin/meta');
-	deeplAuthKey.value = meta.deeplAuthKey;
+	deeplAuthKey.value = meta.deeplAuthKey ?? '';
 	deeplIsPro.value = meta.deeplIsPro;
 	deeplFreeMode.value = meta.deeplFreeMode;
 	deeplFreeInstance.value = meta.deeplFreeInstance;
 	libreTranslateURL.value = meta.libreTranslateURL;
 	libreTranslateKey.value = meta.libreTranslateKey;
+	googleAnalyticsMeasurementId.value = meta.googleAnalyticsMeasurementId ?? '';
 }
 
 function save_deepl() {
@@ -108,11 +123,19 @@ function save_libre() {
 	});
 }
 
+function save_googleAnalytics() {
+	os.apiWithDialog('admin/update-meta', {
+		googleAnalyticsMeasurementId: googleAnalyticsMeasurementId.value,
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
 const headerActions = computed(() => []);
 
 const headerTabs = computed(() => []);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.externalServices,
 	icon: 'ph-arrow-square-out ph-bold ph-lg',
 }));

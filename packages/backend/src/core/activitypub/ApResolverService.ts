@@ -6,7 +6,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull, Not } from 'typeorm';
 import type { MiLocalUser, MiRemoteUser } from '@/models/User.js';
-import { InstanceActorService } from '@/core/InstanceActorService.js';
 import type { NotesRepository, PollsRepository, NoteReactionsRepository, UsersRepository, FollowRequestsRepository, MiMeta, SkApFetchLog } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
@@ -16,13 +15,15 @@ import { bindThis } from '@/decorators.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import type Logger from '@/logger.js';
 import { fromTuple } from '@/misc/from-tuple.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { ApLogService, calculateDurationSince, extractObjectContext } from '@/core/ApLogService.js';
 import { ApUtilityService } from '@/core/activitypub/ApUtilityService.js';
+import { SystemAccountService } from '@/core/SystemAccountService.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { getApId, getNullableApId, IObjectWithId, isCollectionOrOrderedCollection } from './type.js';
 import { ApDbResolverService } from './ApDbResolverService.js';
 import { ApRendererService } from './ApRendererService.js';
 import { ApRequestService } from './ApRequestService.js';
+import { FetchAllowSoftFailMask } from './misc/check-against-url.js';
 import type { IObject, ICollection, IOrderedCollection, ApObject } from './type.js';
 
 export class Resolver {
@@ -39,7 +40,7 @@ export class Resolver {
 		private noteReactionsRepository: NoteReactionsRepository,
 		private followRequestsRepository: FollowRequestsRepository,
 		private utilityService: UtilityService,
-		private instanceActorService: InstanceActorService,
+		private systemAccountService: SystemAccountService,
 		private apRequestService: ApRequestService,
 		private httpRequestService: HttpRequestService,
 		private apRendererService: ApRendererService,
@@ -103,11 +104,10 @@ export class Resolver {
 		return await this.resolve(id);
 	}
 
-	public async resolve(value: string | [string]): Promise<IObjectWithId>;
-	public async resolve(value: string | IObject | [string | IObject]): Promise<IObject>;
+	public async resolve(value: string | [string], allowSoftfail?: FetchAllowSoftFailMask): Promise<IObjectWithId>;
+	public async resolve(value: string | IObject | [string | IObject], allowSoftfail?: FetchAllowSoftFailMask): Promise<IObject>;
 	@bindThis
-	public async resolve(value: string | IObject | [string | IObject]): Promise<IObject> {
-		// eslint-disable-next-line no-param-reassign
+	public async resolve(value: string | IObject | [string | IObject], allowSoftfail: FetchAllowSoftFailMask = FetchAllowSoftFailMask.Strict): Promise<IObject> {
 		value = fromTuple(value);
 
 		if (typeof value !== 'string') {
@@ -116,13 +116,13 @@ export class Resolver {
 
 		const host = this.utilityService.extractDbHost(value);
 		if (this.config.activityLogging.enabled && !this.utilityService.isSelfHost(host)) {
-			return await this._resolveLogged(value, host);
+			return await this._resolveLogged(value, host, allowSoftfail);
 		} else {
-			return await this._resolve(value, host);
+			return await this._resolve(value, host, allowSoftfail);
 		}
 	}
 
-	private async _resolveLogged(requestUri: string, host: string): Promise<IObjectWithId> {
+	private async _resolveLogged(requestUri: string, host: string, allowSoftfail: FetchAllowSoftFailMask): Promise<IObjectWithId> {
 		const startTime = process.hrtime.bigint();
 
 		const log = await this.apLogService.createFetchLog({
@@ -131,7 +131,7 @@ export class Resolver {
 		});
 
 		try {
-			const result = await this._resolve(requestUri, host, log);
+			const result = await this._resolve(requestUri, host, allowSoftfail, log);
 
 			log.accepted = true;
 			log.result = 'ok';
@@ -151,7 +151,7 @@ export class Resolver {
 		}
 	}
 
-	private async _resolve(value: string, host: string, log?: SkApFetchLog): Promise<IObjectWithId> {
+	private async _resolve(value: string, host: string, allowSoftfail: FetchAllowSoftFailMask, log?: SkApFetchLog): Promise<IObjectWithId> {
 		if (value.includes('#')) {
 			// URLs with fragment parts cannot be resolved correctly because
 			// the fragment part does not get transmitted over HTTP(S).
@@ -178,12 +178,12 @@ export class Resolver {
 		}
 
 		if (this.config.signToActivityPubGet && !this.user) {
-			this.user = await this.instanceActorService.getInstanceActor();
+			this.user = await this.systemAccountService.fetch('actor');
 		}
 
 		const object = (this.user
-			? await this.apRequestService.signedGet(value, this.user)
-			: await this.httpRequestService.getActivityJson(value));
+			? await this.apRequestService.signedGet(value, this.user, allowSoftfail) as IObject
+			: await this.httpRequestService.getActivityJson(value, allowSoftfail)) as IObject;
 
 		if (log) {
 			const { object: objectOnly, context, contextHash } = extractObjectContext(object);
@@ -307,7 +307,7 @@ export class ApResolverService {
 		private followRequestsRepository: FollowRequestsRepository,
 
 		private utilityService: UtilityService,
-		private instanceActorService: InstanceActorService,
+		private systemAccountService: SystemAccountService,
 		private apRequestService: ApRequestService,
 		private httpRequestService: HttpRequestService,
 		private apRendererService: ApRendererService,
@@ -332,7 +332,7 @@ export class ApResolverService {
 			this.noteReactionsRepository,
 			this.followRequestsRepository,
 			this.utilityService,
-			this.instanceActorService,
+			this.systemAccountService,
 			this.apRequestService,
 			this.httpRequestService,
 			this.apRendererService,

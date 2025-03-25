@@ -274,6 +274,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template v-else-if="log.type === 'removeRelay'">
 			<div>{{ i18n.ts.inboxUrl }}: {{ log.info.inbox }}</div>
 		</template>
+		<template v-else-if="log.type === 'updateProxyAccountDescription'">
+			<div :class="$style.diff">
+				<CodeDiff :context="5" :hideHeader="true" :oldString="log.info.before ?? ''" :newString="log.info.after ?? ''" maxHeight="300px"/>
+			</div>
+		</template>
 
 		<details>
 			<summary>raw</summary>

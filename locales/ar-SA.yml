@@ -1012,6 +1012,8 @@ sourceCode: "الشفرة المصدرية"
 flip: "اقلب"
 lastNDays: "آخر {n} أيام"
 surrender: "ألغِ"
+postForm: "أنشئ ملاحظة"
+information: "عن"
 _delivery:
   stop: "مُعلّق"
 _initialAccountSetting:
@@ -1584,3 +1586,7 @@ _offlineScreen:
 _remoteLookupErrors:
   _noSuchObject:
     title: "غير موجود"
+_search:
+  searchScopeAll: "الكل"
+  searchScopeLocal: "المحلي"
+  searchScopeUser: "مستخدم محدد"

@@ -1181,6 +1181,10 @@ keepOriginalFilenameDescription: "Если вы выключите данную 
 alwaysConfirmFollow: "Всегда подтверждать подписку"
 inquiry: "Связаться"
 messageToFollower: "Сообщение подписчикам"
+postForm: "Форма отправки"
+information: "Описание"
+_settings:
+  webhook: "Вебхук"
 _delivery:
   stop: "Заморожено"
   _type:
@@ -2147,3 +2151,7 @@ _reversi:
 _remoteLookupErrors:
   _noSuchObject:
     title: "Не найдено"
+_search:
+  searchScopeAll: "Все"
+  searchScopeLocal: "Местная"
+  searchScopeUser: "Указанный пользователь"

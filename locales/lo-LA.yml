@@ -394,6 +394,7 @@ searchByGoogle: "ຄົ້ນຫາ"
 file: "ໄຟລ໌"
 replies: "ຕອບ​ກັບ"
 renotes: "Renote"
+information: "ກ່ຽວກັບ"
 _delivery:
   stop: "ໂຈະ"
   _type:
@@ -477,3 +478,5 @@ _moderationLogTypes:
 _remoteLookupErrors:
   _noSuchObject:
     title: "ບໍ່ພົບ"
+_search:
+  searchScopeAll: "ທັງໝົດ"

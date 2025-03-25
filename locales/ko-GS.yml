@@ -655,6 +655,7 @@ replies: "답하기"
 renotes: "리노트"
 attach: "옇기"
 surrender: "아이예"
+information: "정보"
 _delivery:
   stop: "고만 보내예"
   _type:
@@ -843,3 +844,6 @@ _reversi:
 _remoteLookupErrors:
   _noSuchObject:
     title: "몬 찾앗십니다"
+_search:
+  searchScopeAll: "말캉"
+  searchScopeUser: "사용자 지정"

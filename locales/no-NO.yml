@@ -463,6 +463,7 @@ icon: "Avatar"
 replies: "Svar"
 renotes: "Renote"
 surrender: "Avbryt"
+information: "Informasjon"
 _delivery:
   stop: "Suspendert"
 _initialAccountSetting:
@@ -730,3 +731,5 @@ _moderationLogTypes:
 _remoteLookupErrors:
   _noSuchObject:
     title: "Ikke funnet"
+_search:
+  searchScopeAll: "Alle"

@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	>
 		<iframe
 			v-if="player.url.startsWith('http://') || player.url.startsWith('https://')"
-			sandbox="allow-popups allow-scripts allow-storage-access-by-user-activation allow-same-origin"
+			sandbox="allow-popups allow-popups-to-escape-sandbox allow-scripts allow-storage-access-by-user-activation allow-same-origin"
 			scrolling="no"
 			:allow="player.allow == null ? 'autoplay;encrypted-media;fullscreen' : player.allow.filter(x => ['autoplay', 'clipboard-write', 'fullscreen', 'encrypted-media', 'picture-in-picture', 'web-share'].includes(x)).join(';')"
 			:class="$style.playerIframe"
@@ -34,7 +34,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			sandbox="allow-popups allow-popups-to-escape-sandbox allow-scripts allow-same-origin"
 			scrolling="no"
 			:style="{ position: 'relative', width: '100%', height: `${tweetHeight}px`, border: 0 }"
-			:src="`https://platform.twitter.com/embed/index.html?embedId=${embedId}&amp;hideCard=false&amp;hideThread=false&amp;lang=en&amp;theme=${defaultStore.state.darkMode ? 'dark' : 'light'}&amp;id=${tweetId}`"
+			:src="`https://platform.twitter.com/embed/index.html?embedId=${embedId}&amp;hideCard=false&amp;hideThread=false&amp;lang=en&amp;theme=${store.s.darkMode ? 'dark' : 'light'}&amp;id=${tweetId}`"
 		></iframe>
 	</div>
 	<div :class="$style.action">
@@ -46,7 +46,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div v-else-if="theNote" :class="[$style.link, { [$style.compact]: compact }]"><XNoteSimple :note="theNote" :class="$style.body"/></div>
 <div v-else-if="!hidePreview">
 	<component :is="self ? 'MkA' : 'a'" :class="[$style.link, { [$style.compact]: compact }]" :[attr]="self ? url.substring(local.length) : url" rel="nofollow noopener" :target="target" :title="url" @click.prevent="self ? true : warningExternalWebsite(url)" @click.stop>
-		<div v-if="thumbnail && !sensitive" :class="$style.thumbnail" :style="defaultStore.state.dataSaver.urlPreview ? '' : `background-image: url('${thumbnail}')`">
+		<div v-if="thumbnail && !sensitive" :class="$style.thumbnail" :style="prefer.s.dataSaver.urlPreview ? '' : `background-image: url('${thumbnail}')`">
 		</div>
 		<article :class="$style.body">
 			<header :class="$style.header">
@@ -89,7 +89,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, onDeactivated, onUnmounted, ref, watch } from 'vue';
+import { defineAsyncComponent, onDeactivated, onUnmounted, ref } from 'vue';
 import { url as local } from '@@/js/config.js';
 import { versatileLang } from '@@/js/intl-const.js';
 import * as Misskey from 'misskey-js';
@@ -98,12 +98,13 @@ import type MkNoteSimple from '@/components/MkNoteSimple.vue';
 import type SkNoteSimple from '@/components/SkNoteSimple.vue';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
-import { deviceKind } from '@/scripts/device-kind.js';
+import { deviceKind } from '@/utility/device-kind.js';
 import MkButton from '@/components/MkButton.vue';
-import { transformPlayerUrl } from '@/scripts/player-url-transform.js';
-import { defaultStore } from '@/store.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
-import { warningExternalWebsite } from '@/scripts/warning-external-website.js';
+import { transformPlayerUrl } from '@/utility/player-url-transform.js';
+import { store } from '@/store.js';
+import { prefer } from '@/preferences.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
+import { warningExternalWebsite } from '@/utility/warning-external-website.js';
 
 const XNoteSimple = defineAsyncComponent<typeof MkNoteSimple | typeof SkNoteSimple>(() =>
 	defaultStore.state.noteDesign === 'misskey'
@@ -301,6 +302,7 @@ onUnmounted(() => {
 	box-shadow: 0 0 0 1px var(--MI_THEME-divider);
 	border-radius: var(--MI-radius-sm);
 	overflow: clip;
+	text-align: left;
 
 	&:hover {
 		text-decoration: none;

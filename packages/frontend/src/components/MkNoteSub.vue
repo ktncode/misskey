@@ -93,24 +93,22 @@ import MkSubNoteContent from '@/components/MkSubNoteContent.vue';
 import MkCwButton from '@/components/MkCwButton.vue';
 import { notePage } from '@/filters/note.js';
 import * as os from '@/os.js';
-import * as sound from '@/scripts/sound.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import * as sound from '@/utility/sound.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
-import { $i } from '@/account.js';
+import { $i } from '@/i.js';
 import { userPage } from '@/filters/user.js';
-import { checkWordMute } from '@/scripts/check-word-mute.js';
+import { checkWordMute } from '@/utility/check-word-mute.js';
 import { defaultStore } from '@/store.js';
 import { host } from '@@/js/config.js';
-import { pleaseLogin, type OpenOnRemoteOptions } from '@/scripts/please-login.js';
-import { showMovedDialog } from '@/scripts/show-moved-dialog.js';
+import { pleaseLogin, type OpenOnRemoteOptions } from '@/utility/please-login.js';
+import { showMovedDialog } from '@/utility/show-moved-dialog.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
-import { reactionPicker } from '@/scripts/reaction-picker.js';
-import { claimAchievement } from '@/scripts/achievements.js';
-import { getNoteMenu } from '@/scripts/get-note-menu.js';
-import { useNoteCapture } from '@/scripts/use-note-capture.js';
-import { boostMenuItems, type Visibility, computeRenoteTooltip } from '@/scripts/boost-quote.js';
-
-const canRenote = computed(() => ['public', 'home'].includes(props.note.visibility) || props.note.userId === $i.id);
+import { reactionPicker } from '@/utility/reaction-picker.js';
+import { claimAchievement } from '@/utility/achievements.js';
+import { getNoteMenu } from '@/utility/get-note-menu.js';
+import { useNoteCapture } from '@/utility/use-note-capture.js';
+import { boostMenuItems, type Visibility, computeRenoteTooltip } from '@/utility/boost-quote.js';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -123,6 +121,8 @@ const props = withDefaults(defineProps<{
 }>(), {
 	depth: 1,
 });
+
+const canRenote = computed(() => ['public', 'home'].includes(props.note.visibility) || props.note.userId === $i.id);
 
 const el = shallowRef<HTMLElement>();
 const muted = ref($i ? checkWordMute(props.note, $i, $i.mutedWords) : false);
