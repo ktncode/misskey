@@ -58,6 +58,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					'deletePage',
 					'deleteFlash',
 					'deleteGalleryPost',
+					'deleteChatRoom',
 					'clearUserFiles',
 					'clearRemoteFiles',
 					'clearOwnerlessFiles',
@@ -115,6 +116,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<span v-else-if="log.type === 'deletePage'">: @{{ log.info.pageUserUsername }}</span>
 		<span v-else-if="log.type === 'deleteFlash'">: @{{ log.info.flashUserUsername }}</span>
 		<span v-else-if="log.type === 'deleteGalleryPost'">: @{{ log.info.postUserUsername }}</span>
+		<span v-else-if="log.type === 'deleteChatRoom'">: @{{ log.info.room.name }}</span>
 		<span v-else-if="log.type === 'clearUserFiles'">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>
 		<span v-else-if="log.type === 'nsfwUser'">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>
 		<span v-else-if="log.type === 'unNsfwUser'">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>

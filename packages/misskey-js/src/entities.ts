@@ -229,6 +229,9 @@ export type ModerationLog = {
 	type: 'deleteGalleryPost';
 	info: ModerationLogPayloads['deleteGalleryPost'];
 } | {
+	type: 'deleteChatRoom';
+	info: ModerationLogPayloads['deleteChatRoom'];
+} | {
 	type: 'clearUserFiles';
 	info: ModerationLogPayloads['clearUserFiles'];
 } | {
