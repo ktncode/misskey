@@ -16,7 +16,6 @@ import type { Config } from '@/config.js';
 import { StatusError } from '@/misc/status-error.js';
 import { bindThis } from '@/decorators.js';
 import { validateContentTypeSetAsActivityPub } from '@/core/activitypub/misc/validator.js';
-import { FetchAllowSoftFailMask } from '@/core/activitypub/misc/check-against-url.js';
 import type { IObject, IObjectWithId } from '@/core/activitypub/type.js';
 import { ApUtilityService } from './activitypub/ApUtilityService.js';
 import type { Response } from 'node-fetch';
@@ -250,7 +249,7 @@ export class HttpRequestService {
 	}
 
 	@bindThis
-	public async getActivityJson(url: string, isLocalAddressAllowed = false, allowSoftfail: FetchAllowSoftFailMask = FetchAllowSoftFailMask.Strict): Promise<IObjectWithId> {
+	public async getActivityJson(url: string, isLocalAddressAllowed = false): Promise<IObjectWithId> {
 		const res = await this.send(url, {
 			method: 'GET',
 			headers: {
@@ -268,7 +267,7 @@ export class HttpRequestService {
 
 		// Make sure the object ID matches the final URL (which is where it actually exists).
 		// The caller (ApResolverService) will verify the ID against the original / entry URL, which ensures that all three match.
-		this.apUtilityService.assertIdMatchesUrlAuthority(activity, res.url, allowSoftfail);
+		this.apUtilityService.assertIdMatchesUrlAuthority(activity, res.url);
 
 		return activity as IObjectWithId;
 	}

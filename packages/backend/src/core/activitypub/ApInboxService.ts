@@ -354,7 +354,7 @@ export class ApInboxService {
 			try {
 				// The target ID is verified by secureResolve, so we know it shares host authority with the actor who sent it.
 				// This means we can pass that ID to resolveNote and avoid an extra fetch, which will fail if the note is private.
-				renote = await this.apNoteService.resolveNote(target, { resolver, sentFrom: new URL(getApId(target)) });
+				renote = await this.apNoteService.resolveNote(target, { resolver, sentFrom: getApId(target) });
 				if (renote == null) return 'announce target is null';
 			} catch (err) {
 				// 対象が4xxならスキップ

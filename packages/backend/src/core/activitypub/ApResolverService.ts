@@ -23,7 +23,6 @@ import { getApId, getNullableApId, IObjectWithId, isCollectionOrOrderedCollectio
 import { ApDbResolverService } from './ApDbResolverService.js';
 import { ApRendererService } from './ApRendererService.js';
 import { ApRequestService } from './ApRequestService.js';
-import { FetchAllowSoftFailMask } from './misc/check-against-url.js';
 import type { IObject, ICollection, IOrderedCollection, ApObject } from './type.js';
 
 export class Resolver {
@@ -104,10 +103,10 @@ export class Resolver {
 		return await this.resolve(id);
 	}
 
-	public async resolve(value: string | [string], allowSoftfail?: FetchAllowSoftFailMask): Promise<IObjectWithId>;
-	public async resolve(value: string | IObject | [string | IObject], allowSoftfail?: FetchAllowSoftFailMask): Promise<IObject>;
+	public async resolve(value: string | [string]): Promise<IObjectWithId>;
+	public async resolve(value: string | IObject | [string | IObject]): Promise<IObject>;
 	@bindThis
-	public async resolve(value: string | IObject | [string | IObject], allowSoftfail: FetchAllowSoftFailMask = FetchAllowSoftFailMask.Strict): Promise<IObject> {
+	public async resolve(value: string | IObject | [string | IObject]): Promise<IObject> {
 		value = fromTuple(value);
 
 		if (typeof value !== 'string') {
@@ -116,13 +115,13 @@ export class Resolver {
 
 		const host = this.utilityService.extractDbHost(value);
 		if (this.config.activityLogging.enabled && !this.utilityService.isSelfHost(host)) {
-			return await this._resolveLogged(value, host, allowSoftfail);
+			return await this._resolveLogged(value, host);
 		} else {
-			return await this._resolve(value, host, allowSoftfail);
+			return await this._resolve(value, host);
 		}
 	}
 
-	private async _resolveLogged(requestUri: string, host: string, allowSoftfail: FetchAllowSoftFailMask): Promise<IObjectWithId> {
+	private async _resolveLogged(requestUri: string, host: string): Promise<IObjectWithId> {
 		const startTime = process.hrtime.bigint();
 
 		const log = await this.apLogService.createFetchLog({
@@ -131,7 +130,7 @@ export class Resolver {
 		});
 
 		try {
-			const result = await this._resolve(requestUri, host, allowSoftfail, log);
+			const result = await this._resolve(requestUri, host, log);
 
 			log.accepted = true;
 			log.result = 'ok';
@@ -151,7 +150,7 @@ export class Resolver {
 		}
 	}
 
-	private async _resolve(value: string, host: string, allowSoftfail: FetchAllowSoftFailMask, log?: SkApFetchLog): Promise<IObjectWithId> {
+	private async _resolve(value: string, host: string, log?: SkApFetchLog): Promise<IObjectWithId> {
 		if (value.includes('#')) {
 			// URLs with fragment parts cannot be resolved correctly because
 			// the fragment part does not get transmitted over HTTP(S).
@@ -182,8 +181,8 @@ export class Resolver {
 		}
 
 		const object = (this.user
-			? await this.apRequestService.signedGet(value, this.user, allowSoftfail) as IObject
-			: await this.httpRequestService.getActivityJson(value, allowSoftfail)) as IObject;
+			? await this.apRequestService.signedGet(value, this.user)
+			: await this.httpRequestService.getActivityJson(value));
 
 		if (log) {
 			const { object: objectOnly, context, contextHash } = extractObjectContext(object);

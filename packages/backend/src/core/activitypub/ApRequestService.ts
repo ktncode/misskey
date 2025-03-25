@@ -17,7 +17,6 @@ import { LoggerService } from '@/core/LoggerService.js';
 import { bindThis } from '@/decorators.js';
 import type Logger from '@/logger.js';
 import { validateContentTypeSetAsActivityPub } from '@/core/activitypub/misc/validator.js';
-import { FetchAllowSoftFailMask as FetchAllowSoftFailMask } from '@/core/activitypub/misc/check-against-url.js';
 import type { IObject, IObjectWithId } from './type.js';
 
 type Request = {
@@ -186,7 +185,7 @@ export class ApRequestService {
 	 * @param followAlternate
 	 */
 	@bindThis
-	public async signedGet(url: string, user: { id: MiUser['id'] }, allowSoftfail: FetchAllowSoftFailMask = FetchAllowSoftFailMask.Strict, followAlternate?: boolean): Promise<IObjectWithId> {
+	public async signedGet(url: string, user: { id: MiUser['id'] }, followAlternate?: boolean): Promise<IObjectWithId> {
 		const _followAlternate = followAlternate ?? true;
 		const keypair = await this.userKeypairService.getUserKeypair(user.id);
 
@@ -255,10 +254,10 @@ export class ApRequestService {
 				if (alternate) {
 					const href = alternate.getAttribute('href');
 					if (href && this.apUtilityService.haveSameAuthority(url, href)) {
-						return await this.signedGet(href, user, allowSoftfail, false);
+						return await this.signedGet(href, user, false);
 					}
 				}
-			} catch (e) {
+			} catch {
 				// something went wrong parsing the HTML, ignore the whole thing
 			} finally {
 				happyDOM.close().catch(err => {});
@@ -272,7 +271,7 @@ export class ApRequestService {
 
 		// Make sure the object ID matches the final URL (which is where it actually exists).
 		// The caller (ApResolverService) will verify the ID against the original / entry URL, which ensures that all three match.
-		this.apUtilityService.assertIdMatchesUrlAuthority(activity, res.url, allowSoftfail);
+		this.apUtilityService.assertIdMatchesUrlAuthority(activity, res.url);
 
 		return activity as IObjectWithId;
 	}
