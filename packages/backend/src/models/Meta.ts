@@ -759,10 +759,4 @@ export class MiMeta {
 		default: 'always',
 	})
 	public allowUnsignedFetch: InstanceUnsignedFetchOption;
-
-	@Column('varchar', {
-		length: 64,
-		nullable: true,
-	})
-	public googleAnalyticsMeasurementId: string | null;
 }

@@ -4,6 +4,7 @@
  */
 
 import { computed, watch, version as vueVersion } from 'vue';
+import type { App } from 'vue';
 import { compareVersions } from 'compare-versions';
 import { version, lang, langsVersion, updateLocale, locale } from '@@/js/config.js';
 import defaultLightTheme from '@@/themes/l-light.json5';
@@ -23,7 +24,6 @@ import { reloadChannel } from '@/utility/unison-reload.js';
 import { getUrlWithoutLoginId } from '@/utility/login-id.js';
 import { getAccountFromId } from '@/utility/get-account-from-id.js';
 import { deckStore } from '@/ui/deck/deck-store.js';
-import { analytics, initAnalytics } from '@/analytics.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { fetchCustomEmojis } from '@/custom-emojis.js';
 import { prefer } from '@/preferences.js';
@@ -254,19 +254,6 @@ export async function common(createVue: () => App<Element>) {
 	try {
 		await fetchCustomEmojis();
 	} catch (err) { /* empty */ }
-
-	// analytics
-	fetchInstanceMetaPromise.then(async () => {
-		await initAnalytics(instance);
-
-		if ($i) {
-			analytics.identify($i.id);
-		}
-
-		analytics.page({
-			path: window.location.pathname,
-		});
-	});
 
 	const app = createVue();
 
