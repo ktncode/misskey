@@ -50,7 +50,7 @@ import { i18n } from '@/i18n.js';
 import { defaultStore } from '@/store.js';
 import { useRouter } from '@/router/supplier.js';
 import * as os from '@/os.js';
-import { checkAnimationFromMfm } from '@/scripts/check-animated-mfm.js';
+import { checkAnimationFromMfm } from '@/utility/check-animated-mfm.js';
 
 const props = defineProps<{
 	note: Misskey.entities.Note;

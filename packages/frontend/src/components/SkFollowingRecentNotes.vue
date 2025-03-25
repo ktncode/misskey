@@ -31,8 +31,8 @@ import MkDateSeparatedList from '@/components/MkDateSeparatedList.vue';
 import MkPagination, { Paging } from '@/components/MkPagination.vue';
 import SkFollowingFeedEntry from '@/components/SkFollowingFeedEntry.vue';
 import { $i } from '@/account.js';
-import { checkWordMute } from '@/scripts/check-word-mute.js';
-import { FollowingFeedTab } from '@/scripts/following-feed-utils.js';
+import { checkWordMute } from '@/utility/check-word-mute.js';
+import { FollowingFeedTab } from '@/utility/following-feed-utils.js';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 
 const props = defineProps<{

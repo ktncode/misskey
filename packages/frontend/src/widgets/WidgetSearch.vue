@@ -20,11 +20,11 @@ import { useWidgetPropsManager, WidgetComponentEmits, WidgetComponentExpose, Wid
 import MkInput from '@/components/MkInput.vue';
 import MkContainer from '@/components/MkContainer.vue';
 import { i18n } from '@/i18n.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import * as os from '@/os.js';
 import { useRouter } from '@/router/supplier.js';
-import { GetFormResultType } from '@/scripts/form.js';
-import { notesSearchAvailable } from '@/scripts/check-permissions.js';
+import { GetFormResultType } from '@/utility/form.js';
+import { notesSearchAvailable } from '@/utility/check-permissions.js';
 
 const name = 'search';
 

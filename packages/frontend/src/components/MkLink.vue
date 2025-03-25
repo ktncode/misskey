@@ -23,7 +23,7 @@ import { useTooltip } from '@/use/use-tooltip.js';
 import * as os from '@/os.js';
 import { isEnabledUrlPreview } from '@/instance.js';
 import type { MkABehavior } from '@/components/global/MkA.vue';
-import { warningExternalWebsite } from '@/scripts/warning-external-website.js';
+import { warningExternalWebsite } from '@/utility/warning-external-website.js';
 
 const props = withDefaults(defineProps<{
 	url: string;

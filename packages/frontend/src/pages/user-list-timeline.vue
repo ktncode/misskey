@@ -34,7 +34,7 @@ import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
 import { useRouter } from '@/router.js';
 import { defaultStore } from '@/store.js';
-import { deepMerge } from '@/scripts/merge.js';
+import { deepMerge } from '@/utility/merge.js';
 import * as os from '@/os.js';
 import { $i } from '@/account.js';
 

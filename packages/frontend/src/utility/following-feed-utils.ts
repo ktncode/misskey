@@ -5,7 +5,7 @@
 
 import { computed, Ref, WritableComputedRef } from 'vue';
 import { defaultStore } from '@/store.js';
-import { deepMerge } from '@/scripts/merge.js';
+import { deepMerge } from '@/utility/merge.js';
 import { PageHeaderItem } from '@/types/page-header.js';
 import { i18n } from '@/i18n.js';
 import { popupMenu } from '@/os.js';

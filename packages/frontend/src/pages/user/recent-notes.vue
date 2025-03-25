@@ -14,13 +14,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { computed, shallowRef } from 'vue';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePageMetadata } from '@/utility/page-metadata.js';
 import { i18n } from '@/i18n.js';
 import { PageHeaderItem } from '@/types/page-header.js';
 import MkPageHeader from '@/components/global/MkPageHeader.vue';
 import SkUserRecentNotes from '@/components/SkUserRecentNotes.vue';
 import { acct } from '@/filters/user.js';
-import { createModel, createHeaderItem } from '@/scripts/following-feed-utils.js';
+import { createModel, createHeaderItem } from '@/utility/following-feed-utils.js';
 import MkStickyContainer from '@/components/global/MkStickyContainer.vue';
 
 defineProps<{

@@ -22,7 +22,7 @@ import MkNotes from '@/components/MkNotes.vue';
 import MkUserInfo from '@/components/MkUserInfo.vue';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 import { Paging } from '@/components/MkPagination.vue';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 
 const props = defineProps<{
 	userId: string;

@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed } from 'vue';
 import { i18n } from '@/i18n.js';
 import MkInfo from '@/components/MkInfo.vue';
-import { followersTab, FollowingFeedModel } from '@/scripts/following-feed-utils.js';
+import { followersTab, FollowingFeedModel } from '@/utility/following-feed-utils.js';
 
 const props = defineProps<{
 	model: FollowingFeedModel,

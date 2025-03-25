@@ -73,7 +73,7 @@ import type { PwResponse } from '@/components/MkSignin.password.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { showSuspendedDialog } from '@/utility/show-suspended-dialog.js';
 import { i18n } from '@/i18n.js';
-import { showSystemAccountDialog } from '@/scripts/show-system-account-dialog.js';
+import { showSystemAccountDialog } from '@/utility/show-system-account-dialog.js';
 import * as os from '@/os.js';
 
 import XInput from '@/components/MkSignin.input.vue';

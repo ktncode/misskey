@@ -80,12 +80,12 @@ import * as Misskey from 'misskey-js';
 import { i18n } from '@/i18n.js';
 import { notePage } from '@/filters/note.js';
 import { userPage } from '@/filters/user.js';
-import { getNoteVersionsMenu } from '@/scripts/get-note-versions-menu.js';
+import { getNoteVersionsMenu } from '@/utility/get-note-versions-menu.js';
 import SkInstanceTicker from '@/components/SkInstanceTicker.vue';
 import { popupMenu } from '@/os.js';
 import { defaultStore } from '@/store.js';
 import { useRouter } from '@/router/supplier.js';
-import { deviceKind } from '@/scripts/device-kind.js';
+import { deviceKind } from '@/utility/device-kind.js';
 import MkInstanceTicker from '@/components/MkInstanceTicker.vue';
 
 const props = defineProps<{

@@ -93,10 +93,10 @@ import MkUrlPreview from '@/components/MkUrlPreview.vue';
 import MkInstanceTicker from '@/components/MkInstanceTicker.vue';
 import { userPage } from '@/filters/user.js';
 import { defaultStore, noteViewInterruptors } from '@/store.js';
-import { extractUrlFromMfm } from '@/scripts/extract-url-from-mfm.js';
+import { extractUrlFromMfm } from '@/utility/extract-url-from-mfm.js';
 import { i18n } from '@/i18n.js';
-import { deepClone } from '@/scripts/clone.js';
-import { dateTimeFormat } from '@/scripts/intl-const.js';
+import { deepClone } from '@/utility/clone.js';
+import { dateTimeFormat } from '@/utility/intl-const.js';
 
 const props = defineProps<{
 	note: Misskey.entities.Note;

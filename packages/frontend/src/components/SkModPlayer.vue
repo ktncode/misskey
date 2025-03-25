@@ -45,8 +45,8 @@ import { ref, nextTick, watch, onDeactivated, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import { i18n } from '@/i18n.js';
 import { defaultStore } from '@/store.js';
-import { ChiptuneJsPlayer, ChiptuneJsConfig } from '@/scripts/chiptune2.js';
-import { isTouchUsing } from '@/scripts/touch.js';
+import { ChiptuneJsPlayer, ChiptuneJsConfig } from '@/utility/chiptune2.js';
+import { isTouchUsing } from '@/utility/touch.js';
 
 const colours = {
 	background: '#000000',

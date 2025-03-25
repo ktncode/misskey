@@ -98,14 +98,14 @@ import FormSection from '@/components/form/section.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkLink from '@/components/MkLink.vue';
 import MkInfo from '@/components/MkInfo.vue';
-import { physics } from '@/scripts/physics.js';
+import { physics } from '@/utility/physics.js';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
 import { defaultStore } from '@/store.js';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
-import { claimAchievement, claimedAchievements } from '@/scripts/achievements.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
+import { definePageMetadata } from '@/utility/page-metadata.js';
+import { claimAchievement, claimedAchievements } from '@/utility/achievements.js';
 import { $i } from '@/account.js';
 
 type Section = {

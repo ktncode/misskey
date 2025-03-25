@@ -27,7 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, ComputedRef, Ref, ref, shallowRef } from 'vue';
 import { getScrollContainer } from '@@/js/scroll.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePageMetadata } from '@/utility/page-metadata.js';
 import { i18n } from '@/i18n.js';
 import MkHorizontalSwipe from '@/components/MkHorizontalSwipe.vue';
 import { Tab } from '@/components/global/MkPageHeader.tabs.vue';
@@ -36,7 +36,7 @@ import { useRouter } from '@/router/supplier.js';
 import MkPageHeader from '@/components/global/MkPageHeader.vue';
 import SkUserRecentNotes from '@/components/SkUserRecentNotes.vue';
 import { useScrollPositionManager } from '@/nirax.js';
-import { createModel, createHeaderItem, followingFeedTabs, followingTabIcon, followingTabName, followingTab } from '@/scripts/following-feed-utils.js';
+import { createModel, createHeaderItem, followingFeedTabs, followingTabIcon, followingTabName, followingTab } from '@/utility/following-feed-utils.js';
 import SkLazy from '@/components/global/SkLazy.vue';
 import SkFollowingRecentNotes from '@/components/SkFollowingRecentNotes.vue';
 import SkRemoteFollowersWarning from '@/components/SkRemoteFollowersWarning.vue';
