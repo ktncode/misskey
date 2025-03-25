@@ -17,11 +17,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import * as config from '@@/js/config.js';
+import type { Ref } from 'vue';
 import XQueue from './queue.chart.vue';
 import XHeader from './_header_.vue';
-import type { Ref } from 'vue';
 import * as os from '@/os.js';
+import * as config from '@@/js/config.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkButton from '@/components/MkButton.vue';
@@ -54,7 +54,14 @@ function promoteAllQueues() {
 	});
 }
 
-const headerActions = computed(() => []);
+const headerActions = computed(() => [{
+	asFullButton: true,
+	icon: 'ti ti-external-link',
+	text: i18n.ts.dashboard,
+	handler: () => {
+		window.open(config.url + '/queue', '_blank', 'noopener');
+	},
+}]);
 
 const headerTabs = computed(() => [{
 	key: 'deliver',
