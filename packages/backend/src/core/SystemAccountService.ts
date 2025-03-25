@@ -114,6 +114,12 @@ export class SystemAccountService {
 				isExplorable: false,
 				isBot: true,
 				name: extra.name,
+				// System accounts are automatically approved.
+				approved: true,
+				// We always allow requests to system accounts to avoid federation infinite loop.
+				// When a remote instance needs to check our signature on a request we sent, it will need to fetch information about the user that signed it (which is our instance actor).
+				// If we try to check their signature on *that* request, we'll fetch *their* instance actor... leading to an infinite recursion
+				allowUnsignedFetch: 'always',
 			}).then(x => transactionalEntityManager.findOneByOrFail(MiUser, x.identifiers[0]));
 
 			await transactionalEntityManager.insert(MiUserKeypair, {
