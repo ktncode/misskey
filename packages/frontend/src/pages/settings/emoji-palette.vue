@@ -56,6 +56,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</FormSection>
 
+		<SearchMarker :keywords="['emoji', 'default', 'like', 'react']">
+			<FormSection>
+				<template #label>{{ i18n.ts.defaultLike }}</template>
+				<MkCustomEmoji v-if="like && like.startsWith(':')" style="max-height: 3em; font-size: 1.1em;" :useOriginalSize="false" :name="like" :normal="true" :noStyle="true"/>
+				<MkEmoji v-else-if="like && !like.startsWith(':')" :emoji="like" style="max-height: 3em; font-size: 1.1em;" :normal="true" :noStyle="true"/>
+				<span v-else-if="!like">{{ i18n.ts.notSet }}</span>
+				<div class="_buttons" style="padding-top: 8px;">
+					<MkButton rounded :small="true" inline @click="chooseNewLike"><i class="ph-smiley ph-bold ph-lg"></i> Change</MkButton>
+					<MkButton rounded :small="true" inline @click="resetLike"><i class="ph-arrow-clockwise ph-bold ph-lg"></i> Reset</MkButton>
+				</div>
+			</FormSection>
+		</SearchMarker>
+
 		<SearchMarker :keywords="['emoji', 'picker', 'display']">
 			<FormSection>
 				<template #label><SearchLabel>{{ i18n.ts.emojiPickerDisplay }}</SearchLabel></template>
@@ -133,6 +146,7 @@ import { prefer } from '@/preferences.js';
 import MkPreferenceContainer from '@/components/MkPreferenceContainer.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import { emojiPicker } from '@/utility/emoji-picker.js';
+import { unisonReload } from '@/utility/unison-reload.js';
 
 const emojiPaletteForReaction = prefer.model('emojiPaletteForReaction');
 const emojiPaletteForMain = prefer.model('emojiPaletteForMain');
@@ -140,6 +154,7 @@ const emojiPickerScale = prefer.model('emojiPickerScale');
 const emojiPickerWidth = prefer.model('emojiPickerWidth');
 const emojiPickerHeight = prefer.model('emojiPickerHeight');
 const emojiPickerStyle = prefer.model('emojiPickerStyle');
+const like = prefer.model('like');
 
 const palettesSyncEnabled = ref(prefer.isSyncEnabled('emojiPalettes'));
 
@@ -212,6 +227,30 @@ function getHTMLElement(ev: MouseEvent): HTMLElement {
 
 function previewPicker(ev: MouseEvent) {
 	emojiPicker.show(getHTMLElement(ev));
+}
+
+async function reloadAsk() {
+	const { canceled } = await os.confirm({
+		type: 'info',
+		text: i18n.ts.reloadToApplySetting,
+	});
+	if (canceled) return;
+
+	unisonReload();
+}
+
+function chooseNewLike(ev: MouseEvent) {
+	os.pickEmoji(getHTMLElement(ev), {
+		showPinned: false,
+	}).then(async emoji => {
+		like.value = emoji as string;
+		await reloadAsk();
+	});
+}
+
+async function resetLike() {
+	like.value = null;
+	await reloadAsk();
 }
 
 definePage(() => ({

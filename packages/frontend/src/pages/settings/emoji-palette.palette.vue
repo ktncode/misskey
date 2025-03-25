@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</template>
 
 	<div>
-		<div v-panel style="border-radius: 6px;">
+		<div v-panel style="border-radius: var(--MI-radius-sm);">
 			<Sortable
 				v-model="emojis"
 				:class="$style.emojis"
