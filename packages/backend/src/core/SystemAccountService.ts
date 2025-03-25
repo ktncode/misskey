@@ -175,4 +175,16 @@ export class SystemAccountService {
 
 		return updated;
 	}
+
+	public async getInstanceActor() {
+		return await this.fetch('actor');
+	}
+
+	public async getRelayActor() {
+		return await this.fetch('relay');
+	}
+
+	public async getProxyActor() {
+		return await this.fetch('proxy');
+	}
 }
