@@ -165,6 +165,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
+							<SearchMarker :keywords="['collapse', 'repl']">
+								<MkSwitch v-model="collapseNotesRepliedTo">
+									<template #label><SearchLabel>{{ i18n.ts.collapseNotesRepliedTo }}</SearchLabel></template>
+								</MkSwitch>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['collapse', 'uncollapse', 'un-collapse', 'cw', 'content', 'warning']">
+								<MkSwitch v-model="uncollapseCW">
+									<template #label><SearchLabel>{{ i18n.ts.uncollapseCW }}</SearchLabel></template>
+								</MkSwitch>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['expand', 'long']">
+								<MkSwitch v-model="expandLongNote">
+									<template #label><SearchLabel>{{ i18n.ts.expandLongNote }}</SearchLabel></template>
+								</MkSwitch>
+							</SearchMarker>
+
 							<SearchMarker :keywords="['note', 'timeline', 'gap']">
 								<MkPreferenceContainer k="showGapBetweenNotesInTimeline">
 									<MkSwitch v-model="showGapBetweenNotesInTimeline">
@@ -179,6 +197,43 @@ SPDX-License-Identifier: AGPL-3.0-only
 										<template #label><SearchLabel>{{ i18n.ts.disableStreamingTimeline }}</SearchLabel></template>
 									</MkSwitch>
 								</MkPreferenceContainer>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['show', 'ticker', 'replies']">
+								<MkSwitch v-model="showTickerOnReplies">
+									<template #label>{{ i18n.ts.showTickerOnReplies }}</template>
+								</MkSwitch>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['cat', 'speak']">
+								<MkSwitch v-model="disableCatSpeak">
+									<template #label><SearchLabel>{{ i18n.ts.disableCatSpeak }}</SearchLabel></template>
+								</MkSwitch>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['search', 'engine']">
+								<MkSelect v-model="searchEngine" placeholder="Other">
+									<template #label><SearchLabel>{{ i18n.ts.searchEngine }}</SearchLabel></template>
+									<option
+										v-for="[key, value] in Object.entries(searchEngineMap)" :key="key" :value="key"
+									>
+										{{ value }}
+									</option>
+									<!-- If the user is on Other and enters a domain add this one so that the dropdown doesnt go blank -->
+									<option v-if="useCustomSearchEngine" :value="searchEngine">
+										{{ i18n.ts.searchEngineOther }}
+									</option>
+									<!-- If one of the other options is selected show this as a blank other -->
+									<option v-if="!useCustomSearchEngine" value="">{{ i18n.ts.searchEngineOther }}</option>
+								</MkSelect>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['design', 'appear']">
+								<MkRadios v-model="noteDesign">
+									<template #label><SearchLabel>Note Design</SearchLabel></template>
+									<option value="sharkey"><i class="sk-icons sk-shark sk-icons-lg" style="top: 2px;position: relative;"></i> Sharkey</option>
+									<option value="misskey"><i class="sk-icons sk-misskey sk-icons-lg" style="top: 2px;position: relative;"></i> Misskey</option>
+								</MkRadios>
 							</SearchMarker>
 						</div>
 
@@ -287,6 +342,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 									</MkSelect>
 								</MkPreferenceContainer>
 							</SearchMarker>
+
+							<SearchMarker :keywords="['number', 'replies']">
+								<MkRange v-model="numberOfReplies" :min="2" :max="20" :step="1" easing>
+									<template #label><SearchLabel>{{ i18n.ts.numberOfReplies }}</SearchLabel></template>
+									<template #caption>{{ i18n.ts.numberOfRepliesDescription }}</template>
+								</MkRange>
+							</SearchMarker>
 						</div>
 					</div>
 				</MkFolder>
@@ -367,6 +429,27 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkSwitch>
 							</MkPreferenceContainer>
 						</SearchMarker>
+
+						<SearchMarker :keywords="['click']">
+							<MkSwitch v-model="notificationClickable">
+								<template #label><SearchLabel>{{ i18n.ts.allowClickingNotifications }}</SearchLabel></template>
+							</MkSwitch>
+						</SearchMarker>
+
+						<SearchMarker :keywords="['favicon', 'dot']">
+							<MkSwitch v-model="enableFaviconNotificationDot">
+								<template #label><SearchLabel>{{ i18n.ts.enableFaviconNotificationDot }}</SearchLabel></template>
+								<template #caption>
+									<I18n :src="i18n.ts.notificationDotNotWorkingAdvice" tag="span">
+										<template #link>
+											<MkLink url="https://docs.joinsharkey.org/docs/install/faqs/#ive-enabled-the-notification-dot-but-it-doesnt-show">{{ i18n.ts._mfm.link }}</MkLink>
+										</template>
+									</I18n>
+								</template>
+							</MkSwitch>
+						</SearchMarker>
+
+						<MkButton @click="testNotificationDot">{{ i18n.ts.verifyNotificationDotWorkingButton }}</MkButton>
 
 						<SearchMarker :keywords="['position']">
 							<MkPreferenceContainer k="notificationPosition">
@@ -491,6 +574,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
+							<SearchMarker :keywords="['corner', 'radius']">
+								<MkRadios v-model="cornerRadius">
+									<template #label><SearchLabel>{{ i18n.ts.cornerRadius }}</SearchLabel></template>
+									<option :value="null"><i class="sk-icons sk-shark sk-icons-lg" style="top: 2px;position: relative;"></i> Sharkey</option>
+									<option value="misskey"><i class="sk-icons sk-misskey sk-icons-lg" style="top: 2px;position: relative;"></i> Misskey</option>
+								</MkRadios>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['warn', 'missing', 'alt', 'text']">
+								<MkSwitch v-model="warnMissingAltText">
+									<template #label><SearchLabel>{{ i18n.ts.warnForMissingAltText }}</SearchLabel></template>
+								</MkSwitch>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['warn', 'external', 'url']">
+								<MkSwitch v-model="warnExternalUrl">
+									<template #label><SearchLabel>{{ i18n.ts.warnExternalUrl }}</SearchLabel></template>
+								</MkSwitch>
+							</SearchMarker>
+
 							<SearchMarker :keywords="['image', 'photo', 'picture', 'media', 'thumbnail', 'new', 'tab']">
 								<MkPreferenceContainer k="imageNewTab">
 									<MkSwitch v-model="imageNewTab">
@@ -528,12 +631,38 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkPreferenceContainer>
 						</SearchMarker>
 
+						<MkFolder>
+							<template #label>{{ i18n.ts.boostSettings }}</template>
+							<div class="_gaps_m">
+								<SearchMarker :keywords="['boost', 'show', 'visib', 'selector']">
+									<MkSwitch v-model="showVisibilitySelectorOnBoost">
+										<template #label><SearchLabel>{{ i18n.ts.showVisibilitySelectorOnBoost }}</SearchLabel></template>
+										<template #caption>{{ i18n.ts.showVisibilitySelectorOnBoostDescription }}</template>
+									</MkSwitch>
+								</SearchMarker>
+								<SearchMarker :keywords="['boost', 'visib']">
+									<MkSelect v-model="visibilityOnBoost">
+										<template #label><SearchLabel>{{ i18n.ts.visibilityOnBoost }}</SearchLabel></template>
+										<option value="public">{{ i18n.ts._visibility['public'] }}</option>
+										<option value="home">{{ i18n.ts._visibility['home'] }}</option>
+										<option value="followers">{{ i18n.ts._visibility['followers'] }}</option>
+									</MkSelect>
+								</SearchMarker>
+							</div>
+						</MkFolder>
+
 						<SearchMarker :keywords="['ad', 'show']">
 							<MkPreferenceContainer k="forceShowAds">
 								<MkSwitch v-model="forceShowAds">
 									<template #label><SearchLabel>{{ i18n.ts.forceShowAds }}</SearchLabel></template>
 								</MkSwitch>
 							</MkPreferenceContainer>
+						</SearchMarker>
+
+						<SearchMarker :keywords="['oneko', 'cat']">
+							<MkSwitch v-model="oneko">
+								<template #label>{{ i18n.ts.oneko }}</template>
+							</MkSwitch>
 						</SearchMarker>
 
 						<SearchMarker>
@@ -602,6 +731,11 @@ import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
 import { globalEvents } from '@/events.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { instance } from '@/instance.js';
+import Search from '@/pages/search.vue';
+
+// Sharkey imports
+import { searchEngineMap } from '@/utility/search-engine-map.js';
+import { worksOnInstance } from '@/utility/favicon-dot.js';
 
 const lang = ref(miLocalStorage.getItem('lang'));
 const dataSaver = ref(prefer.s.dataSaver);
@@ -650,6 +784,26 @@ const useBlurEffect = prefer.model('useBlurEffect');
 const defaultFollowWithReplies = prefer.model('defaultFollowWithReplies');
 const chatShowSenderName = prefer.model('chat.showSenderName');
 const chatSendOnEnter = prefer.model('chat.sendOnEnter');
+
+// Sharkey options
+const collapseNotesRepliedTo = prefer.model('collapseNotesRepliedTo');
+const showTickerOnReplies = prefer.model('showTickerOnReplies');
+const searchEngine = prefer.model('searchEngine');
+const noteDesign = prefer.model('noteDesign');
+const uncollapseCW = prefer.model('uncollapseCW');
+const expandLongNote = prefer.model('expandLongNote');
+const disableCatSpeak = prefer.model('disableCatSpeak');
+const enableFaviconNotificationDot = prefer.model('enableFaviconNotificationDot');
+const warnMissingAltText = prefer.model('warnMissingAltText');
+const notificationClickable = prefer.model('notificationClickable');
+const warnExternalUrl = prefer.model('warnExternalUrl');
+const showVisibilitySelectorOnBoost = prefer.model('showVisibilitySelectorOnBoost');
+const visibilityOnBoost = prefer.model('visibilityOnBoost');
+const cornerRadius = prefer.model('cornerRadius');
+const oneko = prefer.model('oneko');
+const numberOfReplies = prefer.model('numberOfReplies');
+
+const useCustomSearchEngine = computed(() => !Object.keys(searchEngineMap).includes(searchEngine.value));
 
 watch(lang, () => {
 	miLocalStorage.setItem('lang', lang.value as string);
@@ -791,6 +945,16 @@ function testNotification(): void {
 	smashTimer = window.setTimeout(() => {
 		smashCount = 0;
 	}, 300);
+}
+
+async function testNotificationDot() {
+	const success = await worksOnInstance();
+
+	if (success) {
+		os.toast(i18n.ts.notificationDotWorking);
+	} else {
+		os.toast(i18n.ts.notificationDotNotWorking);
+	}
 }
 
 const headerActions = computed(() => []);
