@@ -202,10 +202,11 @@ export default class Connection {
 		if (!payload.id || typeof payload.id !== 'string') return;
 
 		const current = this.subscribingNotes.get(payload.id) ?? 0;
+		const updated = current + 1;
+		this.subscribingNotes.set(payload.id, updated);
 
 		// Limit the number of distinct notes that can be subscribed to.
-		// If current is-zero, then this is a new note and we need to check the limit
-		if (current === 0 && this.subscribingNotes.size >= MAX_SUBSCRIPTIONS_PER_CONNECTION) {
+		while (this.subscribingNotes.size > MAX_SUBSCRIPTIONS_PER_CONNECTION) {
 			// Map maintains insertion order, so first key is always the oldest
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			const oldestKey = this.subscribingNotes.keys().next().value!;
@@ -213,9 +214,6 @@ export default class Connection {
 			this.subscribingNotes.delete(oldestKey);
 			this.subscriber.off(`noteStream:${oldestKey}`, this.onNoteStreamMessage);
 		}
-
-		const updated = current + 1;
-		this.subscribingNotes.set(payload.id, updated);
 
 		if (updated === 1) {
 			this.subscriber.on(`noteStream:${payload.id}`, this.onNoteStreamMessage);
