@@ -31,7 +31,6 @@ const MAX_CHANNELS_PER_CONNECTION = 32;
 export default class Connection {
 	public user?: MiUser;
 	public token?: MiAccessToken;
-	private rateLimiter?: () => Promise<boolean>;
 	private wsConnection: WebSocket.WebSocket;
 	public subscriber: StreamEventEmitter;
 	private channels: Channel[] = [];
@@ -45,7 +44,6 @@ export default class Connection {
 	public userIdsWhoMeMutingRenotes: Set<string> = new Set();
 	public userMutedInstances: Set<string> = new Set();
 	private fetchIntervalId: NodeJS.Timeout | null = null;
-	private activeRateLimitRequests = 0;
 	private closingConnection = false;
 	private logger: Logger;
 
@@ -60,11 +58,10 @@ export default class Connection {
 		user: MiUser | null | undefined,
 		token: MiAccessToken | null | undefined,
 		private ip: string,
-		rateLimiter: () => Promise<boolean>,
+		private readonly rateLimiter: () => Promise<boolean>,
 	) {
 		if (user) this.user = user;
 		if (token) this.token = token;
-		if (rateLimiter) this.rateLimiter = rateLimiter;
 
 		this.logger = loggerService.getLogger('streaming', 'coral');
 	}
@@ -121,25 +118,13 @@ export default class Connection {
 
 		if (this.closingConnection) return;
 
-		if (this.rateLimiter) {
-			// this 4096 should match the `max` of the `rateLimiter`, see
-			// StreamingApiServerService
-			if (this.activeRateLimitRequests <= 4096) {
-				this.activeRateLimitRequests++;
-				const shouldRateLimit = await this.rateLimiter();
-				this.activeRateLimitRequests--;
+		// The rate limit is very high, so we can safely disconnect any client that hits it.
+		if (await this.rateLimiter()) {
+			this.logger.warn(`Closing a connection from ${this.ip} (user=${this.user?.id}}) due to an excessive influx of messages.`);
 
-				if (shouldRateLimit) return;
-				if (this.closingConnection) return;
-			} else {
-				let connectionInfo = `IP ${this.ip}`;
-				if (this.user) connectionInfo += `, user ID ${this.user.id}`;
-
-				this.logger.warn(`Closing a connection (${connectionInfo}) due to an excessive influx of messages.`);
-				this.closingConnection = true;
-				this.wsConnection.close(1008, 'Please stop spamming the streaming API.');
-				return;
-			}
+			this.closingConnection = true;
+			this.wsConnection.close(1008, 'Disconnected - too many requests');
+			return;
 		}
 
 		try {
