@@ -24,6 +24,7 @@ import type Channel from './channel.js';
 
 const MAX_CHANNELS_PER_CONNECTION = 32;
 const MAX_SUBSCRIPTIONS_PER_CONNECTION = 256;
+const MAX_CACHED_NOTES_PER_CONNECTION = 32;
 
 /**
  * Main stream connection
@@ -36,7 +37,7 @@ export default class Connection {
 	public subscriber: StreamEventEmitter;
 	private channels: Channel[] = [];
 	private subscribingNotes = new Map<string, number>();
-	private cachedNotes: Packed<'Note'>[] = [];
+	private cachedNotes = new Map<string, Packed<'Note'>>();
 	public userProfile: MiUserProfile | null = null;
 	public following: Record<string, Pick<MiFollowing, 'withReplies'> | undefined> = {};
 	public followingChannels: Set<string> = new Set();
@@ -158,15 +159,13 @@ export default class Connection {
 	@bindThis
 	public cacheNote(note: Packed<'Note'>) {
 		const add = (note: Packed<'Note'>) => {
-			const existIndex = this.cachedNotes.findIndex(n => n.id === note.id);
-			if (existIndex > -1) {
-				this.cachedNotes[existIndex] = note;
-				return;
-			}
+			this.cachedNotes.set(note.id, note);
 
-			this.cachedNotes.unshift(note);
-			if (this.cachedNotes.length > 32) {
-				this.cachedNotes.splice(32);
+			while (this.cachedNotes.size > MAX_CACHED_NOTES_PER_CONNECTION) {
+				// Map maintains insertion order, so first key is always the oldest
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				const oldestKey = this.cachedNotes.keys().next().value!;
+				this.cachedNotes.delete(oldestKey);
 			}
 		};
 
@@ -178,9 +177,9 @@ export default class Connection {
 	@bindThis
 	private readNote(body: JsonValue | undefined) {
 		if (!isJsonObject(body)) return;
-		const id = body.id;
+		const id = body.id as string;
 
-		const note = this.cachedNotes.find(n => n.id === id);
+		const note = this.cachedNotes.get(id);
 		if (note == null) return;
 
 		if (this.user && (note.userId !== this.user.id)) {
@@ -378,5 +377,6 @@ export default class Connection {
 		this.fetchIntervalId = null;
 		this.channels = [];
 		this.subscribingNotes.clear();
+		this.cachedNotes.clear();
 	}
 }
