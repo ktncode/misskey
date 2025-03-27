@@ -35,7 +35,7 @@ export default class Connection {
 	public token?: MiAccessToken;
 	private wsConnection: WebSocket.WebSocket;
 	public subscriber: StreamEventEmitter;
-	private channels: Channel[] = [];
+	private channels = new Map<string, Channel>();
 	private subscribingNotes = new Map<string, number>();
 	private cachedNotes = new Map<string, Packed<'Note'>>();
 	public userProfile: MiUserProfile | null = null;
@@ -299,7 +299,11 @@ export default class Connection {
 	 */
 	@bindThis
 	public connectChannel(id: string, params: JsonObject | undefined, channel: string, pong = false) {
-		if (this.channels.length >= MAX_CHANNELS_PER_CONNECTION) {
+		if (this.channels.has(id)) {
+			this.disconnectChannel(id);
+		}
+
+		if (this.channels.size >= MAX_CHANNELS_PER_CONNECTION) {
 			return;
 		}
 
@@ -315,12 +319,16 @@ export default class Connection {
 		}
 
 		// 共有可能チャンネルに接続しようとしていて、かつそのチャンネルに既に接続していたら無意味なので無視
-		if (channelService.shouldShare && this.channels.some(c => c.chName === channel)) {
-			return;
+		if (channelService.shouldShare) {
+			for (const c of this.channels.values()) {
+				if (c.chName === channel) {
+					return;
+				}
+			}
 		}
 
 		const ch: Channel = channelService.create(id, this);
-		this.channels.push(ch);
+		this.channels.set(ch.id, ch);
 		ch.init(params ?? {});
 
 		if (pong) {
@@ -336,11 +344,11 @@ export default class Connection {
 	 */
 	@bindThis
 	public disconnectChannel(id: string) {
-		const channel = this.channels.find(c => c.id === id);
+		const channel = this.channels.get(id);
 
 		if (channel) {
 			if (channel.dispose) channel.dispose();
-			this.channels = this.channels.filter(c => c.id !== id);
+			this.channels.delete(id);
 		}
 	}
 
@@ -355,7 +363,7 @@ export default class Connection {
 		if (typeof data.type !== 'string') return;
 		if (typeof data.body === 'undefined') return;
 
-		const channel = this.channels.find(c => c.id === data.id);
+		const channel = this.channels.get(data.id);
 		if (channel != null && channel.onMessage != null) {
 			channel.onMessage(data.type, data.body);
 		}
@@ -367,7 +375,7 @@ export default class Connection {
 	@bindThis
 	public dispose() {
 		if (this.fetchIntervalId) clearInterval(this.fetchIntervalId);
-		for (const c of this.channels.filter(c => c.dispose)) {
+		for (const c of this.channels.values()) {
 			if (c.dispose) c.dispose();
 		}
 		for (const k of this.subscribingNotes.keys()) {
@@ -375,7 +383,7 @@ export default class Connection {
 		}
 
 		this.fetchIntervalId = null;
-		this.channels = [];
+		this.channels.clear();
 		this.subscribingNotes.clear();
 		this.cachedNotes.clear();
 	}
