@@ -407,7 +407,9 @@ export class DriveService {
 		);
 		if (this.meta.objectStorageSetPublicRead) params.ACL = 'public-read';
 
-		if (!this.meta.objectStorageEndpoint?.includes('bunnycdn.com')) {
+		if (this.meta.objectStorageEndpoint && this.meta.objectStorageEndpoint.includes('bunnycdn.com')) {
+			await this.bunnyService.upload(this.meta, key, stream);
+		} else {
 			await this.s3Service.upload(this.meta, params)
 				.then(
 					result => {
@@ -422,8 +424,6 @@ export class DriveService {
 						this.registerLogger.error(`Upload Failed: key = ${key}, filename = ${filename}`, err);
 					},
 				);
-		} else {
-			await this.bunnyService.upload(this.meta, key, stream);
 		}
 	}
 
@@ -820,10 +820,10 @@ export class DriveService {
 				Bucket: this.meta.objectStorageBucket,
 				Key: key,
 			} as DeleteObjectCommandInput;
-			if (!this.meta.objectStorageEndpoint?.includes('bunnycdn.com')) {
-				await this.s3Service.delete(this.meta, param);
-			} else {
+			if (this.meta.objectStorageEndpoint && this.meta.objectStorageEndpoint.includes('bunnycdn.com')) {
 				await this.bunnyService.delete(this.meta, key);
+			} else {
+				await this.s3Service.delete(this.meta, param);
 			}
 		} catch (err: any) {
 			if (err.name === 'NoSuchKey') {
