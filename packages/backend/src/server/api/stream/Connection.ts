@@ -373,5 +373,12 @@ export default class Connection {
 		for (const c of this.channels.filter(c => c.dispose)) {
 			if (c.dispose) c.dispose();
 		}
+		for (const k of this.subscribingNotes.keys()) {
+			this.subscriber.off(`noteStream:${k}`, this.onNoteStreamMessage);
+		}
+
+		this.fetchIntervalId = null;
+		this.channels = [];
+		this.subscribingNotes.clear();
 	}
 }
