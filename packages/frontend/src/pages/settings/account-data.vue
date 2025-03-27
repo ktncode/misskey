@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkFeatureBanner>
 
 		<div class="_gaps_s">
-			<SearchMarker :keywords="['notes']">
+			<SearchMarker :keywords="['notes', 'export']">
 				<MkFolder>
 					<template #icon><i class="ti ti-pencil"></i></template>
 					<template #label><SearchLabel>{{ i18n.ts._exportOrImport.allNotes }}</SearchLabel></template>
@@ -20,6 +20,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #icon><i class="ti ti-download"></i></template>
 						<MkButton primary :class="$style.button" inline @click="exportNotes()"><i class="ti ti-download"></i> {{ i18n.ts.export }}</MkButton>
 					</MkFolder>
+				</MkFolder>
+			</SearchMarker>
+
+			<SearchMarker :keywords="['notes', 'import']">
+				<MkFolder v-if="$i && $i.policies.canImportNotes">
+					<template #label><SearchLabel>{{ i18n.ts.import }}</SearchLabel></template>
+					<template #icon><i class="ph-upload ph-bold ph-lg"></i></template>
+					<MkRadios v-model="noteType" style="padding-bottom: 8px;" small>
+						<template #label>Origin</template>
+						<option value="Misskey">Misskey/Firefish</option>
+						<option value="Mastodon">Mastodon/Pleroma/Akkoma</option>
+						<option value="Twitter">Twitter</option>
+						<option value="Instagram">Instagram</option>
+						<option value="Facebook">Facebook</option>
+					</MkRadios>
+					<MkButton primary :class="$style.button" inline @click="importNotes($event)"><i class="ph-upload ph-bold ph-lg"></i> {{ i18n.ts.import }}</MkButton>
 				</MkFolder>
 			</SearchMarker>
 
@@ -162,6 +178,7 @@ import { ref, computed } from 'vue';
 import MkButton from '@/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
+import MkRadios from '@/components/MkRadios.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { selectFile } from '@/utility/select-file.js';
@@ -173,6 +190,7 @@ import { prefer } from '@/preferences.js';
 
 const excludeMutingUsers = ref(false);
 const excludeInactiveUsers = ref(false);
+const noteType = ref(null);
 const withReplies = ref(prefer.s.defaultFollowWithReplies);
 
 const onExportSuccess = () => {
@@ -237,6 +255,14 @@ const importFollowing = async (ev) => {
 	misskeyApi('i/import-following', {
 		fileId: file.id,
 		withReplies: withReplies.value,
+	}).then(onImportSuccess).catch(onError);
+};
+
+const importNotes = async (ev) => {
+	const file = await selectFile(ev.currentTarget ?? ev.target);
+	misskeyApi('i/import-notes', {
+		fileId: file.id,
+		type: noteType.value,
 	}).then(onImportSuccess).catch(onError);
 };
 
