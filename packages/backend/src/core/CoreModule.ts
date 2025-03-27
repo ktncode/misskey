@@ -61,6 +61,7 @@ import { ReactionsBufferingService } from './ReactionsBufferingService.js';
 import { RelayService } from './RelayService.js';
 import { RoleService } from './RoleService.js';
 import { S3Service } from './S3Service.js';
+import { BunnyService } from './BunnyService.js';
 import { SignupService } from './SignupService.js';
 import { WebAuthnService } from './WebAuthnService.js';
 import { UserBlockingService } from './UserBlockingService.js';
@@ -208,6 +209,7 @@ const $ReactionsBufferingService: Provider = { provide: 'ReactionsBufferingServi
 const $RelayService: Provider = { provide: 'RelayService', useExisting: RelayService };
 const $RoleService: Provider = { provide: 'RoleService', useExisting: RoleService };
 const $S3Service: Provider = { provide: 'S3Service', useExisting: S3Service };
+const $BunnyService: Provider = { provide: 'BunnyService', useExisting: BunnyService };
 const $SignupService: Provider = { provide: 'SignupService', useExisting: SignupService };
 const $WebAuthnService: Provider = { provide: 'WebAuthnService', useExisting: WebAuthnService };
 const $UserBlockingService: Provider = { provide: 'UserBlockingService', useExisting: UserBlockingService };
@@ -367,6 +369,7 @@ const $SponsorsService: Provider = { provide: 'SponsorsService', useExisting: Sp
 		RelayService,
 		RoleService,
 		S3Service,
+		BunnyService,
 		SignupService,
 		WebAuthnService,
 		UserBlockingService,
@@ -522,6 +525,7 @@ const $SponsorsService: Provider = { provide: 'SponsorsService', useExisting: Sp
 		$RelayService,
 		$RoleService,
 		$S3Service,
+		$BunnyService,
 		$SignupService,
 		$WebAuthnService,
 		$UserBlockingService,
@@ -678,6 +682,7 @@ const $SponsorsService: Provider = { provide: 'SponsorsService', useExisting: Sp
 		RelayService,
 		RoleService,
 		S3Service,
+		BunnyService,
 		SignupService,
 		WebAuthnService,
 		UserBlockingService,
@@ -832,6 +837,7 @@ const $SponsorsService: Provider = { provide: 'SponsorsService', useExisting: Sp
 		$RelayService,
 		$RoleService,
 		$S3Service,
+		$BunnyService,
 		$SignupService,
 		$WebAuthnService,
 		$UserBlockingService,

@@ -44,6 +44,7 @@ import { correctFilename } from '@/misc/correct-filename.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { UtilityService } from '@/core/UtilityService.js';
+import { BunnyService } from '@/core/BunnyService.js';
 
 type AddFileArgs = {
 	/** User who wish to add file */
@@ -121,6 +122,7 @@ export class DriveService {
 		private downloadService: DownloadService,
 		private internalStorageService: InternalStorageService,
 		private s3Service: S3Service,
+		private bunnyService: BunnyService,
 		private imageProcessingService: ImageProcessingService,
 		private videoProcessingService: VideoProcessingService,
 		private globalEventService: GlobalEventService,
@@ -405,20 +407,24 @@ export class DriveService {
 		);
 		if (this.meta.objectStorageSetPublicRead) params.ACL = 'public-read';
 
-		await this.s3Service.upload(this.meta, params)
-			.then(
-				result => {
-					if ('Bucket' in result) { // CompleteMultipartUploadCommandOutput
-						this.registerLogger.debug(`Uploaded: ${result.Bucket}/${result.Key} => ${result.Location}`);
-					} else { // AbortMultipartUploadCommandOutput
-						this.registerLogger.error(`Upload Result Aborted: key = ${key}, filename = ${filename}`);
-					}
-				})
-			.catch(
-				err => {
-					this.registerLogger.error(`Upload Failed: key = ${key}, filename = ${filename}`, err);
-				},
-			);
+		if (this.meta.objectStorageAccessKey) {
+			await this.s3Service.upload(this.meta, params)
+				.then(
+					result => {
+						if ('Bucket' in result) { // CompleteMultipartUploadCommandOutput
+							this.registerLogger.debug(`Uploaded: ${result.Bucket}/${result.Key} => ${result.Location}`);
+						} else { // AbortMultipartUploadCommandOutput
+							this.registerLogger.error(`Upload Result Aborted: key = ${key}, filename = ${filename}`);
+						}
+					})
+				.catch(
+					err => {
+						this.registerLogger.error(`Upload Failed: key = ${key}, filename = ${filename}`, err);
+					},
+				);
+		} else {
+			await this.bunnyService.upload(this.meta, key, stream);
+		}
 	}
 
 	// Expire oldest file (without avatar or banner) of remote user
@@ -814,8 +820,11 @@ export class DriveService {
 				Bucket: this.meta.objectStorageBucket,
 				Key: key,
 			} as DeleteObjectCommandInput;
-
-			await this.s3Service.delete(this.meta, param);
+			if (this.meta.objectStorageAccessKey) {
+				await this.s3Service.delete(this.meta, param);
+			} else {
+				await this.bunnyService.delete(this.meta, key);
+			}
 		} catch (err: any) {
 			if (err.name === 'NoSuchKey') {
 				this.deleteLogger.warn(`The object storage had no such key to delete: ${key}. Skipping this.`, err as Error);
