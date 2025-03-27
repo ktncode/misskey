@@ -28,7 +28,7 @@ export async function lookup(router?: Router) {
 		return;
 	}
 
-	if (query.startsWith('https://')) {
+	if (query.startsWith('http://') || query.startsWith('https://')) {
 		const res = await apLookup(query);
 
 		if (res.type === 'User') {
