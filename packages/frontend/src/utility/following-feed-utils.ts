@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { computed, Ref, WritableComputedRef } from 'vue';
-import { defaultStore } from '@/store.js';
+import { computed } from 'vue';
+import type { Ref, WritableComputedRef } from 'vue';
+import type { PageHeaderItem } from '@/types/page-header.js';
+import type { MenuItem } from '@/types/menu.js';
 import { deepMerge } from '@/utility/merge.js';
-import { PageHeaderItem } from '@/types/page-header.js';
 import { i18n } from '@/i18n.js';
 import { popupMenu } from '@/os.js';
-import { MenuItem } from '@/types/menu.js';
+import { prefer } from '@/preferences';
 
 export const followingTab = 'following' as const;
 export const mutualsTab = 'mutuals' as const;
@@ -34,7 +35,7 @@ export function followingTabIcon(tab: FollowingFeedTab | null | undefined): stri
 
 export type FollowingFeedModel = {
 	[Key in keyof FollowingFeedState]: WritableComputedRef<FollowingFeedState[Key]>;
-}
+};
 
 export interface FollowingFeedState {
 	withNonPublic: boolean,
@@ -56,10 +57,9 @@ export const defaultFollowingFeedState: FollowingFeedState = {
 	remoteWarningDismissed: false,
 };
 
-interface StorageInterface<T extends Partial<FollowingFeedState> = Partial<FollowingFeedState>> {
-	readonly state: Partial<T>;
-	readonly reactiveState: Ref<Partial<T>>;
-	save(updated: T): void;
+interface StorageInterface {
+	readonly state: Ref<Partial<FollowingFeedState>>;
+	save(updated: Partial<FollowingFeedState>): void;
 }
 
 export function createHeaderItem(storage?: Ref<StorageInterface>): PageHeaderItem {
@@ -117,45 +117,44 @@ export function createOptionsMenu(storage?: Ref<StorageInterface>): MenuItem[] {
 }
 
 export function createModel(storage?: Ref<StorageInterface>): FollowingFeedModel {
-	// eslint-disable-next-line no-param-reassign
 	storage ??= createDefaultStorage();
 
 	// Based on timeline.saveTlFilter()
 	const saveFollowingFilter = <K extends keyof FollowingFeedState>(key: K, value: FollowingFeedState[K]) => {
-		const state = deepMerge(storage.value.state, defaultFollowingFeedState);
-		const out = deepMerge({ [key]: value }, state);
+		const state = deepMerge<FollowingFeedState>(storage.value.state.value, defaultFollowingFeedState);
+		const out = deepMerge<FollowingFeedState>({ [key]: value }, state);
 		storage.value.save(out);
 	};
 
 	const userList: WritableComputedRef<FollowingFeedTab> = computed({
-		get: () => storage.value.reactiveState.value.userList ?? defaultFollowingFeedState.userList,
+		get: () => storage.value.state.value.userList ?? defaultFollowingFeedState.userList,
 		set: value => saveFollowingFilter('userList', value),
 	});
 	const withNonPublic: WritableComputedRef<boolean> = computed({
 		get: () => {
 			if (userList.value === 'followers') return false;
-			return storage.value.reactiveState.value.withNonPublic ?? defaultFollowingFeedState.withNonPublic;
+			return storage.value.state.value.withNonPublic ?? defaultFollowingFeedState.withNonPublic;
 		},
 		set: value => saveFollowingFilter('withNonPublic', value),
 	});
 	const withQuotes: WritableComputedRef<boolean> = computed({
-		get: () => storage.value.reactiveState.value.withQuotes ?? defaultFollowingFeedState.withQuotes,
+		get: () => storage.value.state.value.withQuotes ?? defaultFollowingFeedState.withQuotes,
 		set: value => saveFollowingFilter('withQuotes', value),
 	});
 	const withBots: WritableComputedRef<boolean> = computed({
-		get: () => storage.value.reactiveState.value.withBots ?? defaultFollowingFeedState.withBots,
+		get: () => storage.value.state.value.withBots ?? defaultFollowingFeedState.withBots,
 		set: value => saveFollowingFilter('withBots', value),
 	});
 	const withReplies: WritableComputedRef<boolean> = computed({
-		get: () => storage.value.reactiveState.value.withReplies ?? defaultFollowingFeedState.withReplies,
+		get: () => storage.value.state.value.withReplies ?? defaultFollowingFeedState.withReplies,
 		set: value => saveFollowingFilter('withReplies', value),
 	});
 	const onlyFiles: WritableComputedRef<boolean> = computed({
-		get: () => storage.value.reactiveState.value.onlyFiles ?? defaultFollowingFeedState.onlyFiles,
+		get: () => storage.value.state.value.onlyFiles ?? defaultFollowingFeedState.onlyFiles,
 		set: value => saveFollowingFilter('onlyFiles', value),
 	});
 	const remoteWarningDismissed: WritableComputedRef<boolean> = computed({
-		get: () => storage.value.reactiveState.value.remoteWarningDismissed ?? defaultFollowingFeedState.remoteWarningDismissed,
+		get: () => storage.value.state.value.remoteWarningDismissed ?? defaultFollowingFeedState.remoteWarningDismissed,
 		set: value => saveFollowingFilter('remoteWarningDismissed', value),
 	});
 
@@ -172,10 +171,9 @@ export function createModel(storage?: Ref<StorageInterface>): FollowingFeedModel
 
 function createDefaultStorage() {
 	return computed(() => ({
-		state: defaultStore.state.followingFeed,
-		reactiveState: defaultStore.reactiveState.followingFeed,
-		save(updated: typeof defaultStore.state.followingFeed) {
-			return defaultStore.set('followingFeed', updated);
+		state: prefer.s.followingFeed,
+		save(updated: typeof prefer.s.followingFeed) {
+			prefer.s.followingFeed = updated;
 		},
 	}));
 }
