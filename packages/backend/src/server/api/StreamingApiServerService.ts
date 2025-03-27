@@ -10,7 +10,9 @@ import * as WebSocket from 'ws';
 import proxyAddr from 'proxy-addr';
 import ms from 'ms';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository, MiAccessToken } from '@/models/_.js';
+import type { UsersRepository, MiAccessToken, MiUser } from '@/models/_.js';
+import type { Config } from '@/config.js';
+import type { Keyed, RateLimit } from '@/misc/rate-limit-utils.js';
 import { NoteReadService } from '@/core/NoteReadService.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import { bindThis } from '@/decorators.js';
@@ -25,8 +27,6 @@ import { AuthenticateService, AuthenticationError } from './AuthenticateService.
 import MainStreamConnection from './stream/Connection.js';
 import { ChannelsService } from './stream/ChannelsService.js';
 import type * as http from 'node:http';
-import type { IEndpointMeta } from './endpoints.js';
-import type { Config } from "@/config.js";
 
 @Injectable()
 export class StreamingApiServerService {
@@ -58,17 +58,9 @@ export class StreamingApiServerService {
 
 	@bindThis
 	private async rateLimitThis(
-		user: MiLocalUser | null | undefined,
-		requestIp: string,
-		limit: IEndpointMeta['limit'] & { key: NonNullable<string> },
+		limitActor: MiUser | string,
+		limit: Keyed<RateLimit>,
 	) : Promise<boolean> {
-		let limitActor: string | MiLocalUser;
-		if (user) {
-			limitActor = user;
-		} else {
-			limitActor = getIpHash(requestIp);
-		}
-
 		// Rate limit
 		const rateLimit = await this.rateLimiterService.limit(limit, limitActor);
 		return rateLimit.blocked;
@@ -93,7 +85,8 @@ export class StreamingApiServerService {
 			// so we do the same
 			const requestIp = proxyAddr(request, () => { return true; } );
 
-			if (await this.rateLimitThis(null, requestIp, {
+			const limitActor = getIpHash(requestIp);
+			if (await this.rateLimitThis(limitActor, {
 				key: 'wsconnect',
 				duration: ms('5min'),
 				max: 32,
@@ -141,14 +134,14 @@ export class StreamingApiServerService {
 			}
 
 			const rateLimiter = () => {
-				// rather high limit, because when catching up at the top of a
-				// timeline, the frontend may render many many notes, each of
-				// which causes a message via `useNoteCapture` to ask for
-				// realtime updates of that note
-				return this.rateLimitThis(user, requestIp, {
+				const limitActor = user ?? getIpHash(requestIp);
+
+				// Rather high limit because when catching up at the top of a timeline, the frontend may render many many notes.
+				// Each of which causes a message via `useNoteCapture` to ask for realtime updates of that note.
+				return this.rateLimitThis(limitActor, {
 					key: 'wsmessage',
-					duration: ms('2sec'),
-					max: 4096,
+					max: 4096, // Allow spikes of up to 4096
+					dripRate: 50, // Then once every 50ms (20/second rate)
 				});
 			};
 
