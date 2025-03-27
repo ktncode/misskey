@@ -407,7 +407,7 @@ export class DriveService {
 		);
 		if (this.meta.objectStorageSetPublicRead) params.ACL = 'public-read';
 
-		if (this.meta.objectStorageAccessKey) {
+		if (this.meta.objectStorageAccessKey && !this.meta.objectStorageEndpoint?.includes('bunnycdn.com')) {
 			await this.s3Service.upload(this.meta, params)
 				.then(
 					result => {
@@ -820,7 +820,7 @@ export class DriveService {
 				Bucket: this.meta.objectStorageBucket,
 				Key: key,
 			} as DeleteObjectCommandInput;
-			if (this.meta.objectStorageAccessKey) {
+			if (this.meta.objectStorageAccessKey && !this.meta.objectStorageEndpoint?.includes('bunnycdn.com')) {
 				await this.s3Service.delete(this.meta, param);
 			} else {
 				await this.bunnyService.delete(this.meta, key);
