@@ -17,10 +17,17 @@ import type { RoleService } from '@/core/RoleService.js';
 // Required because MemoryKVCache doesn't support null keys.
 const defaultUserKey = '';
 
+interface Lockout {
+	at: number;
+	info: LimitInfo;
+}
+
 @Injectable()
 export class SkRateLimiterService {
 	// 1-minute cache interval
 	private readonly factorCache = new MemoryKVCache<number>(1000 * 60);
+	// 10-second cache interval
+	private readonly lockoutCache = new MemoryKVCache<Lockout>(1000 * 10);
 	private readonly disabled: boolean;
 
 	constructor(
@@ -58,6 +65,15 @@ export class SkRateLimiterService {
 		}
 
 		const actor = typeof(actorOrUser) === 'object' ? actorOrUser.id : actorOrUser;
+
+		// TODO add to docs
+		// Fast-path to avoid extra redis calls for blocked clients
+		const lockoutKey = `@${actor}#${limit.key}`;
+		const lockout = this.getLockout(lockoutKey);
+		if (lockout) {
+			return lockout;
+		}
+
 		const userCacheKey = typeof(actorOrUser) === 'object' ? actorOrUser.id : defaultUserKey;
 		const userRoleKey = typeof(actorOrUser) === 'object' ? actorOrUser.id : null;
 		const factor = this.factorCache.get(userCacheKey) ?? await this.factorCache.fetch(userCacheKey, async () => {
@@ -73,6 +89,47 @@ export class SkRateLimiterService {
 			throw new Error(`Rate limit factor is zero or negative: ${factor}`);
 		}
 
+		const info = await this.applyLimit(limit, actor, factor);
+
+		// Store blocked status to avoid hammering redis
+		if (info.blocked) {
+			this.lockoutCache.set(lockoutKey, {
+				at: this.timeService.now,
+				info,
+			});
+		}
+
+		return info;
+	}
+
+	private getLockout(lockoutKey: string): LimitInfo | null {
+		const lockout = this.lockoutCache.get(lockoutKey);
+		if (!lockout) {
+			// Not blocked, proceed with redis check
+			return null;
+		}
+
+		const now = this.timeService.now;
+		const elapsedMs = now - lockout.at;
+		if (elapsedMs >= lockout.info.resetMs) {
+			// Block expired, clear and proceed with redis check
+			this.lockoutCache.delete(lockoutKey);
+			return null;
+		}
+
+		// Limit is still active, update calculations
+		lockout.at = now;
+		lockout.info.resetMs -= elapsedMs;
+		lockout.info.resetSec = Math.ceil(lockout.info.resetMs / 1000);
+		lockout.info.fullResetMs -= elapsedMs;
+		lockout.info.fullResetSec = Math.ceil(lockout.info.fullResetMs / 1000);
+
+		// Re-cache the new object
+		this.lockoutCache.set(lockoutKey, lockout);
+		return lockout.info;
+	}
+
+	private async applyLimit(limit: Keyed<RateLimit>, actor: string, factor: number) {
 		if (isLegacyRateLimit(limit)) {
 			return await this.limitLegacy(limit, actor, factor);
 		} else {
