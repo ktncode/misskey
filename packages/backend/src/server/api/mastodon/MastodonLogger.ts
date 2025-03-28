@@ -35,7 +35,7 @@ export class MastodonLogger {
 // TODO move elsewhere
 export interface MastodonError {
 	error: string;
-	error_description: string;
+	error_description?: string;
 }
 
 export function getErrorData(error: unknown): MastodonError {

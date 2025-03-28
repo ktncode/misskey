@@ -32,6 +32,9 @@ export class ApiNotificationsMastodon {
 			const notifications = await Promise.all(data.data.map(n => this.mastoConverters.convertNotification(n, me)));
 			const response: MastodonEntity.Notification[] = [];
 			for (const notification of notifications) {
+				// Notifications for inaccessible notes will be null and should be ignored
+				if (!notification) continue;
+
 				response.push(notification);
 				if (notification.type === 'reaction') {
 					response.push({
@@ -51,6 +54,13 @@ export class ApiNotificationsMastodon {
 			const { client, me } = await this.clientService.getAuthClient(_request);
 			const data = await client.getNotification(_request.params.id);
 			const response = await this.mastoConverters.convertNotification(data.data, me);
+
+			// Notifications for inaccessible notes will be null and should be ignored
+			if (!response) {
+				return reply.code(404).send({
+					error: 'NOT_FOUND',
+				});
+			}
 
 			reply.send(response);
 		});

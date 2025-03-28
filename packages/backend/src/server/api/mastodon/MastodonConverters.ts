@@ -351,12 +351,21 @@ export class MastodonConverters {
 		};
 	}
 
-	public async convertNotification(notification: Entity.Notification, me: MiLocalUser | null): Promise<MastodonEntity.Notification> {
+	public async convertNotification(notification: Entity.Notification, me: MiLocalUser | null): Promise<MastodonEntity.Notification | null> {
+		const status = notification.status
+			? await this.convertStatus(notification.status, me).catch(() => null)
+			: null;
+
+		// We sometimes get notifications for inaccessible notes, these should be ignored.
+		if (!status) {
+			return null;
+		}
+
 		return {
 			account: await this.convertAccount(notification.account),
 			created_at: notification.created_at,
 			id: notification.id,
-			status: notification.status ? await this.convertStatus(notification.status, me) : undefined,
+			status,
 			type: convertNotificationType(notification.type as NotificationType),
 		};
 	}
