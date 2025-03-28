@@ -11,6 +11,7 @@ import { Injectable } from '@nestjs/common';
 import type { MiMeta } from '@/models/Meta.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import { bindThis } from '@/decorators.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 
 @Injectable()
 export class BunnyService {
@@ -22,7 +23,7 @@ export class BunnyService {
 	@bindThis
 	public getBunnyInfo(meta: MiMeta) {
 		if (!meta.objectStorageEndpoint || !meta.objectStorageBucket || !meta.objectStorageSecretKey) {
-			throw new Error('One of the following fields is empty: Endpoint, Bucket, Secret Key');
+			throw new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140bf90', 'Failed to use BunnyCDN, One of the required fields is missing.');
 		}
 
 		return {
