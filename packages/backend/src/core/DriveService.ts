@@ -407,7 +407,7 @@ export class DriveService {
 		);
 		if (this.meta.objectStorageSetPublicRead) params.ACL = 'public-read';
 
-		if (this.meta.objectStorageEndpoint && this.meta.objectStorageEndpoint.includes('bunnycdn.com')) {
+		if (this.bunnyService.usingBunnyCDN(this.meta)) {
 			await this.bunnyService.upload(this.meta, key, stream);
 		} else {
 			await this.s3Service.upload(this.meta, params)
@@ -820,7 +820,7 @@ export class DriveService {
 				Bucket: this.meta.objectStorageBucket,
 				Key: key,
 			} as DeleteObjectCommandInput;
-			if (this.meta.objectStorageEndpoint && this.meta.objectStorageEndpoint.includes('bunnycdn.com')) {
+			if (this.bunnyService.usingBunnyCDN(this.meta)) {
 				await this.bunnyService.delete(this.meta, key);
 			} else {
 				await this.s3Service.delete(this.meta, param);

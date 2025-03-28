@@ -30,6 +30,11 @@ export class BunnyService {
 	}
 
 	@bindThis
+	public usingBunnyCDN(meta: MiMeta) {
+		return meta.objectStorageEndpoint && meta.objectStorageEndpoint.includes('bunnycdn.com') ? true : false;
+	}
+
+	@bindThis
 	public async upload(meta: MiMeta, path: string, input: fs.ReadStream | Buffer) {
 		const client = this.getBunnyInfo(meta);
 
@@ -41,7 +46,7 @@ export class BunnyService {
 		const data = Buffer.isBuffer(input) ? Readable.from(input) : input;
 
 		const agent = this.httpRequestService.getAgentByUrl(new URL(`${client.fullUrl}/${path}`), !meta.objectStorageUseProxy, true);
-		
+
 		// Seperation of path and host/domain is required here
 		const options = {
 			method: 'PUT',
