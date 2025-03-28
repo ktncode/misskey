@@ -22,7 +22,7 @@ export class BunnyService {
 	@bindThis
 	public getBunnyInfo(meta: MiMeta) {
 		return {
-			endpoint: meta.objectStorageEndpoint ?? 'example.net',
+			endpoint: meta.objectStorageEndpoint ?? '',
 			accessKey: meta.objectStorageSecretKey ?? '',
 			zone: meta.objectStorageBucket ?? '',
 			prefix: meta.objectStoragePrefix ?? '',
