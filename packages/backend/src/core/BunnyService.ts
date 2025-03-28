@@ -21,8 +21,16 @@ export class BunnyService {
 
 	@bindThis
 	public getBunnyInfo(meta: MiMeta) {
+		if (!meta.objectStorageEndpoint || !meta.objectStorageBucket || !meta.objectStorageSecretKey) {
+			throw new Error('One of the following fields is empty: Endpoint, Bucket, Secret Key');
+		}
+
 		return {
 			endpoint: meta.objectStorageEndpoint,
+			/*
+			   The way S3 works is that the Secret Key is essentially the password for the API but Bunny calls their password AccessKey so we call it accessKey here.
+			   Bunny also doesn't specify a username/s3 access key when doing HTTP API requests so we end up not using our Access Key field from the form.
+			*/
 			accessKey: meta.objectStorageSecretKey,
 			zone: meta.objectStorageBucket,
 			fullUrl: `https://${meta.objectStorageEndpoint}/${meta.objectStorageBucket}`,
@@ -37,10 +45,6 @@ export class BunnyService {
 	@bindThis
 	public async upload(meta: MiMeta, path: string, input: fs.ReadStream | Buffer) {
 		const client = this.getBunnyInfo(meta);
-
-		if (!client.endpoint || !client.zone || !client.accessKey) {
-			return console.error('Missing Information');
-		}
 
 		// Required to convert the buffer from webpublic and thumbnail to a ReadableStream for PUT
 		const data = Buffer.isBuffer(input) ? Readable.from(input) : input;
@@ -76,9 +80,6 @@ export class BunnyService {
 	@bindThis
 	public delete(meta: MiMeta, file: string) {
 		const client = this.getBunnyInfo(meta);
-		if (!client.endpoint || !client.zone || !client.accessKey) {
-			return;
-		}
 		return this.httpRequestService.send(`${client.fullUrl}/${file}`, { method: 'DELETE', headers: { AccessKey: client.accessKey } });
 	}
 }
