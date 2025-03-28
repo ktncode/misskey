@@ -22,10 +22,10 @@ export class BunnyService {
 	@bindThis
 	public getBunnyInfo(meta: MiMeta) {
 		return {
-			endpoint: meta.objectStorageEndpoint ?? '',
-			accessKey: meta.objectStorageSecretKey ?? '',
-			zone: meta.objectStorageBucket ?? '',
-			prefix: meta.objectStoragePrefix ?? '',
+			endpoint: meta.objectStorageEndpoint,
+			accessKey: meta.objectStorageSecretKey,
+			zone: meta.objectStorageBucket,
+			fullUrl: `https://${meta.objectStorageEndpoint}/${meta.objectStorageBucket}`,
 		};
 	}
 
@@ -33,9 +33,16 @@ export class BunnyService {
 	public async upload(meta: MiMeta, path: string, input: fs.ReadStream | Buffer) {
 		const client = this.getBunnyInfo(meta);
 
-		// Required to convert the buffer from webpulic and thumbnail to a ReadableStream for PUT
+		if (!client.endpoint || !client.zone || !client.accessKey) {
+			return console.error('Missing Information');
+		}
+
+		// Required to convert the buffer from webpublic and thumbnail to a ReadableStream for PUT
 		const data = Buffer.isBuffer(input) ? Readable.from(input) : input;
 
+		const agent = this.httpRequestService.getAgentByUrl(new URL(`${client.fullUrl}/${path}`), !meta.objectStorageUseProxy, true);
+		
+		// Seperation of path and host/domain is required here
 		const options = {
 			method: 'PUT',
 			host: client.endpoint,
@@ -44,6 +51,7 @@ export class BunnyService {
 				AccessKey: client.accessKey,
 				'Content-Type': 'application/octet-stream',
 			},
+			agent: agent,
 		};
 
 		const req = https.request(options);
@@ -56,13 +64,16 @@ export class BunnyService {
 			data.destroy();
 		});
 		
-		// wait till stream gets destroyed upon finish of piping to prevent the UI from showing the upload as success wait too early
+		// wait till stream gets destroyed upon finish of piping to prevent the UI from showing the upload as success way too early
 		await finished(data);
 	}
 
 	@bindThis
 	public delete(meta: MiMeta, file: string) {
 		const client = this.getBunnyInfo(meta);
-		return this.httpRequestService.send(`https://${client.endpoint}/${client.zone}/${file}`, { method: 'DELETE', headers: { AccessKey: client.accessKey } });
+		if (!client.endpoint || !client.zone || !client.accessKey) {
+			return;
+		}
+		return this.httpRequestService.send(`${client.fullUrl}/${file}`, { method: 'DELETE', headers: { AccessKey: client.accessKey } });
 	}
 }
