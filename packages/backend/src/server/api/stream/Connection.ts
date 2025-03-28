@@ -23,8 +23,8 @@ import type { EventEmitter } from 'events';
 import type Channel from './channel.js';
 
 const MAX_CHANNELS_PER_CONNECTION = 32;
-const MAX_SUBSCRIPTIONS_PER_CONNECTION = 256;
-const MAX_CACHED_NOTES_PER_CONNECTION = 32;
+const MAX_SUBSCRIPTIONS_PER_CONNECTION = 512;
+const MAX_CACHED_NOTES_PER_CONNECTION = 64;
 
 /**
  * Main stream connection
