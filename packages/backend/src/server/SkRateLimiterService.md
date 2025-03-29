@@ -42,6 +42,10 @@ While performance has not been formally tested, it's expected that SkRateLimiter
 Redis memory usage should be notably lower due to the reduced number of keys and avoidance of set / array constructions.
 If redis load does become a concern, then a dedicated node can be assigned via the `redisForRateLimit` config setting.
 
+To prevent Redis DoS, SkRateLimiterService internally tracks the number of concurrent requests for each unique client/endpoint combination.
+If the number of requests exceeds the limit's maximum value, then any further requests are automatically rejected.
+The lockout will automatically end when the number of active requests drops to within the limit value.
+
 ## Concurrency and Multi-Node Correctness
 
 To provide consistency across multi-node environments, leaky bucket is implemented with only atomic operations (`Increment`, `Decrement`, `Add`, and `Subtract`).
