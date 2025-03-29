@@ -160,8 +160,9 @@ export class StreamingApiServerService {
 				// Rather high limit because when catching up at the top of a timeline, the frontend may render many many notes.
 				// Each of which causes a message via `useNoteCapture` to ask for realtime updates of that note.
 				return this.rateLimitThis(limitActor, {
+					type: 'bucket',
 					key: 'wsmessage',
-					max: 4096, // Allow spikes of up to 4096
+					size: 4096, // Allow spikes of up to 4096
 					dripRate: 50, // Then once every 50ms (20/second rate)
 				});
 			};
