@@ -101,8 +101,12 @@ export class DownloadService {
 		} catch (e) {
 			if (e instanceof Got.HTTPError) {
 				throw new StatusError(`${e.response.statusCode} ${e.response.statusMessage}`, e.response.statusCode, e.response.statusMessage);
-			} else {
+			} else if (e instanceof Got.RequestError || e instanceof Got.AbortError) {
+				throw new Error(String(e));
+			} else if (e instanceof Error) {
 				throw e;
+			} else {
+				throw new Error(String(e));
 			}
 		}
 
