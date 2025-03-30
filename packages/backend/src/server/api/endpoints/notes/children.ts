@@ -80,7 +80,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			this.queryService.generateVisibilityQuery(query, me);
 			if (me) {
-				this.queryService.generateBlockedUserQuery(query, me);
+				this.queryService.generateMutedUserQueryForNotes(query, me);
+				this.queryService.generateBlockedUserQueryForNotes(query, me);
 			}
 
 			const notes = await query.limit(ps.limit).getMany();
