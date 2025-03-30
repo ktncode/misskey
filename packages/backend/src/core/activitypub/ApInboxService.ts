@@ -148,7 +148,8 @@ export class ApInboxService {
 			if (actor.lastFetchedAt == null || Date.now() - actor.lastFetchedAt.getTime() > 1000 * 60 * 60 * 24) {
 				setImmediate(() => {
 					// 同一ユーザーの情報を再度処理するので、使用済みのresolverを再利用してはいけない
-					this.apPersonService.updatePerson(actor.uri);
+					this.apPersonService.updatePerson(actor.uri)
+						.catch(err => this.logger.error(`Failed to update person: ${renderInlineError(err)}`));
 				});
 			}
 		}
@@ -443,9 +444,11 @@ export class ApInboxService {
 					setImmediate(() => {
 						// Don't re-use the resolver, or it may throw recursion errors.
 						// Instead, create a new resolver with an appropriately-reduced recursion limit.
-						this.apPersonService.updatePerson(actor.uri, this.apResolverService.createResolver({
+						const subResolver = this.apResolverService.createResolver({
 							recursionLimit: resolver.getRecursionLimit() - resolver.getHistory().length,
-						}));
+						});
+						this.apPersonService.updatePerson(actor.uri, subResolver)
+							.catch(err => this.logger.error(`Failed to update person: ${renderInlineError(err)}`));
 					});
 				}
 			});
