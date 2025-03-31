@@ -590,6 +590,7 @@ import type {
 	RolesUsersResponse,
 	ServerInfoResponse,
 	SponsorsRequest,
+	SponsorsResponse,
 	StatsResponse,
 	SwRegisterRequest,
 	SwRegisterResponse,
@@ -1054,7 +1055,7 @@ export type Endpoints = {
 	'roles/show': { req: RolesShowRequest; res: RolesShowResponse };
 	'roles/users': { req: RolesUsersRequest; res: RolesUsersResponse };
 	'server-info': { req: EmptyRequest; res: ServerInfoResponse };
-	'sponsors': { req: SponsorsRequest; res: EmptyResponse };
+	'sponsors': { req: SponsorsRequest; res: SponsorsResponse };
 	'stats': { req: EmptyRequest; res: StatsResponse };
 	'sw/register': { req: SwRegisterRequest; res: SwRegisterResponse };
 	'sw/show-registration': { req: SwShowRegistrationRequest; res: SwShowRegistrationResponse };

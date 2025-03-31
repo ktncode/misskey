@@ -593,6 +593,7 @@ export type RolesUsersRequest = operations['roles___users']['requestBody']['cont
 export type RolesUsersResponse = operations['roles___users']['responses']['200']['content']['application/json'];
 export type ServerInfoResponse = operations['server-info']['responses']['200']['content']['application/json'];
 export type SponsorsRequest = operations['sponsors']['requestBody']['content']['application/json'];
+export type SponsorsResponse = operations['sponsors']['responses']['200']['content']['application/json'];
 export type StatsResponse = operations['stats']['responses']['200']['content']['application/json'];
 export type SwRegisterRequest = operations['sw___register']['requestBody']['content']['application/json'];
 export type SwRegisterResponse = operations['sw___register']['responses']['200']['content']['application/json'];

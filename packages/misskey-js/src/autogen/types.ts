@@ -170,6 +170,15 @@ export type paths = {
      */
     post: operations['admin___announcements___update'];
   };
+  '/admin/approve-user': {
+    /**
+     * admin/approve-user
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:approve-user*
+     */
+    post: operations['admin___approve-user'];
+  };
   '/admin/avatar-decorations/create': {
     /**
      * admin/avatar-decorations/create
@@ -223,6 +232,24 @@ export type paths = {
      * **Credential required**: *Yes* / **Permission**: *write:admin:meta*
      */
     post: operations['admin___captcha___save'];
+  };
+  '/admin/cw-user': {
+    /**
+     * admin/cw-user
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:cw-user*
+     */
+    post: operations['admin___cw-user'];
+  };
+  '/admin/decline-user': {
+    /**
+     * admin/decline-user
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:decline-user*
+     */
+    post: operations['admin___decline-user'];
   };
   '/admin/delete-account': {
     /**
@@ -441,6 +468,15 @@ export type paths = {
      */
     post: operations['admin___forward-abuse-user-report'];
   };
+  '/admin/gen-vapid-keys': {
+    /**
+     * admin/gen-vapid-keys
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:meta*
+     */
+    post: operations['admin___gen-vapid-keys'];
+  };
   '/admin/get-index-stats': {
     /**
      * admin/get-index-stats
@@ -495,6 +531,15 @@ export type paths = {
      */
     post: operations['admin___meta'];
   };
+  '/admin/nsfw-user': {
+    /**
+     * admin/nsfw-user
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:nsfw-user*
+     */
+    post: operations['admin___nsfw-user'];
+  };
   '/admin/promo/create': {
     /**
      * admin/promo/create
@@ -548,6 +593,15 @@ export type paths = {
      * **Credential required**: *Yes* / **Permission**: *read:admin:emoji*
      */
     post: operations['admin___queue___stats'];
+  };
+  '/admin/reject-quotes': {
+    /**
+     * admin/reject-quotes
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:reject-quotes*
+     */
+    post: operations['admin___reject-quotes'];
   };
   '/admin/relays/add': {
     /**
@@ -720,6 +774,15 @@ export type paths = {
      */
     post: operations['admin___show-users'];
   };
+  '/admin/silence-user': {
+    /**
+     * admin/silence-user
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:silence-user*
+     */
+    post: operations['admin___silence-user'];
+  };
   '/admin/suspend-user': {
     /**
      * admin/suspend-user
@@ -789,6 +852,15 @@ export type paths = {
      */
     post: operations['admin___system-webhook___update'];
   };
+  '/admin/unnsfw-user': {
+    /**
+     * admin/unnsfw-user
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:unnsfw-user*
+     */
+    post: operations['admin___unnsfw-user'];
+  };
   '/admin/unset-user-avatar': {
     /**
      * admin/unset-user-avatar
@@ -806,6 +878,15 @@ export type paths = {
      * **Credential required**: *Yes* / **Permission**: *write:admin:unset-user-banner*
      */
     post: operations['admin___unset-user-banner'];
+  };
+  '/admin/unsilence-user': {
+    /**
+     * admin/unsilence-user
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:unsilence-user*
+     */
+    post: operations['admin___unsilence-user'];
   };
   '/admin/unsuspend-user': {
     /**
@@ -1909,7 +1990,7 @@ export type paths = {
      * federation/followers
      * @description No description provided.
      *
-     * **Credential required**: *No*
+     * **Credential required**: *Yes* / **Permission**: *read:account*
      */
     post: operations['federation___followers'];
   };
@@ -1918,7 +1999,7 @@ export type paths = {
      * federation/following
      * @description No description provided.
      *
-     * **Credential required**: *No*
+     * **Credential required**: *Yes* / **Permission**: *read:account*
      */
     post: operations['federation___following'];
   };
@@ -2504,6 +2585,16 @@ export type paths = {
      */
     post: operations['i___export-clips'];
   };
+  '/i/export-data': {
+    /**
+     * i/export-data
+     * @description No description provided.
+     *
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes*
+     */
+    post: operations['i___export-data'];
+  };
   '/i/export-favorites': {
     /**
      * i/export-favorites
@@ -2621,6 +2712,16 @@ export type paths = {
      */
     post: operations['i___import-muting'];
   };
+  '/i/import-notes': {
+    /**
+     * i/import-notes
+     * @description No description provided.
+     *
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes*
+     */
+    post: operations['i___import-notes'];
+  };
   '/i/import-user-lists': {
     /**
      * i/import-user-lists
@@ -2731,6 +2832,15 @@ export type paths = {
      * **Credential required**: *Yes* / **Permission**: *read:account*
      */
     post: operations['i___registry___get-detail'];
+  };
+  '/i/registry/get-unsecure': {
+    /**
+     * i/registry/get-unsecure
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:account*
+     */
+    post: operations['i___registry___get-unsecure'];
   };
   '/i/registry/keys': {
     /**
@@ -2981,6 +3091,15 @@ export type paths = {
      */
     post: operations['notes'];
   };
+  '/notes/bubble-timeline': {
+    /**
+     * notes/bubble-timeline
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
+    post: operations['notes___bubble-timeline'];
+  };
   '/notes/children': {
     /**
      * notes/children
@@ -3026,6 +3145,15 @@ export type paths = {
      */
     post: operations['notes___delete'];
   };
+  '/notes/edit': {
+    /**
+     * notes/edit
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:notes*
+     */
+    post: operations['notes___edit'];
+  };
   '/notes/favorites/create': {
     /**
      * notes/favorites/create
@@ -3060,6 +3188,22 @@ export type paths = {
      */
     post: operations['notes___featured'];
   };
+  '/notes/following': {
+    /**
+     * notes/following
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:account*
+     */
+    get: operations['notes___following'];
+    /**
+     * notes/following
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:account*
+     */
+    post: operations['notes___following'];
+  };
   '/notes/global-timeline': {
     /**
      * notes/global-timeline
@@ -3077,6 +3221,15 @@ export type paths = {
      * **Credential required**: *Yes* / **Permission**: *read:account*
      */
     post: operations['notes___hybrid-timeline'];
+  };
+  '/notes/like': {
+    /**
+     * notes/like
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:reactions*
+     */
+    post: operations['notes___like'];
   };
   '/notes/local-timeline': {
     /**
@@ -3104,6 +3257,15 @@ export type paths = {
      * **Credential required**: *Yes* / **Permission**: *read:account*
      */
     post: operations['notes___polls___recommendation'];
+  };
+  '/notes/polls/refresh': {
+    /**
+     * notes/polls/refresh
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:federation*
+     */
+    post: operations['notes___polls___refresh'];
   };
   '/notes/polls/vote': {
     /**
@@ -3165,6 +3327,33 @@ export type paths = {
      * **Credential required**: *No*
      */
     post: operations['notes___replies'];
+  };
+  '/notes/schedule/create': {
+    /**
+     * notes/schedule/create
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:notes-schedule*
+     */
+    post: operations['notes___schedule___create'];
+  };
+  '/notes/schedule/delete': {
+    /**
+     * notes/schedule/delete
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:notes-schedule*
+     */
+    post: operations['notes___schedule___delete'];
+  };
+  '/notes/schedule/list': {
+    /**
+     * notes/schedule/list
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:notes-schedule*
+     */
+    post: operations['notes___schedule___list'];
   };
   '/notes/search': {
     /**
@@ -3255,6 +3444,15 @@ export type paths = {
      * **Credential required**: *Yes* / **Permission**: *read:account*
      */
     post: operations['notes___user-list-timeline'];
+  };
+  '/notes/versions': {
+    /**
+     * notes/versions
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
+    post: operations['notes___versions'];
   };
   '/notifications/create': {
     /**
@@ -3576,6 +3774,15 @@ export type paths = {
      * **Credential required**: *No*
      */
     post: operations['server-info'];
+  };
+  '/sponsors': {
+    /**
+     * sponsors
+     * @description Get Sharkey Sponsors or Instance Sponsors
+     *
+     * **Credential required**: *No*
+     */
+    post: operations['sponsors'];
   };
   '/stats': {
     /**
@@ -3985,9 +4192,22 @@ export type components = {
           url: string;
           offsetX?: number;
           offsetY?: number;
+          showBelow?: boolean;
         }[];
+      /** @default false */
+      isAdmin?: boolean;
+      /** @default false */
+      isModerator?: boolean;
+      /** @default false */
+      isSystem?: boolean;
+      noindex: boolean;
+      enableRss: boolean;
+      mandatoryCW: string | null;
+      rejectQuotes?: boolean;
       isBot?: boolean;
       isCat?: boolean;
+      speakAsCat?: boolean;
+      isSilenced: boolean;
       requireSigninToViewContents?: boolean;
       makeNotesFollowersOnlyBefore?: number | null;
       makeNotesHiddenBefore?: number | null;
@@ -4027,6 +4247,9 @@ export type components = {
       /** Format: url */
       bannerUrl: string | null;
       bannerBlurhash: string | null;
+      /** Format: url */
+      backgroundUrl: string | null;
+      backgroundBlurhash: string | null;
       isLocked: boolean;
       isSilenced: boolean;
       /** @example false */
@@ -4036,6 +4259,8 @@ export type components = {
       location: string | null;
       /** @example 2018-03-12 */
       birthday: string | null;
+      /** @example Steve */
+      listenbrainz: string | null;
       /** @example ja-JP */
       lang: string | null;
       fields: {
@@ -4082,12 +4307,15 @@ export type components = {
       avatarId: string | null;
       /** Format: id */
       bannerId: string | null;
+      /** Format: id */
+      backgroundId: string | null;
       followedMessage: string | null;
       isModerator: boolean | null;
       isAdmin: boolean | null;
       injectFeaturedNote: boolean;
       receiveAnnouncementEmail: boolean;
       alwaysMarkNsfw: boolean;
+      defaultSensitive: boolean;
       autoSensitive: boolean;
       carefulBot: boolean;
       autoAcceptFollowed: boolean;
@@ -4107,6 +4335,7 @@ export type components = {
       hasUnreadChatMessages: boolean;
       hasUnreadNotification: boolean;
       hasPendingReceivedFollowRequest: boolean;
+      hasPendingSentFollowRequest: boolean;
       unreadNotificationsCount: number;
       mutedWords: string[][];
       hardMutedWords: string[][];
@@ -4273,6 +4502,11 @@ export type components = {
           /** Format: date-time */
           lastUsed: string;
         }[];
+      defaultCW: string | null;
+      /** @enum {string} */
+      defaultCWPriority: 'default' | 'parent' | 'defaultParent' | 'parentDefault';
+      /** @enum {string} */
+      allowUnsignedFetch: 'never' | 'always' | 'essential' | 'staff';
     };
     UserDetailedNotMe: components['schemas']['UserLite'] & components['schemas']['UserDetailedNotMeOnly'];
     MeDetailed: components['schemas']['UserLite'] & components['schemas']['UserDetailedNotMeOnly'] & components['schemas']['MeDetailedOnly'];
@@ -4347,6 +4581,8 @@ export type components = {
       /** Format: date-time */
       createdAt: string;
       /** Format: date-time */
+      updatedAt?: string;
+      /** Format: date-time */
       deletedAt?: string | null;
       text: string | null;
       cw?: string | null;
@@ -4415,6 +4651,7 @@ export type components = {
       url?: string;
       reactionAndUserPairCache?: string[];
       clippedCount?: number;
+      processErrors?: string[] | null;
       myReaction?: string | null;
     };
     NoteReaction: {
@@ -4610,6 +4847,36 @@ export type components = {
       header: string | null;
       icon: string | null;
     }) | {
+      /** Format: id */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** @enum {string} */
+      type: 'edited';
+      user: components['schemas']['UserLite'];
+      /** Format: id */
+      userId: string;
+      note: components['schemas']['Note'];
+    } | {
+      /** Format: id */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** @enum {string} */
+      type: 'scheduledNoteFailed';
+      reason: string;
+    } | {
+      /** Format: id */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** @enum {string} */
+      type: 'scheduledNotePosted';
+      user: components['schemas']['UserLite'];
+      /** Format: id */
+      userId: string;
+      note: components['schemas']['Note'];
+    } | {
       /** Format: id */
       id: string;
       /** Format: date-time */
@@ -4955,6 +5222,9 @@ export type components = {
       infoUpdatedAt: string | null;
       /** Format: date-time */
       latestRequestReceivedAt: string | null;
+      isNSFW: boolean;
+      rejectReports: boolean;
+      rejectQuotes: boolean;
       moderationNote?: string | null;
     };
     GalleryPost: {
@@ -5146,6 +5416,7 @@ export type components = {
     RolePolicies: {
       gtlAvailable: boolean;
       ltlAvailable: boolean;
+      btlAvailable: boolean;
       canPublicNote: boolean;
       mentionLimit: number;
       canInvite: boolean;
@@ -5175,6 +5446,7 @@ export type components = {
       canImportFollowing: boolean;
       canImportMuting: boolean;
       canImportUserLists: boolean;
+      scheduleNoteMax: number;
       canChat: boolean;
     };
     ReversiGameLite: {
@@ -5266,10 +5538,13 @@ export type components = {
       repositoryUrl: string | null;
       /** @default https://github.com/misskey-dev/misskey/issues/new */
       feedbackUrl: string | null;
+      donationUrl: string | null;
       defaultDarkTheme: string | null;
       defaultLightTheme: string | null;
+      defaultLike: string | null;
       disableRegistration: boolean;
       emailRequiredForSignup: boolean;
+      approvalRequiredForSignup: boolean;
       enableHcaptcha: boolean;
       hcaptchaSiteKey: string | null;
       enableMcaptcha: boolean;
@@ -5279,6 +5554,10 @@ export type components = {
       recaptchaSiteKey: string | null;
       enableTurnstile: boolean;
       turnstileSiteKey: string | null;
+      enableFC: boolean;
+      fcSiteKey: string | null;
+      enableAchievements: boolean | null;
+      robotsTxt: string | null;
       enableTestcaptcha: boolean;
       swPublickey: string | null;
       /** @default /assets/ai.png */
@@ -5288,7 +5567,13 @@ export type components = {
       infoImageUrl: string | null;
       notFoundImageUrl: string | null;
       iconUrl: string | null;
+      sidebarLogoUrl: string | null;
       maxNoteTextLength: number;
+      maxRemoteNoteTextLength: number;
+      maxCwLength: number;
+      maxRemoteCwLength: number;
+      maxAltTextLength: number;
+      maxRemoteAltTextLength: number;
       ads: {
           /**
            * Format: id
@@ -5323,6 +5608,7 @@ export type components = {
        * @enum {string}
        */
       noteSearchableScope: 'local' | 'global';
+      trustedLinkUrlPatterns: string[];
       maxFileSize: number;
       /** @enum {string} */
       federation: 'all' | 'specified' | 'none';
@@ -5346,6 +5632,8 @@ export type components = {
       requireSetup: boolean;
       cacheRemoteFiles: boolean;
       cacheRemoteSensitiveFiles: boolean;
+      /** @enum {string} */
+      allowUnsignedFetch: 'never' | 'always' | 'essential';
     };
     MetaDetailed: components['schemas']['MetaLite'] & components['schemas']['MetaDetailedOnly'];
     SystemWebhook: {
@@ -6509,6 +6797,58 @@ export type operations = {
     };
   };
   /**
+   * admin/approve-user
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:approve-user*
+   */
+  'admin___approve-user': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
    * admin/avatar-decorations/create
    * @description No description provided.
    *
@@ -6770,7 +7110,7 @@ export type operations = {
         content: {
           'application/json': {
             /** @enum {string} */
-            provider: 'none' | 'hcaptcha' | 'mcaptcha' | 'recaptcha' | 'turnstile' | 'testcaptcha';
+            provider: 'none' | 'hcaptcha' | 'mcaptcha' | 'recaptcha' | 'turnstile' | 'fc' | 'testcaptcha';
             hcaptcha: {
               siteKey: string | null;
               secretKey: string | null;
@@ -6785,6 +7125,10 @@ export type operations = {
               secretKey: string | null;
             };
             turnstile: {
+              siteKey: string | null;
+              secretKey: string | null;
+            };
+            fc: {
               siteKey: string | null;
               secretKey: string | null;
             };
@@ -6834,11 +7178,116 @@ export type operations = {
       content: {
         'application/json': {
           /** @enum {string} */
-          provider: 'none' | 'hcaptcha' | 'mcaptcha' | 'recaptcha' | 'turnstile' | 'testcaptcha';
+          provider: 'none' | 'hcaptcha' | 'mcaptcha' | 'recaptcha' | 'turnstile' | 'fc' | 'testcaptcha';
           captchaResult?: string | null;
           sitekey?: string | null;
           secret?: string | null;
           instanceUrl?: string | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/cw-user
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:cw-user*
+   */
+  'admin___cw-user': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+          cw: string | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/decline-user
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:decline-user*
+   */
+  'admin___decline-user': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
         };
       };
     };
@@ -7592,6 +8041,8 @@ export type operations = {
           query?: string | null;
           /** @default 10 */
           limit?: number;
+          /** @default null */
+          offset?: number | null;
           /** Format: misskey:id */
           sinceId?: string;
           /** Format: misskey:id */
@@ -8158,7 +8609,10 @@ export type operations = {
         'application/json': {
           host: string;
           isSuspended?: boolean;
+          isNSFW?: boolean;
+          rejectReports?: boolean;
           moderationNote?: string;
+          rejectQuotes?: boolean;
         };
       };
     };
@@ -8214,6 +8668,50 @@ export type operations = {
         };
       };
     };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/gen-vapid-keys
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:meta*
+   */
+  'admin___gen-vapid-keys': {
     responses: {
       /** @description OK (without any results) */
       204: {
@@ -8542,6 +9040,7 @@ export type operations = {
             cacheRemoteFiles: boolean;
             cacheRemoteSensitiveFiles: boolean;
             emailRequiredForSignup: boolean;
+            approvalRequiredForSignup: boolean;
             enableHcaptcha: boolean;
             hcaptchaSiteKey: string | null;
             enableMcaptcha: boolean;
@@ -8551,6 +9050,8 @@ export type operations = {
             recaptchaSiteKey: string | null;
             enableTurnstile: boolean;
             turnstileSiteKey: string | null;
+            enableFC: boolean;
+            fcSiteKey: string | null;
             enableTestcaptcha: boolean;
             swPublickey: string | null;
             /** @default /assets/ai.png */
@@ -8562,10 +9063,11 @@ export type operations = {
             iconUrl: string | null;
             app192IconUrl: string | null;
             app512IconUrl: string | null;
+            sidebarLogoUrl: string | null;
             enableEmail: boolean;
             enableServiceWorker: boolean;
             translatorAvailable: boolean;
-            silencedHosts?: string[];
+            silencedHosts: string[];
             mediaSilencedHosts: string[];
             pinnedUsers: string[];
             hiddenTags: string[];
@@ -8575,14 +9077,17 @@ export type operations = {
             prohibitedWordsForNameOfUser: string[];
             bannedEmailDomains?: string[];
             preservedUsernames: string[];
+            bubbleInstances: string[];
             hcaptchaSecretKey: string | null;
             mcaptchaSecretKey: string | null;
             recaptchaSecretKey: string | null;
             turnstileSecretKey: string | null;
+            fcSecretKey: string | null;
             sensitiveMediaDetection: string;
             sensitiveMediaDetectionSensitivity: string;
             setSensitiveFlagAutomatically: boolean;
             enableSensitiveMediaDetectionForVideos: boolean;
+            enableBotTrending: boolean;
             /** Format: id */
             proxyAccountId: string;
             email: string | null;
@@ -8615,6 +9120,8 @@ export type operations = {
             enableChartsForFederatedInstances: boolean;
             enableStatsForFederatedInstances: boolean;
             enableServerMachineStats: boolean;
+            enableAchievements: boolean;
+            robotsTxt: string | null;
             enableIdenticonGeneration: boolean;
             manifestJsonOverride: string;
             policies: Record<string, never>;
@@ -8629,11 +9136,16 @@ export type operations = {
             backgroundImageUrl: string | null;
             deeplAuthKey: string | null;
             deeplIsPro: boolean;
+            deeplFreeMode: boolean;
+            deeplFreeInstance: string | null;
+            libreTranslateURL: string | null;
+            libreTranslateKey: string | null;
             defaultDarkTheme: string | null;
             defaultLightTheme: string | null;
             description: string | null;
             disableRegistration: boolean;
             impressumUrl: string | null;
+            donationUrl: string | null;
             maintainerEmail: string | null;
             maintainerName: string | null;
             name: string | null;
@@ -8657,11 +9169,67 @@ export type operations = {
             urlPreviewRequireContentLength: boolean;
             urlPreviewUserAgent: string | null;
             urlPreviewSummaryProxyUrl: string | null;
+            trustedLinkUrlPatterns: string[];
             /** @enum {string} */
             federation: 'all' | 'specified' | 'none';
             federationHosts: string[];
+            hasLegacyAuthFetchSetting: boolean;
+            /** @enum {string} */
+            allowUnsignedFetch: 'never' | 'always' | 'essential';
           };
         };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/nsfw-user
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:nsfw-user*
+   */
+  'admin___nsfw-user': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
       };
       /** @description Client error */
       400: {
@@ -8954,6 +9522,59 @@ export type operations = {
             objectStorage: components['schemas']['QueueCount'];
           };
         };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/reject-quotes
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:reject-quotes*
+   */
+  'admin___reject-quotes': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+          rejectQuotes: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
       };
       /** @description Client error */
       400: {
@@ -9998,6 +10619,7 @@ export type operations = {
           'application/json': {
             email: string | null;
             emailVerified: boolean;
+            approved: boolean;
             followedMessage: string | null;
             autoAcceptFollowed: boolean;
             noCrawle: boolean;
@@ -10147,6 +10769,7 @@ export type operations = {
               }]>;
             };
             isModerator: boolean;
+            isSystem: boolean;
             isSilenced: boolean;
             isSuspended: boolean;
             isHibernated: boolean;
@@ -10215,7 +10838,7 @@ export type operations = {
            * @default all
            * @enum {string}
            */
-          state?: 'all' | 'alive' | 'available' | 'admin' | 'moderator' | 'adminOrModerator' | 'suspended';
+          state?: 'all' | 'alive' | 'available' | 'admin' | 'moderator' | 'adminOrModerator' | 'suspended' | 'approved';
           /**
            * @default combined
            * @enum {string}
@@ -10237,6 +10860,58 @@ export type operations = {
         content: {
           'application/json': components['schemas']['UserDetailed'][];
         };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/silence-user
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:silence-user*
+   */
+  'admin___silence-user': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
       };
       /** @description Client error */
       400: {
@@ -10669,6 +11344,58 @@ export type operations = {
     };
   };
   /**
+   * admin/unnsfw-user
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:unnsfw-user*
+   */
+  'admin___unnsfw-user': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
    * admin/unset-user-avatar
    * @description No description provided.
    *
@@ -10727,6 +11454,58 @@ export type operations = {
    * **Credential required**: *Yes* / **Permission**: *write:admin:unset-user-banner*
    */
   'admin___unset-user-banner': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/unsilence-user
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:unsilence-user*
+   */
+  'admin___unsilence-user': {
     requestBody: {
       content: {
         'application/json': {
@@ -10903,6 +11682,7 @@ export type operations = {
           iconUrl?: string | null;
           app192IconUrl?: string | null;
           app512IconUrl?: string | null;
+          sidebarLogoUrl?: string | null;
           backgroundImageUrl?: string | null;
           logoImageUrl?: string | null;
           name?: string | null;
@@ -10910,9 +11690,11 @@ export type operations = {
           description?: string | null;
           defaultLightTheme?: string | null;
           defaultDarkTheme?: string | null;
+          defaultLike?: string | null;
           cacheRemoteFiles?: boolean;
           cacheRemoteSensitiveFiles?: boolean;
           emailRequiredForSignup?: boolean;
+          approvalRequiredForSignup?: boolean;
           enableHcaptcha?: boolean;
           hcaptchaSiteKey?: string | null;
           hcaptchaSecretKey?: string | null;
@@ -10926,6 +11708,9 @@ export type operations = {
           enableTurnstile?: boolean;
           turnstileSiteKey?: string | null;
           turnstileSecretKey?: string | null;
+          enableFC?: boolean;
+          fcSiteKey?: string | null;
+          fcSecretKey?: string | null;
           enableTestcaptcha?: boolean;
           /** @enum {string} */
           sensitiveMediaDetection?: 'none' | 'all' | 'local' | 'remote';
@@ -10933,11 +11718,16 @@ export type operations = {
           sensitiveMediaDetectionSensitivity?: 'medium' | 'low' | 'high' | 'veryLow' | 'veryHigh';
           setSensitiveFlagAutomatically?: boolean;
           enableSensitiveMediaDetectionForVideos?: boolean;
+          enableBotTrending?: boolean;
           maintainerName?: string | null;
           maintainerEmail?: string | null;
           langs?: string[];
           deeplAuthKey?: string | null;
           deeplIsPro?: boolean;
+          deeplFreeMode?: boolean;
+          deeplFreeInstance?: string | null;
+          libreTranslateURL?: string | null;
+          libreTranslateKey?: string | null;
           enableEmail?: boolean;
           email?: string | null;
           smtpSecure?: boolean;
@@ -10952,6 +11742,7 @@ export type operations = {
           repositoryUrl?: string | null;
           feedbackUrl?: string | null;
           impressumUrl?: string | null;
+          donationUrl?: string | null;
           privacyPolicyUrl?: string | null;
           inquiryUrl?: string | null;
           useObjectStorage?: boolean;
@@ -10978,10 +11769,13 @@ export type operations = {
           enableChartsForFederatedInstances?: boolean;
           enableStatsForFederatedInstances?: boolean;
           enableServerMachineStats?: boolean;
+          enableAchievements?: boolean;
+          robotsTxt?: string | null;
           enableIdenticonGeneration?: boolean;
           serverRules?: string[];
           bannedEmailDomains?: string[];
           preservedUsernames?: string[];
+          bubbleInstances?: string[];
           manifestJsonOverride?: string;
           enableFanoutTimeline?: boolean;
           enableFanoutTimelineDbFallback?: boolean;
@@ -11001,9 +11795,12 @@ export type operations = {
           urlPreviewRequireContentLength?: boolean;
           urlPreviewUserAgent?: string | null;
           urlPreviewSummaryProxyUrl?: string | null;
+          trustedLinkUrlPatterns?: string[] | null;
           /** @enum {string} */
           federation?: 'all' | 'none' | 'specified';
           federationHosts?: string[];
+          /** @enum {string} */
+          allowUnsignedFetch?: 'never' | 'always' | 'essential';
         };
       };
     };
@@ -11202,6 +11999,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -11252,6 +12055,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -11321,6 +12130,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -11373,6 +12188,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -11415,6 +12236,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -11481,6 +12308,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -11531,6 +12364,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -11598,6 +12437,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -11784,6 +12629,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -11838,6 +12689,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -11886,6 +12743,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -11943,6 +12806,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -12005,6 +12874,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -12058,6 +12933,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -12240,6 +13121,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -12294,6 +13181,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -12476,6 +13369,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -12518,6 +13417,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -12570,6 +13475,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -12632,6 +13543,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -12674,6 +13591,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -12732,6 +13655,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -12800,6 +13729,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -12854,6 +13789,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -12884,6 +13825,13 @@ export type operations = {
           untilDate?: number;
           /** @default false */
           allowPartial?: boolean;
+          /** @default true */
+          withRenotes?: boolean;
+          /**
+           * @description Only show notes that have attached files.
+           * @default false
+           */
+          withFiles?: boolean;
         };
       };
     };
@@ -12914,6 +13862,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -12970,6 +13924,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -13018,6 +13978,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -13081,6 +14047,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -13153,6 +14125,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -13211,6 +14189,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -13286,6 +14270,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -13349,6 +14339,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -13451,6 +14447,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -13532,6 +14534,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -13595,6 +14603,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -13684,6 +14698,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -13750,6 +14770,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -13823,6 +14849,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -13886,6 +14918,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -13955,6 +14993,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -15451,6 +16495,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -15499,6 +16549,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -15555,6 +16611,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -15601,6 +16663,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -15643,6 +16711,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -15707,6 +16781,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -15757,6 +16837,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -15815,6 +16901,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -15863,6 +16955,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -15924,6 +17022,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -15973,6 +17077,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -16005,6 +17115,8 @@ export type operations = {
           type?: string | null;
           /** @enum {string|null} */
           sort?: '+createdAt' | '-createdAt' | '+name' | '-name' | '+size' | '-size' | null;
+          /** @default */
+          searchQuery?: string;
         };
       };
     };
@@ -16035,6 +17147,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -16099,6 +17217,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -16148,6 +17272,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -16280,6 +17410,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -16338,6 +17474,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -16387,6 +17529,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -16446,6 +17594,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -16501,6 +17655,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -16604,6 +17764,8 @@ export type operations = {
            * @default null
            */
           folderId?: string | null;
+          /** @default */
+          searchQuery?: string;
         };
       };
     };
@@ -16634,6 +17796,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -16752,6 +17920,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -16810,6 +17984,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -16860,6 +18040,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -16917,6 +18103,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -16980,6 +18172,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -17032,6 +18230,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -17089,6 +18293,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -17133,6 +18343,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -17199,6 +18415,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -17241,6 +18463,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -17308,7 +18536,7 @@ export type operations = {
    * federation/followers
    * @description No description provided.
    *
-   * **Credential required**: *No*
+   * **Credential required**: *Yes* / **Permission**: *read:account*
    */
   federation___followers: {
     requestBody: {
@@ -17321,6 +18549,10 @@ export type operations = {
           untilId?: string;
           /** @default 10 */
           limit?: number;
+          /** @default false */
+          includeFollower?: boolean;
+          /** @default true */
+          includeFollowee?: boolean;
         };
       };
     };
@@ -17351,6 +18583,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -17367,7 +18605,7 @@ export type operations = {
    * federation/following
    * @description No description provided.
    *
-   * **Credential required**: *No*
+   * **Credential required**: *Yes* / **Permission**: *read:account*
    */
   federation___following: {
     requestBody: {
@@ -17380,6 +18618,10 @@ export type operations = {
           untilId?: string;
           /** @default 10 */
           limit?: number;
+          /** @default false */
+          includeFollower?: boolean;
+          /** @default true */
+          includeFollowee?: boolean;
         };
       };
     };
@@ -17410,6 +18652,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -17441,6 +18689,8 @@ export type operations = {
           federating?: boolean | null;
           subscribing?: boolean | null;
           publishing?: boolean | null;
+          nsfw?: boolean | null;
+          bubble?: boolean | null;
           /** @default 30 */
           limit?: number;
           /** @default 0 */
@@ -17477,6 +18727,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -17534,6 +18790,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -17597,6 +18859,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -17645,6 +18913,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -17704,6 +18978,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -17872,6 +19152,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -17991,6 +19277,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -18047,6 +19339,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -18095,6 +19393,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -18153,6 +19457,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -18219,6 +19529,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -18273,6 +19589,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -18321,6 +19643,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -18622,6 +19950,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -18672,6 +20006,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -18739,6 +20079,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -18787,6 +20133,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -18850,6 +20202,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -19032,6 +20390,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -19074,6 +20438,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -19132,6 +20502,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -19251,6 +20627,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -19299,6 +20681,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -19357,6 +20745,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -19405,6 +20799,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -19530,6 +20930,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -19574,6 +20980,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -19640,6 +21052,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -19697,6 +21115,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -19750,6 +21174,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -19796,6 +21226,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -19867,6 +21303,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -19909,6 +21351,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -19965,6 +21413,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -20029,6 +21483,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -20077,6 +21537,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -20138,6 +21604,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -20231,6 +21703,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -20281,6 +21759,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -20338,6 +21822,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -20387,6 +21877,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -20451,6 +21947,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -20524,6 +22026,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -20574,6 +22082,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -20630,6 +22144,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -20679,6 +22199,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -20801,6 +22327,57 @@ export type operations = {
    * **Credential required**: *Yes*
    */
   'i___export-clips': {
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * i/export-data
+   * @description No description provided.
+   *
+   * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+   * **Credential required**: *Yes*
+   */
+  'i___export-data': {
     responses: {
       /** @description OK (without any results) */
       204: {
@@ -21159,6 +22736,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -21221,6 +22804,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -21275,6 +22864,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -21525,6 +23120,66 @@ export type operations = {
     };
   };
   /**
+   * i/import-notes
+   * @description No description provided.
+   *
+   * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+   * **Credential required**: *Yes*
+   */
+  'i___import-notes': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          fileId: string;
+          type?: string | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
    * i/import-user-lists
    * @description No description provided.
    *
@@ -21661,8 +23316,8 @@ export type operations = {
           untilId?: string;
           /** @default true */
           markAsRead?: boolean;
-          includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
-          excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+          includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'edited' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'scheduledNoteFailed' | 'scheduledNotePosted' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+          excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'edited' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'scheduledNoteFailed' | 'scheduledNotePosted' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
         };
       };
     };
@@ -21729,8 +23384,8 @@ export type operations = {
           untilId?: string;
           /** @default true */
           markAsRead?: boolean;
-          includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'reaction:grouped' | 'renote:grouped' | 'pollVote' | 'groupInvited')[];
-          excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'reaction:grouped' | 'renote:grouped' | 'pollVote' | 'groupInvited')[];
+          includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'edited' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'scheduledNoteFailed' | 'scheduledNotePosted' | 'app' | 'test' | 'reaction:grouped' | 'renote:grouped' | 'pollVote' | 'groupInvited')[];
+          excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'edited' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'scheduledNoteFailed' | 'scheduledNotePosted' | 'app' | 'test' | 'reaction:grouped' | 'renote:grouped' | 'pollVote' | 'groupInvited')[];
         };
       };
     };
@@ -21833,6 +23488,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -21891,6 +23552,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -21941,6 +23608,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -21997,6 +23670,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -22045,6 +23724,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -22105,6 +23790,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -22156,6 +23847,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -22219,6 +23916,71 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * i/registry/get-unsecure
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:account*
+   */
+  'i___registry___get-unsecure': {
+    requestBody: {
+      content: {
+        'application/json': {
+          key: string;
+          /** @default [] */
+          scope?: string[];
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -22270,6 +24032,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -22331,6 +24099,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -22385,6 +24159,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -22431,6 +24211,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -22490,6 +24276,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -22540,6 +24332,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -22603,6 +24401,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -22657,6 +24461,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -22680,6 +24490,7 @@ export type operations = {
           followedMessage?: string | null;
           location?: string | null;
           birthday?: string | null;
+          listenbrainz?: string | null;
           /** @enum {string|null} */
           lang?: null | 'ach' | 'ady' | 'af' | 'af-NA' | 'af-ZA' | 'ak' | 'ar' | 'ar-AR' | 'ar-MA' | 'ar-SA' | 'ay-BO' | 'az' | 'az-AZ' | 'be-BY' | 'bg' | 'bg-BG' | 'bn' | 'bn-IN' | 'bn-BD' | 'br' | 'bs-BA' | 'ca' | 'ca-ES' | 'cak' | 'ck-US' | 'cs' | 'cs-CZ' | 'cy' | 'cy-GB' | 'da' | 'da-DK' | 'de' | 'de-AT' | 'de-DE' | 'de-CH' | 'dsb' | 'el' | 'el-GR' | 'en' | 'en-GB' | 'en-AU' | 'en-CA' | 'en-IE' | 'en-IN' | 'en-PI' | 'en-SG' | 'en-UD' | 'en-US' | 'en-ZA' | 'en@pirate' | 'eo' | 'eo-EO' | 'es' | 'es-AR' | 'es-419' | 'es-CL' | 'es-CO' | 'es-EC' | 'es-ES' | 'es-LA' | 'es-NI' | 'es-MX' | 'es-US' | 'es-VE' | 'et' | 'et-EE' | 'eu' | 'eu-ES' | 'fa' | 'fa-IR' | 'fb-LT' | 'ff' | 'fi' | 'fi-FI' | 'fo' | 'fo-FO' | 'fr' | 'fr-CA' | 'fr-FR' | 'fr-BE' | 'fr-CH' | 'fy-NL' | 'ga' | 'ga-IE' | 'gd' | 'gl' | 'gl-ES' | 'gn-PY' | 'gu-IN' | 'gv' | 'gx-GR' | 'he' | 'he-IL' | 'hi' | 'hi-IN' | 'hr' | 'hr-HR' | 'hsb' | 'ht' | 'hu' | 'hu-HU' | 'hy' | 'hy-AM' | 'id' | 'id-ID' | 'is' | 'is-IS' | 'it' | 'it-IT' | 'ja' | 'ja-JP' | 'jv-ID' | 'ka-GE' | 'kk-KZ' | 'km' | 'kl' | 'km-KH' | 'kab' | 'kn' | 'kn-IN' | 'ko' | 'ko-KR' | 'ku-TR' | 'kw' | 'la' | 'la-VA' | 'lb' | 'li-NL' | 'lt' | 'lt-LT' | 'lv' | 'lv-LV' | 'mai' | 'mg-MG' | 'mk' | 'mk-MK' | 'ml' | 'ml-IN' | 'mn-MN' | 'mr' | 'mr-IN' | 'ms' | 'ms-MY' | 'mt' | 'mt-MT' | 'my' | 'no' | 'nb' | 'nb-NO' | 'ne' | 'ne-NP' | 'nl' | 'nl-BE' | 'nl-NL' | 'nn-NO' | 'oc' | 'or-IN' | 'pa' | 'pa-IN' | 'pl' | 'pl-PL' | 'ps-AF' | 'pt' | 'pt-BR' | 'pt-PT' | 'qu-PE' | 'rm-CH' | 'ro' | 'ro-RO' | 'ru' | 'ru-RU' | 'sa-IN' | 'se-NO' | 'sh' | 'si-LK' | 'sk' | 'sk-SK' | 'sl' | 'sl-SI' | 'so-SO' | 'sq' | 'sq-AL' | 'sr' | 'sr-RS' | 'su' | 'sv' | 'sv-SE' | 'sw' | 'sw-KE' | 'ta' | 'ta-IN' | 'te' | 'te-IN' | 'tg' | 'tg-TJ' | 'th' | 'th-TH' | 'fil' | 'tlh' | 'tr' | 'tr-TR' | 'tt-RU' | 'uk' | 'uk-UA' | 'ur' | 'ur-PK' | 'uz' | 'uz-UZ' | 'vi' | 'vi-VN' | 'xh-ZA' | 'yi' | 'yi-DE' | 'zh' | 'zh-Hans' | 'zh-Hant' | 'zh-CN' | 'zh-HK' | 'zh-SG' | 'zh-TW' | 'zu-ZA';
           /** Format: misskey:id */
@@ -22691,9 +24502,12 @@ export type operations = {
               flipH?: boolean | null;
               offsetX?: number | null;
               offsetY?: number | null;
+              showBelow?: boolean | null;
             })[];
           /** Format: misskey:id */
           bannerId?: string | null;
+          /** Format: misskey:id */
+          backgroundId?: string | null;
           fields?: {
               name: string;
               value: string;
@@ -22706,14 +24520,18 @@ export type operations = {
           autoAcceptFollowed?: boolean;
           noCrawle?: boolean;
           preventAiLearning?: boolean;
+          noindex?: boolean;
           requireSigninToViewContents?: boolean;
           makeNotesFollowersOnlyBefore?: number | null;
           makeNotesHiddenBefore?: number | null;
+          enableRss?: boolean;
           isBot?: boolean;
           isCat?: boolean;
+          speakAsCat?: boolean;
           injectFeaturedNote?: boolean;
           receiveAnnouncementEmail?: boolean;
           alwaysMarkNsfw?: boolean;
+          defaultSensitive?: boolean;
           autoSensitive?: boolean;
           /** @enum {string} */
           followingVisibility?: 'public' | 'followers' | 'private';
@@ -22865,6 +24683,11 @@ export type operations = {
           };
           emailNotificationTypes?: string[];
           alsoKnownAs?: string[];
+          defaultCW?: string | null;
+          /** @enum {string} */
+          defaultCWPriority?: 'default' | 'parent' | 'defaultParent' | 'parentDefault';
+          /** @enum {string} */
+          allowUnsignedFetch?: 'never' | 'always' | 'essential' | 'staff';
         };
       };
     };
@@ -22989,7 +24812,7 @@ export type operations = {
           url: string;
           /** @default */
           secret?: string;
-          on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+          on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'edited')[];
         };
       };
     };
@@ -23003,7 +24826,7 @@ export type operations = {
             /** Format: misskey:id */
             userId: string;
             name: string;
-            on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+            on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'edited')[];
             url: string;
             secret: string;
             active: boolean;
@@ -23033,6 +24856,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -23089,6 +24918,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -23114,7 +24949,7 @@ export type operations = {
               /** Format: misskey:id */
               userId: string;
               name: string;
-              on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+              on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'edited')[];
               url: string;
               secret: string;
               active: boolean;
@@ -23144,6 +24979,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -23181,7 +25022,7 @@ export type operations = {
             /** Format: misskey:id */
             userId: string;
             name: string;
-            on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+            on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'edited')[];
             url: string;
             secret: string;
             active: boolean;
@@ -23215,6 +25056,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -23237,7 +25084,7 @@ export type operations = {
           /** Format: misskey:id */
           webhookId: string;
           /** @enum {string} */
-          type: 'mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction';
+          type: 'mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'edited';
           override?: {
             url?: string;
             secret?: string;
@@ -23303,7 +25150,7 @@ export type operations = {
           name?: string;
           url?: string;
           secret?: string | null;
-          on?: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+          on?: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'edited')[];
           active?: boolean;
         };
       };
@@ -23333,6 +25180,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -23379,6 +25232,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -23435,6 +25294,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -23479,6 +25344,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -23541,6 +25412,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -23591,6 +25468,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -23651,6 +25534,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -23767,6 +25656,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -23825,6 +25720,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -23877,6 +25778,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -23945,6 +25852,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -23954,23 +25867,29 @@ export type operations = {
     };
   };
   /**
-   * notes/children
+   * notes/bubble-timeline
    * @description No description provided.
    *
    * **Credential required**: *No*
    */
-  notes___children: {
+  'notes___bubble-timeline': {
     requestBody: {
       content: {
         'application/json': {
-          /** Format: misskey:id */
-          noteId: string;
+          /** @default false */
+          withFiles?: boolean;
+          /** @default true */
+          withBots?: boolean;
+          /** @default true */
+          withRenotes?: boolean;
           /** @default 10 */
           limit?: number;
           /** Format: misskey:id */
           sinceId?: string;
           /** Format: misskey:id */
           untilId?: string;
+          sinceDate?: number;
+          untilDate?: number;
         };
       };
     };
@@ -24001,6 +25920,80 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/children
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  notes___children: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          noteId: string;
+          /** @default 10 */
+          limit?: number;
+          /** Format: misskey:id */
+          sinceId?: string;
+          /** Format: misskey:id */
+          untilId?: string;
+          /** @default true */
+          showQuotes?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['Note'][];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -24059,6 +26052,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -24113,6 +26112,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -24279,6 +26284,103 @@ export type operations = {
     };
   };
   /**
+   * notes/edit
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:notes*
+   */
+  notes___edit: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          editId?: string;
+          /**
+           * @default public
+           * @enum {string}
+           */
+          visibility?: 'public' | 'home' | 'followers' | 'specified';
+          visibleUserIds?: string[];
+          cw?: string | null;
+          /** @default false */
+          localOnly?: boolean;
+          /**
+           * @default null
+           * @enum {string|null}
+           */
+          reactionAcceptance?: null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote';
+          /** @default false */
+          noExtractMentions?: boolean;
+          /** @default false */
+          noExtractHashtags?: boolean;
+          /** @default false */
+          noExtractEmojis?: boolean;
+          /** Format: misskey:id */
+          replyId?: string | null;
+          /** Format: misskey:id */
+          renoteId?: string | null;
+          /** Format: misskey:id */
+          channelId?: string | null;
+          text?: string | null;
+          fileIds?: string[];
+          mediaIds?: string[];
+          poll?: ({
+            choices: string[];
+            multiple?: boolean;
+            expiresAt?: number | null;
+            expiredAfter?: number | null;
+          }) | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            createdNote: components['schemas']['Note'];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
    * notes/favorites/create
    * @description No description provided.
    *
@@ -24380,6 +26482,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -24438,6 +26546,93 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/following
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:account*
+   */
+  notes___following: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /**
+           * @default following
+           * @enum {string}
+           */
+          list?: 'following' | 'followers' | 'mutuals';
+          /** @default false */
+          filesOnly?: boolean;
+          /** @default false */
+          includeNonPublic?: boolean;
+          /** @default false */
+          includeReplies?: boolean;
+          /** @default false */
+          includeQuotes?: boolean;
+          /** @default true */
+          includeBots?: boolean;
+          /** @default 10 */
+          limit?: number;
+          /** Format: misskey:id */
+          sinceId?: string;
+          /** Format: misskey:id */
+          untilId?: string;
+          sinceDate?: number;
+          untilDate?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['Note'][];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -24458,6 +26653,8 @@ export type operations = {
         'application/json': {
           /** @default false */
           withFiles?: boolean;
+          /** @default true */
+          withBots?: boolean;
           /** @default true */
           withRenotes?: boolean;
           /** @default 10 */
@@ -24498,6 +26695,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -24542,6 +26745,8 @@ export type operations = {
           withRenotes?: boolean;
           /** @default false */
           withReplies?: boolean;
+          /** @default true */
+          withBots?: boolean;
         };
       };
     };
@@ -24576,6 +26781,71 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/like
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:reactions*
+   */
+  notes___like: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          noteId: string;
+          override?: string | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -24600,6 +26870,8 @@ export type operations = {
           withRenotes?: boolean;
           /** @default false */
           withReplies?: boolean;
+          /** @default true */
+          withBots?: boolean;
           /** @default 10 */
           limit?: number;
           /** Format: misskey:id */
@@ -24640,6 +26912,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -24705,6 +26983,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -24763,6 +27047,70 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/polls/refresh
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:federation*
+   */
+  notes___polls___refresh: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          noteId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -24812,6 +27160,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -24877,6 +27231,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -24926,6 +27286,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -25008,12 +27374,16 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           noteId: string;
+          /** Format: misskey:id */
+          userId?: string;
           /** @default 10 */
           limit?: number;
           /** Format: misskey:id */
           sinceId?: string;
           /** Format: misskey:id */
           untilId?: string;
+          /** @default false */
+          quote?: boolean;
         };
       };
     };
@@ -25044,6 +27414,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -25108,6 +27484,245 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/schedule/create
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:notes-schedule*
+   */
+  notes___schedule___create: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /**
+           * @default public
+           * @enum {string}
+           */
+          visibility?: 'public' | 'home' | 'followers' | 'specified';
+          visibleUserIds?: string[];
+          cw?: string | null;
+          /**
+           * @default null
+           * @enum {string|null}
+           */
+          reactionAcceptance?: null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote';
+          /** @default false */
+          noExtractMentions?: boolean;
+          /** @default false */
+          noExtractHashtags?: boolean;
+          /** @default false */
+          noExtractEmojis?: boolean;
+          /** Format: misskey:id */
+          replyId?: string | null;
+          /** Format: misskey:id */
+          renoteId?: string | null;
+          text?: string | null;
+          fileIds?: string[];
+          mediaIds?: string[];
+          poll?: ({
+            choices: string[];
+            multiple?: boolean;
+            expiresAt?: number | null;
+            expiredAfter?: number | null;
+          }) | null;
+          scheduleNote: {
+            scheduledAt?: number;
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/schedule/delete
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:notes-schedule*
+   */
+  notes___schedule___delete: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          noteId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/schedule/list
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:notes-schedule*
+   */
+  notes___schedule___list: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          sinceId?: string;
+          /** Format: misskey:id */
+          untilId?: string;
+          /** @default 10 */
+          limit?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': ({
+              /** Format: misskey:id */
+              id: string;
+              note: {
+                createdAt: string;
+                text?: string;
+                cw?: string | null;
+                fileIds: string[];
+                /** @enum {string} */
+                visibility: 'public' | 'home' | 'followers' | 'specified';
+                visibleUsers: components['schemas']['UserLite'][];
+                user: components['schemas']['User'];
+                /**
+                 * @default null
+                 * @enum {string|null}
+                 */
+                reactionAcceptance: null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote';
+                isSchedule: boolean;
+              };
+              userId: string;
+              scheduledAt: string;
+            })[];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -25137,6 +27752,8 @@ export type operations = {
           offset?: number;
           /** @description The local host is represented with `.`. */
           host?: string;
+          /** @enum {string|null} */
+          filetype?: 'image' | 'video' | 'audio' | 'module' | 'flash' | null;
           /**
            * Format: misskey:id
            * @default null
@@ -25147,6 +27764,7 @@ export type operations = {
            * @default null
            */
           channelId?: string | null;
+          order?: string;
         };
       };
     };
@@ -25177,6 +27795,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -25253,6 +27877,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -25303,6 +27933,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -25360,6 +27996,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -25474,6 +28116,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -25512,6 +28160,8 @@ export type operations = {
           withFiles?: boolean;
           /** @default true */
           withRenotes?: boolean;
+          /** @default true */
+          withBots?: boolean;
         };
       };
     };
@@ -25542,6 +28192,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -25608,6 +28264,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -25628,6 +28290,8 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           noteId: string;
+          /** @default false */
+          quote?: boolean;
         };
       };
     };
@@ -25743,6 +28407,76 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/versions
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  notes___versions: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          noteId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': ({
+              oldDate: string;
+              updatedAt: string;
+              text: string | null;
+            })[];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -25846,6 +28580,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -25886,6 +28626,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -25991,6 +28737,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -26126,6 +28878,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -26168,6 +28926,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -26220,6 +28984,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -26280,6 +29050,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -26328,6 +29104,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -26454,6 +29236,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -26496,6 +29284,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -26548,6 +29342,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -26662,6 +29462,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -26716,6 +29522,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -26822,6 +29634,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -26870,6 +29688,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -26927,6 +29751,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -26975,6 +29805,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -27039,6 +29875,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -27081,6 +29923,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -27147,6 +29995,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -27201,6 +30055,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -27249,6 +30109,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -27311,6 +30177,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -27353,6 +30225,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -27419,6 +30297,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -27469,6 +30353,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -27537,6 +30427,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -27596,6 +30492,81 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * sponsors
+   * @description Get Sharkey Sponsors or Instance Sponsors
+   *
+   * **Credential required**: *No*
+   */
+  sponsors: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default false */
+          forceUpdate?: boolean;
+          /** @default false */
+          instance?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            sponsor_data: ({
+                name: string;
+                image: string | null;
+                website: string | null;
+                profile: string;
+              })[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -27646,6 +30617,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -27715,6 +30692,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -27777,6 +30760,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -27824,6 +30813,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -27883,6 +30878,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -27955,6 +30956,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -28006,6 +31013,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -28083,6 +31096,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -28136,6 +31155,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -28200,6 +31225,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -28254,6 +31285,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -28318,6 +31355,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -28377,6 +31420,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -28445,6 +31494,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -28501,6 +31556,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -28564,6 +31625,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -28613,6 +31680,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -28672,6 +31745,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -28724,6 +31803,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -28772,6 +31857,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -28847,6 +31938,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -28901,6 +31998,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -28951,6 +32054,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -29071,6 +32180,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -29119,6 +32234,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -29179,6 +32300,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -29234,6 +32361,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -29257,7 +32390,15 @@ export type operations = {
           /** @default false */
           withReplies?: boolean;
           /** @default true */
+          withRepliesToSelf?: boolean;
+          /** @default true */
+          withQuotes?: boolean;
+          /** @default true */
           withRenotes?: boolean;
+          /** @default true */
+          withBots?: boolean;
+          /** @default true */
+          withNonPublic?: boolean;
           /** @default false */
           withChannelNotes?: boolean;
           /** @default 10 */
@@ -29302,6 +32443,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -29362,6 +32509,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -29428,6 +32581,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -29484,6 +32643,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -29521,7 +32686,9 @@ export type operations = {
             isBlocked: boolean;
             isMuted: boolean;
             isRenoteMuted: boolean;
-          }, {
+            isInstanceMuted?: boolean;
+            memo?: string | null;
+          }, ({
               /** Format: id */
               id: string;
               isFollowing: boolean;
@@ -29532,7 +32699,9 @@ export type operations = {
               isBlocked: boolean;
               isMuted: boolean;
               isRenoteMuted: boolean;
-            }[]]>;
+              isInstanceMuted?: boolean;
+              memo?: string | null;
+            })[]]>;
         };
       };
       /** @description Client error */
@@ -29555,6 +32724,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -29608,6 +32783,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -29676,6 +32857,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -29730,6 +32917,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -29792,6 +32985,12 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
       /** @description Internal server error */
       500: {
         content: {
@@ -29842,6 +33041,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };
