@@ -33,5 +33,5 @@ mainRouter.addListener('replace', ctx => {
 mainRouter.init();
 
 export function useRouter(): Router {
-	return inject(DI.router) ?? mainRouter;
+	return inject(DI.router, null) ?? mainRouter;
 }

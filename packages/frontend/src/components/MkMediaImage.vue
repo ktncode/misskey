@@ -221,7 +221,7 @@ function showMenu(ev: MouseEvent) {
 	position: absolute;
 	border-radius: var(--MI-radius-sm);
 	background-color: black;
-	color: var(--MI_THEME-accentLighten);
+	color: hsl(from var(--MI_THEME-accent) h s calc(l + 10));
 	font-size: 12px;
 	opacity: .5;
 	padding: 5px 8px;
@@ -295,7 +295,7 @@ html[data-color-scheme=light] .visible {
 	/* Hardcode to black because either --MI_THEME-bg or --MI_THEME-fg makes it hard to read in dark/light mode */
 	background-color: black;
 	border-radius: var(--MI-radius-sm);
-	color: var(--MI_THEME-accentLighten);
+	color: hsl(from var(--MI_THEME-accent) h s calc(l + 10));
 	display: inline-block;
 	font-weight: bold;
 	font-size: 0.8em;

@@ -80,7 +80,7 @@ const emit = defineEmits<{
 
 const displayBackButton = props.displayBackButton && history.state.key !== 'index' && history.length > 1 && inject('shouldBackButton', true);
 
-const viewId = inject(DI.viewId);
+//const viewId = inject(DI.viewId);
 const injectedPageMetadata = inject(DI.pageMetadata);
 const pageMetadata = computed(() => props.overridePageMetadata ?? injectedPageMetadata.value);
 
