@@ -15,6 +15,7 @@ import type { MenuItem } from '@/types/menu.js';
 import type { PostFormProps } from '@/types/post-form.js';
 import type MkRoleSelectDialog_TypeReferenceOnly from '@/components/MkRoleSelectDialog.vue';
 import type MkEmojiPickerDialog_TypeReferenceOnly from '@/components/MkEmojiPickerDialog.vue';
+import type { AnyRequest, Endpoint, Request, Response } from '@/utility/misskey-api.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { prefer } from '@/preferences.js';
 import { i18n } from '@/i18n.js';
@@ -34,13 +35,18 @@ import { focusParent } from '@/utility/focus.js';
 export const openingWindowsCount = ref(0);
 
 export type ApiWithDialogCustomErrors = Record<string, { title?: string; text: string; }>;
-export const apiWithDialog = (<E extends keyof Misskey.Endpoints, P extends Misskey.Endpoints[E]['req'] = Misskey.Endpoints[E]['req']>(
+export const apiWithDialog = (<
+	ResT = void,
+	E extends Endpoint | NonNullable<string> = Endpoint,
+	P extends AnyRequest<E> = E extends Endpoint ? Request<E> : never,
+	_ResT = ResT extends void ? Response<E, P> : ResT,
+>(
 	endpoint: E,
-	data: P,
+	data: P & { i?: string | null; } = {} as P & { i?: string | null; },
 	token?: string | null | undefined,
 	customErrors?: ApiWithDialogCustomErrors,
-) => {
-	const promise = misskeyApi(endpoint, data, token);
+): Promise<_ResT> => {
+	const promise = misskeyApi<ResT, E, P, _ResT>(endpoint, data, token);
 	promiseDialog(promise, null, async (err) => {
 		let title: string | undefined;
 		let text = err.message + '\n' + err.id;
