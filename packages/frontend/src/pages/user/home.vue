@@ -175,7 +175,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<div>{{ i18n.ts.noNotes }}</div>
 							</div>
 							<div v-else class="_panel">
-								<MkNote v-for="note of user.pinnedNotes" :key="note.id" class="note" :class="$style.pinnedNote" :note="note" :pinned="true"/>
+								<DynamicNote v-for="note of user.pinnedNotes" :key="note.id" class="note" :class="$style.pinnedNote" :note="note" :pinned="true"/>
 							</div>
 						</div>
 						<MkNotes v-else :class="$style.tl" :noGap="true" :pagination="AllPagination"/>
@@ -221,12 +221,7 @@ import { getStaticImageUrl } from '@/utility/media-proxy.js';
 import { infoImageUrl } from '@/instance.js';
 import MkSparkle from '@/components/MkSparkle.vue';
 import { prefer } from '@/preferences.js';
-
-const MkNote = defineAsyncComponent(() =>
-	defaultStore.state.noteDesign === 'sharkey'
-		? import('@/components/SkNote.vue')
-		: import('@/components/MkNote.vue'),
-);
+import DynamicNote from '@/components/DynamicNote.vue';
 
 function calcAge(birthdate: string): number {
 	const date = new Date(birthdate);
@@ -277,7 +272,7 @@ const listenbrainzdata = ref(false);
 if (props.user.listenbrainz) {
 	(async function() {
 		try {
-			const response = await fetch(`https://api.listenbrainz.org/1/user/${props.user.listenbrainz}/playing-now`, {
+			const response = await window.fetch(`https://api.listenbrainz.org/1/user/${props.user.listenbrainz}/playing-now`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
@@ -295,7 +290,7 @@ if (props.user.listenbrainz) {
 
 const background = computed(() => {
 	if (props.user.backgroundUrl == null) return {};
-	if (defaultStore.state.disableShowingAnimatedImages) {
+	if (prefer.s.disableShowingAnimatedImages) {
 		return {
 			'--backgroundImageStatic': `url('${getStaticImageUrl(props.user.backgroundUrl)}')`,
 		};

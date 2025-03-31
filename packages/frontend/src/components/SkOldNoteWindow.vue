@@ -92,11 +92,12 @@ import MkPoll from '@/components/MkPoll.vue';
 import MkUrlPreview from '@/components/MkUrlPreview.vue';
 import MkInstanceTicker from '@/components/MkInstanceTicker.vue';
 import { userPage } from '@/filters/user.js';
-import { defaultStore, noteViewInterruptors } from '@/store.js';
 import { extractUrlFromMfm } from '@/utility/extract-url-from-mfm.js';
 import { i18n } from '@/i18n.js';
 import { deepClone } from '@/utility/clone.js';
 import { dateTimeFormat } from '@/utility/intl-const.js';
+import { prefer } from '@/preferences';
+import { getPluginHandlers } from '@/plugin.js';
 
 const props = defineProps<{
 	note: Misskey.entities.Note;
@@ -113,6 +114,7 @@ const inChannel = inject('inChannel', null);
 let note = ref(deepClone(props.note));
 
 // plugin
+const noteViewInterruptors = getPluginHandlers('note_view_interruptor');
 if (noteViewInterruptors.length > 0) {
 	onMounted(async () => {
 		let result = deepClone(note.value);
@@ -132,7 +134,7 @@ replaceContent();
 const isRenote = (
 	note.value.renote != null &&
 	note.value.text == null &&
-	note.value.fileIds.length === 0 &&
+	!note.value.fileIds?.length &&
 	note.value.poll == null
 );
 
@@ -145,7 +147,7 @@ const showContent = ref(false);
 const translation = ref(null);
 const translating = ref(false);
 const urls = appearNote.value.text ? extractUrlFromMfm(mfm.parse(appearNote.value.text)).filter(u => u !== renoteUrl && u !== renoteUri) : null;
-const showTicker = (defaultStore.state.instanceTicker === 'always') || (defaultStore.state.instanceTicker === 'remote' && appearNote.value.user.instance);
+const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && appearNote.value.user.instance);
 
 </script>
 

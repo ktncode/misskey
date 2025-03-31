@@ -70,8 +70,9 @@ import { $i } from '@/i.js';
 // contextは非ログイン状態の情報しかないためログイン時は利用できない
 const CTX_NOTE = !$i && assertServerContext(serverContext, 'note') ? serverContext.note : null;
 
+// TODO DynamicNoteDetailed
 const MkNoteDetailed = defineAsyncComponent(() =>
-	(defaultStore.state.noteDesign === 'misskey')
+	(prefer.s.noteDesign === 'misskey')
 		? import('@/components/MkNoteDetailed.vue')
 		: import('@/components/SkNoteDetailed.vue'),
 );

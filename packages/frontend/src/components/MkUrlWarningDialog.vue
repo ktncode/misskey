@@ -34,7 +34,7 @@ import MkModal from '@/components/MkModal.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import { i18n } from '@/i18n.js';
-import { defaultStore } from '@/store.js';
+import { prefer } from '@/preferences.js';
 
 type Result = string | number | true | null;
 
@@ -62,8 +62,8 @@ function done(canceled: boolean, result?: Result): void { // eslint-disable-line
 
 async function ok() {
 	const result = true;
-	if (!defaultStore.state.trustedDomains.includes(domain.value) && trustThisDomain.value) {
-		await defaultStore.set('trustedDomains', defaultStore.state.trustedDomains.concat(domain.value));
+	if (!prefer.s.trustedDomains.includes(domain.value) && trustThisDomain.value) {
+		prefer.r.trustedDomains.value = prefer.s.trustedDomains.concat(domain.value);
 	}
 	done(false, result);
 }
@@ -77,11 +77,11 @@ function onKeydown(evt: KeyboardEvent) {
 }
 
 onMounted(() => {
-	document.addEventListener('keydown', onKeydown);
+	window.document.addEventListener('keydown', onKeydown);
 });
 
 onBeforeUnmount(() => {
-	document.removeEventListener('keydown', onKeydown);
+	window.document.removeEventListener('keydown', onKeydown);
 });
 </script>
 

@@ -5,7 +5,6 @@
 
 import { markRaw, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { searchEngineMap } from '@/utility/search-engine-map.js';
 import lightTheme from '@@/themes/l-light.json5';
 import darkTheme from '@@/themes/d-green-lime.json5';
 import { hemisphere } from '@@/js/intl-const.js';
@@ -14,7 +13,8 @@ import type { Plugin } from '@/plugin.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { Pizzax } from '@/lib/pizzax.js';
 import { DEFAULT_DEVICE_KIND } from '@/utility/device-kind.js';
-import { defaultFollowingFeedState } from '@/utility/following-feed-utils.js';
+import { defaultFollowingFeedState, type FollowingFeedState } from '@/utility/following-feed-utils';
+import { searchEngineMap } from '@/utility/search-engine-map.js';
 
 /**
  * 「状態」を管理するストア(not「設定」)
@@ -134,22 +134,6 @@ export const store = markRaw(new Pizzax('base', {
 		where: 'account',
 		default: [],
 	},
-	collapseNotesRepliedTo: {
-		where: 'account',
-		default: false,
-	},
-	collapseFiles: {
-		where: 'account',
-		default: false,
-	},
-	uncollapseCW: {
-		where: 'account',
-		default: false,
-	},
-	expandLongNote: {
-		where: 'device',
-		default: false,
-	},
 	widgets: {
 		where: 'account',
 		default: [] as {
@@ -195,30 +179,6 @@ export const store = markRaw(new Pizzax('base', {
 		where: 'account',
 		default: false,
 	},
-	like: {
-		where: 'account',
-		default: null as string | null,
-	},
-	autoloadConversation: {
-		where: 'account',
-		default: true,
-	},
-	showVisibilitySelectorOnBoost: {
-		where: 'account',
-		default: true,
-	},
-	visibilityOnBoost: {
-		where: 'account',
-		default: 'public' as 'public' | 'home' | 'followers',
-	},
-	trustedDomains: {
-		where: 'account',
-		default: [] as string[],
-	},
-	warnExternalUrl: {
-		where: 'account',
-		default: true,
-	},
 	menu: {
 		where: 'deviceAccount',
 		default: [
@@ -248,10 +208,6 @@ export const store = markRaw(new Pizzax('base', {
 	pinnedUserLists: {
 		where: 'deviceAccount',
 		default: [] as Misskey.entities.UserList[],
-	},
-	followingFeed: {
-		where: 'account',
-		default: defaultFollowingFeedState,
 	},
 	serverDisconnectedBehavior: {
 		where: 'device',
@@ -289,14 +245,6 @@ export const store = markRaw(new Pizzax('base', {
 		where: 'device',
 		default: false,
 	},
-	warnMissingAltText: {
-		where: 'device',
-		default: true,
-	},
-	enableFaviconNotificationDot: {
-		where: 'device',
-		default: true,
-	},
 	imageNewTab: {
 		where: 'device',
 		default: false,
@@ -304,10 +252,6 @@ export const store = markRaw(new Pizzax('base', {
 	disableShowingAnimatedImages: {
 		where: 'device',
 		default: window.matchMedia('(prefers-reduced-motion)').matches,
-	},
-	disableCatSpeak: {
-		where: 'account',
-		default: false,
 	},
 	emojiStyle: {
 		where: 'device',
@@ -332,18 +276,6 @@ export const store = markRaw(new Pizzax('base', {
 	showFixedPostFormInChannel: {
 		where: 'device',
 		default: false,
-	},
-	showTickerOnReplies: {
-		where: 'device',
-		default: false,
-	},
-	searchEngine: {
-		where: 'account',
-		default: Object.keys(searchEngineMap)[0],
-	},
-	noteDesign: {
-		where: 'device',
-		default: 'sharkey' as 'sharkey' | 'misskey',
 	},
 	enableInfiniteScroll: {
 		where: 'device',
@@ -393,10 +325,6 @@ export const store = markRaw(new Pizzax('base', {
 		where: 'device',
 		default: 3,
 	},
-	numberOfReplies: {
-		where: 'device',
-		default: 5,
-	},
 	showNoteActionsOnlyHover: {
 		where: 'device',
 		default: false,
@@ -417,14 +345,6 @@ export const store = markRaw(new Pizzax('base', {
 		where: 'device',
 		default: false,
 	},
-	oneko: {
-		where: 'device',
-		default: false,
-	},
-	clickToOpen: {
-		where: 'device',
-		default: true,
-	},
 	aiChanMode: {
 		where: 'device',
 		default: false,
@@ -444,10 +364,6 @@ export const store = markRaw(new Pizzax('base', {
 	notificationStackAxis: {
 		where: 'device',
 		default: 'horizontal' as 'vertical' | 'horizontal',
-	},
-	notificationClickable: {
-		where: 'device',
-		default: false,
 	},
 	enableCondensedLine: {
 		where: 'device',
@@ -553,7 +469,95 @@ export const store = markRaw(new Pizzax('base', {
 			sfxVolume: 1,
 		},
 	},
+	collapseNotesRepliedTo: {
+		where: 'device',
+		default: false,
+	},
+	collapseFiles: {
+		where: 'device',
+		default: false,
+	},
+	uncollapseCW: {
+		where: 'device',
+		default: false,
+	},
+	expandLongNote: {
+		where: 'device',
+		default: false,
+	},
+	like: {
+		where: 'device',
+		default: null as string | null,
+	},
+	autoloadConversation: {
+		where: 'device',
+		default: true,
+	},
+	showVisibilitySelectorOnBoost: {
+		where: 'device',
+		default: true,
+	},
+	visibilityOnBoost: {
+		where: 'device',
+		default: 'public' as 'public' | 'home' | 'followers',
+	},
+	trustedDomains: {
+		where: 'device',
+		default: [] as string[],
+	},
+	warnExternalUrl: {
+		where: 'device',
+		default: true,
+	},
+	followingFeed: {
+		where: 'device',
+		default: defaultFollowingFeedState as Partial<FollowingFeedState>,
+	},
+	warnMissingAltText: {
+		where: 'device',
+		default: true,
+	},
+	disableCatSpeak: {
+		where: 'device',
+		default: false,
+	},
+	showTickerOnReplies: {
+		where: 'device',
+		default: false,
+	},
+	searchEngine: {
+		where: 'device',
+		default: Object.keys(searchEngineMap)[0],
+	},
+	noteDesign: {
+		where: 'device',
+		default: 'sharkey' as 'sharkey' | 'misskey',
+	},
 	//#endregion
+	oneko: {
+		where: 'device',
+		default: false,
+	},
+	enableFaviconNotificationDot: {
+		where: 'device',
+		default: true,
+	},
+	numberOfReplies: {
+		where: 'device',
+		default: 5,
+	},
+	notificationClickable: {
+		where: 'device',
+		default: false,
+	},
+	cornerRadius: {
+		where: 'device',
+		default: null as 'Misskey' | null,
+	},
+	clickToOpen: {
+		where: 'device',
+		default: true,
+	},
 }));
 
 // TODO: 他のタブと永続化されたstateを同期

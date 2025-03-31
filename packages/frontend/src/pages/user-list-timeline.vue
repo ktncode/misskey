@@ -33,10 +33,10 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
 import { useRouter } from '@/router.js';
-import { defaultStore } from '@/store.js';
+import { store } from '@/store.js';
 import { deepMerge } from '@/utility/merge.js';
 import * as os from '@/os.js';
-import { $i } from '@/account.js';
+import { $i } from '@/i.js';
 
 const router = useRouter();
 
@@ -50,19 +50,18 @@ const tlEl = useTemplateRef('tlEl');
 const rootEl = useTemplateRef('rootEl');
 
 const withRenotes = computed<boolean>({
-	get: () => defaultStore.reactiveState.tl.value.filter.withRenotes,
+	get: () => store.r.tl.value.filter.withRenotes,
 	set: (x) => saveTlFilter('withRenotes', x),
 });
 
 const onlyFiles = computed<boolean>({
-	get: () => defaultStore.reactiveState.tl.value.filter.onlyFiles,
+	get: () => store.r.tl.value.filter.onlyFiles,
 	set: (x) => saveTlFilter('onlyFiles', x),
 });
 
-function saveTlFilter(key: keyof typeof defaultStore.state.tl.filter, newValue: boolean) {
+function saveTlFilter(key: keyof typeof store.s.tl.filter, newValue: boolean) {
 	if (key !== 'withReplies' || $i) {
-		const out = deepMerge({ filter: { [key]: newValue } }, defaultStore.state.tl);
-		defaultStore.set('tl', out);
+		store.r.tl.value = deepMerge({ filter: { [key]: newValue } }, store.s.tl);
 	}
 }
 

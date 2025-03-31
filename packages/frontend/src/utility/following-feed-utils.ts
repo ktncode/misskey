@@ -10,7 +10,7 @@ import type { MenuItem } from '@/types/menu.js';
 import { deepMerge } from '@/utility/merge.js';
 import { i18n } from '@/i18n.js';
 import { popupMenu } from '@/os.js';
-import { prefer } from '@/preferences';
+import { prefer } from '@/preferences.js';
 
 export const followingTab = 'following' as const;
 export const mutualsTab = 'mutuals' as const;
@@ -37,7 +37,7 @@ export type FollowingFeedModel = {
 	[Key in keyof FollowingFeedState]: WritableComputedRef<FollowingFeedState[Key]>;
 };
 
-export interface FollowingFeedState {
+export type FollowingFeedState = {
 	withNonPublic: boolean,
 	withQuotes: boolean,
 	withBots: boolean,
@@ -45,7 +45,7 @@ export interface FollowingFeedState {
 	onlyFiles: boolean,
 	userList: FollowingFeedTab,
 	remoteWarningDismissed: boolean,
-}
+};
 
 export const defaultFollowingFeedState: FollowingFeedState = {
 	withNonPublic: false,
@@ -169,9 +169,9 @@ export function createModel(storage?: Ref<StorageInterface>): FollowingFeedModel
 	};
 }
 
-function createDefaultStorage() {
+function createDefaultStorage(): Ref<StorageInterface> {
 	return computed(() => ({
-		state: prefer.s.followingFeed,
+		state: prefer.r.followingFeed,
 		save(updated: typeof prefer.s.followingFeed) {
 			prefer.s.followingFeed = updated;
 		},

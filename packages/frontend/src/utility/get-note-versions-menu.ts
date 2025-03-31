@@ -3,13 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Ref, defineAsyncComponent } from 'vue';
+import { defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
-import { i18n } from '@/i18n.js';
-import * as os from '@/os.js';
 import { misskeyApi } from './misskey-api.js';
-import { MenuItem } from '@/types/menu.js';
 import { dateTimeFormat } from './intl-const.js';
+import type { Ref } from 'vue';
+import type { MenuItem } from '@/types/menu.js';
+import * as os from '@/os.js';
+
+interface NoteEdit {
+	oldDate: string;
+	updatedAt: string;
+	text: string | null;
+}
 
 export async function getNoteVersionsMenu(props: {
 	note: Misskey.entities.Note;
@@ -18,7 +24,7 @@ export async function getNoteVersionsMenu(props: {
 	const isRenote = (
 		props.note.renote != null &&
 		props.note.text == null &&
-		props.note.fileIds.length === 0 &&
+		!props.note.fileIds?.length &&
 		props.note.poll == null
 	);
 
@@ -26,11 +32,11 @@ export async function getNoteVersionsMenu(props: {
 
 	const cleanups = [] as (() => void)[];
 
-	function openVersion(info): void {
+	function openVersion(info: NoteEdit): void {
 		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/SkOldNoteWindow.vue')), {
 			note: appearNote,
-			oldText: info.text,
-			updatedAt: info.oldDate ? info.oldDate : info.updatedAt,
+			oldText: info.text ?? '',
+			updatedAt: info.updatedAt,
 		}, {
 			closed: () => dispose(),
 		});
@@ -43,9 +49,7 @@ export async function getNoteVersionsMenu(props: {
 
 	await statePromise.then((versions) => {
 		for (const edit of versions) {
-			const _time = edit.oldDate == null ? NaN :
-				typeof edit.oldDate === 'number' ? edit.oldDate :
-				(edit.oldDate instanceof Date ? edit.oldDate : new Date(edit.oldDate)).getTime();
+			const _time = new Date(edit.oldDate).getTime();
 
 			menu.push({
 				icon: 'ph-pencil-simple ph-bold ph-lg',

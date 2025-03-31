@@ -54,7 +54,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div v-if="note.user.badgeRoles" :class="$style.badgeRoles">
 		<img v-for="role in note.user.badgeRoles" :key="role.id" v-tooltip="role.name" :class="$style.badgeRole" :src="role.iconUrl"/>
 	</div>
-	<SkInstanceTicker v-if="showTicker && !isMobile && defaultStore.state.showTickerOnReplies" style="cursor: pointer; max-height: 5px; top: 3px; position: relative; margin-top: 0px !important;" :instance="note.user.instance" :host="note.user.host" @click.stop="showOnRemote()"/>
+	<SkInstanceTicker v-if="showTicker && !isMobile && prefer.s.showTickerOnReplies" style="cursor: pointer; max-height: 5px; top: 3px; position: relative; margin-top: 0px !important;" :instance="note.user.instance" :host="note.user.host" @click.stop="showOnRemote()"/>
 	<div :class="$style.classicInfo">
 		<div v-if="mock">
 			<MkTime :time="note.createdAt" colored/>
@@ -95,7 +95,7 @@ const props = defineProps<{
 
 const menuVersionsButton = shallowRef<HTMLElement>();
 const router = useRouter();
-const showTicker = (defaultStore.state.instanceTicker === 'always') || (defaultStore.state.instanceTicker === 'remote' && props.note.user.instance);
+const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && props.note.user.instance);
 
 const MOBILE_THRESHOLD = 500;
 const isMobile = ref(deviceKind === 'smartphone' || window.innerWidth <= MOBILE_THRESHOLD);

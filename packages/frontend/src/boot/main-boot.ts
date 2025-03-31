@@ -25,7 +25,7 @@ import { deckStore } from '@/ui/deck/deck-store.js';
 import { emojiPicker } from '@/utility/emoji-picker.js';
 import { mainRouter } from '@/router.js';
 import { setFavIconDot } from '@/utility/favicon-dot.js';
-import { type Keymap, makeHotkey } from '@/utility/hotkey.js';
+import { makeHotkey } from '@/utility/hotkey.js';
 import { addCustomEmoji, removeCustomEmojis, updateCustomEmojis } from '@/custom-emojis.js';
 import { prefer } from '@/preferences.js';
 import { launchPlugins } from '@/plugin.js';
@@ -85,9 +85,7 @@ export async function mainBoot() {
 
 	let reloadDialogShowing = false;
 	stream.on('_disconnected_', async () => {
-		if (prefer.s.serverDisconnectedBehavior === 'reload') {
-			window.location.reload();
-		} else if (prefer.s.serverDisconnectedBehavior === 'dialog') {
+		if (prefer.s.serverDisconnectedBehavior === 'dialog') {
 			if (reloadDialogShowing) return;
 			reloadDialogShowing = true;
 			const { canceled } = await confirm({
@@ -351,7 +349,7 @@ export async function mainBoot() {
 		}
 
 		function attemptShowNotificationDot() {
-			if (defaultStore.state.enableFaviconNotificationDot) {
+			if (store.s.enableFaviconNotificationDot) {
 				setFavIconDot(true);
 			}
 		}

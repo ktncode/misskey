@@ -48,7 +48,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <div v-if="$i && $i.isBot" id="botWarn"><span>{{ i18n.ts.loggedInAsBot }}</span></div>
 
-<SkOneko v-if="defaultStore.state.oneko"/>
+<SkOneko v-if="store.r.oneko"/>
 </template>
 
 <script lang="ts" setup>
@@ -65,6 +65,7 @@ import { useStream } from '@/stream.js';
 import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
 import { globalEvents } from '@/events.js';
+import { store } from '@/store.js';
 
 const SkOneko = defineAsyncComponent(() => import('@/components/SkOneko.vue'));
 
@@ -108,7 +109,7 @@ if ($i) {
 }
 
 function getPointerEvents() {
-	return defaultStore.state.notificationClickable ? 'all' : 'none';
+	return store.s.notificationClickable ? 'all' : 'none';
 }
 </script>
 

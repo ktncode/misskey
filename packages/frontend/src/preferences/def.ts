@@ -11,7 +11,10 @@ import type { Plugin } from '@/plugin.js';
 import type { DeviceKind } from '@/utility/device-kind.js';
 import type { DeckProfile } from '@/deck.js';
 import type { PreferencesDefinition } from './manager.js';
+import type { FollowingFeedState } from '@/utility/following-feed-utils.js';
 import { DEFAULT_DEVICE_KIND } from '@/utility/device-kind.js';
+import { searchEngineMap } from '@/utility/search-engine-map.js';
+import { defaultFollowingFeedState } from '@/utility/following-feed-utils.js';
 
 /** サウンド設定 */
 export type SoundStore = {
@@ -125,22 +128,68 @@ export const PREF_DEF = {
 		default: false,
 	},
 	collapseRenotes: {
+		default: false,
+	},
+	collapseNotesRepliedTo: {
+		default: false,
+	},
+	collapseFiles: {
+		default: false,
+	},
+	uncollapseCW: {
+		default: false,
+	},
+	expandLongNote: {
+		default: false,
+	},
+	like: {
+		default: null as string | null,
+	},
+	autoloadConversation: {
 		default: true,
+	},
+	showVisibilitySelectorOnBoost: {
+		default: true,
+	},
+	visibilityOnBoost: {
+		default: 'public' as 'public' | 'home' | 'followers',
+	},
+	trustedDomains: {
+		default: [] as string[],
+	},
+	warnExternalUrl: {
+		default: true,
+	},
+	followingFeed: {
+		default: defaultFollowingFeedState as Partial<FollowingFeedState>,
+	},
+	warnMissingAltText: {
+		default: true,
+	},
+	disableCatSpeak: {
+		default: false,
+	},
+	showTickerOnReplies: {
+		default: false,
+	},
+	searchEngine: {
+		default: Object.keys(searchEngineMap)[0],
+	},
+	noteDesign: {
+		default: 'sharkey' as 'sharkey' | 'misskey',
 	},
 	menu: {
 		default: [
 			'notifications',
-			'clips',
-			'drive',
-			'followRequests',
-			'chat',
-			'-',
 			'explore',
+			'followRequests',
+			'-',
 			'announcements',
-			'channels',
 			'search',
 			'-',
-			'ui',
+			'favorites',
+			'drive',
+			'achievements',
 		],
 	},
 	statusbars: {
@@ -154,7 +203,7 @@ export const PREF_DEF = {
 		}[],
 	},
 	serverDisconnectedBehavior: {
-		default: 'quiet' as 'quiet' | 'reload' | 'dialog',
+		default: 'quiet' as 'quiet' | 'disabled' | 'dialog',
 	},
 	nsfw: {
 		default: 'respect' as 'respect' | 'force' | 'ignore',
@@ -232,7 +281,7 @@ export const PREF_DEF = {
 		default: 'auto' as 'auto' | 'popup' | 'drawer',
 	},
 	squareAvatars: {
-		default: false,
+		default: true,
 	},
 	showAvatarDecorations: {
 		default: true,

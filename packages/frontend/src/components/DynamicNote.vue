@@ -21,7 +21,7 @@ import { computed, defineAsyncComponent, shallowRef } from 'vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
 import type MkNote from '@/components/MkNote.vue';
 import type SkNote from '@/components/SkNote.vue';
-import { defaultStore } from '@/store';
+import { defaultStore } from '@/store.js';
 
 const XNote = computed(() =>
 	defineAsyncComponent(() =>

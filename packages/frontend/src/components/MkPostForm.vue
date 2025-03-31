@@ -884,7 +884,7 @@ async function post(ev?: MouseEvent) {
 		}
 	}
 
-	if (defaultStore.state.warnMissingAltText) {
+	if (prefer.s.warnMissingAltText) {
 		const filesData = toRaw(files.value);
 
 		const isMissingAltText = filesData.filter(
@@ -952,7 +952,7 @@ async function post(ev?: MouseEvent) {
 		}
 	}
 
-	let token: string | undefined = undefined;
+	let token: string | null | undefined = undefined;
 
 	if (postAccount.value) {
 		const storedAccounts = await getAccounts();

@@ -4,7 +4,7 @@
  */
 
 import { apiUrl } from '@@/js/config.js';
-import { defaultMemoryStorage } from '@/memory-storage';
+import { defaultMemoryStorage } from '@/memory-storage.js';
 import { waiting } from '@/os.js';
 import { unisonReload, reloadChannel } from '@/utility/unison-reload.js';
 import { $i } from '@/i.js';

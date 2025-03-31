@@ -196,7 +196,7 @@ export function getNoteMenu(props: {
 				noteId: appearNote.id,
 			});
 
-			if (Date.now() - new Date(appearNote.createdAt).getTime() < 1000 * 60 && appearNote.userId === $i.id) {
+			if (Date.now() - new Date(appearNote.createdAt).getTime() < 1000 * 60 && appearNote.userId === $i?.id) {
 				claimAchievement('noteDeletedWithin1min');
 			}
 		});
@@ -541,7 +541,7 @@ export function getNoteMenu(props: {
 	};
 
 	return {
-		menu: menuItems,
+		popupMenu: menuItems,
 		cleanup,
 	};
 }

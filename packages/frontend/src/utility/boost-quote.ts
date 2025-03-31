@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
 */
 
-import { ref, Ref, computed, ComputedRef } from 'vue';
+import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
+import type { Ref, ComputedRef } from 'vue';
+import type { MenuItem } from '@/types/menu.js';
 import { i18n } from '@/i18n.js';
-import { defaultStore } from '@/store.js';
-import { MenuItem } from '@/types/menu.js';
+import { prefer } from '@/preferences';
+import { store } from '@/store.js';
 
 /*
 	this script should eventually contain all Sharkey-specific bits of
@@ -30,7 +32,7 @@ export function visibilityIsAtLeast(a: Visibility | string, b: Visibility | stri
 }
 
 export function boostMenuItems(appearNote: Ref<Misskey.entities.Note>, renote: (v: Visibility, l: boolean) => void): MenuItem[] {
-	const localOnly = ref(defaultStore.state.rememberNoteVisibility ? defaultStore.state.localOnly : defaultStore.state.defaultNoteLocalOnly);
+	const localOnly = ref(prefer.s.rememberNoteVisibility ? store.s.localOnly : prefer.s.defaultNoteLocalOnly);
 	const effectiveVisibility = (
 		appearNote.value.channel?.isSensitive
 			? smallerVisibility(appearNote.value.visibility, 'home')
@@ -83,7 +85,7 @@ export function boostMenuItems(appearNote: Ref<Misskey.entities.Note>, renote: (
 export function computeRenoteTooltip(renoted: Ref<boolean>): ComputedRef<string> {
 	return computed(() => {
 		if (renoted.value) return i18n.ts.unrenote;
-		if (defaultStore.state.showVisibilitySelectorOnBoost) return i18n.ts.renote;
+		if (prefer.s.showVisibilitySelectorOnBoost) return i18n.ts.renote;
 		return i18n.ts.renoteShift;
 	});
 }

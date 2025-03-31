@@ -4,11 +4,11 @@
  */
 
 import { onUnmounted } from 'vue';
-import type { Ref, ShallowRef } from 'vue';
 import * as Misskey from 'misskey-js';
+import type { Ref, ShallowRef } from 'vue';
 import { useStream } from '@/stream.js';
 import { $i } from '@/i.js';
-import { misskeyApi } from './misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 
 export function useNoteCapture(props: {
 	rootEl: ShallowRef<HTMLElement | undefined>;

@@ -5,6 +5,7 @@
 
 import { v4 as uuid } from 'uuid';
 import type { DeckProfile } from '@/deck.js';
+import type { Theme } from '@/theme.js';
 import { ColdDeviceStorage, store } from '@/store.js';
 import { prefer } from '@/preferences.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
@@ -14,7 +15,7 @@ import { unisonReload } from '@/utility/unison-reload.js';
 // TODO: そのうち消す
 export function migrateOldSettings() {
 	store.loaded.then(async () => {
-		const themes = await misskeyApi('i/registry/get', { scope: ['client'], key: 'themes' }).catch(() => []);
+		const themes = await misskeyApi('i/registry/get', { scope: ['client'], key: 'themes' }).catch(() => []) as Theme[];
 		if (themes.length > 0) {
 			prefer.commit('themes', themes);
 		}
@@ -133,6 +134,23 @@ export function migrateOldSettings() {
 		prefer.commit('sound.on.reaction', store.s.sound_reaction as any);
 		prefer.commit('defaultNoteVisibility', store.s.defaultNoteVisibility);
 		prefer.commit('defaultNoteLocalOnly', store.s.defaultNoteLocalOnly);
+		// Sharkey migrations
+		prefer.commit('collapseNotesRepliedTo', store.s.collapseNotesRepliedTo);
+		prefer.commit('collapseFiles', store.s.collapseFiles);
+		prefer.commit('uncollapseCW', store.s.uncollapseCW);
+		prefer.commit('expandLongNote', store.s.expandLongNote);
+		prefer.commit('like', store.s.like);
+		prefer.commit('autoloadConversation', store.s.autoloadConversation);
+		prefer.commit('showVisibilitySelectorOnBoost', store.s.showVisibilitySelectorOnBoost);
+		prefer.commit('visibilityOnBoost', store.s.visibilityOnBoost);
+		prefer.commit('trustedDomains', store.s.trustedDomains);
+		prefer.commit('warnExternalUrl', store.s.warnExternalUrl);
+		prefer.commit('followingFeed', store.s.followingFeed);
+		prefer.commit('warnMissingAltText', store.s.warnMissingAltText);
+		prefer.commit('disableCatSpeak', store.s.disableCatSpeak);
+		prefer.commit('showTickerOnReplies', store.s.showTickerOnReplies);
+		prefer.commit('searchEngine', store.s.searchEngine);
+		prefer.commit('noteDesign', store.s.noteDesign);
 
 		window.setTimeout(() => {
 			unisonReload();

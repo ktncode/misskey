@@ -13,7 +13,7 @@ import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { instance } from '@/instance.js';
 import { prefer } from '@/preferences.js';
-import { $i } from '@/account.js';
+import { $i } from '@/i.js';
 
 export default defineComponent({
 	props: {
@@ -116,7 +116,7 @@ export default defineComponent({
 		});
 
 		const renderChildren = () => {
-			const shouldHideAds = !defaultStore.state.forceShowAds && $i && $i.policies.canHideAds;
+			const shouldHideAds = (!prefer.s.forceShowAds && $i && $i.policies.canHideAds) ?? false;
 
 			const children = renderChildrenImpl(shouldHideAds);
 			if (isDebuggerEnabled(6864)) {

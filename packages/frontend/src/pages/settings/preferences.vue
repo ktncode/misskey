@@ -936,15 +936,15 @@ const noteDesign = prefer.model('noteDesign');
 const uncollapseCW = prefer.model('uncollapseCW');
 const expandLongNote = prefer.model('expandLongNote');
 const disableCatSpeak = prefer.model('disableCatSpeak');
-const enableFaviconNotificationDot = prefer.model('enableFaviconNotificationDot');
+const enableFaviconNotificationDot = computed(store.makeGetterSetter('enableFaviconNotificationDot'));
 const warnMissingAltText = prefer.model('warnMissingAltText');
-const notificationClickable = prefer.model('notificationClickable');
+const notificationClickable = computed(store.makeGetterSetter('notificationClickable'));
 const warnExternalUrl = prefer.model('warnExternalUrl');
 const showVisibilitySelectorOnBoost = prefer.model('showVisibilitySelectorOnBoost');
 const visibilityOnBoost = prefer.model('visibilityOnBoost');
-const cornerRadius = prefer.model('cornerRadius');
-const oneko = prefer.model('oneko');
-const numberOfReplies = prefer.model('numberOfReplies');
+const cornerRadius = computed(store.makeGetterSetter('cornerRadius'));
+const oneko = computed(store.makeGetterSetter('oneko'));
+const numberOfReplies = computed(store.makeGetterSetter('numberOfReplies'));
 
 const useCustomSearchEngine = computed(() => !Object.keys(searchEngineMap).includes(searchEngine.value));
 

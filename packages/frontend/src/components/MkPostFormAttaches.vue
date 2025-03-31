@@ -36,7 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { defineAsyncComponent, inject } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { MenuItem } from '@/types/menu';
-import { copyToClipboard } from '@/utility/copy-to-clipboard';
+import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
 import MkDriveFileThumbnail from '@/components/MkDriveFileThumbnail.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';

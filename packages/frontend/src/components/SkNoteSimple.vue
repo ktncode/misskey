@@ -36,7 +36,7 @@ const props = defineProps<{
 	hideFiles?: boolean;
 }>();
 
-let showContent = ref(defaultStore.state.uncollapseCW);
+let showContent = ref(prefer.s.uncollapseCW);
 
 const mergedCW = computed(() => computeMergedCw(props.note));
 

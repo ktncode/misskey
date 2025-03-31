@@ -66,7 +66,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 	//provide('linkNavigationBehavior', props.linkNavigationBehavior);
 
 	const isNote = props.isNote ?? true;
-	const shouldNyaize = props.nyaize === 'respect' && props.author?.isCat && props.author?.speakAsCat && !defaultStore.state.disableCatSpeak;
+	const shouldNyaize = props.nyaize === 'respect' && props.author?.isCat && props.author?.speakAsCat && !prefer.s.disableCatSpeak;
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	if (props.text == null || props.text === '') return;
 

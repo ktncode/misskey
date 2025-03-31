@@ -73,7 +73,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</footer>
 		</div>
 	</div>
-	<template v-if="depth < numberOfReplies">
+	<template v-if="depth < store.s.numberOfReplies">
 		<SkNoteSub v-for="reply in replies" :key="reply.id" :note="reply" :class="[$style.reply, { [$style.single]: replies.length === 1 }]" :detail="true" :depth="depth + 1" :expandAllCws="props.expandAllCws" :onDeleteCallback="removeReply" :isReply="props.isReply"/>
 	</template>
 	<div v-else :class="$style.more">
@@ -95,6 +95,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, ref, shallowRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { computeMergedCw } from '@@/js/compute-merged-cw.js';
+import { host } from '@@/js/config.js';
+import type { OpenOnRemoteOptions } from '@/utility/please-login.js';
+import type { Visibility } from '@/utility/boost-quote.js';
 import SkNoteHeader from '@/components/SkNoteHeader.vue';
 import MkReactionsViewer from '@/components/MkReactionsViewer.vue';
 import MkSubNoteContent from '@/components/MkSubNoteContent.vue';
@@ -104,22 +107,22 @@ import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import * as sound from '@/utility/sound.js';
 import { i18n } from '@/i18n.js';
-import { $i } from '@/account.js';
 import { userPage } from '@/filters/user.js';
 import { checkWordMute } from '@/utility/check-word-mute.js';
-import { defaultStore } from '@/store.js';
-import { host } from '@@/js/config.js';
-import { pleaseLogin, type OpenOnRemoteOptions } from '@/utility/please-login.js';
+import { pleaseLogin } from '@/utility/please-login.js';
 import { showMovedDialog } from '@/utility/show-moved-dialog.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { reactionPicker } from '@/utility/reaction-picker.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { getNoteMenu } from '@/utility/get-note-menu.js';
-import { useNoteCapture } from '@/utility/use-note-capture.js';
-import { boostMenuItems, type Visibility, computeRenoteTooltip } from '@/utility/boost-quote.js';
+import { useNoteCapture } from '@/use/use-note-capture.js';
+import { boostMenuItems, computeRenoteTooltip } from '@/utility/boost-quote.js';
+import { prefer } from '@/preferences';
+import { store } from '@/store';
+import { $i } from '@/i.js';
 
 const canRenote = computed(() => ['public', 'home'].includes(props.note.visibility) || props.note.userId === $i.id);
-const hideLine = computed(() => { return props.detail ? true : false; });
+const hideLine = computed(() => props.detail);
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -144,7 +147,6 @@ const translation = ref<any>(null);
 const translating = ref(false);
 const isDeleted = ref(false);
 const renoted = ref(false);
-const numberOfReplies = ref(defaultStore.state.numberOfReplies);
 const reactButton = shallowRef<HTMLElement>();
 const renoteButton = shallowRef<HTMLElement>();
 const quoteButton = shallowRef<HTMLElement>();
@@ -154,7 +156,7 @@ const likeButton = shallowRef<HTMLElement>();
 const renoteTooltip = computeRenoteTooltip(renoted);
 
 let appearNote = computed(() => isRenote ? props.note.renote as Misskey.entities.Note : props.note);
-const defaultLike = computed(() => defaultStore.state.like ? defaultStore.state.like : null);
+const defaultLike = computed(() => prefer.s.like ? prefer.s.like : null);
 const replies = ref<Misskey.entities.Note[]>([]);
 
 const mergedCW = computed(() => computeMergedCw(appearNote.value));
@@ -189,8 +191,8 @@ useNoteCapture({
 	note: appearNote,
 	isDeletedRef: isDeleted,
 	// only update replies if we are, in fact, showing replies
-	onReplyCallback: props.detail && props.depth < numberOfReplies.value ? addReplyTo : undefined,
-	onDeleteCallback: props.detail && props.depth < numberOfReplies.value ? props.onDeleteCallback : undefined,
+	onReplyCallback: props.detail && props.depth < store.s.numberOfReplies ? addReplyTo : undefined,
+	onDeleteCallback: props.detail && props.depth < store.s.numberOfReplies ? props.onDeleteCallback : undefined,
 });
 
 if ($i) {
@@ -299,15 +301,15 @@ function undoRenote() : void {
 	}
 }
 
-let showContent = ref(defaultStore.state.uncollapseCW);
+let showContent = ref(prefer.s.uncollapseCW);
 
 watch(() => props.expandAllCws, (expandAllCws) => {
 	if (expandAllCws !== showContent.value) showContent.value = expandAllCws;
 });
 
 function boostVisibility(forceMenu: boolean = false) {
-	if (!defaultStore.state.showVisibilitySelectorOnBoost && !forceMenu) {
-		renote(defaultStore.state.visibilityOnBoost);
+	if (!prefer.s.showVisibilitySelectorOnBoost && !forceMenu) {
+		renote(prefer.s.visibilityOnBoost);
 	} else {
 		os.popupMenu(boostMenuItems(appearNote, renote), renoteButton.value);
 	}
@@ -415,17 +417,15 @@ function quote() {
 	}
 }
 
-function menu(viaKeyboard = false): void {
-	const { menu, cleanup } = getNoteMenu({ note: props.note, translating, translation, menuButton, isDeleted });
-	os.popupMenu(menu, menuButton.value, {
-		viaKeyboard,
-	}).then(focus).finally(cleanup);
+function menu(): void {
+	const { popupMenu, cleanup } = getNoteMenu({ note: props.note, translating, translation, isDeleted });
+	os.popupMenu(popupMenu, menuButton.value).then(focus).finally(cleanup);
 }
 
 if (props.detail) {
 	misskeyApi('notes/children', {
 		noteId: props.note.id,
-		limit: numberOfReplies.value,
+		limit: store.s.numberOfReplies,
 		showQuotes: false,
 	}).then(res => {
 		replies.value = res;

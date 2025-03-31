@@ -106,8 +106,9 @@ import { prefer } from '@/preferences.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { warningExternalWebsite } from '@/utility/warning-external-website.js';
 
+// TODO DynamicNoteSimple
 const XNoteSimple = defineAsyncComponent<typeof MkNoteSimple | typeof SkNoteSimple>(() =>
-	defaultStore.state.noteDesign === 'misskey'
+	prefer.s.noteDesign === 'misskey'
 		? import('@/components/MkNoteSimple.vue')
 		: import('@/components/SkNoteSimple.vue'),
 );

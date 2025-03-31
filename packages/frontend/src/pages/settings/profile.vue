@@ -7,15 +7,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 <SearchMarker path="/settings/profile" :label="i18n.ts.profile" :keywords="['profile']" icon="ti ti-user">
 	<div class="_gaps_m">
 		<div class="_panel">
-			<div :class="$style.banner" :style="{ backgroundImage: $i.bannerUrl ? `url(${ $i.bannerUrl })` : null }">
+			<div :class="$style.banner" :style="{ backgroundImage: $i.bannerUrl ? `url(${ $i.bannerUrl })` : '' }">
 				<div :class="$style.bannerEdit">
 					<SearchMarker :keywords="['banner', 'change', 'remove']">
-						<MkButton primary rounded @click="changeOrRemoveBanner">{{ <SearchLabel>{{ i18n.ts._profile.changeBanner }}</SearchLabel> }}</MkButton>
+						<MkButton primary rounded @click="changeOrRemoveBanner"><SearchLabel>{{ i18n.ts._profile.changeBanner }}</SearchLabel></MkButton>
 					</SearchMarker>
 				</div>
 				<div :class="$style.backgroundEdit">
 					<SearchMarker :keywords="['background', 'change', 'remove']">
-						<MkButton primary rounded @click="changeOrRemoveBackground">{{ <SearchLabel>{{ i18n.ts._profile.changeBackground }}</SearchLabel> }}</MkButton>
+						<MkButton primary rounded @click="changeOrRemoveBackground"><SearchLabel>{{ i18n.ts._profile.changeBackground }}</SearchLabel></MkButton>
 					</SearchMarker>
 				</div>
 			</div>
@@ -187,6 +187,7 @@ import { claimAchievement } from '@/utility/achievements.js';
 import { store } from '@/store.js';
 import MkInfo from '@/components/MkInfo.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
+import { globalEvents } from '@/events.js';
 
 const $i = ensureSignin();
 
@@ -314,7 +315,6 @@ function changeAvatar(ev) {
 		$i.avatarId = i.avatarId;
 		$i.avatarUrl = i.avatarUrl;
 		claimAchievement('profileFilled');
-		globalEvents.emit('requestClearPageCache');
 	});
 }
 
@@ -365,7 +365,6 @@ function changeBackground(ev) {
 		});
 		$i.backgroundId = i.backgroundId;
 		$i.backgroundUrl = i.backgroundUrl;
-		globalEvents.emit('requestClearPageCache');
 	});
 }
 
@@ -382,7 +381,6 @@ function changeOrRemoveAvatar(ev) {
 				});
 				$i.avatarId = i.avatarId;
 				$i.avatarUrl = i.avatarUrl;
-				globalEvents.emit('requestClearPageCache');
 			},
 		}], ev.currentTarget ?? ev.target);
 	} else {
@@ -404,7 +402,6 @@ function changeOrRemoveBanner(ev) {
 				});
 				$i.bannerId = i.bannerId;
 				$i.bannerUrl = i.bannerUrl;
-				globalEvents.emit('requestClearPageCache');
 			},
 		}], ev.currentTarget ?? ev.target);
 	} else {
@@ -426,7 +423,6 @@ function changeOrRemoveBackground(ev) {
 				});
 				$i.backgroundId = i.backgroundId;
 				$i.backgroundUrl = i.backgroundUrl;
-				globalEvents.emit('requestClearPageCache');
 			},
 		}], ev.currentTarget ?? ev.target);
 	} else {

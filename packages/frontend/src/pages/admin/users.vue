@@ -63,7 +63,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, useTemplateRef, ref, watchEffect } from 'vue';
 import XHeader from './_header_.vue';
-import { defaultMemoryStorage } from '@/memory-storage';
+import { defaultMemoryStorage } from '@/memory-storage.js';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkSelect from '@/components/MkSelect.vue';

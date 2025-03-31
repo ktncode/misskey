@@ -100,6 +100,7 @@ import { notesSearchAvailable } from '@/utility/check-permissions.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { useRouter } from '@/router.js';
 import { deepMerge } from '@/utility/merge.js';
+import { store } from '@/store.js';
 
 const router = useRouter();
 
@@ -122,12 +123,12 @@ const featuredPagination = computed(() => ({
 	},
 }));
 const withRenotes = computed<boolean>({
-	get: () => defaultStore.reactiveState.tl.value.filter.withRenotes,
+	get: () => store.r.tl.value.filter.withRenotes,
 	set: (x) => saveTlFilter('withRenotes', x),
 });
 
 const onlyFiles = computed<boolean>({
-	get: () => defaultStore.reactiveState.tl.value.filter.onlyFiles,
+	get: () => store.r.tl.value.filter.onlyFiles,
 	set: (x) => saveTlFilter('onlyFiles', x),
 });
 
@@ -150,10 +151,9 @@ watch(() => props.channelId, async () => {
 	}
 }, { immediate: true });
 
-function saveTlFilter(key: keyof typeof defaultStore.state.tl.filter, newValue: boolean) {
+function saveTlFilter(key: keyof typeof store.s.tl.filter, newValue: boolean) {
 	if (key !== 'withReplies' || $i) {
-		const out = deepMerge({ filter: { [key]: newValue } }, defaultStore.state.tl);
-		defaultStore.set('tl', out);
+		store.r.tl.value = deepMerge({ filter: { [key]: newValue } }, store.s.tl);
 	}
 }
 
