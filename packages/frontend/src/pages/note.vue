@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div class="_margin _gaps_s">
 							<MkRemoteCaution v-if="note.user.host != null" :href="note.url ?? note.uri"/>
 							<SkErrorList :errors="note.processErrors"/>
-							<MkNoteDetailed :key="note.id" v-model:note="note" :initialTab="initialTab" :class="$style.note" :expandAllCws="expandAllCws"/>
+							<DynamicNoteDetailed :key="note.id" v-model:note="note" :initialTab="initialTab" :class="$style.note" :expandAllCws="expandAllCws"/>
 						</div>
 						<div v-if="clips && clips.length > 0" class="_margin">
 							<div style="font-weight: bold; padding: 12px;">{{ i18n.ts.clip }}</div>
@@ -48,7 +48,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, computed, watch, ref } from 'vue';
+import { computed, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { host } from '@@/js/config.js';
 import type { Paging } from '@/components/MkPagination.vue';
@@ -66,16 +66,10 @@ import { pleaseLogin } from '@/utility/please-login.js';
 import { getAppearNote } from '@/utility/get-appear-note.js';
 import { serverContext, assertServerContext } from '@/server-context.js';
 import { $i } from '@/i.js';
+import DynamicNoteDetailed from '@/components/DynamicNoteDetailed.vue';
 
 // contextは非ログイン状態の情報しかないためログイン時は利用できない
 const CTX_NOTE = !$i && assertServerContext(serverContext, 'note') ? serverContext.note : null;
-
-// TODO DynamicNoteDetailed
-const MkNoteDetailed = defineAsyncComponent(() =>
-	(prefer.s.noteDesign === 'misskey')
-		? import('@/components/MkNoteDetailed.vue')
-		: import('@/components/SkNoteDetailed.vue'),
-);
 
 const props = defineProps<{
 	noteId: string;
