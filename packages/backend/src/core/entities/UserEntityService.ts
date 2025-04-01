@@ -51,6 +51,7 @@ import type { CustomEmojiService } from '@/core/CustomEmojiService.js';
 import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
 import { ChatService } from '@/core/ChatService.js';
 import { isSystemAccount } from '@/misc/is-system-account.js';
+import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { NoteEntityService } from './NoteEntityService.js';
 import type { PageEntityService } from './PageEntityService.js';
