@@ -128,12 +128,12 @@ export function applyTheme(theme: Theme, persist = true) {
 	}
 
 	let existingFontFace;
-	document.fonts.forEach(
+	window.document.fonts.forEach(
 		(fontFace) => {
 			if (fontFace.family === themeFontFaceName) existingFontFace = fontFace;
 		},
 	);
-	if (existingFontFace) document.fonts.delete(existingFontFace);
+	if (existingFontFace) window.document.fonts.delete(existingFontFace);
 
 	const fontFaceSrc = props.fontFaceSrc;
 	const fontFaceOpts = props.fontFaceOpts || {};
@@ -143,7 +143,7 @@ export function applyTheme(theme: Theme, persist = true) {
 			themeFontFaceName,
 			fontFaceSrc, fontFaceOpts,
 		);
-		document.fonts.add(fontFace);
+		window.document.fonts.add(fontFace);
 		fontFace.load().catch(
 			(failure) => {
 				console.log(failure);
