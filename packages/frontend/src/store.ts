@@ -13,7 +13,8 @@ import type { Plugin } from '@/plugin.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { Pizzax } from '@/lib/pizzax.js';
 import { DEFAULT_DEVICE_KIND } from '@/utility/device-kind.js';
-import { defaultFollowingFeedState, type FollowingFeedState } from '@/utility/following-feed-utils';
+import { defaultFollowingFeedState } from '@/utility/following-feed-utils.js';
+import type { FollowingFeedState } from '@/utility/following-feed-utils.js';
 import { searchEngineMap } from '@/utility/search-engine-map.js';
 
 /**
