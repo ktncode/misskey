@@ -173,7 +173,7 @@ function createDefaultStorage(): Ref<StorageInterface> {
 	return computed(() => ({
 		state: prefer.r.followingFeed,
 		save(updated: typeof prefer.s.followingFeed) {
-			prefer.s.followingFeed = updated;
+			prefer.commit('followingFeed', updated);
 		},
 	}));
 }
