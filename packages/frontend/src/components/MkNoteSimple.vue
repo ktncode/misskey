@@ -39,7 +39,7 @@ import { prefer } from '@/preferences.js';
 
 const props = defineProps<{
 	note: Misskey.entities.Note & {
-		isSchedule? : boolean,
+		isSchedule?: boolean,
 		scheduledNoteId?: string
 	};
 	expandAllCws?: boolean;

@@ -43,7 +43,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkButton>
 	</div>
 </template>
-<div v-else-if="theNote" :class="[$style.link, { [$style.compact]: compact }]"><XNoteSimple :note="theNote" :class="$style.body"/></div>
+<div v-else-if="theNote" :class="[$style.link, { [$style.compact]: compact }]"><DynamicNoteSimple :note="theNote" :class="$style.body"/></div>
 <div v-else-if="!hidePreview">
 	<component :is="self ? 'MkA' : 'a'" :class="[$style.link, { [$style.compact]: compact }]" :[attr]="self ? url.substring(local.length) : url" rel="nofollow noopener" :target="target" :title="url" @click.prevent="self ? true : warningExternalWebsite(url)" @click.stop>
 		<div v-if="thumbnail && !sensitive" :class="$style.thumbnail" :style="prefer.s.dataSaver.urlPreview ? '' : `background-image: url('${thumbnail}')`">
@@ -94,8 +94,6 @@ import { url as local } from '@@/js/config.js';
 import { versatileLang } from '@@/js/intl-const.js';
 import * as Misskey from 'misskey-js';
 import type { summaly } from '@misskey-dev/summaly';
-import type MkNoteSimple from '@/components/MkNoteSimple.vue';
-import type SkNoteSimple from '@/components/SkNoteSimple.vue';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { deviceKind } from '@/utility/device-kind.js';
@@ -105,13 +103,7 @@ import { store } from '@/store.js';
 import { prefer } from '@/preferences.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { warningExternalWebsite } from '@/utility/warning-external-website.js';
-
-// TODO DynamicNoteSimple
-const XNoteSimple = defineAsyncComponent<typeof MkNoteSimple | typeof SkNoteSimple>(() =>
-	prefer.s.noteDesign === 'misskey'
-		? import('@/components/MkNoteSimple.vue')
-		: import('@/components/SkNoteSimple.vue'),
-);
+import DynamicNoteSimple from '@/components/DynamicNoteSimple.vue';
 
 type SummalyResult = Awaited<ReturnType<typeof summaly>>;
 
