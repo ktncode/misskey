@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</template>
 	<div v-if="tab === 'pinned'" class="_gaps">
 		<div v-if="user.pinnedNotes.length < 1" class="_fullinfo">
-			<img :src="infoImageUrl" class="_ghost" aria-hidden="true" :alt="i18n.ts.noNotes"/>
+			<img :src="infoImageUrl" draggable="false" aria-hidden="true" :alt="i18n.ts.noNotes"/>
 			<div>{{ i18n.ts.noNotes }}</div>
 		</div>
 		<div v-else class="_panel">

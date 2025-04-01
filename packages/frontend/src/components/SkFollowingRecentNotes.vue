@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkPagination ref="latestNotesPaging" :pagination="latestNotesPagination" @init="onListReady">
 		<template #empty>
 			<div class="_fullinfo">
-				<img :src="infoImageUrl" class="_ghost" :alt="i18n.ts.noNotes" aria-hidden="true"/>
+				<img :src="infoImageUrl" draggable="false" :alt="i18n.ts.noNotes" aria-hidden="true"/>
 				<div>{{ i18n.ts.noNotes }}</div>
 			</div>
 		</template>
