@@ -126,7 +126,7 @@ const props = withDefaults(defineProps<{
 	onDeleteCallback: undefined,
 });
 
-const canRenote = computed(() => ['public', 'home'].includes(props.note.visibility) || props.note.userId === $i.id);
+const canRenote = computed(() => ['public', 'home'].includes(props.note.visibility) || props.note.userId === $i?.id);
 
 const el = shallowRef<HTMLElement>();
 const muted = ref($i ? checkWordMute(props.note, $i, $i.mutedWords) : false);
@@ -384,7 +384,7 @@ function menu(): void {
 if (props.detail) {
 	misskeyApi('notes/children', {
 		noteId: props.note.id,
-		limit: numberOfReplies.value,
+		limit: store.s.numberOfReplies,
 		showQuotes: false,
 	}).then(res => {
 		replies.value = res;
