@@ -246,7 +246,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onMounted, provide, ref, useTemplateRef, watch } from 'vue';
+import { computed, inject, onMounted, onUnmounted, onUpdated, provide, ref, useTemplateRef, watch } from 'vue';
 import * as mfm from '@transfem-org/sfm-js';
 import * as Misskey from 'misskey-js';
 import { isLink } from '@@/js/is-link.js';
@@ -862,7 +862,7 @@ function setScrolling() {
 }
 
 onMounted(() => {
-	document.addEventListener('wheel', setScrolling);
+	window.document.addEventListener('wheel', setScrolling);
 	isScrolling = false;
 	noteEl.value?.scrollIntoView({ block: 'center' });
 });
@@ -870,14 +870,14 @@ onMounted(() => {
 onUpdated(() => {
 	if (!isScrolling) {
 		noteEl.value?.scrollIntoView({ block: 'center' });
-		if (location.hash) {
-			location.replace(location.hash); // Jump to highlighted reply
+		if (window.location.hash) {
+			window.location.replace(window.location.hash); // Jump to highlighted reply
 		}
 	}
 });
 
 onUnmounted(() => {
-	document.removeEventListener('wheel', setScrolling);
+	window.document.removeEventListener('wheel', setScrolling);
 });
 </script>
 
