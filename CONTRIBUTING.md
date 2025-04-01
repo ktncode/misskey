@@ -686,6 +686,8 @@ seems to do a decent job)
 * if there have been any changes to the federated user data (the `renderPerson` function in `packages/backend/src/core/activitypub/ApRendererService.ts`), make sure that the set of fields in `userNeedsPublishing` and `profileNeedsPublishing` in `packages/backend/src/server/api/endpoints/i/update.ts` are still correct.
 * check the changes against our `develop` (`git diff develop`) and against Misskey (`git diff misskey/develop`)
 * re-generate `misskey-js` (`pnpm build-misskey-js-with-types`) and commit
+* re-generate locales (`pnpm run build-assets`) and commit
+* re-generate search index (`pnpm run build-frontend-search-index`) and commit
 * build the frontend: `rm -rf built/; NODE_ENV=development pnpm --filter=frontend --filter=frontend-embed --filter=frontend-shared build` (the `development` tells it to keep some of the original filenames in the built files)
 * make sure there aren't any new `ti-*` classes (Tabler Icons), and replace them with appropriate `ph-*` ones (Phosphor Icons) in [`vite.replaceicons.ts`](packages/frontend/vite.replaceIcons.ts).
     * This command should show you want to change: `grep -ohrP '(?<=["'\'']ti )(ti-(?!fw)[\w\-]+)' --exclude \*.map -- built/ | sort -u`.
