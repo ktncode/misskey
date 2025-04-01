@@ -680,6 +680,7 @@ seems to do a decent job)
         * `packages/frontend/src/widgets/WidgetTimeline.vue`
     * from `packages/backend/src/queue/processors/InboxProcessorService.ts` to `packages/backend/src/core/UpdateInstanceQueue.ts`, where `updateInstanceQueue` is impacted
     * from `.config/example.yml` to `.config/ci.yml`
+    * in `packages/backend/src/core/MfmService.ts`, from `toHtml` to `toMastoApiHtml`
 * if there have been any changes to the federated user data (the `renderPerson` function in `packages/backend/src/core/activitypub/ApRendererService.ts`), make sure that the set of fields in `userNeedsPublishing` and `profileNeedsPublishing` in `packages/backend/src/server/api/endpoints/i/update.ts` are still correct.
 * check the changes against our `develop` (`git diff develop`) and against Misskey (`git diff misskey/develop`)
 * re-generate `misskey-js` (`pnpm build-misskey-js-with-types`) and commit
