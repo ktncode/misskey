@@ -21,11 +21,11 @@ import { computed, defineAsyncComponent, shallowRef } from 'vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
 import type MkNote from '@/components/MkNote.vue';
 import type SkNote from '@/components/SkNote.vue';
-import { defaultStore } from '@/store.js';
+import { prefer } from '@/preferences';
 
 const XNote = computed(() =>
 	defineAsyncComponent(() =>
-		defaultStore.reactiveState.noteDesign.value === 'misskey'
+		prefer.r.noteDesign.value === 'misskey'
 			? import('@/components/MkNote.vue')
 			: import('@/components/SkNote.vue'),
 	),
