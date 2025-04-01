@@ -97,7 +97,7 @@ const withReplies = computed<boolean>({
 });
 const withBots = computed<boolean>({
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	get: () => (defaultStore.reactiveState.tl.value.filter?.withBots ?? saveTlFilter('withBots', true)),
+	get: () => (store.r.tl.value.filter?.withBots ?? saveTlFilter('withBots', true)),
 	set: (x) => saveTlFilter('withBots', x),
 });
 const onlyFiles = computed<boolean>({
@@ -223,6 +223,7 @@ function saveTlFilter(key: keyof typeof store.s.tl.filter, newValue: boolean) {
 	}
 }
 
+/*
 async function timetravel(): Promise<void> {
 	const { canceled, result: date } = await os.inputDate({
 		title: i18n.ts.date,
@@ -235,6 +236,7 @@ async function timetravel(): Promise<void> {
 function focus(): void {
 	tlComponent.value.focus();
 }
+ */
 
 function closeTutorial(): void {
 	if (!isBasicTimeline(src.value)) return;
