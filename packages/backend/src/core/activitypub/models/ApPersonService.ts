@@ -632,7 +632,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 
 		// Update user
 		if (!(await this.usersRepository.update({ id: exist.id, isDeleted: false }, updates)).affected) {
-			return 'skip';
+			return `skip: user ${exist.id} is deleted`;
 		}
 
 		if (person.publicKey) {
