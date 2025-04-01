@@ -4,13 +4,13 @@
  */
 
 import { instance } from '@/instance.js';
-import { defaultStore } from '@/store.js';
 import * as os from '@/os.js';
 import MkUrlWarningDialog from '@/components/MkUrlWarningDialog.vue';
+import { prefer } from '@/preferences';
 
 const isRegExp = /^\/(.+)\/(.*)$/;
 
-function extractHostname(maybeUrl: string): URL | null {
+function extractHostname(maybeUrl: string): string | null {
 	try {
 		const url = new URL(maybeUrl);
 		return url.host;
@@ -36,8 +36,8 @@ export async function warningExternalWebsite(url: string) {
 		}
 	});
 
-	const isTrustedByUser = defaultStore.reactiveState.trustedDomains.value.includes(hostname);
-	const isDisabledByUser = !defaultStore.reactiveState.warnExternalUrl.value;
+	const isTrustedByUser = prefer.r.trustedDomains.value.includes(hostname);
+	const isDisabledByUser = !prefer.r.warnExternalUrl.value;
 
 	if (!isTrustedByInstance && !isTrustedByUser && !isDisabledByUser) {
 		const confirm = await new Promise<{ canceled: boolean }>(resolve => {
