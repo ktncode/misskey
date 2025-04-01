@@ -164,7 +164,7 @@
 		const locale = JSON.parse(localStorage.getItem('locale') || '{}');
 
 		const messages = Object.assign({
-			title: 'Failed to initialize Misskey',
+			title: 'Failed to initialize Sharkey',
 			solution: 'The following actions may solve the problem.',
 			solution1: 'Update your os and browser',
 			solution2: 'Disable an adblocker',
