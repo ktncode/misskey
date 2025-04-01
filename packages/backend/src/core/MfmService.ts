@@ -850,11 +850,14 @@ export class MfmService {
 
 		let result = new XMLSerializer().serializeToString(body);
 
+		// Remove the unnecessary namespace
+		result = result.replace(/^\s*<p xmlns=\"http:\/\/www.w3.org\/1999\/xhtml\">/, '<p>');
+
 		if (inline) {
 			result = result.replace(/^<p>/, '').replace(/<\/p>$/, '');
 		}
 
-		happyDOM.close().catch(e => {});
+		happyDOM.close().catch(() => {});
 
 		return result;
 	}
