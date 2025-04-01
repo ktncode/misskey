@@ -117,13 +117,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, defineAsyncComponent, ref, useTemplateRef, watch } from 'vue';
+import { computed, defineAsyncComponent, ref, useTemplateRef } from 'vue';
 import { v4 as uuid } from 'uuid';
 import XCommon from './_common_/common.vue';
 import XSidebar from '@/ui/_common_/navbar.vue';
 import XNavbarH from '@/ui/_common_/navbar-h.vue';
 import XDrawerMenu from '@/ui/_common_/navbar-for-mobile.vue';
-import MkButton from '@/components/MkButton.vue';
 import * as os from '@/os.js';
 import { navbarItemDef } from '@/navbar.js';
 import { $i } from '@/i.js';
@@ -143,7 +142,6 @@ import XRoleTimelineColumn from '@/ui/deck/role-timeline-column.vue';
 import XFollowingColumn from '@/ui/deck/following-column.vue';
 import { mainRouter } from '@/router.js';
 import { columns, layout, columnTypes, switchProfileMenu, addColumn as addColumnToStore, deleteProfile as deleteProfile_ } from '@/deck.js';
-import { miLocalStorage } from '@/local-storage.js';
 
 const XStatusBars = defineAsyncComponent(() => import('@/ui/_common_/statusbars.vue'));
 const XAnnouncements = defineAsyncComponent(() => import('@/ui/_common_/announcements.vue'));
@@ -178,7 +176,7 @@ window.addEventListener('resize', () => {
 });
 
 const snapScroll = deviceKind === 'smartphone' || deviceKind === 'tablet';
-const withWallpaper = miLocalStorage.getItem('wallpaper') != null;
+const withWallpaper = prefer.s['deck.wallpaper'] != null;
 const drawerMenuShowing = ref(false);
 const gap = prefer.r['deck.columnGap'];
 
@@ -234,9 +232,6 @@ function onWheel(ev: WheelEvent) {
 	}
 }
 
-window.document.documentElement.style.overflowY = 'hidden';
-window.document.documentElement.style.scrollBehavior = 'auto';
-
 async function deleteProfile() {
 	if (prefer.s['deck.profile'] == null) return;
 
@@ -251,6 +246,12 @@ async function deleteProfile() {
 	os.success();
 }
 
+window.document.documentElement.style.overflowY = 'hidden';
+window.document.documentElement.style.scrollBehavior = 'auto';
+
+if (prefer.s['deck.wallpaper'] != null) {
+	window.document.documentElement.style.backgroundImage = `url(${prefer.s['deck.wallpaper']})`;
+}
 </script>
 
 <style lang="scss" module>
