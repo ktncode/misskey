@@ -240,11 +240,11 @@ export class NoteEditService implements OnApplicationShutdown {
 		});
 
 		if (oldnote == null) {
-			throw new UnrecoverableError('edit failed: missing oldnote');
+			throw new UnrecoverableError(`edit failed for ${editid}: missing oldnote`);
 		}
 
 		if (oldnote.userId !== user.id) {
-			throw new UnrecoverableError(`edit failed for ${oldnote.id}: user is not the note author`);
+			throw new UnrecoverableError(`edit failed for ${editid}: user is not the note author`);
 		}
 
 		// we never want to change the replyId, so fetch the original "parent"
