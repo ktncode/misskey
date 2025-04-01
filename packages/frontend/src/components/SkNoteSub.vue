@@ -96,17 +96,18 @@ import { computed, ref, shallowRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { computeMergedCw } from '@@/js/compute-merged-cw.js';
 import { host } from '@@/js/config.js';
-import type { OpenOnRemoteOptions } from '@/utility/please-login.js';
 import type { Visibility } from '@/utility/boost-quote.js';
+import type { OpenOnRemoteOptions } from '@/utility/please-login.js';
 import SkNoteHeader from '@/components/SkNoteHeader.vue';
 import MkReactionsViewer from '@/components/MkReactionsViewer.vue';
 import MkSubNoteContent from '@/components/MkSubNoteContent.vue';
 import MkCwButton from '@/components/MkCwButton.vue';
 import { notePage } from '@/filters/note.js';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
 import * as sound from '@/utility/sound.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
+import { $i } from '@/i.js';
 import { userPage } from '@/filters/user.js';
 import { checkWordMute } from '@/utility/check-word-mute.js';
 import { pleaseLogin } from '@/utility/please-login.js';
@@ -115,14 +116,10 @@ import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { reactionPicker } from '@/utility/reaction-picker.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { getNoteMenu } from '@/utility/get-note-menu.js';
-import { useNoteCapture } from '@/use/use-note-capture.js';
 import { boostMenuItems, computeRenoteTooltip } from '@/utility/boost-quote.js';
-import { prefer } from '@/preferences';
-import { store } from '@/store';
-import { $i } from '@/i.js';
-
-const canRenote = computed(() => ['public', 'home'].includes(props.note.visibility) || props.note.userId === $i.id);
-const hideLine = computed(() => props.detail);
+import { prefer } from '@/preferences.js';
+import { useNoteCapture } from '@/use/use-note-capture.js';
+import { store } from '@/store.js';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -139,7 +136,11 @@ const props = withDefaults(defineProps<{
 	depth: 1,
 	isReply: false,
 	detailed: false,
+	onDeleteCallback: undefined,
 });
+
+const canRenote = computed(() => ['public', 'home'].includes(props.note.visibility) || props.note.userId === $i?.id);
+const hideLine = computed(() => props.detail);
 
 const el = shallowRef<HTMLElement>();
 const muted = ref($i ? checkWordMute(props.note, $i, $i.mutedWords) : false);
@@ -206,22 +207,21 @@ if ($i) {
 }
 
 function focus() {
-	el.value.focus();
+	el.value?.focus();
 }
 
-function reply(viaKeyboard = false): void {
+async function reply(viaKeyboard = false): Promise<void> {
 	pleaseLogin({ openOnRemote: pleaseLoginContext.value });
 	showMovedDialog();
-	os.post({
+	await os.post({
 		reply: props.note,
-		channel: props.note.channel,
+		channel: props.note.channel ?? undefined,
 		animation: !viaKeyboard,
-	}, () => {
-		focus();
 	});
+	focus();
 }
 
-function react(viaKeyboard = false): void {
+function react(): void {
 	pleaseLogin({ openOnRemote: pleaseLoginContext.value });
 	showMovedDialog();
 	sound.playMisskeySfx('reaction');
@@ -363,58 +363,31 @@ function quote() {
 	pleaseLogin({ openOnRemote: pleaseLoginContext.value });
 	showMovedDialog();
 
-	if (appearNote.value.channel) {
-		os.post({
-			renote: appearNote.value,
-			channel: appearNote.value.channel,
-		}).then((cancelled) => {
-			if (cancelled) return;
-			misskeyApi('notes/renotes', {
-				noteId: props.note.id,
-				userId: $i.id,
-				limit: 1,
-				quote: true,
-			}).then((res) => {
-				if (!(res.length > 0)) return;
-				const el = quoteButton.value as HTMLElement | null | undefined;
-				if (el && res.length > 0) {
-					const rect = el.getBoundingClientRect();
-					const x = rect.left + (el.offsetWidth / 2);
-					const y = rect.top + (el.offsetHeight / 2);
-					const { dispose } = os.popup(MkRippleEffect, { x, y }, {
-						end: () => dispose(),
-					});
-				}
+	os.post({
+		renote: appearNote.value,
+		channel: appearNote.value.channel ?? undefined,
+	}).then((cancelled) => {
+		if (cancelled) return;
+		misskeyApi('notes/renotes', {
+			noteId: props.note.id,
+			userId: $i?.id,
+			limit: 1,
+			quote: true,
+		}).then((res) => {
+			if (!(res.length > 0)) return;
+			const popupEl = quoteButton.value as HTMLElement | null | undefined;
+			if (popupEl && res.length > 0) {
+				const rect = popupEl.getBoundingClientRect();
+				const x = rect.left + (popupEl.offsetWidth / 2);
+				const y = rect.top + (popupEl.offsetHeight / 2);
+				const { dispose } = os.popup(MkRippleEffect, { x, y }, {
+					end: () => dispose(),
+				});
+			}
 
-				os.toast(i18n.ts.quoted);
-			});
+			os.toast(i18n.ts.quoted);
 		});
-	} else {
-		os.post({
-			renote: appearNote.value,
-		}).then((cancelled) => {
-			if (cancelled) return;
-			misskeyApi('notes/renotes', {
-				noteId: props.note.id,
-				userId: $i.id,
-				limit: 1,
-				quote: true,
-			}).then((res) => {
-				if (!(res.length > 0)) return;
-				const el = quoteButton.value as HTMLElement | null | undefined;
-				if (el && res.length > 0) {
-					const rect = el.getBoundingClientRect();
-					const x = rect.left + (el.offsetWidth / 2);
-					const y = rect.top + (el.offsetHeight / 2);
-					const { dispose } = os.popup(MkRippleEffect, { x, y }, {
-						end: () => dispose(),
-					});
-				}
-
-				os.toast(i18n.ts.quoted);
-			});
-		});
-	}
+	});
 }
 
 function menu(): void {
