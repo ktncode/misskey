@@ -243,7 +243,7 @@ export class WebhookTestService {
 				break;
 			}
 			case 'edited': {
-				send('edited', { note: toPackedNote(dummyNote1) });
+				send('edited', { note: await this.toPackedNote(dummyNote1) });
 				break;
 			}
 			case 'follow': {
@@ -426,6 +426,7 @@ export class WebhookTestService {
 	@bindThis
 	private async toPackedUserLite(user: MiUser, override?: Packed<'UserLite'>): Promise<Packed<'UserLite'>> {
 		return {
+			...user,
 			id: user.id,
 			name: user.name,
 			username: user.username,
@@ -445,6 +446,9 @@ export class WebhookTestService {
 			emojis: await this.customEmojiService.populateEmojis(user.emojis, user.host),
 			onlineStatus: 'active',
 			badgeRoles: [],
+			isAdmin: false,
+			isModerator: false,
+			isSystem: false,
 			...override,
 		};
 	}
@@ -462,6 +466,9 @@ export class WebhookTestService {
 			lastFetchedAt: user.lastFetchedAt?.toISOString() ?? null,
 			bannerUrl: user.bannerUrl,
 			bannerBlurhash: user.bannerBlurhash,
+			backgroundUrl: user.backgroundUrl,
+			backgroundBlurhash: user.backgroundBlurhash,
+			listenbrainz: null,
 			isLocked: user.isLocked,
 			isSilenced: false,
 			isSuspended: user.isSuspended,

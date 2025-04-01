@@ -8,6 +8,7 @@ import { bindThis } from '@/decorators.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import { ChatService } from '@/core/ChatService.js';
+import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import Channel, { type MiChannelService } from '../channel.js';
 
 class ChatUserChannel extends Channel {
@@ -22,8 +23,9 @@ class ChatUserChannel extends Channel {
 
 		id: string,
 		connection: Channel['connection'],
+		noteEntityService: NoteEntityService,
 	) {
-		super(id, connection);
+		super(id, connection, noteEntityService);
 	}
 
 	@bindThis
@@ -64,6 +66,7 @@ export class ChatUserChannelService implements MiChannelService<true> {
 
 	constructor(
 		private chatService: ChatService,
+		private readonly noteEntityService: NoteEntityService,
 	) {
 	}
 
@@ -73,6 +76,7 @@ export class ChatUserChannelService implements MiChannelService<true> {
 			this.chatService,
 			id,
 			connection,
+			this.noteEntityService,
 		);
 	}
 }

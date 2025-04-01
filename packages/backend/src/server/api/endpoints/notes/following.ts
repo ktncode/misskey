@@ -144,8 +144,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			// Respect blocks and mutes
-			this.queryService.generateBlockedUserQuery(query, me);
-			this.queryService.generateMutedUserQuery(query, me);
+			this.queryService.generateBlockedUserQueryForNotes(query, me);
+			this.queryService.generateMutedUserQueryForNotes(query, me);
 
 			// Support pagination
 			this.queryService
