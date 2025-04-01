@@ -78,7 +78,7 @@ const emit = defineEmits<{
 	(ev: 'update:tab', key: string);
 }>();
 
-const displayBackButton = props.displayBackButton && history.state.key !== 'index' && history.length > 1 && inject('shouldBackButton', true);
+const displayBackButton = props.displayBackButton && window.history.state.key !== 'index' && window.history.length > 1 && inject('shouldBackButton', true);
 
 //const viewId = inject(DI.viewId);
 const injectedPageMetadata = inject(DI.pageMetadata);
