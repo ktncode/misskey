@@ -425,7 +425,7 @@ export class ApNoteService {
 		/**
 		 * 禁止ワードチェック
 		 */
-		const hasProhibitedWords = await this.noteCreateService.checkProhibitedWordsContain({ cw, text, pollChoices: poll?.choices });
+		const hasProhibitedWords = this.noteCreateService.checkProhibitedWordsContain({ cw, text, pollChoices: poll?.choices });
 		if (hasProhibitedWords) {
 			throw new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140af99', `Note contains prohibited words: ${noteUri}`);
 		}
@@ -466,13 +466,13 @@ export class ApNoteService {
 				.then(x => {
 					if (x == null) {
 						this.logger.warn('Specified inReplyTo, but not found');
-						throw new Error(`could not fetch inReplyTo ${note.inReplyTo}: ${entryUri}`);
+						throw new Error(`could not fetch inReplyTo ${note.inReplyTo} for note ${entryUri}`);
 					}
 
 					return x;
 				})
 				.catch(async err => {
-					this.logger.warn(`error ${err.statusCode ?? err} fetching inReplyTo ${note.inReplyTo}: ${entryUri}`);
+					this.logger.warn(`error ${err.statusCode ?? err} fetching inReplyTo ${note.inReplyTo} for note ${entryUri}`);
 					throw err;
 				})
 			: null;
