@@ -282,6 +282,7 @@ import MkDisableSection from '@/components/MkDisableSection.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
 import MkRadios from '@/components/MkRadios.vue';
+import { prefer } from '@/preferences';
 
 const $i = ensureSignin();
 
@@ -309,10 +310,11 @@ const computedAllowUnsignedFetch = computed(() => {
 	return instance.allowUnsignedFetch;
 });
 
-const defaultNoteVisibility = computed(defaultStore.makeGetterSetter('defaultNoteVisibility'));
-const defaultNoteLocalOnly = computed(defaultStore.makeGetterSetter('defaultNoteLocalOnly'));
-const rememberNoteVisibility = computed(defaultStore.makeGetterSetter('rememberNoteVisibility'));
-const keepCw = computed(defaultStore.makeGetterSetter('keepCw'));
+const preventAiLearning = ref($i.preventAiLearning);
+const defaultNoteVisibility = prefer.model('defaultNoteVisibility');
+const defaultNoteLocalOnly = prefer.model('defaultNoteLocalOnly');
+const rememberNoteVisibility = prefer.model('rememberNoteVisibility');
+const keepCw = prefer.model('keepCw');
 
 const makeNotesFollowersOnlyBefore_type = computed(() => {
 	if (makeNotesFollowersOnlyBefore.value == null) {
