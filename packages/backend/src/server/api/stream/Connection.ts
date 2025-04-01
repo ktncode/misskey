@@ -36,8 +36,6 @@ export default class Connection {
 	public subscriber: StreamEventEmitter;
 	private channels = new Map<string, Channel>();
 	private subscribingNotes = new Map<string, number>();
-	// TODO see if we should remove this, now that it has no more reads
-	private cachedNotes = new Map<string, Packed<'Note'>>();
 	public userProfile: MiUserProfile | null = null;
 	public following: Record<string, Pick<MiFollowing, 'withReplies'> | undefined> = {};
 	public followingChannels: Set<string> = new Set();
@@ -153,24 +151,6 @@ export default class Connection {
 	@bindThis
 	private onBroadcastMessage(data: GlobalEvents['broadcast']['payload']) {
 		this.sendMessageToWs(data.type, data.body);
-	}
-
-	@bindThis
-	public cacheNote(note: Packed<'Note'>) {
-		const add = (note: Packed<'Note'>) => {
-			this.cachedNotes.set(note.id, note);
-
-			while (this.cachedNotes.size > MAX_CACHED_NOTES_PER_CONNECTION) {
-				// Map maintains insertion order, so first key is always the oldest
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				const oldestKey = this.cachedNotes.keys().next().value!;
-				this.cachedNotes.delete(oldestKey);
-			}
-		};
-
-		add(note);
-		if (note.reply) add(note.reply);
-		if (note.renote) add(note.renote);
 	}
 
 	@bindThis
@@ -371,6 +351,5 @@ export default class Connection {
 		this.fetchIntervalId = null;
 		this.channels.clear();
 		this.subscribingNotes.clear();
-		this.cachedNotes.clear();
 	}
 }
