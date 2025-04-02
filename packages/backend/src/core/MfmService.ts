@@ -6,7 +6,7 @@
 import { URL } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
 import * as parse5 from 'parse5';
-import { Window, XMLSerializer } from 'happy-dom';
+import { Window } from 'happy-dom';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { intersperse } from '@/misc/prelude/array.js';
@@ -577,7 +577,7 @@ export class MfmService {
 		appendChildren(nodes, body);
 
 		// Remove the unnecessary namespace
-		const serialized = new XMLSerializer().serializeToString(body).replace(/^\s*<p xmlns=\"http:\/\/www.w3.org\/1999\/xhtml\">/, '<p>');
+		const serialized = body.outerHTML;
 
 		happyDOM.close().catch(err => {});
 
@@ -848,10 +848,7 @@ export class MfmService {
 			body.appendChild(quote);
 		}
 
-		let result = new XMLSerializer().serializeToString(body);
-
-		// Remove the unnecessary namespace
-		result = result.replace(/^\s*<p xmlns=\"http:\/\/www.w3.org\/1999\/xhtml\">/, '<p>');
+		let result = body.outerHTML;
 
 		if (inline) {
 			result = result.replace(/^<p>/, '').replace(/<\/p>$/, '');
