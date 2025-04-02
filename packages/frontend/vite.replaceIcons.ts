@@ -395,6 +395,7 @@ export function pluginReplaceIcons() {
 					'ti ti-antenna-bars-3': 'ph-cell-signal-medium ph-bold ph-lg',
 					'ti ti-arrows-horizontal': 'ph-arrows-horizontal ph-bold ph-lg',
 					'ti ti-battery-vertical-eco': 'ph-battery-plus-vertical ph-bold ph-lg',
+					'ti ti-caret-down': 'ph-caret-down ph-bold ph-lg',
 					'ti ti-clipboard': 'ph-clipboard ph-bold ph-lg',
 					'ti ti-cloud-cog': 'ph-cloud-check ph-bold ph-lg',
 					'ti ti-cloud-down': 'ph-cloud-arrow-down ph-bold ph-lg',
