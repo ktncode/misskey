@@ -661,7 +661,9 @@ export async function captureWebhook<T = SystemWebhookPayload>(postAction: () =>
 	let timeoutHandle: NodeJS.Timeout | null = null;
 	const result = await new Promise<string>(async (resolve, reject) => {
 		fastify.all('/', async (req, res) => {
-			timeoutHandle && clearTimeout(timeoutHandle);
+			if (timeoutHandle) {
+				clearTimeout(timeoutHandle);
+			}
 
 			const body = JSON.stringify(req.body);
 			res.status(200).send('ok');

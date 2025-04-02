@@ -487,7 +487,7 @@ function applyEnvOverrides(config: Source) {
 		}
 	}
 
-	function _step2name(step: string|number): string {
+	function _step2name(step: string | number): string {
 		return step.toString().replaceAll(/[^a-z0-9]+/gi, '').toUpperCase();
 	}
 
