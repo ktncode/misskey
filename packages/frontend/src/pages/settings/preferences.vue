@@ -861,7 +861,6 @@ import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
 import { globalEvents } from '@/events.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { instance } from '@/instance.js';
-import Search from '@/pages/search.vue';
 
 // Sharkey imports
 import { searchEngineMap } from '@/utility/search-engine-map.js';

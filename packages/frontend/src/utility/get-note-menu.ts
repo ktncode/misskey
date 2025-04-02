@@ -541,7 +541,7 @@ export function getNoteMenu(props: {
 	};
 
 	return {
-		popupMenu: menuItems,
+		menu: menuItems,
 		cleanup,
 	};
 }

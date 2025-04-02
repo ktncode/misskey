@@ -229,12 +229,12 @@ export class ServerService implements OnApplicationShutdown {
 			}
 		});
 
-		fastify.get<{ Params: { x: string } }>('/identicon/:x', async (request, reply) => {
-			reply.header('Content-Type', 'image/png');
+		fastify.get<{ Params: { x: string } }>('/identicon/:x', (request, reply) => {
+ 			reply.header('Content-Type', 'image/png');
 			reply.header('Cache-Control', 'public, max-age=86400');
 
 			if (this.meta.enableIdenticonGeneration) {
-				return await genIdenticon(request.params.x);
+				return genIdenticon(request.params.x);
 			} else {
 				return reply.redirect('/static-assets/avatar.png');
 			}
@@ -293,13 +293,14 @@ export class ServerService implements OnApplicationShutdown {
 			if (fs.existsSync(this.config.socket)) {
 				fs.unlinkSync(this.config.socket);
 			}
-			fastify.listen({ path: this.config.socket }, (err, address) => {
-				if (this.config.chmodSocket) {
-					fs.chmodSync(this.config.socket!, this.config.chmodSocket);
-				}
-			});
+
+			await fastify.listen({ path: this.config.socket });
+
+			if (this.config.chmodSocket) {
+				fs.chmodSync(this.config.socket!, this.config.chmodSocket);
+			}
 		} else {
-			fastify.listen({ port: this.config.port, host: this.config.address });
+			await fastify.listen({ port: this.config.port, host: this.config.address });
 		}
 
 		await fastify.ready();

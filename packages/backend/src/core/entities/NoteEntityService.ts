@@ -479,14 +479,6 @@ export class NoteEntityService implements OnModuleInit {
 			mentions: note.mentions && note.mentions.length > 0 ? note.mentions : undefined,
 			uri: note.uri ?? undefined,
 			url: note.url ?? undefined,
-			poll: note.hasPoll ? this.populatePoll(note, meId) : undefined,
-			...(meId && Object.keys(reactions).length > 0 ? {
-				myReaction: this.populateMyReaction({
-					id: note.id,
-					reactions: reactions,
-					reactionAndUserPairCache: reactionAndUserPairCache,
-				}, meId, options?._hint_),
-			} : {}),
 
 			...(opts.detail ? {
 				clippedCount: note.clippedCount,
@@ -505,6 +497,16 @@ export class NoteEntityService implements OnModuleInit {
 					withReactionAndUserPairCache: opts.withReactionAndUserPairCache,
 					_hint_: options?._hint_,
 				}) : undefined,
+
+				poll: note.hasPoll ? this.populatePoll(note, meId) : undefined,
+
+				...(meId && Object.keys(reactions).length > 0 ? {
+					myReaction: this.populateMyReaction({
+						id: note.id,
+						reactions: reactions,
+						reactionAndUserPairCache: reactionAndUserPairCache,
+					}, meId, options?._hint_),
+				} : {}),
 			} : {}),
 		});
 

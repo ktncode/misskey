@@ -108,6 +108,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #icon><i class="ti ti-password"></i></template>
 							<template #label>IP</template>
 							<MkInfo v-if="!iAmAdmin" warn>{{ i18n.ts.requireAdminForView }}</MkInfo>
+							<!-- TODO translate -->
 							<MkInfo v-else>The date is the IP address was first acknowledged.</MkInfo>
 							<template v-if="iAmAdmin && ips">
 								<div v-for="record in ips" :key="record.ip" class="_monospace" :class="$style.ip" style="margin: 1em 0;">

@@ -98,6 +98,7 @@ const src = computed(() => {
 		case 'fc': return 'https://cdn.jsdelivr.net/npm/friendly-challenge@0.9.18/widget.min.js';
 		case 'mcaptcha': return null;
 		case 'testcaptcha': return null;
+		default: return null;
 	}
 });
 

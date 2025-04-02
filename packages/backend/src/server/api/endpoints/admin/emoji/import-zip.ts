@@ -33,7 +33,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private readonly driveFilesRepository: DriveFilesRepository,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			const file = await driveFilesRepository.findOneByOrFail({ id: ps.fileId });
+			const file = await this.driveFilesRepository.findOneByOrFail({ id: ps.fileId });
 			await this.moderationLogService.log(me, 'importCustomEmojis', {
 				fileName: file.name,
 			});

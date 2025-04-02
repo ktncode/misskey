@@ -391,8 +391,8 @@ function quote() {
 }
 
 function menu(): void {
-	const { popupMenu, cleanup } = getNoteMenu({ note: props.note, translating, translation, isDeleted });
-	os.popupMenu(popupMenu, menuButton.value).then(focus).finally(cleanup);
+	const { menu, cleanup } = getNoteMenu({ note: props.note, translating, translation, isDeleted });
+	os.popupMenu(menu, menuButton.value).then(focus).finally(cleanup);
 }
 
 if (props.detail) {

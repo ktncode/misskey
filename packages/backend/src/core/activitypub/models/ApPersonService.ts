@@ -322,6 +322,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 
 		const host = this.utilityService.punyHost(uri);
 		if (host === this.utilityService.toPuny(this.config.host)) {
+			// TODO convert to unrecoverable error
 			throw new StatusError(`cannot resolve local user: ${uri}`, 400, 'cannot resolve local user');
 		}
 
@@ -570,7 +571,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 				.catch(err => {
 					if (!(err instanceof StatusError) || err.isRetryable) {
 						this.logger.error('error occurred while fetching following/followers collection', { stack: err });
-						// Do not update the visibiility on transient errors.
+						// Do not update the visibility on transient errors.
 						return undefined;
 					}
 					return 'private';

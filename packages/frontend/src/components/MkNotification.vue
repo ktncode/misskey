@@ -219,9 +219,22 @@ const props = withDefaults(defineProps<{
 	full: false,
 });
 
-const userDetailed: Ref<UserDetailed | null> = ref(null);
+type ExportCompletedNotification = Misskey.entities.Notification & { type: 'exportCompleted' };
+
+const exportEntityName = {
+	antenna: i18n.ts.antennas,
+	blocking: i18n.ts.blockedUsers,
+	clip: i18n.ts.clips,
+	customEmoji: i18n.ts.customEmojis,
+	favorite: i18n.ts.favorites,
+	following: i18n.ts.following,
+	muting: i18n.ts.mutedUsers,
+	note: i18n.ts.notes,
+	userList: i18n.ts.lists,
+} as const satisfies Record<ExportCompletedNotification['exportedEntity'], string>;
 
 const followRequestDone = ref(true);
+const userDetailed: Ref<UserDetailed | null> = ref(null);
 
 // watch() is required because computed() doesn't support async.
 watch(props, async () => {
@@ -240,20 +253,6 @@ watch(props, async () => {
 		followRequestDone.value = false;
 	}
 }, { immediate: true });
-
-type ExportCompletedNotification = Misskey.entities.Notification & { type: 'exportCompleted' };
-
-const exportEntityName = {
-	antenna: i18n.ts.antennas,
-	blocking: i18n.ts.blockedUsers,
-	clip: i18n.ts.clips,
-	customEmoji: i18n.ts.customEmojis,
-	favorite: i18n.ts.favorites,
-	following: i18n.ts.following,
-	muting: i18n.ts.mutedUsers,
-	note: i18n.ts.notes,
-	userList: i18n.ts.lists,
-} as const satisfies Record<ExportCompletedNotification['exportedEntity'], string>;
 
 const acceptFollowRequest = () => {
 	if (!('user' in props.notification)) return;

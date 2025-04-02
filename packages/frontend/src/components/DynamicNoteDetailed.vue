@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import * as Misskey from 'misskey-js';
-import { computed, defineAsyncComponent, shallowRef } from 'vue';
+import { computed, defineAsyncComponent, useTemplateRef } from 'vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
 import type MkNoteDetailed from '@/components/MkNoteDetailed.vue';
 import type SkNoteDetailed from '@/components/SkNoteDetailed.vue';
@@ -28,7 +28,7 @@ const XNoteDetailed = computed(() =>
 	),
 );
 
-const rootEl = shallowRef<ComponentExposed<typeof MkNoteDetailed | typeof SkNoteDetailed>>();
+const rootEl = useTemplateRef<ComponentExposed<typeof MkNoteDetailed | typeof SkNoteDetailed>>('rootEl');
 
 defineExpose({ rootEl });
 

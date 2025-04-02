@@ -571,7 +571,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (this.meta.enableStatsForFederatedInstances) {
 			if (this.userEntityService.isRemoteUser(user)) {
 				this.federatedInstanceService.fetchOrRegister(user.host).then(async i => {
-					if (note.renote && note.text || !note.renote) {
+					if (!this.isRenote(note) || this.isQuote(note)) {
 						this.updateNotesCountQueue.enqueue(i.id, 1);
 					}
 					if (this.meta.enableChartsForFederatedInstances) {
@@ -583,17 +583,12 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 		// ハッシュタグ更新
 		if (data.visibility === 'public' || data.visibility === 'home') {
-			if (user.isBot && this.meta.enableBotTrending) {
-				this.hashtagService.updateHashtags(user, tags);
-			} else if (!user.isBot) {
+			if (!user.isBot || this.meta.enableBotTrending) {
 				this.hashtagService.updateHashtags(user, tags);
 			}
 		}
 
-		if (data.renote && data.text) {
-			// Increment notes count (user)
-			this.incNotesCountOfUser(user);
-		} else if (!data.renote) {
+		if (!this.isRenote(note) || this.isQuote(note)) {
 			// Increment notes count (user)
 			this.incNotesCountOfUser(user);
 		}
@@ -631,7 +626,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			});
 		}
 
-		if (data.renote && data.text == null && data.renote.userId !== user.id && !user.isBot) {
+		if (this.isRenote(data) && !this.isQuote(data) && data.renote.userId !== user.id && !user.isBot) {
 			this.incRenoteCount(data.renote);
 		}
 
@@ -706,13 +701,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 						},
 					});
 
-					const [
-						userIdsWhoMeMuting,
-					] = data.renote.userId ? await Promise.all([
-						this.cacheService.userMutingsCache.fetch(data.renote.userId),
-					]) : [new Set<string>()];
-
-					const muted = isUserRelated(note, userIdsWhoMeMuting);
+					const muted = data.renote.userId && isUserRelated(note, await this.cacheService.userMutingsCache.fetch(data.renote.userId));
 
 					if (!isThreadMuted && !muted) {
 						nm.push(data.renote.userId, type);
@@ -848,13 +837,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 				},
 			});
 
-			const [
-				userIdsWhoMeMuting,
-			] = u.id ? await Promise.all([
-				this.cacheService.userMutingsCache.fetch(u.id),
-			]) : [new Set<string>()];
-
-			const muted = isUserRelated(note, userIdsWhoMeMuting);
+			const muted = u.id && isUserRelated(note, await this.cacheService.userMutingsCache.fetch(u.id));
 
 			if (isThreadMuted || muted) {
 				continue;

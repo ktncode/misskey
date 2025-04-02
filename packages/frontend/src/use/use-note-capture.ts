@@ -4,8 +4,8 @@
  */
 
 import { onUnmounted } from 'vue';
-import * as Misskey from 'misskey-js';
 import type { Ref, ShallowRef } from 'vue';
+import * as Misskey from 'misskey-js';
 import { useStream } from '@/stream.js';
 import { $i } from '@/i.js';
 import { misskeyApi } from '@/utility/misskey-api.js';

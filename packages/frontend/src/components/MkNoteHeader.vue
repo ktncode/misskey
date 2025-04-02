@@ -54,11 +54,9 @@ const props = defineProps<{
 
 const menuVersionsButton = shallowRef<HTMLElement>();
 
-async function menuVersions(viaKeyboard = false): Promise<void> {
-	const { menu, cleanup } = await getNoteVersionsMenu({ note: props.note, menuVersionsButton });
-	popupMenu(menu, menuVersionsButton.value, {
-		viaKeyboard,
-	}).then(focus).finally(cleanup);
+async function menuVersions(): Promise<void> {
+	const { menu, cleanup } = await getNoteVersionsMenu({ note: props.note, menuButton: menuVersionsButton });
+	popupMenu(menu, menuVersionsButton.value).then(focus).finally(cleanup);
 }
 
 const mock = inject(DI.mock, false);

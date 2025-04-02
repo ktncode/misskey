@@ -46,7 +46,7 @@ const props = defineProps<{
 	hideFiles?: boolean;
 }>();
 
-let showContent = ref(prefer.s.uncollapseCW);
+const showContent = ref(prefer.s.uncollapseCW);
 const isDeleted = ref(false);
 
 const mergedCW = computed(() => computeMergedCw(props.note));

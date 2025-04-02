@@ -6,9 +6,6 @@
 import querystring from 'querystring';
 import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
-/* import { kinds } from '@/misc/api-permissions.js';
-import type { Config } from '@/config.js';
-import { DI } from '@/di-symbols.js'; */
 import multer from 'fastify-multer';
 import { bindThis } from '@/decorators.js';
 import type { Config } from '@/config.js';

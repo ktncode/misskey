@@ -14,20 +14,18 @@ class FavIconDot {
 	private hasLoaded: Promise<void> | undefined;
 
 	constructor() {
-		this.canvas = document.createElement('canvas');
+		this.canvas = window.document.createElement('canvas');
 	}
 
 	/**
 	 * Must be called before calling any other functions
 	 */
 	public async setup() {
-		const element: HTMLLinkElement = await this.getOrMakeFaviconElement();
-
-		this.faviconEL = element;
+		this.faviconEL = await this.getOrMakeFaviconElement();
 		this.src = this.faviconEL.getAttribute('href');
 		this.ctx = this.canvas.getContext('2d');
 
-		this.faviconImage = document.createElement('img');
+		this.faviconImage = window.document.createElement('img');
 		this.faviconImage.crossOrigin = 'anonymous';
 
 		this.hasLoaded = new Promise((resolve, reject) => {
@@ -46,7 +44,7 @@ class FavIconDot {
 
 	private async getOrMakeFaviconElement(): Promise<HTMLLinkElement> {
 		return new Promise((resolve, reject) => {
-			const favicon = (document.querySelector('link[rel=icon]') ?? this.createFaviconElem()) as HTMLLinkElement;
+			const favicon = (window.document.querySelector('link[rel=icon]') ?? this.createFaviconElem()) as HTMLLinkElement;
 			favicon.addEventListener('load', () => {
 				resolve(favicon);
 			});
@@ -59,12 +57,12 @@ class FavIconDot {
 	}
 
 	private createFaviconElem() {
-		const newLink = document.createElement('link');
+		const newLink = window.document.createElement('link');
 		newLink.setAttribute('rel', 'icon');
 		newLink.setAttribute('href', '/favicon.ico');
 		newLink.setAttribute('type', 'image/x-icon');
 
-		document.head.appendChild(newLink);
+		window.document.head.appendChild(newLink);
 		return newLink;
 	}
 
@@ -79,7 +77,7 @@ class FavIconDot {
 		this.ctx.beginPath();
 		const radius = Math.min(this.faviconImage.width, this.faviconImage.height) * 0.2;
 		this.ctx.arc(this.faviconImage.width - radius, radius, radius, 0, 2 * Math.PI);
-		const computedStyle = getComputedStyle(document.documentElement);
+		const computedStyle = getComputedStyle(window.document.documentElement);
 		this.ctx.fillStyle = tinycolor(computedStyle.getPropertyValue('--MI_THEME-navIndicator')).toHexString();
 		this.ctx.strokeStyle = 'white';
 		this.ctx.fill();
@@ -111,7 +109,7 @@ class FavIconDot {
 	public async worksOnInstance() {
 		try {
 			await this.setVisible(true);
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			await new Promise((resolve) => window.setTimeout(resolve, 1000));
 			await this.setVisible(false);
 		} catch (error) {
 			console.error('error setting notification dot', error);
@@ -138,7 +136,7 @@ export async function setFavIconDot(visible: boolean) {
 	};
 
 	// If document is already loaded, set visibility immediately
-	if (document.readyState === 'complete') {
+	if (window.document.readyState === 'complete') {
 		await setIconVisibility();
 	} else {
 		// Otherwise, set visibility when window loads

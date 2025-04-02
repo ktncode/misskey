@@ -129,7 +129,7 @@ const props = withDefaults(defineProps<{
 const canRenote = computed(() => ['public', 'home'].includes(props.note.visibility) || props.note.userId === $i?.id);
 
 const el = shallowRef<HTMLElement>();
-const muted = ref($i ? checkWordMute(props.note, $i, $i.mutedWords) : false);
+const muted = computed(() => $i ? checkWordMute(props.note, $i, $i.mutedWords) : false);
 const translation = ref<any>(null);
 const translating = ref(false);
 const isDeleted = ref(false);
@@ -142,7 +142,7 @@ const likeButton = shallowRef<HTMLElement>();
 
 const renoteTooltip = computeRenoteTooltip(renoted);
 
-let appearNote = computed(() => isRenote ? props.note.renote as Misskey.entities.Note : props.note);
+const appearNote = computed(() => isRenote ? props.note.renote as Misskey.entities.Note : props.note);
 const defaultLike = computed(() => prefer.s.like ? prefer.s.like : null);
 const replies = ref<Misskey.entities.Note[]>([]);
 
@@ -377,8 +377,8 @@ function quote() {
 }
 
 function menu(): void {
-	const { popupMenu, cleanup } = getNoteMenu({ note: props.note, translating, translation, isDeleted });
-	os.popupMenu(popupMenu, menuButton.value).then(focus).finally(cleanup);
+	const { menu, cleanup } = getNoteMenu({ note: props.note, translating, translation, isDeleted });
+	os.popupMenu(menu, menuButton.value).then(focus).finally(cleanup);
 }
 
 if (props.detail) {

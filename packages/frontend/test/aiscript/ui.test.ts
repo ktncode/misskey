@@ -25,7 +25,7 @@ type ExeResult = {
 	root: AsUiRoot;
 	get: (id: string) => AsUiComponent;
 	outputs: values.Value[];
-}
+};
 
 async function exe(script: string): Promise<ExeResult> {
 	const rootRef = ref<AsUiRoot>();

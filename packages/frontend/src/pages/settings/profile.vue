@@ -187,7 +187,6 @@ import { claimAchievement } from '@/utility/achievements.js';
 import { store } from '@/store.js';
 import MkInfo from '@/components/MkInfo.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
-import { globalEvents } from '@/events.js';
 
 const $i = ensureSignin();
 

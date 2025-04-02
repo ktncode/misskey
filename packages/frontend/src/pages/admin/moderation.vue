@@ -28,6 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 					<FormLink to="/admin/server-rules">{{ i18n.ts.serverRules }}</FormLink>
 
+					<!-- TODO translate -->
 					<MkFolder v-if="bubbleTimelineEnabled">
 						<template #icon><i class="ph-drop ph-bold ph-lg"></i></template>
 						<template #label>Bubble timeline</template>

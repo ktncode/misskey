@@ -8,6 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.formContainer">
 		<form :class="$style.form" class="_panel" @submit.prevent="submit()">
 			<div :class="$style.title">
+				<!-- TODO translate -->
 				<div>Welcome to Sharkey!</div>
 				<div :class="$style.version">v{{ version }}</div>
 			</div>

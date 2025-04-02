@@ -48,7 +48,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
-import { computed, ref, shallowRef, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import type { StyleValue } from 'vue';
 import tinycolor from 'tinycolor2';
 import * as Misskey from 'misskey-js';
@@ -61,10 +61,9 @@ import { i18n } from '@/i18n.js';
 import bytes from '@/filters/bytes.js';
 import { definePage } from '@/page.js';
 import MkSelect from '@/components/MkSelect.vue';
-import { getDriveFileMenu } from '@/utility/get-drive-file-menu.js';
 import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
 
-const paginationComponent = shallowRef<InstanceType<typeof MkPagination>>();
+const paginationComponent = useTemplateRef<InstanceType<typeof MkPagination>>('paginationComponent');
 
 const sortMode = ref('+size');
 const pagination = {

@@ -805,8 +805,8 @@ function onContextmenu(ev: MouseEvent): void {
 		ev.preventDefault();
 		react();
 	} else {
-		const { popupMenu, cleanup } = getNoteMenu({ note: note.value, translating, translation, isDeleted, currentClip: currentClip?.value });
-		os.contextMenu(popupMenu, ev).then(focus).finally(cleanup);
+		const { menu, cleanup } = getNoteMenu({ note: note.value, translating, translation, isDeleted, currentClip: currentClip?.value });
+		os.contextMenu(menu, ev).then(focus).finally(cleanup);
 	}
 }
 
@@ -815,8 +815,8 @@ function showMenu(): void {
 		return;
 	}
 
-	const { popupMenu, cleanup } = getNoteMenu({ note: note.value, translating, translation, isDeleted, currentClip: currentClip?.value });
-	os.popupMenu(popupMenu, menuButton.value).then(focus).finally(cleanup);
+	const { menu, cleanup } = getNoteMenu({ note: note.value, translating, translation, isDeleted, currentClip: currentClip?.value });
+	os.popupMenu(menu, menuButton.value).then(focus).finally(cleanup);
 }
 
 async function menuVersions(): Promise<void> {

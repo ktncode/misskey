@@ -25,8 +25,6 @@ import { JsonLdService } from '@/core/activitypub/JsonLdService.js';
 import { ApInboxService } from '@/core/activitypub/ApInboxService.js';
 import { bindThis } from '@/decorators.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-//import { CollapsedQueue } from '@/misc/collapsed-queue.js';
-//import { MiNote } from '@/models/Note.js';
 import { MiMeta } from '@/models/Meta.js';
 import { DI } from '@/di-symbols.js';
 import { SkApInboxLog } from '@/models/_.js';
@@ -68,7 +66,6 @@ export class InboxProcessorService implements OnApplicationShutdown {
 		private readonly updateInstanceQueue: UpdateInstanceQueue,
 	) {
 		this.logger = this.queueLoggerService.logger.createSubLogger('inbox');
-		//this.updateInstanceQueue = new CollapsedQueue(process.env.NODE_ENV !== 'test' ? 60 * 1000 * 5 : 0, this.collapseUpdateInstanceJobs, this.performUpdateInstance);
 	}
 
 	@bindThis

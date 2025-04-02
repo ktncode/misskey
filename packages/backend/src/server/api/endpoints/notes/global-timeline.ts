@@ -76,11 +76,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.gtlDisabled);
 			}
 
-			const [
-				followings,
-			] = me ? await Promise.all([
-				this.cacheService.userFollowingsCache.fetch(me.id),
-			]) : [undefined];
+			const followings = me ? await this.cacheService.userFollowingsCache.fetch(me.id) : {};
 
 			//#region Construct query
 			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'),

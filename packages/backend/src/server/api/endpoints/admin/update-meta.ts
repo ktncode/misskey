@@ -404,12 +404,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				set.turnstileSecretKey = ps.turnstileSecretKey;
 			}
 
-			if (ps.enableFC !== undefined) {
-				set.enableFC = ps.enableFC;
-			}
-
 			if (ps.enableTestcaptcha !== undefined) {
 				set.enableTestcaptcha = ps.enableTestcaptcha;
+			}
+
+			if (ps.enableFC !== undefined) {
+				set.enableFC = ps.enableFC;
 			}
 
 			if (ps.fcSiteKey !== undefined) {

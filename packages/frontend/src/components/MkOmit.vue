@@ -62,7 +62,6 @@ onUnmounted(() => {
 			left: 0;
 			width: 100%;
 			height: 64px;
-			//background: linear-gradient(0deg, var(--MI_THEME-panel), color(from var(--MI_THEME-panel) srgb r g b / 0));
 
 			> .fadeLabel {
 				display: inline-block;

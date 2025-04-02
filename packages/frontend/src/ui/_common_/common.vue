@@ -31,11 +31,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	:enterFromClass="$style.transition_notification_enterFrom"
 	:leaveToClass="$style.transition_notification_leaveTo"
 >
-	<div
-		v-for="notification in notifications" :key="notification.id" :class="$style.notification" :style="{
-			pointerEvents: getPointerEvents()
-		}"
-	>
+	<div v-for="notification in notifications" :key="notification.id" :class="$style.notification" :style="{ pointerEvents: getPointerEvents() }">
 		<XNotification :notification="notification"/>
 	</div>
 </component>
@@ -67,10 +63,9 @@ import { prefer } from '@/preferences.js';
 import { globalEvents } from '@/events.js';
 import { store } from '@/store.js';
 
-const SkOneko = defineAsyncComponent(() => import('@/components/SkOneko.vue'));
-
 const XStreamIndicator = defineAsyncComponent(() => import('./stream-indicator.vue'));
 const XUpload = defineAsyncComponent(() => import('./upload.vue'));
+const SkOneko = defineAsyncComponent(() => import('@/components/SkOneko.vue'));
 
 const dev = _DEV_;
 
@@ -99,7 +94,6 @@ function onNotification(notification: Misskey.entities.Notification, isClient = 
 if ($i) {
 	const connection = useStream().useChannel('main', null, 'UI');
 	connection.on('notification', onNotification);
-
 	globalEvents.on('clientNotification', notification => onNotification(notification, true));
 
 	//#region Listen message from SW
@@ -132,8 +126,8 @@ function getPointerEvents() {
 	position: fixed;
 	z-index: 3900000;
 	padding: 0 var(--MI-margin);
-	display: flex;
 	pointer-events: none;
+	display: flex;
 
 	&.notificationsPosition_leftTop {
 		top: var(--MI-margin);

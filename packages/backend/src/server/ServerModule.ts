@@ -28,7 +28,6 @@ import { ActivityPubServerService } from './ActivityPubServerService.js';
 import { ApiLoggerService } from './api/ApiLoggerService.js';
 import { ApiServerService } from './api/ApiServerService.js';
 import { AuthenticateService } from './api/AuthenticateService.js';
-import { RateLimiterService } from './api/RateLimiterService.js';
 import { SigninApiService } from './api/SigninApiService.js';
 import { SigninService } from './api/SigninService.js';
 import { SignupApiService } from './api/SignupApiService.js';
@@ -88,8 +87,6 @@ import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.j
 		ApiServerService,
 		AuthenticateService,
 		SkRateLimiterService,
-		// No longer used, but kept for backwards compatibility
-		RateLimiterService,
 		SigninApiService,
 		SigninWithPasskeyApiService,
 		SigninService,

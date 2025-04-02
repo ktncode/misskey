@@ -35,6 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkSwitch>
 						</MkFolder>
 
+						<!-- TODO translate -->
 						<MkFolder v-if="matchQuery([i18n.ts._role._options.btlAvailable, 'btlAvailable'])">
 							<template #label>{{ i18n.ts._role._options.btlAvailable }}</template>
 							<template #suffix>{{ policies.btlAvailable ? i18n.ts.yes : i18n.ts.no }}</template>

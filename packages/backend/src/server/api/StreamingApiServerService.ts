@@ -124,9 +124,11 @@ export class StreamingApiServerService {
 			const requestIp = proxyAddr(request, () => true );
 			const limitActor = user?.id ?? getIpHash(requestIp);
 			if (await this.rateLimitThis(limitActor, {
+				// Up to 32 connections, then 1 every 10 seconds
+				type: 'bucket',
 				key: 'wsconnect',
-				duration: ms('5min'),
-				max: 32,
+				size: 32,
+				dripRate: 10 * 1000,
 			})) {
 				socket.write('HTTP/1.1 429 Rate Limit Exceeded\r\n\r\n');
 				socket.destroy();

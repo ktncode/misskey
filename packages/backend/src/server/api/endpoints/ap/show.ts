@@ -30,7 +30,8 @@ export const meta = {
 
 	// Up to 30 calls, then 1 per 1/2 second
 	limit: {
-		max: 30,
+		type: 'bucket',
+		size: 30,
 		dripRate: 500,
 	},
 

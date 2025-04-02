@@ -135,7 +135,9 @@ function waitForDecode() {
 			.then(() => img.value?.decode())
 			.then(() => {
 				loaded.value = true;
-			});
+			})
+			// Ignore decoding errors
+			.catch(() => {});
 	} else {
 		loaded.value = false;
 	}

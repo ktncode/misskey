@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-type JsonLike = string | number | boolean | null | undefined | JsonLike[] | { [key: string]: JsonLike | undefined } | Map<string, JsonLike>;
+type JsonLike = string | number | boolean | null | undefined | JsonLike[] | { [key: string]: JsonLike } | Map<string, JsonLike>;
 
 export function deepEqual(a: JsonLike, b: JsonLike): boolean {
 	if (a === b) return true;

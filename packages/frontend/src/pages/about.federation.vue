@@ -11,6 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #label>{{ i18n.ts.host }}</template>
 		</MkInput>
 		<FormSplit style="margin-top: var(--MI-margin);">
+			<!-- TODO translate -->
 			<MkSelect v-model="state">
 				<template #label>{{ i18n.ts.state }}</template>
 				<option value="all">{{ i18n.ts.all }}</option>
@@ -61,7 +62,7 @@ import type { Paging } from '@/components/MkPagination.vue';
 import MkInstanceCardMini from '@/components/MkInstanceCardMini.vue';
 import FormSplit from '@/components/form/split.vue';
 import { i18n } from '@/i18n.js';
-import { $i } from '@/account.js';
+import { $i } from '@/i';
 
 const host = ref('');
 const state = ref('federating');

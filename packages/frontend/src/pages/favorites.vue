@@ -26,11 +26,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import MkPagination from '@/components/MkPagination.vue';
+import DynamicNote from '@/components/DynamicNote.vue';
 import MkDateSeparatedList from '@/components/MkDateSeparatedList.vue';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { infoImageUrl } from '@/instance.js';
-import DynamicNote from '@/components/DynamicNote.vue';
 
 const pagination = {
 	endpoint: 'i/favorites' as const,
