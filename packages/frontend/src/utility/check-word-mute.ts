@@ -42,7 +42,7 @@ export function checkWordMute(note: Misskey.entities.Note, me: Misskey.entities.
 	return false;
 }
 
-function getNoteText(note: Note): string {
+function getNoteText(note: Misskey.entities.Note): string {
 	const textParts: string[] = [];
 
 	if (note.cw) textParts.push(note.cw);
