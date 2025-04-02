@@ -25,14 +25,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import * as Misskey from 'misskey-js';
 import { computed, shallowRef } from 'vue';
+import type { FollowingFeedTab } from '@/utility/following-feed-utils.js';
+import type { Paging } from '@/components/MkPagination.vue';
 import { infoImageUrl } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import MkDateSeparatedList from '@/components/MkDateSeparatedList.vue';
-import MkPagination, { Paging } from '@/components/MkPagination.vue';
+import MkPagination from '@/components/MkPagination.vue';
 import SkFollowingFeedEntry from '@/components/SkFollowingFeedEntry.vue';
 import { $i } from '@/i.js';
 import { checkWordMute } from '@/utility/check-word-mute.js';
-import { FollowingFeedTab } from '@/utility/following-feed-utils.js';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 
 const props = defineProps<{
@@ -112,7 +113,7 @@ function checkMute(note: Misskey.entities.Note | undefined | null, mutes: Mutes)
 		return false;
 	}
 
-	return checkWordMute(note, $i, mutes);
+	return !!checkWordMute(note, $i, mutes);
 }
 </script>
 

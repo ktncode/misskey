@@ -15,13 +15,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, Ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
+import type { Ref } from 'vue';
+import type { Paging } from '@/components/MkPagination.vue';
 import MkLoading from '@/components/global/MkLoading.vue';
 import MkNotes from '@/components/MkNotes.vue';
 import MkUserInfo from '@/components/MkUserInfo.vue';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
-import { Paging } from '@/components/MkPagination.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 
 const props = defineProps<{
@@ -68,7 +69,7 @@ async function reload(): Promise<void> {
 
 			// Wait for 1 second to match the animation effects in MkHorizontalSwipe, MkPullToRefresh, and MkPagination.
 			// Otherwise, the page appears to load "backwards".
-			new Promise(resolve => setTimeout(resolve, 1000)),
+			new Promise(resolve => window.setTimeout(resolve, 1000)),
 		])
 		.then(([u]) => user.value = u)
 		.catch(error => {
