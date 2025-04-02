@@ -4,12 +4,12 @@
  */
 
 import { h, defineAsyncComponent } from 'vue';
-import * as mfm from 'mfm-js';
+import * as mfm from '@transfem-org/sfm-js';
 import * as Misskey from 'misskey-js';
 import { host } from '@@/js/config.js';
+import CkFollowMouse from '../CkFollowMouse.vue';
 import type { VNode, SetupContext } from 'vue';
 import type { MkABehavior } from '@/components/global/MkA.vue';
-import CkFollowMouse from '../CkFollowMouse.vue';
 import MkUrl from '@/components/global/MkUrl.vue';
 import MkTime from '@/components/global/MkTime.vue';
 import MkLink from '@/components/MkLink.vue';
