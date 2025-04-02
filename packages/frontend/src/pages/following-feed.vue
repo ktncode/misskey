@@ -25,21 +25,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, ComputedRef, Ref, ref, shallowRef } from 'vue';
-import { getScrollContainer } from '@@/js/scroll.js';
-import { definePageMetadata } from '@/utility/page-metadata.js';
+import { computed, ref, shallowRef } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
+import type { Tab } from '@/components/global/MkPageHeader.tabs.vue';
+import type { PageHeaderItem } from '@/types/page-header.js';
 import { i18n } from '@/i18n.js';
 import MkHorizontalSwipe from '@/components/MkHorizontalSwipe.vue';
-import { Tab } from '@/components/global/MkPageHeader.tabs.vue';
-import { PageHeaderItem } from '@/types/page-header.js';
-import { useRouter } from '@/router/supplier.js';
 import MkPageHeader from '@/components/global/MkPageHeader.vue';
 import SkUserRecentNotes from '@/components/SkUserRecentNotes.vue';
-import { useScrollPositionManager } from '@/nirax.js';
 import { createModel, createHeaderItem, followingFeedTabs, followingTabIcon, followingTabName, followingTab } from '@/utility/following-feed-utils.js';
 import SkLazy from '@/components/global/SkLazy.vue';
 import SkFollowingRecentNotes from '@/components/SkFollowingRecentNotes.vue';
 import SkRemoteFollowersWarning from '@/components/SkRemoteFollowersWarning.vue';
+import { useRouter } from '@/router';
+import { definePage } from '@/page';
 
 const model = createModel();
 const {
@@ -100,9 +99,7 @@ const headerTabs: ComputedRef<Tab[]> = computed(() => followingFeedTabs.map(t =>
 	title: followingTabName(t),
 })));
 
-useScrollPositionManager(() => getScrollContainer(userScroll.value?.rootEl ?? null), router);
-useScrollPositionManager(() => getScrollContainer(noteScroll.value ?? null), router);
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.following,
 	icon: followingTabIcon(followingTab),
 }));
