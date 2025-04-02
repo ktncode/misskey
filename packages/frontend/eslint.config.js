@@ -165,6 +165,12 @@ export default [
 		},
 	},
 	{
+		files: ['src/**/*.stories.ts'],
+		rules: {
+			'no-restricted-globals': 'off',
+		}
+	},
+	{
 		ignores: [
 			"**/lib/",
 			"**/temp/",
