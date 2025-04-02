@@ -534,3 +534,5 @@ authorizedFetchLegacyWarning: "The configuration property 'checkActivityPubGetSi
 _followRequest:
   recieved: "Received"
   sent: "Sent"
+
+deleted: "Deleted"

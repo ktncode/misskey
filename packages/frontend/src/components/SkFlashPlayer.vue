@@ -60,7 +60,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, onDeactivated } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { PublicAPI, PublicAPILike } from '@/types/ruffle/setup';
-import type { PlayerElement } from '@/types/ruffle/player.js';
+import type { PlayerElement } from '@/types/ruffle/player';
 import MkEllipsis from '@/components/global/MkEllipsis.vue';
 import MkLoading from '@/components/global/MkLoading.vue';
 import { i18n } from '@/i18n.js';
@@ -177,11 +177,11 @@ async function loadContent() {
 		loadingStatus.value = undefined;
 	} catch (error) {
 		try {
-			await fetch('https://raw.esm.sh/', {
+			await window.fetch('https://raw.esm.sh/', {
 				mode: 'cors',
 			});
 			handleError(error); // Unexpected error
-		} catch (_) {
+		} catch {
 			// Must be CSP because esm.sh should be online if `loadRuffle()` didn't fail
 			handleError(i18n.ts._flash.cspError);
 		}

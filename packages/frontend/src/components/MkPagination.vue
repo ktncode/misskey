@@ -43,11 +43,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import { computed, isRef, nextTick, onActivated, onBeforeMount, onBeforeUnmount, onDeactivated, ref, useTemplateRef, watch, type Ref } from 'vue';
+import { computed, isRef, nextTick, onActivated, onBeforeMount, onBeforeUnmount, onDeactivated, ref, useTemplateRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useDocumentVisibility } from '@@/js/use-document-visibility.js';
 import { onScrollTop, isHeadVisible, getBodyScrollHeight, getScrollContainer, onScrollBottom, scrollToBottom, scrollInContainer, isTailVisible } from '@@/js/scroll.js';
-import type { ComputedRef } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import type { MisskeyEntity } from '@/types/date-separated-list.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
@@ -197,10 +197,10 @@ watch(error, (n, o) => {
 	emit('status', n);
 });
 
-function getActualValue<T>(input: T|Ref<T>|undefined, defaultValue: T) : T {
-		if (!input) return defaultValue;
-		if (isRef(input)) return input.value;
-		return input;
+function getActualValue<T>(input: T | Ref<T> | undefined, defaultValue: T) : T {
+	if (!input) return defaultValue;
+	if (isRef(input)) return input.value;
+	return input;
 }
 
 async function init(): Promise<void> {

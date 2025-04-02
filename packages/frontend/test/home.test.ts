@@ -4,9 +4,10 @@
  */
 
 import { afterEach, assert, describe, test } from 'vitest';
-import { cleanup, render, type RenderResult } from '@testing-library/vue';
-import './init';
 import * as Misskey from 'misskey-js';
+import { cleanup, render } from '@testing-library/vue';
+import type { RenderResult } from '@testing-library/vue';
+import './init';
 import { directives } from '@/directives/index.js';
 import { components } from '@/components/index.js';
 import XHome from '@/pages/user/home.vue';
@@ -15,7 +16,7 @@ import 'intersection-observer';
 describe('XHome', () => {
 	const renderHome = (user: Partial<Misskey.entities.UserDetailed>): RenderResult => {
 		return render(XHome, {
-			props: { user, disableNotes: true },
+			props: { user: user as Misskey.entitites.UserDetailed, disableNotes: true },
 			global: { directives, components },
 		});
 	};
@@ -41,7 +42,7 @@ describe('XHome', () => {
 
 		const anchor = home.container.querySelector<HTMLAnchorElement>('a[href^="https://example.com/"]');
 		assert.exists(anchor, 'anchor to the remote exists');
-		assert.strictEqual(anchor?.href, 'https://example.com/@user/profile');
+		assert.strictEqual(anchor.href, 'https://example.com/@user/profile');
 	});
 
 	test('The remote caution should fall back to uri if url is null', async () => {
@@ -61,6 +62,6 @@ describe('XHome', () => {
 
 		const anchor = home.container.querySelector<HTMLAnchorElement>('a[href^="https://example.com/"]');
 		assert.exists(anchor, 'anchor to the remote exists');
-		assert.strictEqual(anchor?.href, 'https://example.com/@user');
+		assert.strictEqual(anchor.href, 'https://example.com/@user');
 	});
 });

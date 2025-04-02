@@ -12868,6 +12868,10 @@ export interface Locale extends ILocale {
      * The configuration property 'checkActivityPubGetSignature' has been deprecated and replaced with the new Authorized Fetch setting. Please remove it from your configuration file.
      */
     "authorizedFetchLegacyWarning": string;
+    /**
+     * Deleted
+     */
+    "deleted": string;
 }
 declare const locales: {
     [lang: string]: Locale;
