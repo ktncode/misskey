@@ -94,7 +94,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 	 * @param scale How times large the text is
 	 * @param disableNyaize Whether nyaize is disabled or not
 	 */
-	const genEl = (ast: mfm.MfmNode[], scale: number, disableNyaize = false) => ast.map((token): VNode | string | (VNode | string)[] => {
+	const genEl = (ast: mfm.MfmNode[], scale: number, disableNyaize = false) => ast.map((token):VNode | string | (VNode | string)[] => {
 		switch (token.type) {
 			case 'text': {
 				let text = token.props.text.replace(/(\r\n|\n|\r)/g, '\n');
@@ -116,17 +116,17 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 			}
 
 			case 'bold': {
-				return [h('b', genEl(token.children, scale))];
+				return [h('b', () => genEl(token.children, scale))];
 			}
 
 			case 'strike': {
-				return [h('del', genEl(token.children, scale))];
+				return [h('del', () => genEl(token.children, scale))];
 			}
 
 			case 'italic': {
 				return h('i', {
 					style: 'font-style: oblique;',
-				}, genEl(token.children, scale));
+				}, () => genEl(token.children, scale));
 			}
 
 			case 'fn': {
@@ -194,17 +194,17 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 					case 'x2': {
 						return h('span', {
 							class: prefer.s.advancedMfm ? 'mfm-x2' : '',
-						}, genEl(token.children, scale * 2));
+						}, () => genEl(token.children, scale * 2));
 					}
 					case 'x3': {
 						return h('span', {
 							class: prefer.s.advancedMfm ? 'mfm-x3' : '',
-						}, genEl(token.children, scale * 3));
+						}, () => genEl(token.children, scale * 3));
 					}
 					case 'x4': {
 						return h('span', {
 							class: prefer.s.advancedMfm ? 'mfm-x4' : '',
-						}, genEl(token.children, scale * 4));
+						}, () => genEl(token.children, scale * 4));
 					}
 					case 'font': {
 						const family =
@@ -221,13 +221,13 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 					case 'blur': {
 						return h('span', {
 							class: '_mfm_blur_',
-						}, genEl(token.children, scale));
+						}, () => genEl(token.children, scale));
 					}
 					case 'rainbow': {
 						if (!useAnim) {
 							return h('span', {
 								class: '_mfm_rainbow_fallback_',
-							}, genEl(token.children, scale));
+							}, () => genEl(token.children, scale));
 						}
 						const speed = validTime(token.props.args.speed) ?? '1s';
 						const delay = validTime(token.props.args.delay) ?? '0s';
@@ -238,7 +238,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 						if (!useAnim) {
 							return genEl(token.children, scale);
 						}
-						return h(MkSparkle, {}, genEl(token.children, scale));
+						return h(MkSparkle, {}, () => genEl(token.children, scale));
 					}
 					case 'fade': {
 						if (!useAnim) {
@@ -280,7 +280,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 							y: y,
 							speed: validTime(token.props.args.speed) ?? '0.1s',
 							rotateByVelocity: !!token.props.args.rotateByVelocity,
-						}, genEl(token.children, scale));
+						}, () => genEl(token.children, scale));
 					}
 					case 'position': {
 						if (!prefer.s.advancedMfm) break;
@@ -349,14 +349,14 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 							if (!disableNyaize && shouldNyaize) {
 								text = Misskey.nyaize(text);
 							}
-							return h('ruby', {}, [text.split(' ')[0], h('rt', text.split(' ')[1])]);
+							return h('ruby', {}, () => [text.split(' ')[0], h('rt', text.split(' ')[1])]);
 						} else {
 							const rt = token.children.at(-1)!;
 							let text = rt.type === 'text' ? rt.props.text : '';
 							if (!disableNyaize && shouldNyaize) {
 								text = Misskey.nyaize(text);
 							}
-							return h('ruby', {}, [...genEl(token.children.slice(0, token.children.length - 1), scale), h('rt', text.trim())]);
+							return h('ruby', {}, () => [...genEl(token.children.slice(0, token.children.length - 1), scale), h('rt', text.trim())]);
 						}
 					}
 					case 'group': { // this is mostly a hack for the insides of `ruby`
@@ -368,7 +368,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 						const unixtime = parseInt(child.type === 'text' ? child.props.text : '');
 						return h('span', {
 							style: 'display: inline-block; font-size: 90%; border: solid 1px var(--MI_THEME-divider); border-radius: var(--MI-radius-ellipse); padding: 4px 10px 4px 6px;',
-						}, [
+						}, () => [
 							h('i', {
 								class: 'ti ti-clock',
 								style: 'margin-right: 0.25em;',
@@ -386,32 +386,32 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 							ev.preventDefault();
 							const clickEv = typeof token.props.args.ev === 'string' ? token.props.args.ev : '';
 							emit('clickEv', clickEv);
-						} }, genEl(token.children, scale));
+						} }, () => genEl(token.children, scale));
 					}
 				}
 				if (style === undefined) {
-					return h('span', {}, ['$[', token.props.name, ' ', ...genEl(token.children, scale), ']']);
+					return h('span', {}, () => ['$[', token.props.name, ' ', ...genEl(token.children, scale), ']']);
 				} else {
 					return h('span', {
 						style: 'display: inline-block; ' + style,
-					}, genEl(token.children, scale));
+					}, () => genEl(token.children, scale));
 				}
 			}
 
 			case 'small': {
 				return [h('small', {
 					style: 'opacity: 0.7;',
-				}, genEl(token.children, scale))];
+				}, () => genEl(token.children, scale))];
 			}
 
 			case 'center': {
 				return [h('div', {
 					style: 'text-align:center;',
-				}, h('bdi', genEl(token.children, scale)))];
+				}, h('bdi', () => genEl(token.children, scale)))];
 			}
 
 			case 'url': {
-				return [h('bdi', h(MkUrl, {
+				return [h('bdi', () => h(MkUrl, {
 					key: Math.random(),
 					url: token.props.url,
 					rel: 'nofollow noopener',
@@ -420,16 +420,16 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 			}
 
 			case 'link': {
-				return [h('bdi', h(MkLink, {
+				return [h('bdi', () => h(MkLink, {
 					key: Math.random(),
 					url: token.props.url,
 					rel: 'nofollow noopener',
 					navigationBehavior: props.linkNavigationBehavior,
-				}, genEl(token.children, scale, true)))];
+				}, () => genEl(token.children, scale, true)))];
 			}
 
 			case 'mention': {
-				return [h('bdi', h(MkMention, {
+				return [h('bdi', () => h(MkMention, {
 					key: Math.random(),
 					host: (token.props.host == null && props.author && props.author.host != null ? props.author.host : token.props.host) ?? host,
 					username: token.props.username,
@@ -438,7 +438,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 			}
 
 			case 'hashtag': {
-				return [h('bdi', h(MkA, {
+				return [h('bdi', () => h(MkA, {
 					key: Math.random(),
 					to: isNote ? `/tags/${encodeURIComponent(token.props.hashtag)}` : `/user-tags/${encodeURIComponent(token.props.hashtag)}`,
 					style: 'color:var(--MI_THEME-hashtag);',
@@ -447,7 +447,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 			}
 
 			case 'blockCode': {
-				return [h('bdi', { class: 'block' }, h(MkCode, {
+				return [h('bdi', { class: 'block' }, () => h(MkCode, {
 					key: Math.random(),
 					code: token.props.code,
 					lang: token.props.lang ?? undefined,
@@ -455,7 +455,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 			}
 
 			case 'inlineCode': {
-				return [h('bdi', h(MkCodeInline, {
+				return [h('bdi', () => h(MkCodeInline, {
 					key: Math.random(),
 					code: token.props.code,
 				}))];
@@ -463,13 +463,13 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 
 			case 'quote': {
 				if (!props.nowrap) {
-					return [h('bdi', { class: 'block' }, h('div', {
+					return [h('bdi', { class: 'block' }, () => h('div', {
 						style: QUOTE_STYLE,
-					}, h('bdi', genEl(token.children, scale, true))))];
+					}, () => h('bdi', () => genEl(token.children, scale, true))))];
 				} else {
 					return [h('span', {
 						style: QUOTE_STYLE,
-					}, h('bdi', genEl(token.children, scale, true)))];
+					}, () => h('bdi', () => genEl(token.children, scale, true)))];
 				}
 			}
 
@@ -512,14 +512,14 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 			}
 
 			case 'mathInline': {
-				return [h('bdi', h(SkFormula, {
+				return [h('bdi', () => h(SkFormula, {
 					formula: token.props.formula,
 					block: false,
 				}))];
 			}
 
 			case 'mathBlock': {
-				return [h('bdi', { class: 'block' }, h(SkFormula, {
+				return [h('bdi', { class: 'block' }, () => h(SkFormula, {
 					formula: token.props.formula,
 					block: true,
 				}))];
@@ -533,7 +533,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 			}
 
 			case 'plain': {
-				return [h('bdi', h('span', genEl(token.children, scale, true)))];
+				return [h('bdi', () => h('span', () => genEl(token.children, scale, true)))];
 			}
 
 			default: {
@@ -545,8 +545,8 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 		}
 	}).flat(Infinity) as (VNode | string)[];
 
-	return h('bdi', { ...( isBlock ? { class: 'block' } : {}) }, h('span', {
+	return h('bdi', { ...( isBlock ? { class: 'block' } : {}) }, () => h('span', {
 		// https://codeday.me/jp/qa/20190424/690106.html
 		style: props.nowrap ? 'white-space: pre; word-wrap: normal; overflow: hidden; text-overflow: ellipsis;' : 'white-space: pre-wrap;',
-	}, genEl(rootAst, props.rootScale ?? 1)));
+	}, () => genEl(rootAst, props.rootScale ?? 1)));
 }
