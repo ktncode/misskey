@@ -44,7 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <div v-if="$i && $i.isBot" id="botWarn"><span>{{ i18n.ts.loggedInAsBot }}</span></div>
 
-<SkOneko v-if="store.r.oneko"/>
+<SkOneko v-if="store.r.oneko.value"/>
 </template>
 
 <script lang="ts" setup>
