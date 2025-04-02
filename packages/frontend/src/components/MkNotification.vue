@@ -194,9 +194,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { Ref, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
-import { UserDetailed } from 'misskey-js/autogen/models.js';
+import type { Ref } from 'vue';
 import MkReactionIcon from '@/components/MkReactionIcon.vue';
 import MkButton from '@/components/MkButton.vue';
 import { getNoteSummary } from '@/utility/get-note-summary.js';
@@ -234,7 +234,7 @@ const exportEntityName = {
 } as const satisfies Record<ExportCompletedNotification['exportedEntity'], string>;
 
 const followRequestDone = ref(true);
-const userDetailed: Ref<UserDetailed | null> = ref(null);
+const userDetailed: Ref<Misskey.entities.UserDetailed | null> = ref(null);
 
 // watch() is required because computed() doesn't support async.
 watch(props, async () => {
