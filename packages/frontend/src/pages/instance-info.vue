@@ -197,7 +197,7 @@ import { getProxiedImageUrlNullable } from '@/utility/media-proxy.js';
 import { dateString } from '@/filters/date.js';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkInfo from '@/components/MkInfo.vue';
-import { $i } from '@/account.js';
+import { $i } from '@/i.js';
 
 const props = defineProps<{
 	host: string;
