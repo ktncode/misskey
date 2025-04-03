@@ -7,7 +7,6 @@ import { defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 import { misskeyApi } from './misskey-api.js';
 import { dateTimeFormat } from './intl-const.js';
-import type { Ref } from 'vue';
 import type { MenuItem } from '@/types/menu.js';
 import * as os from '@/os.js';
 
@@ -17,10 +16,7 @@ interface NoteEdit {
 	text: string | null;
 }
 
-export async function getNoteVersionsMenu(props: {
-	note: Misskey.entities.Note;
-	menuButton: Ref<HTMLElement>;
-}) {
+export async function getNoteVersionsMenu(props: { note: Misskey.entities.Note }) {
 	const isRenote = (
 		props.note.renote != null &&
 		props.note.text == null &&

@@ -55,7 +55,7 @@ const props = defineProps<{
 const menuVersionsButton = shallowRef<HTMLElement>();
 
 async function menuVersions(): Promise<void> {
-	const { menu, cleanup } = await getNoteVersionsMenu({ note: props.note, menuButton: menuVersionsButton });
+	const { menu, cleanup } = await getNoteVersionsMenu({ note: props.note });
 	popupMenu(menu, menuVersionsButton.value).then(focus).finally(cleanup);
 }
 

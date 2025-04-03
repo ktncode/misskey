@@ -760,7 +760,7 @@ function showMenu(): void {
 }
 
 async function menuVersions(): Promise<void> {
-	const { menu, cleanup } = await getNoteVersionsMenu({ note: note.value, menuButton: menuVersionsButton });
+	const { menu, cleanup } = await getNoteVersionsMenu({ note: note.value });
 	os.popupMenu(menu, menuVersionsButton.value).then(focus).finally(cleanup);
 }
 

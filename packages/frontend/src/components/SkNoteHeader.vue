@@ -101,7 +101,7 @@ const MOBILE_THRESHOLD = 500;
 const isMobile = ref(deviceKind === 'smartphone' || window.innerWidth <= MOBILE_THRESHOLD);
 
 async function menuVersions(): Promise<void> {
-	const { menu, cleanup } = await getNoteVersionsMenu({ note: props.note, menuButton: menuVersionsButton });
+	const { menu, cleanup } = await getNoteVersionsMenu({ note: props.note });
 	popupMenu(menu, menuVersionsButton.value).then(focus).finally(cleanup);
 }
 
