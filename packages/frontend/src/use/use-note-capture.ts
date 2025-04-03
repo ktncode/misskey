@@ -5,13 +5,13 @@
 
 import { onUnmounted } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { Ref, ShallowRef } from 'vue';
+import type { Ref } from 'vue';
 import { useStream } from '@/stream.js';
 import { $i } from '@/i.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 
 export function useNoteCapture(props: {
-	rootEl: ShallowRef<HTMLElement | undefined>;
+	rootEl: Readonly<Ref<HTMLElement | null | undefined>>;
 	note: Ref<Misskey.entities.Note>;
 	pureNote?: Ref<Misskey.entities.Note>;
 	isDeletedRef: Ref<boolean>;
