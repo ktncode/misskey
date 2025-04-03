@@ -245,7 +245,7 @@ const XListenBrainz = defineAsyncComponent(() => import('./index.listenbrainz.vu
 const props = withDefaults(defineProps<{
 	user: Misskey.entities.UserDetailed;
 	/** Test only; MkNotes currently causes problems in vitest */
-	disableNotes: boolean;
+	disableNotes?: boolean;
 }>(), {
 	disableNotes: false,
 });
