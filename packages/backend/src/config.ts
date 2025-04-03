@@ -8,7 +8,8 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import * as yaml from 'js-yaml';
 import { globSync } from 'glob';
-import * as Sentry from '@sentry/node';
+import type * as Sentry from '@sentry/node';
+import type * as SentryVue from '@sentry/vue';
 import type { RedisOptions } from 'ioredis';
 
 type RedisOptionsSource = Partial<RedisOptions> & {
@@ -66,7 +67,12 @@ type Source = {
 		scope?: 'local' | 'global' | string[];
 	};
 	sentryForBackend?: { options: Partial<Sentry.NodeOptions>; enableNodeProfiling: boolean; };
-	sentryForFrontend?: { options: Partial<Sentry.NodeOptions> };
+	sentryForFrontend?: {
+		options: Partial<SentryVue.BrowserOptions> & { dsn: string };
+		vueIntegration?: SentryVue.VueIntegrationOptions | null;
+		browserTracingIntegration?: Parameters<typeof SentryVue.browserTracingIntegration>[0] | null;
+		replayIntegration?: Parameters<typeof SentryVue.replayIntegration>[0] | null;
+	};
 
 	publishTarballInsteadOfProvideRepositoryUrl?: boolean;
 
@@ -239,7 +245,12 @@ export type Config = {
 	redisForReactions: RedisOptions & RedisOptionsSource;
 	redisForRateLimit: RedisOptions & RedisOptionsSource;
 	sentryForBackend: { options: Partial<Sentry.NodeOptions>; enableNodeProfiling: boolean; } | undefined;
-	sentryForFrontend: { options: Partial<Sentry.NodeOptions> } | undefined;
+	sentryForFrontend: {
+		options: Partial<SentryVue.BrowserOptions> & { dsn: string };
+		vueIntegration?: SentryVue.VueIntegrationOptions | null;
+		browserTracingIntegration?: Parameters<typeof SentryVue.browserTracingIntegration>[0] | null;
+		replayIntegration?: Parameters<typeof SentryVue.replayIntegration>[0] | null;
+	} | undefined;
 	perChannelMaxNoteCacheCount: number;
 	perUserNotificationsMaxCount: number;
 	deactivateAntennaThreshold: number;
