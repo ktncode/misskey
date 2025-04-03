@@ -425,7 +425,7 @@ export default function MkMfm(props: MfmProps, { emit }: { emit: SetupContext<Mf
 					url: token.props.url,
 					rel: 'nofollow noopener',
 					navigationBehavior: props.linkNavigationBehavior,
-				}, genEl(token.children, scale, true)))];
+				}, () => genEl(token.children, scale, true)))];
 			}
 
 			case 'mention': {
@@ -443,7 +443,7 @@ export default function MkMfm(props: MfmProps, { emit }: { emit: SetupContext<Mf
 					to: isNote ? `/tags/${encodeURIComponent(token.props.hashtag)}` : `/user-tags/${encodeURIComponent(token.props.hashtag)}`,
 					style: 'color:var(--MI_THEME-hashtag);',
 					behavior: props.linkNavigationBehavior,
-				}, `#${token.props.hashtag}`))];
+				}, () => `#${token.props.hashtag}`))];
 			}
 
 			case 'blockCode': {
