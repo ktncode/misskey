@@ -61,7 +61,7 @@ type MfmEvents = {
 };
 
 // eslint-disable-next-line import/no-default-export
-export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEvents>['emit'] }) {
+export default function MkMfm(props: MfmProps, { emit }: { emit: SetupContext<MfmEvents>['emit'] }) {
 	// こうしたいところだけど functional component 内では provide は使えない
 	//provide('linkNavigationBehavior', props.linkNavigationBehavior);
 
