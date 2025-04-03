@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { computed, watch, version as vueVersion } from 'vue';
-import type { App } from 'vue';
+import { watch, version as vueVersion } from 'vue';
 import { compareVersions } from 'compare-versions';
 import { version, lang, langsVersion, updateLocale, locale } from '@@/js/config.js';
 import defaultLightTheme from '@@/themes/l-light.json5';
