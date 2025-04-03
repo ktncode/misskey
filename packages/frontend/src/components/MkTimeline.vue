@@ -75,7 +75,7 @@ const tlComponent = useTemplateRef('tlComponent');
 
 let tlNotesCount = 0;
 
-function prepend(note) {
+function prepend(note: Misskey.entities.Note) {
 	if (tlComponent.value == null) return;
 
 	tlNotesCount++;
