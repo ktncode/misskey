@@ -165,7 +165,7 @@ export class NotificationService implements OnApplicationShutdown {
 				redisId = (await this.redisClient.xadd(
 					`notificationTimeline:${notifieeId}`,
 					'MAXLEN', '~', this.config.perUserNotificationsMaxCount.toString(),
-					this.toXListId(notification.id),
+					this.toXListId(notification.id, 0),
 					'data', JSON.stringify(notification)))!;
 			} catch (e) {
 				// The ID specified in XADD is equal or smaller than the target stream top item で失敗することがあるのでリトライ
