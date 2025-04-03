@@ -244,23 +244,24 @@ const reload = (): Promise<void> => {
 const fetchMore = async (): Promise<void> => {
 	if (!more.value || fetching.value || moreFetching.value || items.value.size === 0) return;
 	moreFetching.value = true;
-	const params = getActualValue<Paging['params']>(props.pagination.params, {});
-	const offsetMode = getActualValue(props.pagination.offsetMode, false);
-	await misskeyApi<MisskeyEntity[]>(props.pagination.endpoint, {
-		...params,
-		limit: SECOND_FETCH_LIMIT,
-		...(offsetMode ? {
-			offset: items.value.size,
-		} : {
-			untilId: Array.from(items.value.keys()).at(-1),
-		}),
-	}).then(res => {
+	try {
+		const params = getActualValue<Paging['params']>(props.pagination.params, {});
+		const offsetMode = getActualValue(props.pagination.offsetMode, false);
+		const res = await misskeyApi<MisskeyEntity[]>(props.pagination.endpoint, {
+			...params,
+			limit: SECOND_FETCH_LIMIT,
+			...(offsetMode ? {
+				offset: items.value.size,
+			} : {
+				untilId: Array.from(items.value.keys()).at(-1),
+			}),
+		});
 		for (let i = 0; i < res.length; i++) {
 			const item = res[i];
 			if (i === 10) item._shouldInsertAd_ = true;
 		}
 
-		const reverseConcat = _res => {
+		const reverseConcat = (_res: typeof res) => {
 			const oldHeight = scrollableElement.value ? scrollableElement.value.scrollHeight : getBodyScrollHeight();
 			const oldScroll = scrollableElement.value ? scrollableElement.value.scrollTop : window.scrollY;
 
@@ -281,28 +282,24 @@ const fetchMore = async (): Promise<void> => {
 			if (props.pagination.reversed) {
 				reverseConcat(res).then(() => {
 					more.value = false;
-					moreFetching.value = false;
 				});
 			} else {
 				items.value = concatMapWithArray(items.value, res);
 				more.value = false;
-				moreFetching.value = false;
 			}
 		} else {
 			if (props.pagination.reversed) {
 				reverseConcat(res).then(() => {
 					more.value = true;
-					moreFetching.value = false;
 				});
 			} else {
 				items.value = concatMapWithArray(items.value, res);
 				more.value = true;
-				moreFetching.value = false;
 			}
 		}
-	}, err => {
+	} finally {
 		moreFetching.value = false;
-	});
+	}
 };
 
 const fetchMoreAhead = async (): Promise<void> => {
