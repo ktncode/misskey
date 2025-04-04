@@ -657,6 +657,15 @@ export type paths = {
      */
     post: operations['admin___reject-quotes'];
   };
+  '/admin/relays/accept-litepub': {
+    /**
+     * admin/relays/accept-litepub
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:relays*
+     */
+    post: operations['admin___relays___accept-litepub'];
+  };
   '/admin/relays/add': {
     /**
      * admin/relays/add
@@ -665,6 +674,24 @@ export type paths = {
      * **Credential required**: *Yes* / **Permission**: *write:admin:relays*
      */
     post: operations['admin___relays___add'];
+  };
+  '/admin/relays/add-litepub': {
+    /**
+     * admin/relays/add-litepub
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:relays*
+     */
+    post: operations['admin___relays___add-litepub'];
+  };
+  '/admin/relays/has-pending': {
+    /**
+     * admin/relays/has-pending
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:admin:relays*
+     */
+    post: operations['admin___relays___has-pending'];
   };
   '/admin/relays/list': {
     /**
@@ -675,6 +702,24 @@ export type paths = {
      */
     post: operations['admin___relays___list'];
   };
+  '/admin/relays/list-litepub': {
+    /**
+     * admin/relays/list-litepub
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:admin:relays*
+     */
+    post: operations['admin___relays___list-litepub'];
+  };
+  '/admin/relays/reject-litepub': {
+    /**
+     * admin/relays/reject-litepub
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:relays*
+     */
+    post: operations['admin___relays___reject-litepub'];
+  };
   '/admin/relays/remove': {
     /**
      * admin/relays/remove
@@ -683,6 +728,15 @@ export type paths = {
      * **Credential required**: *Yes* / **Permission**: *write:admin:relays*
      */
     post: operations['admin___relays___remove'];
+  };
+  '/admin/relays/remove-litepub': {
+    /**
+     * admin/relays/remove-litepub
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:relays*
+     */
+    post: operations['admin___relays___remove-litepub'];
   };
   '/admin/reset-password': {
     /**
@@ -5844,6 +5898,24 @@ export type components = {
       roomId: string;
       room?: components['schemas']['ChatRoom'];
     };
+    MastodonRelay: {
+      /** Format: id */
+      id: string;
+      /** Format: url */
+      inbox: string;
+      /** @enum {string} */
+      status: 'requesting' | 'accepted' | 'rejected';
+    };
+    LitePubRelay: {
+      /** Format: id */
+      id: string;
+      /** Format: url */
+      actor: string;
+      /** @enum {string} */
+      pub: 'requesting' | 'accepted' | 'rejected' | 'none';
+      /** @enum {string} */
+      sub: 'requesting' | 'accepted' | 'rejected' | 'none';
+    };
   };
   responses: never;
   parameters: never;
@@ -10051,6 +10123,57 @@ export type operations = {
     };
   };
   /**
+   * admin/relays/accept-litepub
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:relays*
+   */
+  'admin___relays___accept-litepub': {
+    requestBody: {
+      content: {
+        'application/json': {
+          actor: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
    * admin/relays/add
    * @description No description provided.
    *
@@ -10068,16 +10191,105 @@ export type operations = {
       /** @description OK (with results) */
       200: {
         content: {
+          'application/json': components['schemas']['MastodonRelay'];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/relays/add-litepub
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:relays*
+   */
+  'admin___relays___add-litepub': {
+    requestBody: {
+      content: {
+        'application/json': {
+          actor: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/relays/has-pending
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:admin:relays*
+   */
+  'admin___relays___has-pending': {
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
           'application/json': {
-            /** Format: id */
-            id: string;
-            /** Format: url */
-            inbox: string;
-            /**
-             * @default requesting
-             * @enum {string}
-             */
-            status: 'requesting' | 'accepted' | 'rejected';
+            hasPending: boolean;
           };
         };
       };
@@ -10124,18 +10336,105 @@ export type operations = {
       /** @description OK (with results) */
       200: {
         content: {
-          'application/json': ({
-              /** Format: id */
-              id: string;
-              /** Format: url */
-              inbox: string;
-              /**
-               * @default requesting
-               * @enum {string}
-               */
-              status: 'requesting' | 'accepted' | 'rejected';
-            })[];
+          'application/json': components['schemas']['MastodonRelay'][];
         };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/relays/list-litepub
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:admin:relays*
+   */
+  'admin___relays___list-litepub': {
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['LitePubRelay'][];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/relays/reject-litepub
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:relays*
+   */
+  'admin___relays___reject-litepub': {
+    requestBody: {
+      content: {
+        'application/json': {
+          actor: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
       };
       /** @description Client error */
       400: {
@@ -10180,6 +10479,57 @@ export type operations = {
       content: {
         'application/json': {
           inbox: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/relays/remove-litepub
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:relays*
+   */
+  'admin___relays___remove-litepub': {
+    requestBody: {
+      content: {
+        'application/json': {
+          actor: string;
         };
       };
     };

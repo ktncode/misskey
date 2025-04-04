@@ -32,9 +32,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			await this.moderationLogService.log(me, 'removeRelay', {
+				type: 'Mastodon',
 				inbox: ps.inbox,
 			});
-			await this.relayService.removeRelay(ps.inbox);
+			await this.relayService.removeMastodonRelay(ps.inbox);
 		});
 	}
 }

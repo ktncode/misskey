@@ -6,6 +6,8 @@
 import { Entity, Column, Index, OneToOne, JoinColumn, PrimaryColumn, ManyToOne } from 'typeorm';
 import { type UserUnsignedFetchOption, userUnsignedFetchOptions } from '@/const.js';
 import { MiInstance } from '@/models/Instance.js';
+import { validActor } from '@/core/activitypub/type.js';
+import type { ValidActor } from '@/core/activitypub/type.js';
 import { id } from './util/id.js';
 import { MiDriveFile } from './DriveFile.js';
 import type { MiUserProfile } from './UserProfile.js';
@@ -398,6 +400,19 @@ export class MiUser {
 
 	@OneToOne('user_profile', (profile: MiUserProfile) => profile.user)
 	public userProfile: MiUserProfile | null;
+
+	// TODO create migration
+
+	/**
+	 * For remote uses, contains the ActivityPub type of the actor.
+	 * May be null if the user was last fetch before adding this column.
+	 */
+	@Column('enum', {
+		name: 'ap_type',
+		enum: validActor,
+		nullable: true,
+	})
+	public apType: ValidActor | null;
 
 	constructor(data: Partial<MiUser>) {
 		if (data == null) return;

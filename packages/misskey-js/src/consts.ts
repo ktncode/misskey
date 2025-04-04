@@ -180,6 +180,27 @@ export const moderationLogTypes = [
 	'deleteFlash',
 	'deleteGalleryPost',
 	'deleteChatRoom',
+	'acceptQuotesUser',
+	'rejectQuotesUser',
+	'acceptQuotesInstance',
+	'rejectQuotesInstance',
+	'clearUserFiles',
+	'nsfwUser',
+	'unNsfwUser',
+	'silenceUser',
+	'unSilenceUser',
+	'createAccount',
+	'clearRemoteFiles',
+	'clearOwnerlessFiles',
+	'updateCustomEmojis',
+	'importCustomEmojis',
+	'clearInstanceFiles',
+	'severFollowRelations',
+	'createPromo',
+	'addRelay',
+	'removeRelay',
+	'acceptRelay',
+	'rejectRelay',
 ] as const;
 
 // See: packages/backend/src/core/ReversiService.ts@L410
@@ -566,10 +587,30 @@ export type ModerationLogPayloads = {
 		noteUserHost: string | null;
 	};
 	addRelay: {
+		type: 'Mastodon';
 		inbox: string;
+		actor: undefined;
+	} | {
+		type: 'LitePub';
+		inbox: undefined;
+		actor: string;
 	};
 	removeRelay: {
+		type: 'Mastodon';
 		inbox: string;
+		actor: undefined;
+	} | {
+		type: 'LitePub';
+		inbox: undefined;
+		actor: string;
+	};
+	acceptRelay: {
+		type: 'LitePub',
+		actor: string,
+	};
+	rejectRelay: {
+		type: 'LitePub',
+		actor: string,
 	};
 	deleteChatRoom: {
 		roomId: string;

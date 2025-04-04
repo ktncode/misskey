@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-FileCopyrightText: hazelnoot and other Sharkey contributors
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
@@ -15,11 +15,13 @@ export const meta = {
 	kind: 'read:admin:relays',
 
 	res: {
-		type: 'array',
+		type: 'object',
 		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			ref: 'MastodonRelay',
+		properties: {
+			hasPending: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
 		},
 	},
 } as const;
@@ -33,10 +35,12 @@ export const paramDef = {
 @Injectable()
 export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
 	constructor(
-		private relayService: RelayService,
+		private readonly relayService: RelayService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
-			return await this.relayService.listMastodonRelays();
+		super(meta, paramDef, async () => {
+			return {
+				hasPending: await this.relayService.hasPendingRelayRequests(),
+			};
 		});
 	}
 }

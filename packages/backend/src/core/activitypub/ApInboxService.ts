@@ -24,7 +24,7 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { QueueService } from '@/core/QueueService.js';
-import type { UsersRepository, NotesRepository, FollowingsRepository, AbuseUserReportsRepository, FollowRequestsRepository, MiMeta } from '@/models/_.js';
+import type { UsersRepository, NotesRepository, FollowingsRepository, AbuseUserReportsRepository, FollowRequestsRepository, MiMeta, MiUser } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import type { MiRemoteUser } from '@/models/User.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
@@ -37,6 +37,7 @@ import InstanceChart from '@/core/chart/charts/instance.js';
 import FederationChart from '@/core/chart/charts/federation.js';
 import { FetchInstanceMetadataService } from '@/core/FetchInstanceMetadataService.js';
 import { UpdateInstanceQueue } from '@/core/UpdateInstanceQueue.js';
+import { SystemAccountService } from '@/core/SystemAccountService.js';
 import { CacheService } from '@/core/CacheService.js';
 import { getApHrefNullable, getApId, getApIds, getApType, getNullableApId, isAccept, isActor, isAdd, isAnnounce, isApObject, isBlock, isCollectionOrOrderedCollection, isCreate, isDelete, isFlag, isFollow, isLike, isDislike, isMove, isPost, isReject, isRemove, isTombstone, isUndo, isUpdate, validActor, validPost, isActivity, IObjectWithId } from './type.js';
 import { ApNoteService } from './models/ApNoteService.js';
@@ -99,6 +100,7 @@ export class ApInboxService {
 		private readonly instanceChart: InstanceChart,
 		private readonly federationChart: FederationChart,
 		private readonly updateInstanceQueue: UpdateInstanceQueue,
+		private readonly systemAccountService: SystemAccountService,
 		private readonly cacheService: CacheService,
 	) {
 		this.logger = this.apLoggerService.logger;
@@ -170,7 +172,7 @@ export class ApInboxService {
 		} else if (isUpdate(activity)) {
 			return await this.update(actor, activity, resolver);
 		} else if (isFollow(activity)) {
-			return await this.follow(actor, activity);
+			return await this.follow(actor, activity, resolver);
 		} else if (isAccept(activity)) {
 			return await this.accept(actor, activity, resolver);
 		} else if (isReject(activity)) {
@@ -199,8 +201,15 @@ export class ApInboxService {
 	}
 
 	@bindThis
-	private async follow(actor: MiRemoteUser, activity: IFollow): Promise<string> {
-		const followee = await this.apDbResolverService.getUserFromApId(activity.object);
+	private async follow(actor: MiRemoteUser, activity: IFollow, resolver: Resolver | undefined): Promise<string> {
+		const target = getApId(activity.object);
+
+		let followee: MiUser | null;
+		if (target === 'https://www.w3.org/ns/activitystreams#Public') {
+			followee = await this.systemAccountService.getRelayActor();
+		} else {
+			followee = await this.apDbResolverService.getUserFromApId(target);
+		}
 
 		if (followee == null) {
 			return 'skip: followee not found';
@@ -211,7 +220,7 @@ export class ApInboxService {
 		}
 
 		// don't queue because the sender may attempt again when timeout
-		await this.userFollowingService.follow(actor, followee, { requestId: activity.id });
+		await this.userFollowingService.follow(actor, followee, { requestId: activity.id, resolver });
 		return 'ok';
 	}
 
@@ -284,7 +293,7 @@ export class ApInboxService {
 		// relay
 		const match = activity.id?.match(/follow-relay\/(\w+)/);
 		if (match) {
-			return await this.relayService.relayAccepted(match[1]);
+			return await this.relayService.acceptMastodonRelay(match[1]);
 		}
 
 		await this.userFollowingService.acceptFollowRequest(actor, follower);
@@ -701,7 +710,7 @@ export class ApInboxService {
 		// relay
 		const match = activity.id?.match(/follow-relay\/(\w+)/);
 		if (match) {
-			return await this.relayService.relayRejected(match[1]);
+			return await this.relayService.rejectMastodonRelay(match[1]);
 		}
 
 		await this.userFollowingService.remoteReject(actor, follower);
@@ -811,7 +820,15 @@ export class ApInboxService {
 
 	@bindThis
 	private async undoFollow(actor: MiRemoteUser, activity: IFollow): Promise<string> {
-		const followee = await this.apDbResolverService.getUserFromApId(activity.object);
+		const target = getApId(activity.object);
+
+		let followee: MiUser | null;
+		if (target === 'https://www.w3.org/ns/activitystreams#Public') {
+			followee = await this.systemAccountService.getRelayActor();
+		} else {
+			followee = await this.apDbResolverService.getUserFromApId(target);
+		}
+
 		if (followee == null) {
 			return 'skip: followee not found';
 		}

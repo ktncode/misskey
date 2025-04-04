@@ -19,6 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkInfo v-if="noBotProtection" warn class="info">{{ i18n.ts.noBotProtectionWarning }} <MkA to="/admin/security" class="_link">{{ i18n.ts.configure }}</MkA></MkInfo>
 					<MkInfo v-if="noEmailServer" warn class="info">{{ i18n.ts.noEmailServerWarning }} <MkA to="/admin/email-settings" class="_link">{{ i18n.ts.configure }}</MkA></MkInfo>
 					<MkInfo v-if="pendingUserApprovals" warn class="info">{{ i18n.ts.pendingUserApprovals }} <MkA to="/admin/approvals" class="_link">{{ i18n.ts.check }}</MkA></MkInfo>
+					<MkInfo v-if="pendingRelayApprovals" warn class="info">{{ i18n.ts.pendingRelayApprovals }} <MkA to="/admin/relays" class="_link">{{ i18n.ts.check }}</MkA></MkInfo>
 					<MkInfo v-if="hasLegacyAuthFetchSetting" warn class="info">{{ i18n.ts.authorizedFetchLegacyWarning }}</MkInfo>
 				</div>
 
@@ -72,6 +73,7 @@ const noInquiryUrl = computed(() => isEmpty(instance.inquiryUrl));
 const thereIsUnresolvedAbuseReport = ref(false);
 const pendingUserApprovals = ref(false);
 const hasLegacyAuthFetchSetting = ref(false);
+const pendingRelayApprovals = ref(false);
 const currentPage = computed(() => router.currentRef.value.child);
 
 misskeyApi('admin/abuse-user-reports', {
@@ -92,6 +94,11 @@ misskeyApi('admin/show-users', {
 misskeyApi('admin/meta')
 	.then(meta => {
 		hasLegacyAuthFetchSetting.value = meta.hasLegacyAuthFetchSetting;
+	});
+
+misskeyApi('admin/relays/has-pending')
+	.then(({ hasPending }) => {
+		pendingRelayApprovals.value = hasPending;
 	});
 
 const NARROW_THRESHOLD = 600;
