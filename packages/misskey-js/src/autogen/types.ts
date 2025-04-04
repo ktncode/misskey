@@ -5405,6 +5405,8 @@ export type components = {
       /** @example false */
       asBadge: boolean;
       /** @example false */
+      preserveAssignmentOnMoveAccount: boolean;
+      /** @example false */
       canEditMembersByModerator: boolean;
       policies: {
         [key: string]: {
@@ -5693,10 +5695,10 @@ export type components = {
       fileId?: string | null;
       file?: components['schemas']['DriveFile'] | null;
       isRead?: boolean;
-      reactions: ({
+      reactions: {
           reaction: string;
-          user?: components['schemas']['UserLite'] | null;
-        })[];
+          user: components['schemas']['UserLite'];
+        }[];
     };
     ChatMessageLite: {
       id: string;
@@ -5713,6 +5715,34 @@ export type components = {
           reaction: string;
           user?: components['schemas']['UserLite'] | null;
         })[];
+    };
+    ChatMessageLiteFor1on1: {
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      fromUserId: string;
+      toUserId: string;
+      text?: string | null;
+      fileId?: string | null;
+      file?: components['schemas']['DriveFile'] | null;
+      reactions: {
+          reaction: string;
+        }[];
+    };
+    ChatMessageLiteForRoom: {
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      fromUserId: string;
+      fromUser: components['schemas']['UserLite'];
+      toRoomId: string;
+      text?: string | null;
+      fileId?: string | null;
+      file?: components['schemas']['DriveFile'] | null;
+      reactions: {
+          reaction: string;
+          user: components['schemas']['UserLite'];
+        }[];
     };
     ChatRoom: {
       id: string;
@@ -9983,6 +10013,7 @@ export type operations = {
           /** @default false */
           isExplorable?: boolean;
           asBadge: boolean;
+          preserveAssignmentOnMoveAccount?: boolean;
           canEditMembersByModerator: boolean;
           displayOrder: number;
           policies: Record<string, never>;
@@ -10258,6 +10289,7 @@ export type operations = {
           isAdministrator?: boolean;
           isExplorable?: boolean;
           asBadge?: boolean;
+          preserveAssignmentOnMoveAccount?: boolean;
           canEditMembersByModerator?: boolean;
           displayOrder?: number;
           policies?: Record<string, never>;
@@ -15108,7 +15140,7 @@ export type operations = {
       /** @description OK (with results) */
       200: {
         content: {
-          'application/json': components['schemas']['ChatMessageLite'];
+          'application/json': components['schemas']['ChatMessageLiteForRoom'];
         };
       };
       /** @description Client error */
@@ -15171,7 +15203,7 @@ export type operations = {
       /** @description OK (with results) */
       200: {
         content: {
-          'application/json': components['schemas']['ChatMessageLite'];
+          'application/json': components['schemas']['ChatMessageLiteFor1on1'];
         };
       };
       /** @description Client error */
@@ -15346,7 +15378,7 @@ export type operations = {
       /** @description OK (with results) */
       200: {
         content: {
-          'application/json': components['schemas']['ChatMessageLite'][];
+          'application/json': components['schemas']['ChatMessageLiteForRoom'][];
         };
       };
       /** @description Client error */
@@ -15574,7 +15606,7 @@ export type operations = {
       /** @description OK (with results) */
       200: {
         content: {
-          'application/json': components['schemas']['ChatMessageLite'][];
+          'application/json': components['schemas']['ChatMessageLiteFor1on1'][];
         };
       };
       /** @description Client error */
