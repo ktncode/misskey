@@ -81,7 +81,7 @@ const emit = defineEmits<{
 const displayBackButton = props.displayBackButton && window.history.state.key !== 'index' && window.history.length > 1 && inject('shouldBackButton', true);
 
 //const viewId = inject(DI.viewId);
-const injectedPageMetadata = inject(DI.pageMetadata);
+const injectedPageMetadata = inject(DI.pageMetadata, ref(null));
 const pageMetadata = computed(() => props.overridePageMetadata ?? injectedPageMetadata.value);
 
 const hideTitle = computed(() => inject('shouldOmitHeaderTitle', false) || props.hideTitle);

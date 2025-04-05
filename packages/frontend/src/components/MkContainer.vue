@@ -181,10 +181,15 @@ onUnmounted(() => {
 	left: 0;
 	color: var(--MI_THEME-panelHeaderFg);
 	background: var(--MI_THEME-panelHeaderBg);
-	border-bottom: solid 0.5px var(--MI_THEME-panelHeaderDivider);
 	z-index: 2;
 	line-height: 1.4em;
 	background: color-mix(in srgb, var(--MI_THEME-panelHeaderBg) 35%, transparent);
+}
+
+@container style(--MI_THEME-panelHeaderBg: var(--MI_THEME-panel)) {
+	.header {
+		box-shadow: 0 0.5px 0 0 light-dark(#0002, #fff2);
+	}
 }
 
 .title {
