@@ -68,7 +68,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<SearchMarker :keywords="['account', 'export', 'data']">
 				<MkFolder>
 					<template #icon><i class="ph-database ph-bold ph-lg"></i></template>
-					<template #label>{{ i18n.ts._dataRequest.title }}</template>
+					<template #label><SearchLabel>{{ i18n.ts._dataRequest.title }}</SearchLabel></template>
 
 					<div class="_gaps_m">
 						<FormInfo warn>{{ i18n.ts._dataRequest.warn }}</FormInfo>

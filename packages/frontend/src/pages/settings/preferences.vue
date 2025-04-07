@@ -787,18 +787,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkPreferenceContainer>
 						</SearchMarker>
 
-						<MkFolder>
-							<template #label>{{ i18n.ts.boostSettings }}</template>
-							<div class="_gaps_m">
-								<SearchMarker :keywords="['boost', 'show', 'visib', 'selector']">
+						<SearchMarker :keywords="['boost', 'show', 'visib', 'selector']">
+							<MkFolder>
+								<template #label><SearchLabel>{{ i18n.ts.boostSettings }}</SearchLabel></template>
+								<div class="_gaps_m">
 									<MkPreferenceContainer k="showVisibilitySelectorOnBoost">
 										<MkSwitch v-model="showVisibilitySelectorOnBoost">
 											<template #label><SearchLabel>{{ i18n.ts.showVisibilitySelectorOnBoost }}</SearchLabel></template>
 											<template #caption>{{ i18n.ts.showVisibilitySelectorOnBoostDescription }}</template>
 										</MkSwitch>
 									</MkPreferenceContainer>
-								</SearchMarker>
-								<SearchMarker :keywords="['boost', 'visib']">
 									<MkPreferenceContainer k="visibilityOnBoost">
 										<MkSelect v-model="visibilityOnBoost">
 											<template #label><SearchLabel>{{ i18n.ts.visibilityOnBoost }}</SearchLabel></template>
@@ -807,9 +805,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 											<option value="followers">{{ i18n.ts._visibility['followers'] }}</option>
 										</MkSelect>
 									</MkPreferenceContainer>
-								</SearchMarker>
-							</div>
-						</MkFolder>
+								</div>
+							</MkFolder>
+						</SearchMarker>
 
 						<SearchMarker :keywords="['ad', 'show']">
 							<MkPreferenceContainer k="forceShowAds">
