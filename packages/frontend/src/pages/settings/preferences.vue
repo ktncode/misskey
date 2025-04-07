@@ -822,7 +822,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<SearchMarker :keywords="['oneko', 'cat']">
 							<MkPreferenceContainer k="oneko">
 								<MkSwitch v-model="oneko">
-									<template #label>{{ i18n.ts.oneko }}</template>
+									<template #label><SearchLabel>{{ i18n.ts.oneko }}</SearchLabel></template>
 								</MkSwitch>
 							</MkPreferenceContainer>
 						</SearchMarker>
