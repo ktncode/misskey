@@ -208,6 +208,9 @@ export const PREF_DEF = {
 	nsfw: {
 		default: 'respect' as 'respect' | 'force' | 'ignore',
 	},
+	numberOfReplies: {
+		default: 5,
+	},
 	highlightSensitiveMedia: {
 		default: false,
 	},
@@ -304,6 +307,9 @@ export const PREF_DEF = {
 	forceShowAds: {
 		default: false,
 	},
+	oneko: {
+		default: false,
+	},
 	aiChanMode: {
 		default: false,
 	},
@@ -331,6 +337,12 @@ export const PREF_DEF = {
 	useGroupedNotifications: {
 		default: true,
 	},
+	notificationClickable: {
+		default: false,
+	},
+	enableFaviconNotificationDot: {
+		default: true,
+	},
 	dataSaver: {
 		default: {
 			media: false,
@@ -344,6 +356,9 @@ export const PREF_DEF = {
 	},
 	enableSeasonalScreenEffect: {
 		default: false,
+	},
+	cornerRadius: {
+		default: null as 'Misskey' | null,
 	},
 	enableHorizontalSwipe: {
 		default: true,
