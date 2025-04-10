@@ -17,9 +17,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<b><i class="ph-eye ph-bold ph-lg"></i> Pattern Hidden</b>
 			<span>{{ i18n.ts.clickToShow }}</span>
 		</div>
+		<!--
 		<span :class="$style.patternShadowTop"></span>
 		<span :class="$style.patternShadowBottom"></span>
 		<canvas ref="displayCanvas" :class="$style.pattern_canvas"></canvas>
+		-->
+		<div ref="sliceDisplay" :class="$style.slice_display">
+			<canvas v-for="slice in dummyArray" :key="slice.id" ref="canvasRefs" :class="$style.patternSlice"></canvas>
+		</div>
 	</div>
 	<div :class="$style.controls">
 		<input v-if="patternScrollSliderShow" ref="patternScrollSlider" v-model="patternScrollSliderPos" :class="$style.pattern_slider" type="range" min="0" max="100" step="0.01" style=""/>
@@ -41,6 +46,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+// Bugs to fix:
+// Slices reseting
+// Slices not updating correctly when going backwards.
+// ^^ ¿ Fixed ? ^^
+
+// Don't forgot to autohide the pattern.
+
 import { ref, nextTick, watch, onDeactivated, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import { i18n } from '@/i18n.js';
@@ -70,12 +82,34 @@ const props = defineProps<{
 	module: Misskey.entities.DriveFile
 }>();
 
+interface DummyCanvas {
+	id: number;
+}
+
+interface CanvasData {
+	offscreen: boolean;
+	active: boolean;
+	pattern: number;
+	row: number;
+	position: number;
+	offest: number;
+	slicePos: number;
+}
+
+interface CanvasSlice {
+	data: CanvasData;
+	did: DummyCanvas;
+	ctx: CanvasRenderingContext2D;
+	ref: HTMLCanvasElement;
+}
+
 const isSensitive = props.module.isSensitive;
 const url = props.module.url;
 let hide = ref((defaultStore.state.nsfw === 'force') ? true : isSensitive && (defaultStore.state.nsfw !== 'ignore'));
 let patternHide = ref(false);
 let playing = ref(false);
-let displayCanvas = ref<HTMLCanvasElement>();
+//let displayCanvas = ref<HTMLCanvasElement>();
+let sliceDisplay = ref<HTMLDivElement>();
 let progress = ref<HTMLProgressElement>();
 let position = ref(0);
 let patternScrollSlider = ref<HTMLProgressElement>();
@@ -92,8 +126,12 @@ let lastPattern = -1;
 let lastDrawnRow = -1;
 let numberRowCanvas = new OffscreenCanvas(2 * CHAR_WIDTH + 1, maxRowNumbers * CHAR_HEIGHT + 1);
 let alreadyHiddenOnce = false;
-let alreadyDrawn = [false];
+let alreadyDrawn: boolean[] = [];
+let dummyArray: DummyCanvas[] = [];
 let patternTime = { 'current': 0, 'max': 0, 'initial': 0 };
+let canvasSlice: CanvasSlice[] = [];
+let canvasRefs = ref([]);
+let sliceWidth = 0;
 
 function bakeNumberRow() {
 	let ctx = numberRowCanvas.getContext('2d', { alpha: false }) as OffscreenCanvasRenderingContext2D;
@@ -110,6 +148,49 @@ function bakeNumberRow() {
 	}
 }
 
+function populateCanvasSlices () {
+	if (dummyArray.length === 0) for (let i = 0; i < rowBuffer; i++) dummyArray.push({ id: i });
+
+	let nbChannels = 0;
+	if (player.value.currentPlayingNode) {
+		nbChannels = player.value.currentPlayingNode.nbChannels;
+	}
+	sliceWidth = 12 + 84 * nbChannels + 2;
+
+	// I don't want to know why
+	// I don't have to know why
+	// But vue forced my hand.
+	// For some forsaken reason I need two nested nextTick calls in order for everything to show up properly.
+	nextTick(() => nextTick(() => {
+		canvasRefs.value.forEach((canvas, i) => {
+			let c = canvas as HTMLCanvasElement;
+			c.height = CHAR_HEIGHT;
+			c.width = sliceWidth;
+			let ctx = c.getContext('2d', { alpha: false, desynchronized: true }) as CanvasRenderingContext2D;
+			ctx.font = '10px monospace';
+			ctx.imageSmoothingEnabled = false;
+
+			let cd: CanvasData = {
+				offscreen: false,
+				active: false,
+				pattern: -1,
+				row: -1,
+				position: i,
+				offest: 0,
+				slicePos: i,
+			};
+
+			canvasSlice[i] = {
+				data: cd,
+				did: dummyArray[i],
+				ctx: ctx,
+				ref: c,
+			};
+		});
+		stop();
+	}));
+}
+
 onMounted(() => {
 	player.value.load(url).then((result) => {
 		buffer = result;
@@ -117,7 +198,8 @@ onMounted(() => {
 			player.value.play(buffer);
 			progress.value!.max = player.value.duration();
 			bakeNumberRow();
-			display();
+			populateCanvasSlices();
+			display(true);
 		} catch (err) {
 			console.warn(err);
 		}
@@ -156,6 +238,8 @@ function stop(noDisplayUpdate = false) {
 	if (!noDisplayUpdate) {
 		try {
 			player.value.play(buffer);
+			lastDrawnRow = -1;
+			lastPattern = -1;
 			display(true);
 		} catch (err) {
 			console.warn(err);
@@ -176,7 +260,7 @@ function performSeek() {
 		player.value.play(buffer);
 	}
 	player.value.seek(position.value);
-	display();
+	display(true);
 	if (noNode) {
 		player.value.stop();
 	}
@@ -188,6 +272,10 @@ function toggleVisible() {
 	if (!hide.value) {
 		lastPattern = -1;
 		lastDrawnRow = -1;
+		nextTick(() => {
+			playPause();
+			populateCanvasSlices();
+		});
 	}
 	nextTick(() => { stop(hide.value); });
 }
@@ -209,15 +297,12 @@ function togglePattern() {
 	}
 }
 
-function drawPattern() {
-	if (!displayCanvas.value) return;
-	const canvas = displayCanvas.value;
-
+function drawSlices(skipOptimizationChecks = false) {
 	const startTime = performance.now();
 	const pattern = player.value.getPattern();
 	const nbRows = player.value.getPatternNumRows(pattern);
 	const row = player.value.getRow();
-	const halfbuf = rowBuffer / 2;
+	const halfbuf = Math.floor(rowBuffer / 2);
 	const minRow = row - halfbuf;
 	const maxRow = row + halfbuf;
 
@@ -227,12 +312,57 @@ function drawPattern() {
 	if (player.value.currentPlayingNode) {
 		nbChannels = player.value.currentPlayingNode.nbChannels;
 	}
-	if (pattern === lastPattern) {
+	if (pattern === lastPattern && !skipOptimizationChecks) {
 		rowDif = row - lastDrawnRow;
+
+		if (rowDif !== 0 && rowDif !== 1) console.log(rowDif);
+		let curtime = performance.now();
+
+		const isRowBufPos = rowDif > 0;
+		let s = 0;
+		//if (!isRowBufPos) playPause(); // Debug pause
+		for (let i = 0; i < canvasSlice.length; i++) {
+			let curRow = row - halfbuf + i;
+			//if (buf === 0) break; // I don't want it to do random things.
+			//if (canvasSlice[i].data.pattern === pattern) {
+			canvasSlice[i].data.slicePos = canvasSlice[i].data.slicePos - rowDif;
+			if (canvasSlice[i].data.slicePos > -1 && canvasSlice[i].data.slicePos < rowBuffer + 1) continue;
+
+			canvasSlice[i].data.slicePos = isRowBufPos ? rowBuffer - 1 : s;
+			canvasSlice[i].data.position = isRowBufPos ? canvasSlice[i].data.position + rowBuffer : canvasSlice[i].data.position - rowBuffer;
+
+			canvasSlice[i].ctx.fillStyle = '#000000';
+			canvasSlice[i].ctx.fillRect(0, 0, canvasSlice[i].ref.width, canvasSlice[i].ref.height);
+			drawRow(canvasSlice[i].ctx, curRow, nbChannels, pattern);
+			alreadyDrawn[curRow] = true;
+			canvasSlice[i].ctx.fillStyle = isRowBufPos ? colours.foreground.fx : colours.foreground.operant;
+			canvasSlice[i].ref.style.top = (canvasSlice[i].data.offest + (canvasSlice[i].data.position) * CHAR_HEIGHT) + 'px';
+			// Debug text
+			canvasSlice[i].ctx.fillText(
+				i.toString() + ' ' +
+				curRow.toString() + ' ' +
+				canvasSlice[i].data.slicePos + ' ' +
+				canvasSlice[i].data.position + ' ' +
+				Math.trunc(curtime) + 'ms ' +
+				canvasSlice[i].data.offest + 'px ' +
+				canvasSlice[i].ref.style.top
+				, 0, ROW_OFFSET_Y);
+
+			//canvasSlice[i].data.position = buf > 0 ? canvasSlice[i].data.position + rowBuffer + buf : canvasSlice[i].data.position - rowBuffer + buf;
+			//canvasSlice[i].ref.style.top = buf > 0 ? (canvasSlice[i].data.slicePos * CHAR_HEIGHT) + 'px' : (buf + row) * CHAR_HEIGHT + 'px';
+			//buf = (buf > 0) ? buf - 1 : buf + 1;
+			s++;
+		}
 	} else {
 		if (patternTime.initial !== 0 && !alreadyHiddenOnce) {
+			//const arrLen = patternTime.length - 1;
+			//const averageDraw = patternTime.total / (patternTime.at - 1);
+			//const initialDraw = patternTime.initial;
 			const trackerTime = player.value.currentPlayingNode.getProcessTime();
 
+			//console.log( initialDraw, averageDraw, player.value.getCurrentTempo(), player.value.getCurrentSpeed() );
+			console.log( trackerTime, patternTime );
+			console.log( patternTime.initial + trackerTime.max, trackerTime.max + patternTime.max );
 			if (patternTime.initial + trackerTime.max > MAX_TIME_SPENT && trackerTime.max + patternTime.max > MAX_TIME_PER_ROW) {
 				alreadyHiddenOnce = true;
 				togglePattern();
@@ -242,87 +372,63 @@ function drawPattern() {
 
 		patternTime = { 'current': 0, 'max': 0, 'initial': 0 };
 		alreadyDrawn = [];
-		if (canvas.width !== (12 + 84 * nbChannels + 2)) canvas.width = 12 + 84 * nbChannels + 2;
-		if (canvas.height !== (12 * nbRows)) canvas.height = 12 * nbRows;
-	}
 
-	const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true }) as CanvasRenderingContext2D;
-	if (ctx.font !== '10px monospace') ctx.font = '10px monospace';
-	ctx.imageSmoothingEnabled = false;
-	if (pattern !== lastPattern) {
-		ctx.fillStyle = colours.background;
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
-		ctx.drawImage( numberRowCanvas, 0, 0 );
-	}
-
-	ctx.fillStyle = colours.foreground.default;
-	for (let rowOffset = minRow + rowDif; rowOffset < maxRow + rowDif; rowOffset++) {
-		const rowToDraw = rowOffset - rowDif;
-
-		if (alreadyDrawn[rowToDraw] === true) continue;
-
-		if (rowToDraw >= 0 && rowToDraw < nbRows) {
-			const baseOffset = 2 * CHAR_WIDTH;
-			const baseRowOffset = ROW_OFFSET_Y + rowToDraw * CHAR_HEIGHT;
-			let done = drawRow(ctx, rowToDraw, nbChannels, pattern, baseOffset, baseRowOffset);
-
-			alreadyDrawn[rowToDraw] = done;
+		let curtime = performance.now();
+		for (let i = 0; i < canvasSlice.length; i++) {
+			let curRow = row - halfbuf + i;
+			// just paint which slice, row and pushed row it is.
+			canvasSlice[i].ctx.fillStyle = '#000000';
+			canvasSlice[i].ctx.fillRect(0, 0, canvasSlice[i].ref.width, canvasSlice[i].ref.height);
+			drawRow(canvasSlice[i].ctx, curRow, nbChannels, pattern);
+			//alreadyDrawn[curRow] = true;
+			canvasSlice[i].data.slicePos = i;
+			canvasSlice[i].data.position = 0;
+			canvasSlice[i].data.offest = row * CHAR_HEIGHT;
+			canvasSlice[i].data.row = row - halfbuf + i;
+			canvasSlice[i].data.pattern = pattern;
+			canvasSlice[i].ref.style.top = canvasSlice[i].data.offest - CHAR_HEIGHT + 'px';
+			canvasSlice[i].data.offest = canvasSlice[i].data.offest - CHAR_HEIGHT;
+			/*
+			canvasSlice[i].ctx.fillStyle = colours.foreground.default;
+			canvasSlice[i].ctx.fillText(
+				i.toString() + ' ' +
+				curRow.toString() + ' ' +
+				canvasSlice[i].data.slicePos + ' ' +
+				canvasSlice[i].data.position + ' ' +
+				Math.trunc(curtime) + 'ms ' +
+				canvasSlice[i].data.offest + 'px ' +
+				'init'
+				, 0, ROW_OFFSET_Y);
+				*/
 		}
 	}
 
+	if (sliceDisplay.value) sliceDisplay.value.style.top = -(row * CHAR_HEIGHT - ((rowDif > 0 || pattern !== lastPattern) ? CHAR_HEIGHT : 0)) + 'px';
+
+	/*
+	canvasSlice.forEach((slice, i) => {
+		if (lastPattern === pattern) {
+
+		} else {
+		// just paint which slice, row and pushed row it is.
+			let curRow = row - halfbuf + i;
+			slice.ctx.fillStyle = '#000000';
+			slice.ctx.fillRect(0, 0, slice.ref.width, slice.ref.height);
+			//drawRow(slice.ctx, curRow, nbChannels, pattern);
+			alreadyDrawn[curRow] = true;
+			slice.ctx.fillStyle = colours.foreground.default;
+			slice.ctx.fillText(i.toString() + ' ' + curRow.toString() + ' ' + curtime, 0, ROW_OFFSET_Y);
+		}
+	});
+*/
 	lastDrawnRow = row;
 	lastPattern = pattern;
-
-	patternTime.current = performance.now() - startTime;
-	if (patternTime.initial !== 0 && patternTime.current > patternTime.max) patternTime.max = patternTime.current;
-	else if (patternTime.initial === 0) patternTime.initial = patternTime.current;
-}
-
-function drawPetternPreview() {
-	if (!displayCanvas.value) return;
-	const canvas = displayCanvas.value;
-
-	const pattern = player.value.getPattern();
-	const nbRows = player.value.getPatternNumRows(pattern);
-	const row = player.value.getRow();
-	const halfbuf = rowBuffer / 2;
-	alreadyDrawn = [];
-
-	let nbChannels = 0;
-	if (player.value.currentPlayingNode) {
-		nbChannels = player.value.currentPlayingNode.nbChannels;
-	}
-	if (canvas.width !== (12 + 84 * nbChannels + 2)) canvas.width = 12 + 84 * nbChannels + 2;
-	if (canvas.height !== (12 * rowBuffer)) canvas.height = 12 * rowBuffer;
-
-	const ctx = canvas.getContext('2d', { alpha: false }) as CanvasRenderingContext2D;
-	ctx.font = '10px monospace';
-	ctx.imageSmoothingEnabled = false;
-	ctx.fillStyle = colours.background;
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	ctx.drawImage( numberRowCanvas, 0, (halfbuf - row) * CHAR_HEIGHT );
-
-	for (let rowOffset = 0; rowOffset < rowBuffer; rowOffset++) {
-		const rowToDraw = rowOffset + row - halfbuf;
-
-		if (rowToDraw >= 0 && rowToDraw < nbRows) {
-			const baseOffset = 2 * CHAR_WIDTH;
-			const baseRowOffset = ROW_OFFSET_Y + rowOffset * CHAR_HEIGHT;
-			drawRow(ctx, rowToDraw, nbChannels, pattern, baseOffset, baseRowOffset);
-		} else if (rowToDraw >= 0) {
-			const baseRowOffset = ROW_OFFSET_Y + rowOffset * CHAR_HEIGHT;
-			ctx.fillStyle = colours.background;
-			ctx.fillRect(0, baseRowOffset - CHAR_HEIGHT, CHAR_WIDTH * 2, baseRowOffset);
-		}
-	}
-
-	lastPattern = -1;
-	lastDrawnRow = -1;
 }
 
 function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, pattern: number, drawX = (2 * CHAR_WIDTH), drawY = ROW_OFFSET_Y) {
 	if (!player.value.currentPlayingNode) return false;
-	if (alreadyDrawn[row]) return true;
+	if (row < 0 || row > player.value.getPatternNumRows()) return false;
+	//if (alreadyDrawn[row]) return true;
 	const spacer = 11;
 	const space = ' ';
 	let seperators = '';
@@ -341,6 +447,8 @@ function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, p
 		fx += part.substring(10, 11) + space.repeat( spacer + 2 );
 		op += part.substring(11, 13) + space.repeat( spacer + 1 );
 	}
+
+	//console.log( 'seperators: ' + seperators + '\nnote: '+ note + '\ninstr: ' + instr + '\nvolume: ' + volume + '\nfx: ' + fx + '\nop: ' + op);
 
 	ctx.fillStyle = colours.foreground.default;
 	ctx.fillText(seperators, drawX, drawY);
@@ -364,7 +472,7 @@ function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, p
 }
 
 function display(skipOptimizationChecks = false) {
-	if (!displayCanvas.value || !displayCanvas.value.parentElement) {
+	if (!sliceDisplay.value || !sliceDisplay.value.parentElement) {
 		stop();
 		return;
 	}
@@ -373,7 +481,7 @@ function display(skipOptimizationChecks = false) {
 
 	if (firstFrame) {
 		// Changing it to false should enable pattern display by default.
-		patternHide.value = true;
+		patternHide.value = false;
 		handleScrollBarEnable();
 		firstFrame = false;
 	}
@@ -383,11 +491,18 @@ function display(skipOptimizationChecks = false) {
 
 	if ( row === lastDrawnRow && pattern === lastPattern && !skipOptimizationChecks) return;
 
-	// Size vs speed
-	if (patternHide.value) drawPetternPreview();
-	else drawPattern();
+	/*
+	canvasRefs.value..forEach((canvas) => {
+		console.log(canvas);
+	});*/
 
-	displayCanvas.value.style.top = !patternHide.value ? 'calc( 50% - ' + (row * CHAR_HEIGHT) + 'px )' : '0%';
+	// Size vs speed
+	//if (patternHide.value) drawPetternPreview();
+	//else drawPattern();
+
+	//displayCanvas.value.style.top = !patternHide.value ? 'calc( 50% - ' + (row * CHAR_HEIGHT) + 'px )' : '0%';
+
+	drawSlices(skipOptimizationChecks);
 }
 
 let suppressScrollSliderWatcher = false;
@@ -396,10 +511,10 @@ function scrollHandler() {
 	suppressScrollSliderWatcher = true;
 
 	if (!patternScrollSlider.value) return;
-	if (!displayCanvas.value) return;
-	if (!displayCanvas.value.parentElement) return;
+	if (!sliceDisplay.value) return;
+	if (!sliceDisplay.value.parentElement) return;
 
-	patternScrollSliderPos.value = (displayCanvas.value.parentElement.scrollLeft) / (displayCanvas.value.width - displayCanvas.value.parentElement.offsetWidth) * 100;
+	patternScrollSliderPos.value = (sliceDisplay.value.parentElement.scrollLeft) / (sliceWidth - sliceDisplay.value.parentElement.offsetWidth) * 100;
 	patternScrollSlider.value.style.opacity = '1';
 }
 
@@ -414,21 +529,21 @@ function handleScrollBarEnable() {
 	patternScrollSliderShow.value = (!patternHide.value && !isTouchUsing);
 	if (patternScrollSliderShow.value !== true) return;
 
-	if (!displayCanvas.value) return;
-	if (!displayCanvas.value.parentElement) return;
+	if (!sliceDisplay.value) return;
+	if (!sliceDisplay.value.parentElement) return;
 	if (firstFrame) {
-		patternScrollSliderShow.value = (12 + 84 * player.value.getPatternNumRows(player.value.getPattern()) + 2 > displayCanvas.value.parentElement.offsetWidth);
+		patternScrollSliderShow.value = (12 + 84 * player.value.getPatternNumRows(player.value.getPattern()) + 2 > sliceDisplay.value.parentElement.offsetWidth);
 	} else {
-		patternScrollSliderShow.value = (displayCanvas.value.width > displayCanvas.value.parentElement.offsetWidth);
+		patternScrollSliderShow.value = (sliceWidth > sliceDisplay.value.parentElement.offsetWidth);
 	}
 }
 
 watch(patternScrollSliderPos, () => {
 	if (suppressScrollSliderWatcher) return;
-	if (!displayCanvas.value) return;
-	if (!displayCanvas.value.parentElement) return;
+	if (!sliceDisplay.value) return;
+	if (!sliceDisplay.value.parentElement) return;
 
-	displayCanvas.value.parentElement.scrollLeft = (displayCanvas.value.width - displayCanvas.value.parentElement.offsetWidth) * patternScrollSliderPos.value / 100;
+	sliceDisplay.value.parentElement.scrollLeft = (sliceWidth - sliceDisplay.value.parentElement.offsetWidth) * patternScrollSliderPos.value / 100;
 });
 
 onDeactivated(() => {
@@ -482,6 +597,42 @@ onDeactivated(() => {
 
 		&::-webkit-scrollbar {
 			display: none;
+		}
+
+		.slice_display {
+			display: grid;
+			position: relative;
+			background-color: white;
+			image-rendering: pixelated;
+			/*pointer-events: none;*/
+			z-index: 0;
+
+			.patternSlice {
+				position: relative;
+				background-color: black;
+				image-rendering: pixelated;
+				/*pointer-events: none;*/
+				z-index: 0;
+				/*filter: grayscale(50%);*/
+			}
+
+			.patternSlice.offScreen {
+				position: relative;
+				background-color: black;
+				image-rendering: pixelated;
+				pointer-events: none;
+				z-index: 0;
+				filter: opacity(0);
+			}
+
+			.patternSlice.activeSlice {
+				position: relative;
+				background-color: black;
+				image-rendering: pixelated;
+				pointer-events: none;
+				z-index: 0;
+				filter: invert(1);
+			}
 		}
 
 		.pattern_canvas {
