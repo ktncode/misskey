@@ -470,6 +470,8 @@ export const store = markRaw(new Pizzax('base', {
 			sfxVolume: 1,
 		},
 	},
+	//#endregion
+	//#region Sharkey
 	collapseNotesRepliedTo: {
 		where: 'device',
 		default: false,
@@ -534,7 +536,6 @@ export const store = markRaw(new Pizzax('base', {
 		where: 'device',
 		default: 'sharkey' as 'sharkey' | 'misskey',
 	},
-	//#endregion
 	oneko: {
 		where: 'device',
 		default: false,
@@ -559,6 +560,7 @@ export const store = markRaw(new Pizzax('base', {
 		where: 'device',
 		default: true,
 	},
+	//#endregion
 }));
 
 // TODO: 他のタブと永続化されたstateを同期
