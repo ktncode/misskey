@@ -471,72 +471,25 @@ export const store = markRaw(new Pizzax('base', {
 		},
 	},
 	//#endregion
+
 	//#region Sharkey
-	collapseNotesRepliedTo: {
+	autoloadConversation: {
 		where: 'device',
-		default: false,
+		default: true,
+	},
+	clickToOpen: {
+		where: 'device',
+		default: true,
 	},
 	collapseFiles: {
 		where: 'device',
 		default: false,
 	},
-	uncollapseCW: {
+	collapseNotesRepliedTo: {
 		where: 'device',
 		default: false,
-	},
-	expandLongNote: {
-		where: 'device',
-		default: false,
-	},
-	like: {
-		where: 'device',
-		default: null as string | null,
-	},
-	autoloadConversation: {
-		where: 'device',
-		default: true,
-	},
-	showVisibilitySelectorOnBoost: {
-		where: 'device',
-		default: true,
-	},
-	visibilityOnBoost: {
-		where: 'device',
-		default: 'public' as 'public' | 'home' | 'followers',
-	},
-	trustedDomains: {
-		where: 'device',
-		default: [] as string[],
-	},
-	warnExternalUrl: {
-		where: 'device',
-		default: true,
-	},
-	followingFeed: {
-		where: 'device',
-		default: defaultFollowingFeedState as Partial<FollowingFeedState>,
-	},
-	warnMissingAltText: {
-		where: 'device',
-		default: true,
 	},
 	disableCatSpeak: {
-		where: 'device',
-		default: false,
-	},
-	showTickerOnReplies: {
-		where: 'device',
-		default: false,
-	},
-	searchEngine: {
-		where: 'device',
-		default: Object.keys(searchEngineMap)[0],
-	},
-	noteDesign: {
-		where: 'device',
-		default: 'sharkey' as 'sharkey' | 'misskey',
-	},
-	oneko: {
 		where: 'device',
 		default: false,
 	},
@@ -544,19 +497,63 @@ export const store = markRaw(new Pizzax('base', {
 		where: 'device',
 		default: true,
 	},
-	numberOfReplies: {
+	expandLongNote: {
 		where: 'device',
-		default: 5,
+		default: false,
+	},
+	followingFeed: {
+		where: 'device',
+		default: defaultFollowingFeedState as Partial<FollowingFeedState>,
+	},
+	like: {
+		where: 'device',
+		default: null as string | null,
+	},
+	noteDesign: {
+		where: 'device',
+		default: 'sharkey' as 'sharkey' | 'misskey',
 	},
 	notificationClickable: {
 		where: 'device',
 		default: false,
 	},
-	cornerRadius: {
+	numberOfReplies: {
 		where: 'device',
-		default: null as 'Misskey' | null,
+		default: 5,
 	},
-	clickToOpen: {
+	oneko: {
+		where: 'device',
+		default: false,
+	},
+	searchEngine: {
+		where: 'device',
+		default: Object.keys(searchEngineMap)[0],
+	},
+	showTickerOnReplies: {
+		where: 'device',
+		default: false,
+	},
+	showVisibilitySelectorOnBoost: {
+		where: 'device',
+		default: true,
+	},
+	trustedDomains: {
+		where: 'device',
+		default: [] as string[],
+	},
+	uncollapseCW: {
+		where: 'device',
+		default: false,
+	},
+	visibilityOnBoost: {
+		where: 'device',
+		default: 'public' as 'public' | 'home' | 'followers',
+	},
+	warnExternalUrl: {
+		where: 'device',
+		default: true,
+	},
+	warnMissingAltText: {
 		where: 'device',
 		default: true,
 	},

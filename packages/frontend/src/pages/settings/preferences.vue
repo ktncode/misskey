@@ -725,13 +725,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</SearchMarker>
 
 							<SearchMarker :keywords="['corner', 'radius']">
-								<MkPreferenceContainer k="cornerRadius">
-									<MkRadios v-model="cornerRadius">
-										<template #label><SearchLabel>{{ i18n.ts.cornerRadius }}</SearchLabel></template>
-										<option :value="null"><i class="sk-icons sk-shark sk-icons-lg" style="top: 2px;position: relative;"></i> Sharkey</option>
-										<option value="misskey"><i class="sk-icons sk-misskey sk-icons-lg" style="top: 2px;position: relative;"></i> Misskey</option>
-									</MkRadios>
-								</MkPreferenceContainer>
+								<MkRadios v-model="cornerRadius">
+									<template #label><SearchLabel>{{ i18n.ts.cornerRadius }}</SearchLabel></template>
+									<option :value="null"><i class="sk-icons sk-shark sk-icons-lg" style="top: 2px;position: relative;"></i> Sharkey</option>
+									<option value="misskey"><i class="sk-icons sk-misskey sk-icons-lg" style="top: 2px;position: relative;"></i> Misskey</option>
+								</MkRadios>
 							</SearchMarker>
 
 							<SearchMarker :keywords="['warn', 'missing', 'alt', 'text']">
@@ -972,9 +970,9 @@ const notificationClickable = computed(store.makeGetterSetter('notificationClick
 const warnExternalUrl = prefer.model('warnExternalUrl');
 const showVisibilitySelectorOnBoost = prefer.model('showVisibilitySelectorOnBoost');
 const visibilityOnBoost = prefer.model('visibilityOnBoost');
-const cornerRadius = computed(store.makeGetterSetter('cornerRadius'));
 const oneko = computed(store.makeGetterSetter('oneko'));
 const numberOfReplies = computed(store.makeGetterSetter('numberOfReplies'));
+const cornerRadius = ref(miLocalStorage.getItem('cornerRadius'));
 
 const useCustomSearchEngine = computed(() => !Object.keys(searchEngineMap).includes(searchEngine.value));
 
@@ -997,6 +995,14 @@ watch(useSystemFont, () => {
 		miLocalStorage.setItem('useSystemFont', 't');
 	} else {
 		miLocalStorage.removeItem('useSystemFont');
+	}
+});
+
+watch(cornerRadius, () => {
+	if (cornerRadius.value == null) {
+		miLocalStorage.removeItem('cornerRadius');
+	} else {
+		miLocalStorage.setItem('cornerRadius', cornerRadius.value);
 	}
 });
 
