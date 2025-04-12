@@ -156,6 +156,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
+							<SearchMarker :keywords="['collapse', 'files']">
+								<MkPreferenceContainer k="collapseFiles">
+									<MkSwitch v-model="collapseFiles">
+										<template #label><SearchLabel>{{ i18n.ts.collapseFiles }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
+							</SearchMarker>
+
 							<SearchMarker :keywords="['expand', 'long']">
 								<MkPreferenceContainer k="expandLongNote">
 									<MkSwitch v-model="expandLongNote">
@@ -596,6 +604,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 									</MkSwitch>
 								</MkPreferenceContainer>
 							</SearchMarker>
+
+							<SearchMarker :keywords="['click', 'open']">
+								<MkPreferenceContainer k="clickToOpen">
+									<MkSwitch v-model="clickToOpen">
+										<template #label><SearchLabel>{{ i18n.ts.clickToOpen }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
+							</SearchMarker>
 						</div>
 
 						<SearchMarker :keywords="['menu', 'style', 'popup', 'drawer']">
@@ -970,6 +986,7 @@ const showTickerOnReplies = prefer.model('showTickerOnReplies');
 const searchEngine = prefer.model('searchEngine');
 const noteDesign = prefer.model('noteDesign');
 const uncollapseCW = prefer.model('uncollapseCW');
+const collapseFiles = prefer.model('collapseFiles');
 const expandLongNote = prefer.model('expandLongNote');
 const disableCatSpeak = prefer.model('disableCatSpeak');
 const enableFaviconNotificationDot = prefer.model('enableFaviconNotificationDot');
@@ -982,7 +999,7 @@ const cornerRadius = ref(miLocalStorage.getItem('cornerRadius'));
 const oneko = prefer.model('oneko');
 const numberOfReplies = prefer.model('numberOfReplies');
 const autoloadConversation = prefer.model('autoloadConversation');
-
+const clickToOpen = prefer.model('clickToOpen');
 const useCustomSearchEngine = computed(() => !Object.keys(searchEngineMap).includes(searchEngine.value));
 
 watch(lang, () => {
