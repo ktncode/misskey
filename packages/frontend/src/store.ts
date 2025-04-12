@@ -474,7 +474,7 @@ export const store = markRaw(new Pizzax('base', {
 
 	//#region Sharkey
 	autoloadConversation: {
-		where: 'device',
+		where: 'account',
 		default: true,
 	},
 	clickToOpen: {
@@ -482,15 +482,15 @@ export const store = markRaw(new Pizzax('base', {
 		default: true,
 	},
 	collapseFiles: {
-		where: 'device',
+		where: 'account',
 		default: false,
 	},
 	collapseNotesRepliedTo: {
-		where: 'device',
+		where: 'account',
 		default: false,
 	},
 	disableCatSpeak: {
-		where: 'device',
+		where: 'account',
 		default: false,
 	},
 	enableFaviconNotificationDot: {
@@ -502,11 +502,11 @@ export const store = markRaw(new Pizzax('base', {
 		default: false,
 	},
 	followingFeed: {
-		where: 'device',
+		where: 'account',
 		default: defaultFollowingFeedState as Partial<FollowingFeedState>,
 	},
 	like: {
-		where: 'device',
+		where: 'account',
 		default: null as string | null,
 	},
 	noteDesign: {
@@ -526,7 +526,7 @@ export const store = markRaw(new Pizzax('base', {
 		default: false,
 	},
 	searchEngine: {
-		where: 'device',
+		where: 'account',
 		default: Object.keys(searchEngineMap)[0],
 	},
 	showTickerOnReplies: {
@@ -534,23 +534,23 @@ export const store = markRaw(new Pizzax('base', {
 		default: false,
 	},
 	showVisibilitySelectorOnBoost: {
-		where: 'device',
+		where: 'account',
 		default: true,
 	},
 	trustedDomains: {
-		where: 'device',
+		where: 'account',
 		default: [] as string[],
 	},
 	uncollapseCW: {
-		where: 'device',
+		where: 'account',
 		default: false,
 	},
 	visibilityOnBoost: {
-		where: 'device',
+		where: 'account',
 		default: 'public' as 'public' | 'home' | 'followers',
 	},
 	warnExternalUrl: {
-		where: 'device',
+		where: 'account',
 		default: true,
 	},
 	warnMissingAltText: {
