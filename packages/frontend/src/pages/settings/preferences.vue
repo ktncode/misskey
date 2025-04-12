@@ -341,6 +341,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
+							<SearchMarker :keywords="['load', 'conversation']">
+								<MkPreferenceContainer k="autoloadConversation">
+									<MkSwitch v-model="autoloadConversation">
+										<template #label><SearchLabel>{{ i18n.ts.autoloadConversation }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
+							</SearchMarker>
+
 							<SearchMarker :keywords="['number', 'replies']">
 								<MkPreferenceContainer k="numberOfReplies">
 									<MkRange v-model="numberOfReplies" :min="2" :max="20" :step="1" easing>
@@ -973,6 +981,7 @@ const visibilityOnBoost = prefer.model('visibilityOnBoost');
 const cornerRadius = ref(miLocalStorage.getItem('cornerRadius'));
 const oneko = prefer.model('oneko');
 const numberOfReplies = prefer.model('numberOfReplies');
+const autoloadConversation = prefer.model('autoloadConversation');
 
 const useCustomSearchEngine = computed(() => !Object.keys(searchEngineMap).includes(searchEngine.value));
 
