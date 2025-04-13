@@ -670,8 +670,8 @@ seems to do a decent job)
         * from `packages/frontend/src/components/MkNoteSub.vue` to `packages/frontend/src/components/SkNoteSub.vue`
     * from MK note components to Dynamic note components (if the public signature changed)
         * from `packages/frontend/src/components/MkNote.vue` to `packages/frontend/src/components/DynamicNote.vue`
-				* from `packages/frontend/src/components/MkNoteDetailed.vue` to `packages/frontend/src/components/DynamicNoteDetailed.vue`
-				* from `packages/frontend/src/components/MkNoteSimple.vue` to `packages/frontend/src/components/DynamicNoteSimple.vue`
+        * from `packages/frontend/src/components/MkNoteDetailed.vue` to `packages/frontend/src/components/DynamicNoteDetailed.vue`
+        * from `packages/frontend/src/components/MkNoteSimple.vue` to `packages/frontend/src/components/DynamicNoteSimple.vue`
     * from the global timeline to the bubble timeline
         * `packages/backend/src/server/api/stream/channels/global-timeline.ts`
         * `packages/backend/src/server/api/stream/channels/bubble-timeline.ts`
