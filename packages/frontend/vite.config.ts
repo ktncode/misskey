@@ -3,8 +3,6 @@ import pluginReplace from '@rollup/plugin-replace';
 import pluginVue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 import type { UserConfig } from 'vite';
-import * as yaml from 'js-yaml';
-import { promises as fsp } from 'fs';
 
 import locales from '../../locales/index.js';
 import { localesVersion } from '../../locales/version.js';
