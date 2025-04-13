@@ -461,15 +461,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 									<template #caption>
 										<I18n :src="i18n.ts.notificationDotNotWorkingAdvice" tag="span">
 											<template #link>
-											<MkLink url="https://docs.joinsharkey.org/docs/install/faqs/#ive-enabled-the-notification-dot-but-it-doesnt-show">{{ i18n.ts._mfm.link }}</MkLink>
+												<MkLink url="https://docs.joinsharkey.org/docs/install/faqs/#ive-enabled-the-notification-dot-but-it-doesnt-show">{{ i18n.ts._mfm.link }}</MkLink>
 											</template>
 										</I18n>
 									</template>
 								</MkSwitch>
 							</MkPreferenceContainer>
-						</SearchMarker>
 
-						<MkButton @click="testNotificationDot">{{ i18n.ts.verifyNotificationDotWorkingButton }}</MkButton>
+							<MkButton @click="testNotificationDot">{{ i18n.ts.verifyNotificationDotWorkingButton }}</MkButton>
+						</SearchMarker>
 
 						<SearchMarker :keywords="['position']">
 							<MkPreferenceContainer k="notificationPosition">
