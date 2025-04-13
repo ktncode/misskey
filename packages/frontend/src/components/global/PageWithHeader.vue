@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div ref="rootEl" :class="[$style.root, reversed ? '_pageScrollableReversed' : '_pageScrollable']">
 	<MkStickyContainer>
-		<template #header><MkPageHeader v-model:tab="tab" :actions="actions" :tabs="tabs"/></template>
+		<template #header><MkPageHeader v-model:tab="tab" :actions="actions" :tabs="tabs" :displayBackButton="displayBackButton"/></template>
 		<div :class="$style.body">
 			<slot></slot>
 		</div>
@@ -28,6 +28,7 @@ const props = withDefaults(defineProps<{
 	hideTitle?: boolean;
 	displayMyAvatar?: boolean;
 	reversed?: boolean;
+	displayBackButton?: boolean;
 }>(), {
 	tabs: () => ([] as Tab[]),
 });
