@@ -34,25 +34,25 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</header>
 			<div :class="$style.noteContent">
 				<p v-if="appearNote.cw != null" :class="$style.cw">
-					<Mfm v-if="appearNote.cw != ''" style="margin-right: 8px;" :text="appearNote.cw" :isBlock="true" :author="appearNote.user" :nyaize="'account'"/>
+					<Mfm v-if="appearNote.cw != ''" style="margin-right: 8px;" :text="appearNote.cw" :isBlock="true" :author="appearNote.user" :nyaize="'respect'"/>
 					<MkCwButton v-model="showContent" :text="appearNote.text" :files="appearNote.files" :poll="appearNote.poll"/>
 				</p>
 				<div v-show="appearNote.cw == null || showContent">
 					<span v-if="appearNote.isHidden" style="opacity: 0.5">({{ i18n.ts.private }})</span>
 					<MkA v-if="appearNote.replyId" :class="$style.noteReplyTarget" :to="`/notes/${appearNote.replyId}`"><i class="ph-arrow-bend-left-up ph-bold ph-lg"></i></MkA>
-					<Mfm v-if="appearNote.text" :text="appearNote.text" :isBlock="true" :author="appearNote.user" :nyaize="'account'" :emojiUrls="appearNote.emojis"/>
+					<Mfm v-if="appearNote.text" :text="appearNote.text" :isBlock="true" :author="appearNote.user" :nyaize="'respect'" :emojiUrls="appearNote.emojis"/>
 					<a v-if="appearNote.renote != null" :class="$style.rn">RN:</a>
 					<div v-if="translating || translation" :class="$style.translation">
 						<MkLoading v-if="translating" mini/>
 						<div v-else>
 							<b>{{ i18n.t('translatedFrom', { x: translation.sourceLang }) }}: </b>
-							<Mfm :text="translation.text" :isBlock="true" :author="appearNote.user" :nyaize="'account'" :emojiUrls="appearNote.emojis"/>
+							<Mfm :text="translation.text" :isBlock="true" :author="appearNote.user" :nyaize="'respect'" :emojiUrls="appearNote.emojis"/>
 						</div>
 					</div>
-					<div v-if="appearNote.files.length > 0">
+					<div v-if="appearNote.files && appearNote.files.length > 0">
 						<MkMediaList :mediaList="appearNote.files"/>
 					</div>
-					<MkPoll v-if="appearNote.poll" ref="pollViewer" :note="appearNote" :class="$style.poll"/>
+					<MkPoll v-if="appearNote.poll" :noteId="appearNote.id" :poll="appearNote.poll" :local="!appearNote.user.host" :author="appearNote.user" :emojiUrls="appearNote.emojis" :class="$style.poll"/>
 					<MkUrlPreview v-for="url in urls" :key="url" :url="url" :compact="true" :detail="true" style="margin-top: 6px;"/>
 					<div v-if="appearNote.renote" :class="$style.quote"><MkNoteSimple :note="appearNote.renote" :class="$style.quoteNote"/></div>
 				</div>
@@ -117,11 +117,18 @@ let note = ref(deepClone(props.note));
 const noteViewInterruptors = getPluginHandlers('note_view_interruptor');
 if (noteViewInterruptors.length > 0) {
 	onMounted(async () => {
-		let result = deepClone(note.value);
+		let result: Misskey.entities.Note | null = deepClone(note.value);
 		for (const interruptor of noteViewInterruptors) {
-			result = await interruptor.handler(result);
+			try {
+				result = await interruptor.handler(result!) as Misskey.entities.Note | null;
+				if (result === null) {
+					return;
+				}
+			} catch (err) {
+				console.error(err);
+			}
 		}
-		note.value = result;
+		note.value = result as Misskey.entities.Note;
 	});
 }
 

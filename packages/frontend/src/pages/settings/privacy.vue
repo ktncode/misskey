@@ -64,10 +64,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkSwitch>
 		</SearchMarker>
 
+		<SearchMarker :keywords="['crawle', 'ai']">
+			<MkSwitch v-model="preventAiLearning" @update:modelValue="save()">
+				<template #label><SearchLabel>{{ i18n.ts.preventAiLearning }}</SearchLabel></template>
+				<template #caption><SearchKeyword>{{ i18n.ts.preventAiLearningDescription }}</SearchKeyword></template>
+			</MkSwitch>
+		</SearchMarker>
+
 		<SearchMarker :keywords="['index', 'search']">
 			<MkSwitch v-model="noindex" @update:modelValue="save()">
-				{{ i18n.ts.makeIndexable }}
-				<template #caption>{{ i18n.ts.makeIndexableDescription }}</template>
+				<template #label><SearchLabel>{{ i18n.ts.makeIndexable }}</SearchLabel></template>
+				<template #caption><SearchKeyword>{{ i18n.ts.makeIndexableDescription }}</SearchKeyword></template>
 			</MkSwitch>
 		</SearchMarker>
 
@@ -80,15 +87,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<SearchMarker :keywords="['rss', 'feed']">
 			<MkSwitch v-model="enableRss" @update:modelValue="save()">
-				{{ i18n.ts.enableRss }}
-				<template #caption>{{ i18n.ts.enableRssDescription }}</template>
-			</MkSwitch>
-		</SearchMarker>
-
-		<SearchMarker :keywords="['crawle', 'ai']">
-			<MkSwitch v-model="preventAiLearning" @update:modelValue="save()">
-				<template #label><SearchLabel>{{ i18n.ts.preventAiLearning }}</SearchLabel></template>
-				<template #caption><SearchKeyword>{{ i18n.ts.preventAiLearningDescription }}</SearchKeyword></template>
+				<template #label><SearchLabel>{{ i18n.ts.enableRss }}</SearchLabel></template>
+				<template #caption><SearchKeyword>{{ i18n.ts.enableRssDescription }}</SearchKeyword></template>
 			</MkSwitch>
 		</SearchMarker>
 
@@ -205,12 +205,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 					<SearchMarker :keywords="['federate', 'auth', 'fetch']">
 						<MkFolder v-if="instance.federation !== 'none'">
-							<template #label>{{ i18n.ts.authorizedFetchSection }}</template>
+							<template #label><SearchLabel>{{ i18n.ts.authorizedFetchSection }}</SearchLabel></template>
 							<template #suffix>{{ computedAllowUnsignedFetch !== 'always' ? i18n.ts.enabled : i18n.ts.disabled }}</template>
 
 							<MkRadios v-model="allowUnsignedFetch" @update:modelValue="save()">
-								<template #label>{{ i18n.ts.authorizedFetchLabel }}</template>
-								<template #caption>{{ i18n.ts.authorizedFetchDescription }}</template>
+								<template #label><SearchLabel>{{ i18n.ts.authorizedFetchLabel }}</SearchLabel></template>
+								<template #caption><SearchKeyword>{{ i18n.ts.authorizedFetchDescription }}</SearchKeyword></template>
 								<option value="never">{{ i18n.ts._authorizedFetchValue.never }} - {{ i18n.ts._authorizedFetchValueDescription.never }}</option>
 								<option value="always">{{ i18n.ts._authorizedFetchValue.always }} - {{ i18n.ts._authorizedFetchValueDescription.always }}</option>
 								<option value="essential">{{ i18n.ts._authorizedFetchValue.essential }} - {{ i18n.ts._authorizedFetchValueDescription.essential }}</option>
@@ -221,9 +221,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 					<SearchMarker :keywords="['note', 'visib']">
 						<div class="_gaps_m">
-							<MkSwitch v-model="rememberNoteVisibility" @update:modelValue="save()">{{ i18n.ts.rememberNoteVisibility }}</MkSwitch>
+							<MkSwitch v-model="rememberNoteVisibility" @update:modelValue="save()"><SearchLabel>{{ i18n.ts.rememberNoteVisibility }}</SearchLabel></MkSwitch>
 							<MkFolder v-if="!rememberNoteVisibility">
-								<template #label>{{ i18n.ts.defaultNoteVisibility }}</template>
+								<template #label><SearchLabel>{{ i18n.ts.defaultNoteVisibility }}</SearchLabel></template>
 								<template v-if="defaultNoteVisibility === 'public'" #suffix>{{ i18n.ts._visibility.public }}</template>
 								<template v-else-if="defaultNoteVisibility === 'home'" #suffix>{{ i18n.ts._visibility.home }}</template>
 								<template v-else-if="defaultNoteVisibility === 'followers'" #suffix>{{ i18n.ts._visibility.followers }}</template>
@@ -244,16 +244,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 					<SearchMarker :keywords="['keep', 'cw', 'content', 'warning']">
 						<div class="_gaps_m">
-							<MkSwitch v-model="keepCw" @update:modelValue="save()">{{ i18n.ts.keepCw }}</MkSwitch>
+							<MkSwitch v-model="keepCw" @update:modelValue="save()"><SearchLabel>{{ i18n.ts.keepCw }}</SearchLabel></MkSwitch>
 
 							<MkInput v-model="defaultCW" type="text" manualSave @update:modelValue="save()">
-								<template #label>{{ i18n.ts.defaultCW }}</template>
-								<template #caption>{{ i18n.ts.defaultCWDescription }}</template>
+								<template #label><SearchLabel>{{ i18n.ts.defaultCW }}</SearchLabel></template>
+								<template #caption><SearchKeyword>{{ i18n.ts.defaultCWDescription }}</SearchKeyword></template>
 							</MkInput>
 
 							<MkSelect v-model="defaultCWPriority" :disabled="!defaultCW || !keepCw" @update:modelValue="save()">
-								<template #label>{{ i18n.ts.defaultCWPriority }}</template>
-								<template #caption>{{ i18n.ts.defaultCWPriorityDescription }}</template>
+								<template #label><SearchLabel>{{ i18n.ts.defaultCWPriority }}</SearchLabel></template>
+								<template #caption><SearchKeyword>{{ i18n.ts.defaultCWPriorityDescription }}</SearchKeyword></template>
 								<option value="default">{{ i18n.ts._defaultCWPriority.default }}</option>
 								<option value="parent">{{ i18n.ts._defaultCWPriority.parent }}</option>
 								<option value="parentDefault">{{ i18n.ts._defaultCWPriority.parentDefault }}</option>
@@ -296,6 +296,7 @@ const $i = ensureSignin();
 const isLocked = ref($i.isLocked);
 const autoAcceptFollowed = ref($i.autoAcceptFollowed);
 const noCrawle = ref($i.noCrawle);
+const preventAiLearning = ref($i.preventAiLearning);
 const noindex = ref($i.noindex);
 const enableRss = ref($i.enableRss);
 const isExplorable = ref($i.isExplorable);
@@ -316,8 +317,6 @@ const computedAllowUnsignedFetch = computed(() => {
 	}
 	return instance.allowUnsignedFetch;
 });
-
-const preventAiLearning = ref($i.preventAiLearning);
 const defaultNoteVisibility = prefer.model('defaultNoteVisibility');
 const defaultNoteLocalOnly = prefer.model('defaultNoteLocalOnly');
 const rememberNoteVisibility = prefer.model('rememberNoteVisibility');
@@ -365,6 +364,7 @@ function save() {
 		isLocked: !!isLocked.value,
 		autoAcceptFollowed: !!autoAcceptFollowed.value,
 		noCrawle: !!noCrawle.value,
+		preventAiLearning: !!preventAiLearning.value,
 		noindex: !!noindex.value,
 		enableRss: !!enableRss.value,
 		isExplorable: !!isExplorable.value,

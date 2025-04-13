@@ -141,21 +141,35 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</SearchMarker>
 
 							<SearchMarker :keywords="['collapse', 'repl']">
-								<MkSwitch v-model="collapseNotesRepliedTo">
-									<template #label><SearchLabel>{{ i18n.ts.collapseNotesRepliedTo }}</SearchLabel></template>
-								</MkSwitch>
+								<MkPreferenceContainer k="collapseNotesRepliedTo">
+									<MkSwitch v-model="collapseNotesRepliedTo">
+										<template #label><SearchLabel>{{ i18n.ts.collapseNotesRepliedTo }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
 							</SearchMarker>
 
 							<SearchMarker :keywords="['collapse', 'uncollapse', 'un-collapse', 'cw', 'content', 'warning']">
-								<MkSwitch v-model="uncollapseCW">
-									<template #label><SearchLabel>{{ i18n.ts.uncollapseCW }}</SearchLabel></template>
-								</MkSwitch>
+								<MkPreferenceContainer k="uncollapseCW">
+									<MkSwitch v-model="uncollapseCW">
+										<template #label><SearchLabel>{{ i18n.ts.uncollapseCW }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['collapse', 'files']">
+								<MkPreferenceContainer k="collapseFiles">
+									<MkSwitch v-model="collapseFiles">
+										<template #label><SearchLabel>{{ i18n.ts.collapseFiles }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
 							</SearchMarker>
 
 							<SearchMarker :keywords="['expand', 'long']">
-								<MkSwitch v-model="expandLongNote">
-									<template #label><SearchLabel>{{ i18n.ts.expandLongNote }}</SearchLabel></template>
-								</MkSwitch>
+								<MkPreferenceContainer k="expandLongNote">
+									<MkSwitch v-model="expandLongNote">
+										<template #label><SearchLabel>{{ i18n.ts.expandLongNote }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
 							</SearchMarker>
 
 							<SearchMarker :keywords="['note', 'timeline', 'gap']">
@@ -184,40 +198,48 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</SearchMarker>
 
 							<SearchMarker :keywords="['show', 'ticker', 'replies']">
-								<MkSwitch v-model="showTickerOnReplies">
-									<template #label>{{ i18n.ts.showTickerOnReplies }}</template>
-								</MkSwitch>
+								<MkPreferenceContainer k="showTickerOnReplies">
+									<MkSwitch v-model="showTickerOnReplies">
+										<template #label>{{ i18n.ts.showTickerOnReplies }}</template>
+									</MkSwitch>
+								</MkPreferenceContainer>
 							</SearchMarker>
 
 							<SearchMarker :keywords="['cat', 'speak']">
-								<MkSwitch v-model="disableCatSpeak">
-									<template #label><SearchLabel>{{ i18n.ts.disableCatSpeak }}</SearchLabel></template>
-								</MkSwitch>
+								<MkPreferenceContainer k="disableCatSpeak">
+									<MkSwitch v-model="disableCatSpeak">
+										<template #label><SearchLabel>{{ i18n.ts.disableCatSpeak }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
 							</SearchMarker>
 
 							<SearchMarker :keywords="['search', 'engine']">
-								<MkSelect v-model="searchEngine" placeholder="Other">
-									<template #label><SearchLabel>{{ i18n.ts.searchEngine }}</SearchLabel></template>
-									<option
-										v-for="[key, value] in Object.entries(searchEngineMap)" :key="key" :value="key"
-									>
-										{{ value }}
-									</option>
-									<!-- If the user is on Other and enters a domain add this one so that the dropdown doesnt go blank -->
-									<option v-if="useCustomSearchEngine" :value="searchEngine">
-										{{ i18n.ts.searchEngineOther }}
-									</option>
-									<!-- If one of the other options is selected show this as a blank other -->
-									<option v-if="!useCustomSearchEngine" value="">{{ i18n.ts.searchEngineOther }}</option>
-								</MkSelect>
+								<MkPreferenceContainer k="searchEngine">
+									<MkSelect v-model="searchEngine" placeholder="Other">
+										<template #label><SearchLabel>{{ i18n.ts.searchEngine }}</SearchLabel></template>
+										<option
+											v-for="[key, value] in Object.entries(searchEngineMap)" :key="key" :value="key"
+										>
+											{{ value }}
+										</option>
+										<!-- If the user is on Other and enters a domain add this one so that the dropdown doesnt go blank -->
+										<option v-if="useCustomSearchEngine" :value="searchEngine">
+											{{ i18n.ts.searchEngineOther }}
+										</option>
+										<!-- If one of the other options is selected show this as a blank other -->
+										<option v-if="!useCustomSearchEngine" value="">{{ i18n.ts.searchEngineOther }}</option>
+									</MkSelect>
+								</MkPreferenceContainer>
 							</SearchMarker>
 
 							<SearchMarker :keywords="['design', 'appear']">
-								<MkRadios v-model="noteDesign">
-									<template #label><SearchLabel>Note Design</SearchLabel></template>
-									<option value="sharkey"><i class="sk-icons sk-shark sk-icons-lg" style="top: 2px;position: relative;"></i> Sharkey</option>
-									<option value="misskey"><i class="sk-icons sk-misskey sk-icons-lg" style="top: 2px;position: relative;"></i> Misskey</option>
-								</MkRadios>
+								<MkPreferenceContainer k="noteDesign">
+									<MkRadios v-model="noteDesign">
+										<template #label><SearchLabel>Note Design</SearchLabel></template>
+										<option value="sharkey"><i class="sk-icons sk-shark sk-icons-lg" style="top: 2px;position: relative;"></i> Sharkey</option>
+										<option value="misskey"><i class="sk-icons sk-misskey sk-icons-lg" style="top: 2px;position: relative;"></i> Misskey</option>
+									</MkRadios>
+								</MkPreferenceContainer>
 							</SearchMarker>
 						</div>
 
@@ -327,11 +349,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
+							<SearchMarker :keywords="['load', 'conversation']">
+								<MkPreferenceContainer k="autoloadConversation">
+									<MkSwitch v-model="autoloadConversation">
+										<template #label><SearchLabel>{{ i18n.ts.autoloadConversation }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
+							</SearchMarker>
+
 							<SearchMarker :keywords="['number', 'replies']">
-								<MkRange v-model="numberOfReplies" :min="2" :max="20" :step="1" easing>
-									<template #label><SearchLabel>{{ i18n.ts.numberOfReplies }}</SearchLabel></template>
-									<template #caption>{{ i18n.ts.numberOfRepliesDescription }}</template>
-								</MkRange>
+								<MkPreferenceContainer k="numberOfReplies">
+									<MkRange v-model="numberOfReplies" :min="2" :max="20" :step="1" easing>
+										<template #label><SearchLabel>{{ i18n.ts.numberOfReplies }}</SearchLabel></template>
+										<template #caption>{{ i18n.ts.numberOfRepliesDescription }}</template>
+									</MkRange>
+								</MkPreferenceContainer>
 							</SearchMarker>
 						</div>
 					</div>
@@ -415,22 +447,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</SearchMarker>
 
 						<SearchMarker :keywords="['click']">
-							<MkSwitch v-model="notificationClickable">
-								<template #label><SearchLabel>{{ i18n.ts.allowClickingNotifications }}</SearchLabel></template>
-							</MkSwitch>
+							<MkPreferenceContainer k="notificationClickable">
+								<MkSwitch v-model="notificationClickable">
+									<template #label><SearchLabel>{{ i18n.ts.allowClickingNotifications }}</SearchLabel></template>
+								</MkSwitch>
+							</MkPreferenceContainer>
 						</SearchMarker>
 
 						<SearchMarker :keywords="['favicon', 'dot']">
-							<MkSwitch v-model="enableFaviconNotificationDot">
-								<template #label><SearchLabel>{{ i18n.ts.enableFaviconNotificationDot }}</SearchLabel></template>
-								<template #caption>
-									<I18n :src="i18n.ts.notificationDotNotWorkingAdvice" tag="span">
-										<template #link>
+							<MkPreferenceContainer k="enableFaviconNotificationDot">
+								<MkSwitch v-model="enableFaviconNotificationDot">
+									<template #label><SearchLabel>{{ i18n.ts.enableFaviconNotificationDot }}</SearchLabel></template>
+									<template #caption>
+										<I18n :src="i18n.ts.notificationDotNotWorkingAdvice" tag="span">
+											<template #link>
 											<MkLink url="https://docs.joinsharkey.org/docs/install/faqs/#ive-enabled-the-notification-dot-but-it-doesnt-show">{{ i18n.ts._mfm.link }}</MkLink>
-										</template>
-									</I18n>
-								</template>
-							</MkSwitch>
+											</template>
+										</I18n>
+									</template>
+								</MkSwitch>
+							</MkPreferenceContainer>
 						</SearchMarker>
 
 						<MkButton @click="testNotificationDot">{{ i18n.ts.verifyNotificationDotWorkingButton }}</MkButton>
@@ -567,6 +603,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 									<MkSwitch v-model="makeEveryTextElementsSelectable">
 										<template #label><SearchLabel>{{ i18n.ts._settings.makeEveryTextElementsSelectable }}</SearchLabel></template>
 										<template #caption>{{ i18n.ts._settings.makeEveryTextElementsSelectable_description }}</template>
+									</MkSwitch>
+								</MkPreferenceContainer>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['click', 'open']">
+								<MkPreferenceContainer k="clickToOpen">
+									<MkSwitch v-model="clickToOpen">
+										<template #label><SearchLabel>{{ i18n.ts.clickToOpen }}</SearchLabel></template>
 									</MkSwitch>
 								</MkPreferenceContainer>
 							</SearchMarker>
@@ -715,15 +759,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</SearchMarker>
 
 							<SearchMarker :keywords="['warn', 'missing', 'alt', 'text']">
-								<MkSwitch v-model="warnMissingAltText">
-									<template #label><SearchLabel>{{ i18n.ts.warnForMissingAltText }}</SearchLabel></template>
-								</MkSwitch>
+								<MkPreferenceContainer k="warnMissingAltText">
+									<MkSwitch v-model="warnMissingAltText">
+										<template #label><SearchLabel>{{ i18n.ts.warnForMissingAltText }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
 							</SearchMarker>
 
 							<SearchMarker :keywords="['warn', 'external', 'url']">
-								<MkSwitch v-model="warnExternalUrl">
-									<template #label><SearchLabel>{{ i18n.ts.warnExternalUrl }}</SearchLabel></template>
-								</MkSwitch>
+								<MkPreferenceContainer k="warnExternalUrl">
+									<MkSwitch v-model="warnExternalUrl">
+										<template #label><SearchLabel>{{ i18n.ts.warnExternalUrl }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
 							</SearchMarker>
 
 							<SearchMarker :keywords="['image', 'photo', 'picture', 'media', 'thumbnail', 'new', 'tab']">
@@ -763,25 +811,27 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkPreferenceContainer>
 						</SearchMarker>
 
-						<MkFolder>
-							<template #label>{{ i18n.ts.boostSettings }}</template>
-							<div class="_gaps_m">
-								<SearchMarker :keywords="['boost', 'show', 'visib', 'selector']">
-									<MkSwitch v-model="showVisibilitySelectorOnBoost">
-										<template #label><SearchLabel>{{ i18n.ts.showVisibilitySelectorOnBoost }}</SearchLabel></template>
-										<template #caption>{{ i18n.ts.showVisibilitySelectorOnBoostDescription }}</template>
-									</MkSwitch>
-								</SearchMarker>
-								<SearchMarker :keywords="['boost', 'visib']">
-									<MkSelect v-model="visibilityOnBoost">
-										<template #label><SearchLabel>{{ i18n.ts.visibilityOnBoost }}</SearchLabel></template>
-										<option value="public">{{ i18n.ts._visibility['public'] }}</option>
-										<option value="home">{{ i18n.ts._visibility['home'] }}</option>
-										<option value="followers">{{ i18n.ts._visibility['followers'] }}</option>
-									</MkSelect>
-								</SearchMarker>
-							</div>
-						</MkFolder>
+						<SearchMarker :keywords="['boost', 'show', 'visib', 'selector']">
+							<MkFolder>
+								<template #label><SearchLabel>{{ i18n.ts.boostSettings }}</SearchLabel></template>
+								<div class="_gaps_m">
+									<MkPreferenceContainer k="showVisibilitySelectorOnBoost">
+										<MkSwitch v-model="showVisibilitySelectorOnBoost">
+											<template #label><SearchLabel>{{ i18n.ts.showVisibilitySelectorOnBoost }}</SearchLabel></template>
+											<template #caption>{{ i18n.ts.showVisibilitySelectorOnBoostDescription }}</template>
+										</MkSwitch>
+									</MkPreferenceContainer>
+									<MkPreferenceContainer k="visibilityOnBoost">
+										<MkSelect v-model="visibilityOnBoost">
+											<template #label><SearchLabel>{{ i18n.ts.visibilityOnBoost }}</SearchLabel></template>
+											<option value="public">{{ i18n.ts._visibility['public'] }}</option>
+											<option value="home">{{ i18n.ts._visibility['home'] }}</option>
+											<option value="followers">{{ i18n.ts._visibility['followers'] }}</option>
+										</MkSelect>
+									</MkPreferenceContainer>
+								</div>
+							</MkFolder>
+						</SearchMarker>
 
 						<SearchMarker :keywords="['ad', 'show']">
 							<MkPreferenceContainer k="forceShowAds">
@@ -792,9 +842,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</SearchMarker>
 
 						<SearchMarker :keywords="['oneko', 'cat']">
-							<MkSwitch v-model="oneko">
-								<template #label>{{ i18n.ts.oneko }}</template>
-							</MkSwitch>
+							<MkPreferenceContainer k="oneko">
+								<MkSwitch v-model="oneko">
+									<template #label><SearchLabel>{{ i18n.ts.oneko }}</SearchLabel></template>
+								</MkSwitch>
+							</MkPreferenceContainer>
 						</SearchMarker>
 
 						<SearchMarker>
@@ -937,18 +989,20 @@ const showTickerOnReplies = prefer.model('showTickerOnReplies');
 const searchEngine = prefer.model('searchEngine');
 const noteDesign = prefer.model('noteDesign');
 const uncollapseCW = prefer.model('uncollapseCW');
+const collapseFiles = prefer.model('collapseFiles');
 const expandLongNote = prefer.model('expandLongNote');
 const disableCatSpeak = prefer.model('disableCatSpeak');
-const enableFaviconNotificationDot = computed(store.makeGetterSetter('enableFaviconNotificationDot'));
+const enableFaviconNotificationDot = prefer.model('enableFaviconNotificationDot');
 const warnMissingAltText = prefer.model('warnMissingAltText');
-const notificationClickable = computed(store.makeGetterSetter('notificationClickable'));
+const notificationClickable = prefer.model('notificationClickable');
 const warnExternalUrl = prefer.model('warnExternalUrl');
 const showVisibilitySelectorOnBoost = prefer.model('showVisibilitySelectorOnBoost');
 const visibilityOnBoost = prefer.model('visibilityOnBoost');
-const cornerRadius = computed(store.makeGetterSetter('cornerRadius'));
-const oneko = computed(store.makeGetterSetter('oneko'));
-const numberOfReplies = computed(store.makeGetterSetter('numberOfReplies'));
-
+const cornerRadius = ref(miLocalStorage.getItem('cornerRadius'));
+const oneko = prefer.model('oneko');
+const numberOfReplies = prefer.model('numberOfReplies');
+const autoloadConversation = prefer.model('autoloadConversation');
+const clickToOpen = prefer.model('clickToOpen');
 const useCustomSearchEngine = computed(() => !Object.keys(searchEngineMap).includes(searchEngine.value));
 
 watch(lang, () => {
@@ -970,6 +1024,14 @@ watch(useSystemFont, () => {
 		miLocalStorage.setItem('useSystemFont', 't');
 	} else {
 		miLocalStorage.removeItem('useSystemFont');
+	}
+});
+
+watch(cornerRadius, () => {
+	if (cornerRadius.value == null) {
+		miLocalStorage.removeItem('cornerRadius');
+	} else {
+		miLocalStorage.setItem('cornerRadius', cornerRadius.value);
 	}
 });
 

@@ -139,23 +139,30 @@ export function migrateOldSettings() {
 		prefer.commit('sound.on.reaction', store.s.sound_reaction as any);
 		prefer.commit('defaultNoteVisibility', store.s.defaultNoteVisibility);
 		prefer.commit('defaultNoteLocalOnly', store.s.defaultNoteLocalOnly);
-		// Sharkey migrations
-		prefer.commit('collapseNotesRepliedTo', store.s.collapseNotesRepliedTo);
-		prefer.commit('collapseFiles', store.s.collapseFiles);
-		prefer.commit('uncollapseCW', store.s.uncollapseCW);
-		prefer.commit('expandLongNote', store.s.expandLongNote);
-		prefer.commit('like', store.s.like);
+
+		//#region Sharkey migrations
 		prefer.commit('autoloadConversation', store.s.autoloadConversation);
-		prefer.commit('showVisibilitySelectorOnBoost', store.s.showVisibilitySelectorOnBoost);
-		prefer.commit('visibilityOnBoost', store.s.visibilityOnBoost);
-		prefer.commit('trustedDomains', store.s.trustedDomains);
-		prefer.commit('warnExternalUrl', store.s.warnExternalUrl);
-		prefer.commit('followingFeed', store.s.followingFeed);
-		prefer.commit('warnMissingAltText', store.s.warnMissingAltText);
+		prefer.commit('clickToOpen', store.s.clickToOpen);
+		prefer.commit('collapseFiles', store.s.collapseFiles);
+		prefer.commit('collapseNotesRepliedTo', store.s.collapseNotesRepliedTo);
 		prefer.commit('disableCatSpeak', store.s.disableCatSpeak);
-		prefer.commit('showTickerOnReplies', store.s.showTickerOnReplies);
-		prefer.commit('searchEngine', store.s.searchEngine);
+		prefer.commit('enableFaviconNotificationDot', store.s.enableFaviconNotificationDot);
+		prefer.commit('expandLongNote', store.s.expandLongNote);
+		prefer.commit('followingFeed', store.s.followingFeed);
+		prefer.commit('like', store.s.like);
 		prefer.commit('noteDesign', store.s.noteDesign);
+		prefer.commit('notificationClickable', store.s.notificationClickable);
+		prefer.commit('numberOfReplies', store.s.numberOfReplies);
+		prefer.commit('oneko', store.s.oneko);
+		prefer.commit('searchEngine', store.s.searchEngine);
+		prefer.commit('showTickerOnReplies', store.s.showTickerOnReplies);
+		prefer.commit('showVisibilitySelectorOnBoost', store.s.showVisibilitySelectorOnBoost);
+		prefer.commit('trustedDomains', store.s.trustedDomains);
+		prefer.commit('uncollapseCW', store.s.uncollapseCW);
+		prefer.commit('visibilityOnBoost', store.s.visibilityOnBoost);
+		prefer.commit('warnExternalUrl', store.s.warnExternalUrl);
+		prefer.commit('warnMissingAltText', store.s.warnMissingAltText);
+		//#endregion
 
 		window.setTimeout(() => {
 			unisonReload();

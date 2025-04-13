@@ -130,54 +130,6 @@ export const PREF_DEF = {
 	collapseRenotes: {
 		default: false,
 	},
-	collapseNotesRepliedTo: {
-		default: false,
-	},
-	collapseFiles: {
-		default: false,
-	},
-	uncollapseCW: {
-		default: false,
-	},
-	expandLongNote: {
-		default: false,
-	},
-	like: {
-		default: null as string | null,
-	},
-	autoloadConversation: {
-		default: true,
-	},
-	showVisibilitySelectorOnBoost: {
-		default: true,
-	},
-	visibilityOnBoost: {
-		default: 'public' as 'public' | 'home' | 'followers',
-	},
-	trustedDomains: {
-		default: [] as string[],
-	},
-	warnExternalUrl: {
-		default: true,
-	},
-	followingFeed: {
-		default: defaultFollowingFeedState as Partial<FollowingFeedState>,
-	},
-	warnMissingAltText: {
-		default: true,
-	},
-	disableCatSpeak: {
-		default: false,
-	},
-	showTickerOnReplies: {
-		default: false,
-	},
-	searchEngine: {
-		default: Object.keys(searchEngineMap)[0],
-	},
-	noteDesign: {
-		default: 'sharkey' as 'sharkey' | 'misskey',
-	},
 	menu: {
 		default: [
 			'notifications',
@@ -452,4 +404,70 @@ export const PREF_DEF = {
 	'experimental.stackingRouterView': {
 		default: false,
 	},
+
+	//#region Sharkey
+	autoloadConversation: {
+		default: true,
+	},
+	clickToOpen: {
+		default: true,
+	},
+	collapseFiles: {
+		default: false,
+	},
+	collapseNotesRepliedTo: {
+		default: false,
+	},
+	disableCatSpeak: {
+		default: false,
+	},
+	enableFaviconNotificationDot: {
+		default: true,
+	},
+	expandLongNote: {
+		default: false,
+	},
+	followingFeed: {
+		default: defaultFollowingFeedState as Partial<FollowingFeedState>,
+	},
+	like: {
+		default: null as string | null,
+	},
+	noteDesign: {
+		default: 'sharkey' as 'sharkey' | 'misskey',
+	},
+	notificationClickable: {
+		default: false,
+	},
+	numberOfReplies: {
+		default: 5,
+	},
+	oneko: {
+		default: false,
+	},
+	searchEngine: {
+		default: Object.keys(searchEngineMap)[0],
+	},
+	showTickerOnReplies: {
+		default: false,
+	},
+	showVisibilitySelectorOnBoost: {
+		default: true,
+	},
+	trustedDomains: {
+		default: [] as string[],
+	},
+	uncollapseCW: {
+		default: false,
+	},
+	visibilityOnBoost: {
+		default: 'public' as 'public' | 'home' | 'followers',
+	},
+	warnExternalUrl: {
+		default: true,
+	},
+	warnMissingAltText: {
+		default: true,
+	},
+	//#endregion
 } satisfies PreferencesDefinition;

@@ -470,95 +470,94 @@ export const store = markRaw(new Pizzax('base', {
 			sfxVolume: 1,
 		},
 	},
-	collapseNotesRepliedTo: {
+	//#endregion
+
+	//#region Sharkey
+	autoloadConversation: {
+		where: 'account',
+		default: true,
+	},
+	clickToOpen: {
 		where: 'device',
-		default: false,
+		default: true,
 	},
 	collapseFiles: {
-		where: 'device',
+		where: 'account',
 		default: false,
 	},
-	uncollapseCW: {
-		where: 'device',
+	collapseNotesRepliedTo: {
+		where: 'account',
 		default: false,
-	},
-	expandLongNote: {
-		where: 'device',
-		default: false,
-	},
-	like: {
-		where: 'device',
-		default: null as string | null,
-	},
-	autoloadConversation: {
-		where: 'device',
-		default: true,
-	},
-	showVisibilitySelectorOnBoost: {
-		where: 'device',
-		default: true,
-	},
-	visibilityOnBoost: {
-		where: 'device',
-		default: 'public' as 'public' | 'home' | 'followers',
-	},
-	trustedDomains: {
-		where: 'device',
-		default: [] as string[],
-	},
-	warnExternalUrl: {
-		where: 'device',
-		default: true,
-	},
-	followingFeed: {
-		where: 'device',
-		default: defaultFollowingFeedState as Partial<FollowingFeedState>,
-	},
-	warnMissingAltText: {
-		where: 'device',
-		default: true,
 	},
 	disableCatSpeak: {
-		where: 'device',
-		default: false,
-	},
-	showTickerOnReplies: {
-		where: 'device',
-		default: false,
-	},
-	searchEngine: {
-		where: 'device',
-		default: Object.keys(searchEngineMap)[0],
-	},
-	noteDesign: {
-		where: 'device',
-		default: 'sharkey' as 'sharkey' | 'misskey',
-	},
-	//#endregion
-	oneko: {
-		where: 'device',
+		where: 'account',
 		default: false,
 	},
 	enableFaviconNotificationDot: {
 		where: 'device',
 		default: true,
 	},
-	numberOfReplies: {
+	expandLongNote: {
 		where: 'device',
-		default: 5,
+		default: false,
+	},
+	followingFeed: {
+		where: 'account',
+		default: defaultFollowingFeedState as Partial<FollowingFeedState>,
+	},
+	like: {
+		where: 'account',
+		default: null as string | null,
+	},
+	noteDesign: {
+		where: 'device',
+		default: 'sharkey' as 'sharkey' | 'misskey',
 	},
 	notificationClickable: {
 		where: 'device',
 		default: false,
 	},
-	cornerRadius: {
+	numberOfReplies: {
 		where: 'device',
-		default: null as 'Misskey' | null,
+		default: 5,
 	},
-	clickToOpen: {
+	oneko: {
+		where: 'device',
+		default: false,
+	},
+	searchEngine: {
+		where: 'account',
+		default: Object.keys(searchEngineMap)[0],
+	},
+	showTickerOnReplies: {
+		where: 'device',
+		default: false,
+	},
+	showVisibilitySelectorOnBoost: {
+		where: 'account',
+		default: true,
+	},
+	trustedDomains: {
+		where: 'account',
+		default: [] as string[],
+	},
+	uncollapseCW: {
+		where: 'account',
+		default: false,
+	},
+	visibilityOnBoost: {
+		where: 'account',
+		default: 'public' as 'public' | 'home' | 'followers',
+	},
+	warnExternalUrl: {
+		where: 'account',
+		default: true,
+	},
+	warnMissingAltText: {
 		where: 'device',
 		default: true,
 	},
+	//#endregion
 }));
 
 // TODO: 他のタブと永続化されたstateを同期
