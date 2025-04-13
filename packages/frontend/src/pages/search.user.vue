@@ -88,17 +88,6 @@ async function search() {
 	}
 	//#endregion
 
-	if (query.length > 1 && !query.includes(' ') && query.startsWith('#')) {
-		const confirm = await os.confirm({
-			type: 'info',
-			text: i18n.ts.openTagPageConfirm,
-		});
-		if (!confirm.canceled) {
-			router.push(`/user-tags/${encodeURIComponent(query.substring(1))}`);
-			return;
-		}
-	}
-
 	if (query.match(/^@[a-z0-9_.-]+@[a-z0-9_.-]+$/i)) {
 		const confirm = await os.confirm({
 			type: 'info',
@@ -106,6 +95,17 @@ async function search() {
 		});
 		if (!confirm.canceled) {
 			router.push(`/${query}`);
+			return;
+		}
+	}
+
+	if (query.length > 1 && !query.includes(' ') && query.startsWith('#')) {
+		const confirm = await os.confirm({
+			type: 'info',
+			text: i18n.ts.openTagPageConfirm,
+		});
+		if (!confirm.canceled) {
+			router.push(`/user-tags/${encodeURIComponent(query.substring(1))}`);
 			return;
 		}
 	}
