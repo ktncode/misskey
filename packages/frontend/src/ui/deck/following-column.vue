@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <XColumn :menu="menu" :column="column" :isStacked="isStacked" :refresher="reload">
 	<template #header>
-		<i :class="columnIcon" aria-hidden="true"/><span style="margin-left: 8px;">{{ column.name }}</span>
+		<i :class="columnIcon" aria-hidden="true"/><span style="margin-left: 8px;">{{ (column.name || column.userList) ?? i18n.ts._deck._columns.following }}</span>
 	</template>
 
 	<SkRemoteFollowersWarning :class="$style.followersWarning" :model="model"/>
