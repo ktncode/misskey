@@ -87,14 +87,17 @@ const storageProvider: StorageProvider = {
 	},
 
 	cloudGets: async (ctx) => {
-		// TODO: 値の取得を1つのリクエストで済ませたい(バックエンド側でAPIの新設が必要)
-		const fetchings = ctx.needs.map(need => storageProvider.cloudGet(need).then(res => [need.key, res] as const));
-		const cloudDatas = await Promise.all(fetchings);
+		const cloudDatas = await misskeyApi('i/registry/get-all', {
+			scope: ['client', 'preferences', 'sync'],
+		}) as Record<string, [any, any][] | undefined>;
 
 		const res = {} as Partial<Record<string, any>>;
-		for (const cloudData of cloudDatas) {
-			if (cloudData[1] != null) {
-				res[cloudData[0]] = cloudData[1].value;
+		for (const need of ctx.needs) {
+			const cloudData = cloudDatas[syncGroup + ':' + need.key];
+			const target = cloudData?.find(([scope]) => isSameScope(scope, need.scope));
+
+			if (target != null) {
+				res[need.key] = target[1];
 			}
 		}
 
