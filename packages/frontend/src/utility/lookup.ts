@@ -18,7 +18,7 @@ export async function lookup(router?: Router) {
 	const query = temp ? temp.trim() : '';
 	if (canceled || query.length <= 1) return;
 
-	if (query.startsWith('@') && !query.includes(' ')) {
+	if (query.match(/^@[a-z0-9_.-]+@[a-z0-9_.-]+$/i)) {
 		_router.push(`/${query}`);
 		return;
 	}
