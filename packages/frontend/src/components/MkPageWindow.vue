@@ -113,7 +113,7 @@ windowRouter.addListener('change', ctx => {
 windowRouter.init();
 
 provide(DI.router, windowRouter);
-provide('inAppSearchMarkerId', searchMarkerId);
+provide(DI.inAppSearchMarkerId, searchMarkerId);
 provideMetadataReceiver((metadataGetter) => {
 	const info = metadataGetter();
 	pageMetadata.value = info;
@@ -121,7 +121,7 @@ provideMetadataReceiver((metadataGetter) => {
 provideReactiveMetadata(pageMetadata);
 provide('shouldOmitHeaderTitle', true);
 provide('shouldHeaderThin', true);
-provide('forceSpacerMin', true);
+provide(DI.forceSpacerMin, true);
 provide('shouldBackButton', false);
 
 const contextmenu = computed(() => ([{
