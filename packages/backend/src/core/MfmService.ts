@@ -576,7 +576,6 @@ export class MfmService {
 
 		appendChildren(nodes, body);
 
-		// Remove the unnecessary namespace
 		const serialized = body.outerHTML;
 
 		happyDOM.close().catch(err => {});
