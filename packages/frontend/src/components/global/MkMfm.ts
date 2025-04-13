@@ -83,7 +83,7 @@ export default function MkMfm(props: MfmProps, { emit }: { emit: SetupContext<Mf
 		return c.match(/^[0-9a-f]{3,6}$/i) ? c : null;
 	};
 
-	const useAnim = prefer.s.advancedMfm && prefer.s.animatedMfm;
+	const useAnim = props.isAnim ?? (prefer.s.advancedMfm && prefer.s.animatedMfm);
 	const isBlock = props.isBlock ?? false;
 
 	const SkFormula = defineAsyncComponent(() => import('@/components/SkFormula.vue'));
