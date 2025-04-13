@@ -449,7 +449,7 @@ async function deleteAllFiles() {
 async function deleteAccount() {
 	const confirm = await os.confirm({
 		type: 'warning',
-		text: i18n.ts.deleteAccountConfirm,
+		text: i18n.ts.deleteThisAccountConfirm,
 	});
 	if (confirm.canceled) return;
 

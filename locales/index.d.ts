@@ -12203,6 +12203,10 @@ export interface Locale extends ILocale {
      */
     "oneko": string;
     /**
+     * This will irreversibly delete this account. Proceed?
+     */
+    "deleteThisAccountConfirm": string;
+    /**
      * Enable Achievements
      */
     "enableAchievements": string;
