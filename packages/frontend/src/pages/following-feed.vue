@@ -16,16 +16,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkHorizontalSwipe>
 	</div>
 
-	<SkLazy ref="userScroll" :class="$style.user">
+	<MkLazy ref="userScroll" :class="$style.user">
 		<MkHorizontalSwipe v-if="selectedUserId" v-model:tab="userList" :tabs="headerTabs">
 			<SkUserRecentNotes ref="userRecentNotes" :userId="selectedUserId" :withNonPublic="withNonPublic" :withQuotes="withQuotes" :withBots="withBots" :withReplies="withReplies" :onlyFiles="onlyFiles"/>
 		</MkHorizontalSwipe>
-	</SkLazy>
+	</MkLazy>
 </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, shallowRef } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 import type { ComputedRef, Ref } from 'vue';
 import type { Tab } from '@/components/global/MkPageHeader.tabs.vue';
 import type { PageHeaderItem } from '@/types/page-header.js';
@@ -34,11 +34,11 @@ import MkHorizontalSwipe from '@/components/MkHorizontalSwipe.vue';
 import MkPageHeader from '@/components/global/MkPageHeader.vue';
 import SkUserRecentNotes from '@/components/SkUserRecentNotes.vue';
 import { createModel, createHeaderItem, followingFeedTabs, followingTabIcon, followingTabName, followingTab } from '@/utility/following-feed-utils.js';
-import SkLazy from '@/components/global/SkLazy.vue';
 import SkFollowingRecentNotes from '@/components/SkFollowingRecentNotes.vue';
 import SkRemoteFollowersWarning from '@/components/SkRemoteFollowersWarning.vue';
 import { useRouter } from '@/router';
 import { definePage } from '@/page';
+import MkLazy from '@/components';
 
 const model = createModel();
 const {
@@ -52,10 +52,10 @@ const {
 
 const router = useRouter();
 
-const userRecentNotes = shallowRef<InstanceType<typeof SkUserRecentNotes>>();
-const followingRecentNotes = shallowRef<InstanceType<typeof SkFollowingRecentNotes>>();
-const userScroll = shallowRef<InstanceType<typeof SkLazy>>();
-const noteScroll = shallowRef<HTMLElement>();
+const userRecentNotes = useTemplateRef('userRecentNotes');
+const followingRecentNotes = useTemplateRef('followingRecentNotes');
+const userScroll = useTemplateRef('userScroll');
+const noteScroll = useTemplateRef('noteScroll');
 
 const selectedUserId: Ref<string | null> = ref(null);
 
