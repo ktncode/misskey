@@ -45,11 +45,9 @@ export async function getNoteVersionsMenu(props: { note: Misskey.entities.Note }
 
 	await statePromise.then((versions) => {
 		for (const edit of versions) {
-			const _time = new Date(edit.oldDate).getTime();
-
 			menu.push({
 				icon: 'ph-pencil-simple ph-bold ph-lg',
-				text: _time ? dateTimeFormat.format(_time) : dateTimeFormat.format(new Date(edit.updatedAt)),
+				text: dateTimeFormat.format(new Date(edit.oldDate)),
 				action: () => openVersion(edit),
 			});
 		}
