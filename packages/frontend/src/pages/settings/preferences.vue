@@ -812,7 +812,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</SearchMarker>
 
 						<SearchMarker :keywords="['boost', 'show', 'visib', 'selector']">
-							<MkFolder>
+							<MkFolder :defaultOpen="slotProps.isParentOfTarget">
 								<template #label><SearchLabel>{{ i18n.ts.boostSettings }}</SearchLabel></template>
 								<div class="_gaps_m">
 									<MkPreferenceContainer k="showVisibilitySelectorOnBoost">
