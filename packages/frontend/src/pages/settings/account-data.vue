@@ -168,6 +168,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 				</MkFolder>
 			</SearchMarker>
+
+			<SearchMarker :keywords="['account', 'export', 'data']">
+				<MkFolder>
+					<template #icon><SearchIcon><i class="ph-database ph-bold ph-lg"></i></SearchIcon></template>
+					<template #label><SearchLabel>{{ i18n.ts._dataRequest.title }}</SearchLabel></template>
+
+					<div class="_gaps_m">
+						<FormInfo warn>{{ i18n.ts._dataRequest.warn }}</FormInfo>
+						<FormInfo>{{ i18n.ts._dataRequest.text }}</FormInfo>
+						<MkButton primary @click="exportData">{{ i18n.ts._dataRequest.button }}</MkButton>
+					</div>
+				</MkFolder>
+			</SearchMarker>
 		</div>
 	</div>
 </SearchMarker>
@@ -179,6 +192,7 @@ import MkButton from '@/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkRadios from '@/components/MkRadios.vue';
+import FormInfo from '@/components/MkInfo.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { selectFile } from '@/utility/select-file.js';
@@ -248,6 +262,10 @@ const exportMuting = () => {
 
 const exportAntennas = () => {
 	misskeyApi('i/export-antennas', {}).then(onExportSuccess).catch(onError);
+};
+
+const exportData = () => {
+	misskeyApi('i/export-data', {}).then(onExportSuccess).catch(onError);
 };
 
 const importFollowing = async (ev) => {

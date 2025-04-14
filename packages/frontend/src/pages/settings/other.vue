@@ -67,19 +67,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkFolder>
 			</SearchMarker>
 
-			<SearchMarker :keywords="['account', 'export', 'data']">
-				<MkFolder>
-					<template #icon><i class="ph-database ph-bold ph-lg"></i></template>
-					<template #label><SearchLabel>{{ i18n.ts._dataRequest.title }}</SearchLabel></template>
-
-					<div class="_gaps_m">
-						<FormInfo warn>{{ i18n.ts._dataRequest.warn }}</FormInfo>
-						<FormInfo>{{ i18n.ts._dataRequest.text }}</FormInfo>
-						<MkButton primary @click="exportData">{{ i18n.ts._dataRequest.button }}</MkButton>
-					</div>
-				</MkFolder>
-			</SearchMarker>
-
 			<SearchMarker :keywords="['account', 'close', 'delete']">
 				<MkFolder>
 					<template #icon><SearchIcon><i class="ti ti-alert-triangle"></i></SearchIcon></template>
@@ -210,20 +197,6 @@ async function deleteAccount() {
 function migrate() {
 	migrateOldSettings();
 }
-
-const exportData = () => {
-	misskeyApi('i/export-data', {}).then(() => {
-		os.alert({
-			type: 'info',
-			text: i18n.ts.exportRequested,
-		});
-	}).catch((ev) => {
-		os.alert({
-			type: 'error',
-			text: ev.message,
-		});
-	});
-};
 
 const headerActions = computed(() => []);
 
