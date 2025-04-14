@@ -87,6 +87,13 @@ const storageProvider: StorageProvider = {
 	},
 
 	cloudGets: async (ctx) => {
+		/* this happens when the frontend boots and there's no logged-in
+			 user; we can't call `i/registry/get-all` because that would
+			 fail, but also we don't need to: return the empty result that
+			 the caller asked for */
+		if (ctx.needs.length === 0) {
+			return {};
+		}
 		const cloudDatas = await misskeyApi('i/registry/get-all', {
 			scope: ['client', 'preferences', 'sync'],
 		}) as Record<string, [any, any][] | undefined>;
