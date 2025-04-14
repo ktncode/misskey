@@ -36,9 +36,9 @@ import SkUserRecentNotes from '@/components/SkUserRecentNotes.vue';
 import { createModel, createHeaderItem, followingFeedTabs, followingTabIcon, followingTabName, followingTab } from '@/utility/following-feed-utils.js';
 import SkFollowingRecentNotes from '@/components/SkFollowingRecentNotes.vue';
 import SkRemoteFollowersWarning from '@/components/SkRemoteFollowersWarning.vue';
-import { useRouter } from '@/router';
-import { definePage } from '@/page';
-import MkLazy from '@/components';
+import { useRouter } from '@/router.js';
+import { definePage } from '@/page.js';
+import MkLazy from '@/components/global/MkLazy.vue';
 
 const model = createModel();
 const {
