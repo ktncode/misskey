@@ -1399,7 +1399,7 @@ export interface Locale extends ILocale {
      */
     "inputNewFileName": string;
     /**
-     * Enter new alt text
+     * 新しいキャプションを入力してください
      */
     "inputNewDescription": string;
     /**
@@ -2595,11 +2595,11 @@ export interface Locale extends ILocale {
      */
     "description": string;
     /**
-     * Add alt text
+     * キャプションを付ける
      */
     "describeFile": string;
     /**
-     * Enter alt text
+     * キャプションを入力
      */
     "enterFileDescription": string;
     /**
@@ -4080,7 +4080,7 @@ export interface Locale extends ILocale {
      */
     "windowRestore": string;
     /**
-     * Alt text
+     * キャプション
      */
     "caption": string;
     /**
