@@ -219,29 +219,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</MkFolder>
 					</SearchMarker>
 
-					<SearchMarker :keywords="['note', 'visib']">
-						<div class="_gaps_m">
-							<MkSwitch v-model="rememberNoteVisibility" @update:modelValue="save()"><SearchLabel>{{ i18n.ts.rememberNoteVisibility }}</SearchLabel></MkSwitch>
-							<MkFolder v-if="!rememberNoteVisibility">
-								<template #label><SearchLabel>{{ i18n.ts.defaultNoteVisibility }}</SearchLabel></template>
-								<template v-if="defaultNoteVisibility === 'public'" #suffix>{{ i18n.ts._visibility.public }}</template>
-								<template v-else-if="defaultNoteVisibility === 'home'" #suffix>{{ i18n.ts._visibility.home }}</template>
-								<template v-else-if="defaultNoteVisibility === 'followers'" #suffix>{{ i18n.ts._visibility.followers }}</template>
-								<template v-else-if="defaultNoteVisibility === 'specified'" #suffix>{{ i18n.ts._visibility.specified }}</template>
-
-								<div class="_gaps_m">
-									<MkSelect v-model="defaultNoteVisibility">
-										<option value="public">{{ i18n.ts._visibility.public }}</option>
-										<option value="home">{{ i18n.ts._visibility.home }}</option>
-										<option value="followers">{{ i18n.ts._visibility.followers }}</option>
-										<option value="specified">{{ i18n.ts._visibility.specified }}</option>
-									</MkSelect>
-									<MkSwitch v-model="defaultNoteLocalOnly">{{ i18n.ts._visibility.disableFederation }}</MkSwitch>
-								</div>
-							</MkFolder>
-						</div>
-					</SearchMarker>
-
 					<SearchMarker :keywords="['keep', 'cw', 'content', 'warning']">
 						<div class="_gaps_m">
 							<MkSwitch v-model="keepCw" @update:modelValue="save()"><SearchLabel>{{ i18n.ts.keepCw }}</SearchLabel></MkSwitch>
@@ -317,9 +294,6 @@ const computedAllowUnsignedFetch = computed(() => {
 	}
 	return instance.allowUnsignedFetch;
 });
-const defaultNoteVisibility = prefer.model('defaultNoteVisibility');
-const defaultNoteLocalOnly = prefer.model('defaultNoteLocalOnly');
-const rememberNoteVisibility = prefer.model('rememberNoteVisibility');
 const keepCw = prefer.model('keepCw');
 
 const makeNotesFollowersOnlyBefore_type = computed(() => {
