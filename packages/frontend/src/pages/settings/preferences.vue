@@ -200,7 +200,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<SearchMarker :keywords="['show', 'ticker', 'replies']">
 								<MkPreferenceContainer k="showTickerOnReplies">
 									<MkSwitch v-model="showTickerOnReplies">
-										<template #label>{{ i18n.ts.showTickerOnReplies }}</template>
+										<template #label><SearchLabel>{{ i18n.ts.showTickerOnReplies }}</SearchLabel></template>
 									</MkSwitch>
 								</MkPreferenceContainer>
 							</SearchMarker>
