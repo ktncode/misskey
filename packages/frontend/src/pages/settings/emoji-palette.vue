@@ -58,7 +58,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<SearchMarker :keywords="['emoji', 'default', 'like', 'react']">
 			<FormSection>
-				<template #label>{{ i18n.ts.defaultLike }}</template>
+				<template #label><SearchLabel>{{ i18n.ts.defaultLike }}</SearchLabel></template>
 				<MkCustomEmoji v-if="like && like.startsWith(':')" style="max-height: 3em; font-size: 1.1em;" :useOriginalSize="false" :name="like" :normal="true" :noStyle="true"/>
 				<MkEmoji v-else-if="like && !like.startsWith(':')" :emoji="like" style="max-height: 3em; font-size: 1.1em;" :normal="true" :noStyle="true"/>
 				<span v-else-if="!like">{{ i18n.ts.notSet }}</span>
