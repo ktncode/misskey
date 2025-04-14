@@ -219,26 +219,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</MkFolder>
 					</SearchMarker>
 
-					<SearchMarker :keywords="['keep', 'cw', 'content', 'warning']">
-						<div class="_gaps_m">
-							<MkSwitch v-model="keepCw" @update:modelValue="save()"><SearchLabel>{{ i18n.ts.keepCw }}</SearchLabel></MkSwitch>
-
-							<MkInput v-model="defaultCW" type="text" manualSave @update:modelValue="save()">
-								<template #label><SearchLabel>{{ i18n.ts.defaultCW }}</SearchLabel></template>
-								<template #caption><SearchKeyword>{{ i18n.ts.defaultCWDescription }}</SearchKeyword></template>
-							</MkInput>
-
-							<MkSelect v-model="defaultCWPriority" :disabled="!defaultCW || !keepCw" @update:modelValue="save()">
-								<template #label><SearchLabel>{{ i18n.ts.defaultCWPriority }}</SearchLabel></template>
-								<template #caption><SearchKeyword>{{ i18n.ts.defaultCWPriorityDescription }}</SearchKeyword></template>
-								<option value="default">{{ i18n.ts._defaultCWPriority.default }}</option>
-								<option value="parent">{{ i18n.ts._defaultCWPriority.parent }}</option>
-								<option value="parentDefault">{{ i18n.ts._defaultCWPriority.parentDefault }}</option>
-								<option value="defaultParent">{{ i18n.ts._defaultCWPriority.defaultParent }}</option>
-							</MkSelect>
-						</div>
-					</SearchMarker>
-
 					<MkInfo warn>{{ i18n.ts._accountSettings.mayNotEffectSomeSituations }}</MkInfo>
 				</div>
 			</FormSection>
@@ -285,8 +265,6 @@ const publicReactions = ref($i.publicReactions);
 const followingVisibility = ref($i.followingVisibility);
 const followersVisibility = ref($i.followersVisibility);
 const chatScope = ref($i.chatScope);
-const defaultCW = ref($i.defaultCW);
-const defaultCWPriority = ref($i.defaultCWPriority);
 const allowUnsignedFetch = ref($i.allowUnsignedFetch);
 const computedAllowUnsignedFetch = computed(() => {
 	if (allowUnsignedFetch.value !== 'staff') {
@@ -294,7 +272,6 @@ const computedAllowUnsignedFetch = computed(() => {
 	}
 	return instance.allowUnsignedFetch;
 });
-const keepCw = prefer.model('keepCw');
 
 const makeNotesFollowersOnlyBefore_type = computed(() => {
 	if (makeNotesFollowersOnlyBefore.value == null) {
@@ -350,8 +327,6 @@ function save() {
 		followingVisibility: followingVisibility.value,
 		followersVisibility: followersVisibility.value,
 		chatScope: chatScope.value,
-		defaultCWPriority: defaultCWPriority.value,
-		defaultCW: defaultCW.value,
 		allowUnsignedFetch: allowUnsignedFetch.value,
 	});
 }

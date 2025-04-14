@@ -385,6 +385,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
+							<SearchMarker :keywords="['note', 'cw']">
+								<MkInput v-model="defaultCW" type="text" manualSave @update:modelValue="save()">
+									<template #label><SearchLabel>{{ i18n.ts.defaultCW }}</SearchLabel></template>
+									<template #caption><SearchKeyword>{{ i18n.ts.defaultCWDescription }}</SearchKeyword></template>
+								</MkInput>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['note', 'cw', 'priority']">
+								<MkSelect v-model="defaultCWPriority" :disabled="!defaultCW || !keepCw" @update:modelValue="save()">
+									<template #label><SearchLabel>{{ i18n.ts.defaultCWPriority }}</SearchLabel></template>
+									<template #caption><SearchKeyword>{{ i18n.ts.defaultCWPriorityDescription }}</SearchKeyword></template>
+									<option value="default">{{ i18n.ts._defaultCWPriority.default }}</option>
+									<option value="parent">{{ i18n.ts._defaultCWPriority.parent }}</option>
+									<option value="parentDefault">{{ i18n.ts._defaultCWPriority.parentDefault }}</option>
+									<option value="defaultParent">{{ i18n.ts._defaultCWPriority.defaultParent }}</option>
+								</MkSelect>
+							</SearchMarker>
+
 							<SearchMarker :keywords="['remember', 'keep', 'note', 'visibility']">
 								<MkPreferenceContainer k="rememberNoteVisibility">
 									<MkSwitch v-model="rememberNoteVisibility">
@@ -902,6 +920,7 @@ import FormSection from '@/components/form/section.vue';
 import FormLink from '@/components/form/link.vue';
 import MkLink from '@/components/MkLink.vue';
 import MkInfo from '@/components/MkInfo.vue';
+import MkInput from '@/components/MkInput.vue';
 import { store } from '@/store.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
@@ -1004,6 +1023,8 @@ const numberOfReplies = prefer.model('numberOfReplies');
 const autoloadConversation = prefer.model('autoloadConversation');
 const clickToOpen = prefer.model('clickToOpen');
 const useCustomSearchEngine = computed(() => !Object.keys(searchEngineMap).includes(searchEngine.value));
+const defaultCW = ref($i.defaultCW);
+const defaultCWPriority = ref($i.defaultCWPriority);
 
 watch(lang, () => {
 	miLocalStorage.setItem('lang', lang.value as string);
@@ -1185,6 +1206,13 @@ async function testNotificationDot() {
 	} else {
 		os.toast(i18n.ts.notificationDotNotWorking);
 	}
+}
+
+function save() {
+	misskeyApi('i/update', {
+		defaultCWPriority: defaultCWPriority.value,
+		defaultCW: defaultCW.value,
+	});
 }
 
 const headerActions = computed(() => []);
