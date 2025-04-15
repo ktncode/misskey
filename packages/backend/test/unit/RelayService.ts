@@ -18,6 +18,7 @@ import { RelayService } from '@/core/RelayService.js';
 import { SystemAccountService } from '@/core/SystemAccountService.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { UtilityService } from '@/core/UtilityService.js';
+import { UserFollowingService } from '@/core/UserFollowingService.js';
 
 const moduleMocker = new ModuleMocker(global);
 
@@ -38,12 +39,18 @@ describe('RelayService', () => {
 				UserEntityService,
 				SystemAccountService,
 				UtilityService,
+				UserFollowingService,
+				{
+					provide: 'UserFollowingService',
+					useClass: UserFollowingService,
+				},
+				{
+					provide: QueueService,
+					useValue: { deliver: jest.fn() },
+				},
 			],
 		})
 			.useMocker((token) => {
-				if (token === QueueService) {
-					return { deliver: jest.fn() };
-				}
 				if (typeof token === 'function') {
 					const mockMetadata = moduleMocker.getMetadata(token) as MockFunctionMetadata<any, any>;
 					const Mock = moduleMocker.generateFromMetadata(mockMetadata);
