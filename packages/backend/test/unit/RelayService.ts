@@ -19,6 +19,8 @@ import { SystemAccountService } from '@/core/SystemAccountService.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { UserFollowingService } from '@/core/UserFollowingService.js';
+import { RelaysRepository } from '@/models/_.js';
+import { DI } from '@/di-symbols.js';
 
 const moduleMocker = new ModuleMocker(global);
 
@@ -26,6 +28,8 @@ describe('RelayService', () => {
 	let app: TestingModule;
 	let relayService: RelayService;
 	let queueService: jest.Mocked<QueueService>;
+	let relaysRepository: RelaysRepository;
+	let idService: IdService;
 
 	beforeAll(async () => {
 		app = await Test.createTestingModule({
@@ -63,6 +67,8 @@ describe('RelayService', () => {
 
 		relayService = app.get<RelayService>(RelayService);
 		queueService = app.get<QueueService>(QueueService) as jest.Mocked<QueueService>;
+		relaysRepository = app.get<RelaysRepository>(DI.relaysRepository);
+		idService = app.get<IdService>(IdService);
 	});
 
 	afterAll(async () => {
@@ -105,5 +111,43 @@ describe('RelayService', () => {
 	test('removeMastodonRelay with a non-connected relay should throw', async () => {
 		await expect(relayService.removeMastodonRelay('https://x.example.com'))
 			.rejects.toThrow('relay not found');
+	});
+
+	test('acceptMastodonRelay should update repository', async () => {
+		const id = idService.gen();
+
+		try {
+			await relaysRepository.insert({
+				id,
+				inbox: 'https://example.com',
+				status: 'requesting',
+			});
+
+			await relayService.acceptMastodonRelay(id);
+			const result = await relaysRepository.findOneByOrFail({ id });
+
+			expect(result.status).toBe('accepted');
+		} finally {
+			await relaysRepository.delete({ id });
+		}
+	});
+
+	test('rejectMastodonRelay should update repository', async () => {
+		const id = idService.gen();
+
+		try {
+			await relaysRepository.insert({
+				id,
+				inbox: 'https://example.com',
+				status: 'requesting',
+			});
+
+			await relayService.rejectMastodonRelay(id);
+			const result = await relaysRepository.findOneByOrFail({ id });
+
+			expect(result.status).toBe('rejected');
+		} finally {
+			await relaysRepository.delete({ id });
+		}
 	});
 });
