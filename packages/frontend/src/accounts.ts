@@ -294,6 +294,11 @@ export async function openAccountMenu(opts: {
 			icon: 'ti ti-users',
 			text: i18n.ts.manageAccounts,
 			to: '/settings/accounts',
+		}, {
+			type: 'button' as const,
+			icon: 'ph-power ph-bold ph-lg',
+			text: i18n.ts.logout,
+			action: () => { signout(); },
 		});
 	} else {
 		if (opts.includeCurrentAccount) {
