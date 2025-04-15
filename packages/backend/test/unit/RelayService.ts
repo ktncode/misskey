@@ -69,7 +69,7 @@ describe('RelayService', () => {
 		await app.close();
 	});
 
-	test('addRelay', async () => {
+	test('addMastodonRelay should update status and deliver activity', async () => {
 		const result = await relayService.addMastodonRelay('https://example.com');
 
 		expect(result.inbox).toBe('https://example.com');
@@ -80,7 +80,7 @@ describe('RelayService', () => {
 		//expect(queueService.deliver.mock.lastCall![0].username).toBe('relay.actor');
 	});
 
-	test('listRelay', async () => {
+	test('listMastodonRelays should update status and deliver activity', async () => {
 		const result = await relayService.listMastodonRelays();
 
 		expect(result.length).toBe(1);
@@ -88,7 +88,7 @@ describe('RelayService', () => {
 		expect(result[0].status).toBe('requesting');
 	});
 
-	test('removeRelay: succ', async () => {
+	test('removeMastodonRelay with a connected relay should update status and deliver activity', async () => {
 		await relayService.removeMastodonRelay('https://example.com');
 
 		expect(queueService.deliver).toHaveBeenCalled();
@@ -102,7 +102,7 @@ describe('RelayService', () => {
 		expect(list.length).toBe(0);
 	});
 
-	test('removeRelay: fail', async () => {
+	test('removeMastodonRelay with a non-connected relay should throw', async () => {
 		await expect(relayService.removeMastodonRelay('https://x.example.com'))
 			.rejects.toThrow('relay not found');
 	});
