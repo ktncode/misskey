@@ -119,6 +119,7 @@ const player = ref(new ChiptuneJsPlayer(new ChiptuneJsConfig()));
 
 const maxRowNumbers = 0xFF;
 const rowBuffer = 26;
+const maxChannelLimit = 9;
 let buffer = null;
 let isSeeking = false;
 let firstFrame = true;
@@ -154,6 +155,7 @@ function populateCanvasSlices () {
 	let nbChannels = 0;
 	if (player.value.currentPlayingNode) {
 		nbChannels = player.value.currentPlayingNode.nbChannels;
+		//nbChannels = nbChannels > maxChannelLimit ? maxChannelLimit : nbChannels;
 	}
 	sliceWidth = 12 + 84 * nbChannels + 2;
 
@@ -320,9 +322,8 @@ function drawSlices(skipOptimizationChecks = false) {
 
 		const isRowBufPos = rowDif > 0;
 		let s = 0;
-		//if (!isRowBufPos) playPause(); // Debug pause
+
 		for (let i = 0; i < canvasSlice.length; i++) {
-			let curRow = row - halfbuf + i;
 			//if (buf === 0) break; // I don't want it to do random things.
 			//if (canvasSlice[i].data.pattern === pattern) {
 			canvasSlice[i].data.slicePos = canvasSlice[i].data.slicePos - rowDif;
@@ -331,22 +332,29 @@ function drawSlices(skipOptimizationChecks = false) {
 			canvasSlice[i].data.slicePos = isRowBufPos ? rowBuffer - 1 : s;
 			canvasSlice[i].data.position = isRowBufPos ? canvasSlice[i].data.position + rowBuffer : canvasSlice[i].data.position - rowBuffer;
 
-			canvasSlice[i].ctx.fillStyle = '#000000';
+			let curRow = row + halfbuf - 1;
+
+			canvasSlice[i].ctx.fillStyle = colours.background;
 			canvasSlice[i].ctx.fillRect(0, 0, canvasSlice[i].ref.width, canvasSlice[i].ref.height);
-			drawRow(canvasSlice[i].ctx, curRow, nbChannels, pattern);
-			alreadyDrawn[curRow] = true;
-			canvasSlice[i].ctx.fillStyle = isRowBufPos ? colours.foreground.fx : colours.foreground.operant;
 			canvasSlice[i].ref.style.top = (canvasSlice[i].data.offest + (canvasSlice[i].data.position) * CHAR_HEIGHT) + 'px';
+			drawRow(canvasSlice[i].ctx, curRow, nbChannels, pattern);
+
+			//alreadyDrawn[curRow] = true;
+
+			canvasSlice[i].ctx.fillStyle = isRowBufPos ? colours.foreground.fx : colours.foreground.operant; // Debug
 			// Debug text
 			canvasSlice[i].ctx.fillText(
-				i.toString() + ' ' +
+				'   ' +
+				//i.toString() + ' ' +
 				curRow.toString() + ' ' +
-				canvasSlice[i].data.slicePos + ' ' +
-				canvasSlice[i].data.position + ' ' +
+				//canvasSlice[i].data.slicePos + ' ' +
+				//canvasSlice[i].data.position + ' ' +
 				Math.trunc(curtime) + 'ms ' +
-				canvasSlice[i].data.offest + 'px ' +
+				//canvasSlice[i].data.offest + 'px ' +
 				canvasSlice[i].ref.style.top
 				, 0, ROW_OFFSET_Y);
+
+			if (!isRowBufPos) playPause(); // Debug pause
 
 			//canvasSlice[i].data.position = buf > 0 ? canvasSlice[i].data.position + rowBuffer + buf : canvasSlice[i].data.position - rowBuffer + buf;
 			//canvasSlice[i].ref.style.top = buf > 0 ? (canvasSlice[i].data.slicePos * CHAR_HEIGHT) + 'px' : (buf + row) * CHAR_HEIGHT + 'px';
@@ -377,7 +385,7 @@ function drawSlices(skipOptimizationChecks = false) {
 		for (let i = 0; i < canvasSlice.length; i++) {
 			let curRow = row - halfbuf + i;
 			// just paint which slice, row and pushed row it is.
-			canvasSlice[i].ctx.fillStyle = '#000000';
+			canvasSlice[i].ctx.fillStyle = colours.background;
 			canvasSlice[i].ctx.fillRect(0, 0, canvasSlice[i].ref.width, canvasSlice[i].ref.height);
 			drawRow(canvasSlice[i].ctx, curRow, nbChannels, pattern);
 			//alreadyDrawn[curRow] = true;
@@ -389,6 +397,7 @@ function drawSlices(skipOptimizationChecks = false) {
 			canvasSlice[i].ref.style.top = canvasSlice[i].data.offest - CHAR_HEIGHT + 'px';
 			canvasSlice[i].data.offest = canvasSlice[i].data.offest - CHAR_HEIGHT;
 			/*
+			// Debug Text
 			canvasSlice[i].ctx.fillStyle = colours.foreground.default;
 			canvasSlice[i].ctx.fillText(
 				i.toString() + ' ' +
@@ -427,7 +436,7 @@ function drawSlices(skipOptimizationChecks = false) {
 
 function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, pattern: number, drawX = (2 * CHAR_WIDTH), drawY = ROW_OFFSET_Y) {
 	if (!player.value.currentPlayingNode) return false;
-	if (row < 0 || row > player.value.getPatternNumRows()) return false;
+	if (row < 0 || row > player.value.getPatternNumRows(pattern) - 1) return false;
 	//if (alreadyDrawn[row]) return true;
 	const spacer = 11;
 	const space = ' ';
@@ -438,6 +447,7 @@ function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, p
 	let fx = '';
 	let op = '';
 	for (let channel = 0; channel < channels; channel++) {
+		//if (channel > maxChannelLimit) break;
 		const part = player.value.getPatternRowChannel(pattern, row, channel);
 
 		seperators += '|' + space.repeat( spacer + 2 );
@@ -448,7 +458,7 @@ function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, p
 		op += part.substring(11, 13) + space.repeat( spacer + 1 );
 	}
 
-	//console.log( 'seperators: ' + seperators + '\nnote: '+ note + '\ninstr: ' + instr + '\nvolume: ' + volume + '\nfx: ' + fx + '\nop: ' + op);
+	//console.log( 'seperators: ' + seperators + '\nnote: ' + note + '\ninstr: ' + instr + '\nvolume: ' + volume + '\nfx: ' + fx + '\nop: ' + op);
 
 	ctx.fillStyle = colours.foreground.default;
 	ctx.fillText(seperators, drawX, drawY);
@@ -467,6 +477,8 @@ function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, p
 
 	ctx.fillStyle = colours.foreground.operant;
 	ctx.fillText(op, drawX + CHAR_WIDTH * 12, drawY);
+
+	ctx.drawImage( numberRowCanvas, 0, -(CHAR_HEIGHT * row) );
 
 	return true;
 }
@@ -604,6 +616,7 @@ onDeactivated(() => {
 			position: relative;
 			background-color: white;
 			image-rendering: pixelated;
+			/*transform: translateY(-24px);*/
 			/*pointer-events: none;*/
 			z-index: 0;
 
