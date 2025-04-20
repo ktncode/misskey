@@ -31,6 +31,7 @@ import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.j
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import type { Config } from '@/config.js';
 import { safeForSql } from '@/misc/safe-for-sql.js';
+import { verifyFieldLink } from '@/misc/verify-field-link.js'
 import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
 import { notificationRecieveConfig } from '@/models/json-schema/user.js';
 import { userUnsignedFetchOptions } from '@/const.js';
@@ -613,13 +614,23 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const urls = updatedProfile.fields.filter(x => x.value.startsWith('https://'));
 			for (const url of urls) {
-				this.verifyLink(url.value, user);
+				// this is a different, broader implementation so we can support remote users.
+				const includesProfileLinks = await verifyFieldLink(url.value, `${this.config.url}/@${user.username}`, this.httpRequestService);
+				if (includesProfileLinks) {
+					await userProfilesRepository.createQueryBuilder('profile').update()
+						.where('userId = :userId', { userId: user.id })
+						.set({
+							verifiedLinks: () => `array_append("verifiedLinks", '${url}')`, // ここでSQLインジェクションされそうなのでとりあえず safeForSql で弾いている
+						})
+						.execute();
+				}
 			}
 
 			return iObj;
 		});
 	}
 
+	// this function is superseded by '@/misc/verify-field-link.ts'
 	private async verifyLink(url: string, user: MiLocalUser) {
 		if (!safeForSql(url)) return;
 
