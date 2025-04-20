@@ -337,7 +337,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		this.logger.info(`Creating the Person: ${person.id}`);
 
 		const fields = this.analyzeAttachments(person.attachment ?? []);
-		const field_urls = fields.filter(x => x.value.includes('https://'));
+		const field_urls = fields.filter(x => x.value.startsWith('https://'));
 
 		const tags = extractApHashtags(person.tag).map(normalizeForSearch).splice(0, 32);
 
@@ -566,7 +566,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		const emojiNames = emojis.map(emoji => emoji.name);
 
 		const fields = this.analyzeAttachments(person.attachment ?? []);
-		const field_urls = fields.filter(x => x.value.includes('https://'));
+		const field_urls = fields.filter(x => x.value.startsWith('https://'));
 
 		const tags = extractApHashtags(person.tag).map(normalizeForSearch).splice(0, 32);
 
