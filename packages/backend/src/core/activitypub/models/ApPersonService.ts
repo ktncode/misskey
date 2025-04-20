@@ -41,6 +41,8 @@ import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.j
 import type { AccountMoveService } from '@/core/AccountMoveService.js';
 import { ApUtilityService } from '@/core/activitypub/ApUtilityService.js';
 import { MemoryKVCache } from '@/misc/cache.js';
+import { HttpRequestService } from '@/core/HttpRequestService.js';
+import { verifyFieldLink } from '@/misc/verify-field-link.js';
 import { getApId, getApType, isActor, isCollection, isCollectionOrOrderedCollection, isPropertyValue } from '../type.js';
 import { extractApHashtags } from './tag.js';
 import type { OnModuleInit } from '@nestjs/common';
@@ -112,6 +114,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 
 		private roleService: RoleService,
 		private readonly apUtilityService: ApUtilityService,
+		private httpRequestService: HttpRequestService,
 	) {
 	}
 
@@ -334,6 +337,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		this.logger.info(`Creating the Person: ${person.id}`);
 
 		const fields = this.analyzeAttachments(person.attachment ?? []);
+		const field_urls = fields.filter(x => x.value.includes('https://'));
 
 		const tags = extractApHashtags(person.tag).map(normalizeForSearch).splice(0, 32);
 
@@ -361,6 +365,16 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		}
 
 		const url = this.apUtilityService.findBestObjectUrl(person);
+
+		const verifiedLinks: string[] = [];
+		if (url) {
+			for (const field_url of field_urls) {
+				const includesProfileLinks = await verifyFieldLink(field_url.value, url, this.httpRequestService);
+				if (includesProfileLinks) {
+					verifiedLinks.push(field_url.value)
+				}
+			}
+		}
 
 		// Create user
 		let user: MiRemoteUser | null = null;
@@ -436,6 +450,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 					followedMessage: person._misskey_followedMessage != null ? truncate(person._misskey_followedMessage, 256) : null,
 					url,
 					fields,
+					verifiedLinks,
 					followingVisibility,
 					followersVisibility,
 					birthday: bday?.[0] ?? null,
@@ -551,6 +566,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		const emojiNames = emojis.map(emoji => emoji.name);
 
 		const fields = this.analyzeAttachments(person.attachment ?? []);
+		const field_urls = fields.filter(x => x.value.includes('https://'));
 
 		const tags = extractApHashtags(person.tag).map(normalizeForSearch).splice(0, 32);
 
@@ -578,6 +594,16 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		}
 
 		const url = this.apUtilityService.findBestObjectUrl(person);
+
+		const verifiedLinks: string[] = [];
+		if (url) {
+			for (const field_url of field_urls) {
+				const includesProfileLinks = await verifyFieldLink(field_url.value, url, this.httpRequestService);
+				if (includesProfileLinks) {
+					verifiedLinks.push(field_url.value)
+				}
+			}
+		}
 
 		const updates = {
 			lastFetchedAt: new Date(),
@@ -661,6 +687,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		await this.userProfilesRepository.update({ userId: exist.id }, {
 			url,
 			fields,
+			verifiedLinks,
 			description: _description,
 			followedMessage: person._misskey_followedMessage != null ? truncate(person._misskey_followedMessage, 256) : null,
 			followingVisibility,
