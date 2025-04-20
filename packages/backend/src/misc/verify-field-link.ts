@@ -12,7 +12,6 @@ export async function verifyFieldLinks(fields: Field[], profile_url: string, htt
 	const verified_links = [];
 	for (const field_url of fields
 		.filter(x => URL.canParse(x.value) && ['http:', 'https:'].includes((new URL(x.value).protocol)))) {
-		console.log('fortnite ' + field_url);
 		try {
 			const html = await httpRequestService.getHtml(field_url.value);
 
