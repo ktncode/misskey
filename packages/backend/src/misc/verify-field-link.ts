@@ -5,28 +5,31 @@
 
 import { JSDOM } from 'jsdom';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
-import { safeForSql } from './safe-for-sql.js';
 
+type Field = { name: string, value: string };
 
-export async function verifyFieldLink(field_url: string, profile_url: string, httpRequestService: HttpRequestService): Promise<boolean | undefined> {
-	if (!safeForSql(field_url)) return;
+export async function verifyFieldLinks(fields: Field[], profile_url: string, httpRequestService: HttpRequestService): Promise<string[]> {
+	const verified_links = [];
+	for (const field_url of fields
+		.filter(x => URL.canParse(x.value) && ['http:', 'https:'].includes((new URL(x.value).protocol)))) {
+		console.log('fortnite ' + field_url);
+		try {
+			const html = await httpRequestService.getHtml(field_url.value);
 
-	try {
-		const html = await httpRequestService.getHtml(field_url);
+			const { window } = new JSDOM(html);
+			const doc: Document = window.document;
 
-		const { window } = new JSDOM(html);
-		const doc: Document = window.document;
+			const aEls = Array.from(doc.getElementsByTagName('a'));
+			const linkEls = Array.from(doc.getElementsByTagName('link'));
 
-		const aEls = Array.from(doc.getElementsByTagName('a'));
-		const linkEls = Array.from(doc.getElementsByTagName('link'));
+			const includesProfileLinks = [...aEls, ...linkEls].some(link => link.rel === 'me' && link.href === profile_url);
+			if (includesProfileLinks) { verified_links.push(field_url.value); }
 
-		const includesProfileLinks = [...aEls, ...linkEls].some(link => link.rel === 'me' && link.href === profile_url);
-
-		window.close();
-
-		return includesProfileLinks;
-	} catch (err) {
-		// なにもしない
-		return;
+			window.close();
+		} catch (err) {
+			// don't do anything.
+			continue;
+		}
 	}
+	return verified_links;
 }

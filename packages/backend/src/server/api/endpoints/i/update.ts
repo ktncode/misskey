@@ -31,7 +31,7 @@ import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.j
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import type { Config } from '@/config.js';
 import { safeForSql } from '@/misc/safe-for-sql.js';
-import { verifyFieldLink } from '@/misc/verify-field-link.js'
+import { verifyFieldLinks } from '@/misc/verify-field-link.js';
 import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
 import { notificationRecieveConfig } from '@/models/json-schema/user.js';
 import { userUnsignedFetchOptions } from '@/const.js';
@@ -585,9 +585,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				this.globalEventService.publishInternalEvent('localUserUpdated', { id: user.id });
 			}
 
+			const verified_links = await verifyFieldLinks(newFields, `${this.config.url}/@${user.username}`, this.httpRequestService);
+
 			await this.userProfilesRepository.update(user.id, {
 				...profileUpdates,
-				verifiedLinks: [],
+				verifiedLinks: verified_links,
 			});
 
 			const iObj = await this.userEntityService.pack(user.id, user, {
@@ -612,18 +614,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				this.accountUpdateService.publishToFollowers(user.id);
 			}
 
-			const urls = updatedProfile.fields.filter(x => x.value.startsWith('https://'));
-			for (const url of urls) {
-				// this is a different, broader implementation so we can support remote users.
-				const includesProfileLinks = await verifyFieldLink(url.value, `${this.config.url}/@${user.username}`, this.httpRequestService);
-				if (includesProfileLinks) {
-					await userProfilesRepository.createQueryBuilder('profile').update()
-						.where('userId = :userId', { userId: user.id })
-						.set({
-							verifiedLinks: () => `array_append("verifiedLinks", '${url}')`, // ここでSQLインジェクションされそうなのでとりあえず safeForSql で弾いている
-						})
-						.execute();
-				}
+			if (verified_links.length > 0) {
+				await userProfilesRepository.createQueryBuilder('profile').update()
+					.where('userId = :userId', { userId: user.id })
+					.set({
+						verifiedLinks: verified_links.filter(x => safeForSql(x)), // ここでSQLインジェクションされそうなのでとりあえず safeForSql で弾いている
+					})
+					.execute();
 			}
 
 			return iObj;

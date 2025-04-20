@@ -42,7 +42,7 @@ import type { AccountMoveService } from '@/core/AccountMoveService.js';
 import { ApUtilityService } from '@/core/activitypub/ApUtilityService.js';
 import { MemoryKVCache } from '@/misc/cache.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
-import { verifyFieldLink } from '@/misc/verify-field-link.js';
+import { verifyFieldLinks } from '@/misc/verify-field-link.js';
 import { getApId, getApType, isActor, isCollection, isCollectionOrOrderedCollection, isPropertyValue } from '../type.js';
 import { extractApHashtags } from './tag.js';
 import type { OnModuleInit } from '@nestjs/common';
@@ -337,7 +337,6 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		this.logger.info(`Creating the Person: ${person.id}`);
 
 		const fields = this.analyzeAttachments(person.attachment ?? []);
-		const field_urls = fields.filter(x => x.value.startsWith('https://'));
 
 		const tags = extractApHashtags(person.tag).map(normalizeForSearch).splice(0, 32);
 
@@ -366,15 +365,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 
 		const url = this.apUtilityService.findBestObjectUrl(person);
 
-		const verifiedLinks: string[] = [];
-		if (url) {
-			for (const field_url of field_urls) {
-				const includesProfileLinks = await verifyFieldLink(field_url.value, url, this.httpRequestService);
-				if (includesProfileLinks) {
-					verifiedLinks.push(field_url.value)
-				}
-			}
-		}
+		const verifiedLinks = url ? await verifyFieldLinks(fields, url, this.httpRequestService) : [];
 
 		// Create user
 		let user: MiRemoteUser | null = null;
@@ -566,7 +557,6 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		const emojiNames = emojis.map(emoji => emoji.name);
 
 		const fields = this.analyzeAttachments(person.attachment ?? []);
-		const field_urls = fields.filter(x => x.value.startsWith('https://'));
 
 		const tags = extractApHashtags(person.tag).map(normalizeForSearch).splice(0, 32);
 
@@ -595,15 +585,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 
 		const url = this.apUtilityService.findBestObjectUrl(person);
 
-		const verifiedLinks: string[] = [];
-		if (url) {
-			for (const field_url of field_urls) {
-				const includesProfileLinks = await verifyFieldLink(field_url.value, url, this.httpRequestService);
-				if (includesProfileLinks) {
-					verifiedLinks.push(field_url.value)
-				}
-			}
-		}
+		const verifiedLinks = url ? await verifyFieldLinks(fields, url, this.httpRequestService) : [];
 
 		const updates = {
 			lastFetchedAt: new Date(),
