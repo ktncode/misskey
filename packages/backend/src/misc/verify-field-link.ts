@@ -4,7 +4,7 @@
 */
 
 import { JSDOM } from 'jsdom';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
+import type { HttpRequestService } from '@/core/HttpRequestService.js';
 
 type Field = { name: string, value: string };
 
