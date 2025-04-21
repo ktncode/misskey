@@ -614,15 +614,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				this.accountUpdateService.publishToFollowers(user.id);
 			}
 
-			if (verified_links.length > 0) {
-				await userProfilesRepository.createQueryBuilder('profile').update()
-					.where('userId = :userId', { userId: user.id })
-					.set({
-						verifiedLinks: verified_links.filter(x => safeForSql(x)), // ここでSQLインジェクションされそうなのでとりあえず safeForSql で弾いている
-					})
-					.execute();
-			}
-
 			return iObj;
 		});
 	}
