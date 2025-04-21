@@ -106,13 +106,22 @@ export class UtilityService {
 
 	@bindThis
 	public toPuny(host: string): string {
-		return domainToASCII(host.toLowerCase());
+		// domainToASCII will return an empty string if we give it a
+		// string like `name:123`, but `host` may well be in that form
+		// (e.g. when testing locally, you'll get `localhost:3000`); split
+		// the port off, and add it back later
+		const hostParts = host.toLowerCase().match(/^(.+?)(:.+)?$/);
+		if (!hostParts) return '';
+		const hostname = hostParts[1];
+		const port = hostParts[2] ?? '';
+
+		return domainToASCII(hostname) + port;
 	}
 
 	@bindThis
 	public toPunyNullable(host: string | null | undefined): string | null {
 		if (host == null) return null;
-		return domainToASCII(host.toLowerCase());
+		return this.toPuny(host);
 	}
 
 	@bindThis
