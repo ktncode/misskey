@@ -155,7 +155,7 @@ export const PREF_DEF = {
 		}[],
 	},
 	serverDisconnectedBehavior: {
-		default: 'quiet' as 'quiet' | 'disabled' | 'dialog',
+		default: 'disabled' as 'quiet' | 'disabled' | 'dialog',
 	},
 	nsfw: {
 		default: 'respect' as 'respect' | 'force' | 'ignore',
@@ -347,7 +347,7 @@ export const PREF_DEF = {
 		default: false,
 	},
 	'sound.on.note': {
-		default: { type: 'syuilo/n-aec', volume: 1 } as SoundStore,
+		default: { type: 'syuilo/n-aec', volume: 0 } as SoundStore,
 	},
 	'sound.on.noteMy': {
 		default: { type: 'syuilo/n-cea-4va', volume: 1 } as SoundStore,
