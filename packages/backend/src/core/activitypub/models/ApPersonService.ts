@@ -42,6 +42,8 @@ import type { AccountMoveService } from '@/core/AccountMoveService.js';
 import { ApUtilityService } from '@/core/activitypub/ApUtilityService.js';
 import { AppLockService } from '@/core/AppLockService.js';
 import { MemoryKVCache } from '@/misc/cache.js';
+import { HttpRequestService } from '@/core/HttpRequestService.js';
+import { verifyFieldLinks } from '@/misc/verify-field-link.js';
 import { getApId, getApType, isActor, isCollection, isCollectionOrOrderedCollection, isPropertyValue } from '../type.js';
 import { extractApHashtags } from './tag.js';
 import type { OnModuleInit } from '@nestjs/common';
@@ -113,6 +115,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 
 		private roleService: RoleService,
 		private readonly apUtilityService: ApUtilityService,
+		private readonly httpRequestService: HttpRequestService,
 		private readonly appLockService: AppLockService,
 	) {
 	}
@@ -370,6 +373,8 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 
 		const url = this.apUtilityService.findBestObjectUrl(person);
 
+		const verifiedLinks = url ? await verifyFieldLinks(fields, url, this.httpRequestService) : [];
+
 		// Create user
 		let user: MiRemoteUser | null = null;
 		let publicKey: MiUserPublickey | null = null;
@@ -444,6 +449,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 					followedMessage: person._misskey_followedMessage != null ? truncate(person._misskey_followedMessage, 256) : null,
 					url,
 					fields,
+					verifiedLinks,
 					followingVisibility,
 					followersVisibility,
 					birthday: bday?.[0] ?? null,
@@ -587,6 +593,8 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 
 		const url = this.apUtilityService.findBestObjectUrl(person);
 
+		const verifiedLinks = url ? await verifyFieldLinks(fields, url, this.httpRequestService) : [];
+
 		const updates = {
 			lastFetchedAt: new Date(),
 			inbox: person.inbox,
@@ -671,6 +679,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		await this.userProfilesRepository.update({ userId: exist.id }, {
 			url,
 			fields,
+			verifiedLinks,
 			description: _description,
 			followedMessage: person._misskey_followedMessage != null ? truncate(person._misskey_followedMessage, 256) : null,
 			followingVisibility,
