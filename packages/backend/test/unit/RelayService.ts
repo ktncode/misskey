@@ -290,4 +290,48 @@ describe('RelayService', () => {
 			await relayService.removeMastodonRelay(relay);
 		}
 	}
+
+	test('listLitePubRelays should list all relays of all statuses', async () => {
+		// TODO implement
+	});
+
+	test('addLitePubRelay should deliver activity', async () => {
+		// TODO implement
+	});
+
+	test('addLitePubRelay should update status', async () => {
+		// TODO implement
+	});
+
+	test('removeLitePubRelay should deliver activity', async () => {
+		// TODO implement
+	});
+
+	test('removeLitePubRelay should update status', async () => {
+		// TODO implement
+	});
+
+	test('hasPendingRelayRequests should return true if there are any follow requests', async () => {
+		// TODO implement
+	});
+
+	test('hasPendingRelayRequests should return false if there are no follow requests', async () => {
+		// TODO implement
+	});
+
+	test('acceptLitePubRelay should deliver activity', async () => {
+		// TODO implement
+	});
+
+	test('acceptLitePubRelay should update status', async () => {
+		// TODO implement
+	});
+
+	test('rejectLitePubRelay should deliver activity', async () => {
+		// TODO implement
+	});
+
+	test('rejectLitePubRelay should update status', async () => {
+		// TODO implement
+	});
 });
