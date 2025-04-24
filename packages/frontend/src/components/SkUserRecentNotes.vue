@@ -67,7 +67,7 @@ async function reload(): Promise<void> {
 			// An additional request is needed to "upgrade" the object.
 			misskeyApi('users/show', { userId: props.userId }),
 
-			// Wait for 1 second to match the animation effects in MkHorizontalSwipe, MkPullToRefresh, and MkPagination.
+			// Wait for 1 second to match the animation effects in MkSwiper, MkPullToRefresh, and MkPagination.
 			// Otherwise, the page appears to load "backwards".
 			new Promise(resolve => window.setTimeout(resolve, 1000)),
 		])

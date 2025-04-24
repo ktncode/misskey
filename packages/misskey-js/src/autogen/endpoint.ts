@@ -79,9 +79,15 @@ import type {
 	AdminMetaResponse,
 	AdminNsfwUserRequest,
 	AdminPromoCreateRequest,
+	AdminQueueClearRequest,
 	AdminQueueDeliverDelayedResponse,
 	AdminQueueInboxDelayedResponse,
-	AdminQueuePromoteRequest,
+	AdminQueueJobsRequest,
+	AdminQueuePromoteJobsRequest,
+	AdminQueueQueueStatsRequest,
+	AdminQueueRemoveJobRequest,
+	AdminQueueRetryJobRequest,
+	AdminQueueShowJobRequest,
 	AdminQueueStatsResponse,
 	AdminRejectQuotesRequest,
 	AdminRelaysAddRequest,
@@ -721,10 +727,16 @@ export type Endpoints = {
 	'admin/meta': { req: EmptyRequest; res: AdminMetaResponse };
 	'admin/nsfw-user': { req: AdminNsfwUserRequest; res: EmptyResponse };
 	'admin/promo/create': { req: AdminPromoCreateRequest; res: EmptyResponse };
-	'admin/queue/clear': { req: EmptyRequest; res: EmptyResponse };
+	'admin/queue/clear': { req: AdminQueueClearRequest; res: EmptyResponse };
 	'admin/queue/deliver-delayed': { req: EmptyRequest; res: AdminQueueDeliverDelayedResponse };
 	'admin/queue/inbox-delayed': { req: EmptyRequest; res: AdminQueueInboxDelayedResponse };
-	'admin/queue/promote': { req: AdminQueuePromoteRequest; res: EmptyResponse };
+	'admin/queue/jobs': { req: AdminQueueJobsRequest; res: EmptyResponse };
+	'admin/queue/promote-jobs': { req: AdminQueuePromoteJobsRequest; res: EmptyResponse };
+	'admin/queue/queue-stats': { req: AdminQueueQueueStatsRequest; res: EmptyResponse };
+	'admin/queue/queues': { req: EmptyRequest; res: EmptyResponse };
+	'admin/queue/remove-job': { req: AdminQueueRemoveJobRequest; res: EmptyResponse };
+	'admin/queue/retry-job': { req: AdminQueueRetryJobRequest; res: EmptyResponse };
+	'admin/queue/show-job': { req: AdminQueueShowJobRequest; res: EmptyResponse };
 	'admin/queue/stats': { req: EmptyRequest; res: AdminQueueStatsResponse };
 	'admin/reject-quotes': { req: AdminRejectQuotesRequest; res: EmptyResponse };
 	'admin/relays/add': { req: AdminRelaysAddRequest; res: AdminRelaysAddResponse };

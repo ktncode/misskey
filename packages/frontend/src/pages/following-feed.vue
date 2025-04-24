@@ -11,15 +11,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 
 	<div ref="noteScroll" :class="$style.notes">
-		<MkHorizontalSwipe v-model:tab="userList" :tabs="headerTabs">
+		<MkSwiper v-model:tab="userList" :tabs="headerTabs">
 			<SkFollowingRecentNotes ref="followingRecentNotes" :selectedUserId="selectedUserId" :userList="userList" :withNonPublic="withNonPublic" :withQuotes="withQuotes" :withBots="withBots" :withReplies="withReplies" :onlyFiles="onlyFiles" @userSelected="userSelected" @loaded="listReady"/>
-		</MkHorizontalSwipe>
+		</MkSwiper>
 	</div>
 
 	<MkLazy ref="userScroll" :class="$style.user">
-		<MkHorizontalSwipe v-if="selectedUserId" v-model:tab="userList" :tabs="headerTabs">
+		<MkSwiper v-if="selectedUserId" v-model:tab="userList" :tabs="headerTabs">
 			<SkUserRecentNotes ref="userRecentNotes" :userId="selectedUserId" :withNonPublic="withNonPublic" :withQuotes="withQuotes" :withBots="withBots" :withReplies="withReplies" :onlyFiles="onlyFiles"/>
-		</MkHorizontalSwipe>
+		</MkSwiper>
 	</MkLazy>
 </div>
 </template>
@@ -30,7 +30,7 @@ import type { ComputedRef, Ref } from 'vue';
 import type { Tab } from '@/components/global/MkPageHeader.tabs.vue';
 import type { PageHeaderItem } from '@/types/page-header.js';
 import { i18n } from '@/i18n.js';
-import MkHorizontalSwipe from '@/components/MkHorizontalSwipe.vue';
+import MkSwiper from '@/components/MkSwiper.vue';
 import MkPageHeader from '@/components/global/MkPageHeader.vue';
 import SkUserRecentNotes from '@/components/SkUserRecentNotes.vue';
 import { createModel, createHeaderItem, followingFeedTabs, followingTabIcon, followingTabName, followingTab } from '@/utility/following-feed-utils.js';

@@ -20,6 +20,7 @@ import { useTemplateRef } from 'vue';
 import { scrollInContainer } from '@@/js/scroll.js';
 import type { PageHeaderItem } from '@/types/page-header.js';
 import type { Tab } from './MkPageHeader.tabs.vue';
+import { useScrollPositionKeeper } from '@/use/use-scroll-position-keeper.js';
 
 const props = withDefaults(defineProps<{
 	tabs?: Tab[];
@@ -35,6 +36,8 @@ const props = withDefaults(defineProps<{
 
 const tab = defineModel<string>('tab');
 const rootEl = useTemplateRef('rootEl');
+
+useScrollPositionKeeper(rootEl);
 
 defineExpose({
 	scrollToTop: () => {

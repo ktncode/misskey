@@ -25,6 +25,7 @@ import InstanceChart from '@/core/chart/charts/instance.js';
 import PerUserFollowingChart from '@/core/chart/charts/per-user-following.js';
 import { SystemAccountService } from '@/core/SystemAccountService.js';
 import { RoleService } from '@/core/RoleService.js';
+import { AntennaService } from '@/core/AntennaService.js';
 
 @Injectable()
 export class AccountMoveService {
@@ -66,6 +67,7 @@ export class AccountMoveService {
 		private queueService: QueueService,
 		private systemAccountService: SystemAccountService,
 		private roleService: RoleService,
+		private antennaService: AntennaService,
 	) {
 	}
 
@@ -127,6 +129,7 @@ export class AccountMoveService {
 				this.deleteScheduledNotes(src),
 				this.copyRoles(src, dst),
 				this.updateLists(src, dst),
+				this.antennaService.onMoveAccount(src, dst),
 			]);
 		} catch {
 			/* skip if any error happens */

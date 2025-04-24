@@ -409,6 +409,13 @@ export function pluginReplaceIcons() {
 					'ti ti-ticket': 'ph-ticket ph-bold ph-lg',
 					'ti ti-user-cog': 'ph-user-circle-gear ph-bold ph-lg',
 					'ti ti-users-group': 'ph-users-three ph-bold ph-lg',
+					'ti ti-code-asterisk': 'ph-brackets-curly ph-bold ph-lg',
+					'ti ti-hourglass-high': 'ph-hourglass-high ph-bold ph-lg',
+					'ti ti-http-que': 'ph-queue ph-bold ph-lg',
+					'ti ti-list-check': 'ph-list-checks ph-bold ph-lg',
+					'ti ti-logs': 'ph-list-dashes ph-bold ph-lg',
+					'ti ti-timeline-event': 'ph-map-pin-simple-line ph-bold ph-lg',
+					'ti ti-user-minus': 'ph-user-minus ph-bold ph-lg',
 				},
 			}),
 	];

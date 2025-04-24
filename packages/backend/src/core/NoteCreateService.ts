@@ -640,7 +640,14 @@ export class NoteCreateService implements OnApplicationShutdown {
 			}, {
 				jobId: `pollEnd:${note.id}`,
 				delay,
-				removeOnComplete: true,
+				removeOnComplete: {
+					age: 3600 * 24 * 7, // keep up to 7 days
+					count: 30,
+				},
+				removeOnFail: {
+					age: 3600 * 24 * 7, // keep up to 7 days
+					count: 100,
+				},
 			});
 		}
 

@@ -39,6 +39,7 @@ export const columnTypes = [
 	'mentions',
 	'direct',
 	'roleTimeline',
+	'chat',
 	'following',
 ] as const;
 

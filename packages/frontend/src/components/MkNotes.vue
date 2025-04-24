@@ -14,7 +14,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 	<template #default="{ items: notes }">
 		<component
-			:is="prefer.s.animation ? TransitionGroup : 'div'" :class="[$style.root, { [$style.noGap]: noGap, '_gaps': !noGap }]"
+			:is="prefer.s.animation ? TransitionGroup : 'div'"
+			:class="[$style.root, { [$style.noGap]: noGap, '_gaps': !noGap, [$style.reverse]: pagination.reversed }]"
 			:enterActiveClass="$style.transition_x_enterActive"
 			:leaveActiveClass="$style.transition_x_leaveActive"
 			:enterFromClass="$style.transition_x_enterFrom"
@@ -22,14 +23,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:moveClass=" $style.transition_x_move"
 			tag="div"
 		>
-			<template v-for="note in notes" :key="note.id">
-				<div v-if="note._shouldInsertAd_" :class="[$style.noteWithAd, { '_gaps': !noGap }]">
+			<template v-for="(note, i) in notes" :key="note.id">
+				<div v-if="note._shouldInsertAd_" :class="[$style.noteWithAd, { '_gaps': !noGap }]" :data-scroll-anchor="note.id">
 					<DynamicNote :class="$style.note" :note="note as Misskey.entities.Note" :withHardMute="true"/>
 					<div :class="$style.ad">
 						<MkAd :preferForms="['horizontal', 'horizontal-big']"/>
 					</div>
 				</div>
-				<DynamicNote v-else :class="$style.note" :note="note as Misskey.entities.Note" :withHardMute="true"/>
+				<DynamicNote v-else :class="$style.note" :note="note as Misskey.entities.Note" :withHardMute="true" :data-scroll-anchor="note.id"/>
 			</template>
 		</component>
 	</template>
@@ -72,6 +73,11 @@ defineExpose({
 }
 .transition_x_leaveActive {
 	position: absolute;
+}
+
+.reverse {
+	display: flex;
+	flex-direction: column-reverse;
 }
 
 .root {
