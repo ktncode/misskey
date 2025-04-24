@@ -39,6 +39,7 @@ import SkRemoteFollowersWarning from '@/components/SkRemoteFollowersWarning.vue'
 import { useRouter } from '@/router.js';
 import { definePage } from '@/page.js';
 import MkLazy from '@/components/global/MkLazy.vue';
+import { useScrollPositionKeeper } from '@/use/use-scroll-position-keeper.js';
 
 const model = createModel();
 const {
@@ -99,6 +100,8 @@ const headerTabs: ComputedRef<Tab[]> = computed(() => followingFeedTabs.map(t =>
 	title: followingTabName(t),
 })));
 
+useScrollPositionKeeper(computed(() => userScroll.value?.rootEl));
+useScrollPositionKeeper(computed(() => noteScroll.value));
 definePage(() => ({
 	title: i18n.ts.following,
 	icon: followingTabIcon(followingTab),
