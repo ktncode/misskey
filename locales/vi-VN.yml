@@ -842,6 +842,7 @@ notSpecifiedMentionWarning: "Tút này có đề cập đến những người k
 info: "Giới thiệu"
 userInfo: "Thông tin người dùng"
 unknown: "Chưa biết"
+mutuals: "Theo sau nhau"
 onlineStatus: "Trạng thái"
 hideOnlineStatus: "Ẩn trạng thái online"
 hideOnlineStatusDescription: "Ẩn trạng thái online của bạn làm giảm sự tiện lợi của một số tính năng như tìm kiếm."
