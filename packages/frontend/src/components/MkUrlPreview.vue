@@ -45,8 +45,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 <div v-else-if="theNote" :class="[$style.link, { [$style.compact]: compact }]"><XNoteSimple :note="theNote" :class="$style.body"/></div>
 <div v-else-if="!hidePreview">
-	<component :is="self ? 'MkA' : 'a'" :class="[$style.link, { [$style.compact]: compact }]" :[attr]="self ? url.substring(local.length) : url" rel="nofollow noopener" :target="target" :title="url">
-		<div v-if="thumbnail && !sensitive" :class="$style.thumbnail" :style="defaultStore.state.dataSaver.urlPreview ? '' : `background-image: url('${thumbnail}')`">
+	<component :is="self ? 'MkA' : 'a'" :class="[$style.link, { [$style.compact]: compact }]" :[attr]="maybeRelativeUrl" rel="nofollow noopener" :target="target" :title="url">
+		<div v-if="thumbnail && !sensitive" :class="$style.thumbnail" :style="defaultStore.state.dataSaver.urlPreview ? '' : { backgroundImage: `url('${thumbnail}')` }">
 		</div>
 		<article :class="$style.body">
 			<header :class="$style.header">
@@ -98,6 +98,7 @@ import MkButton from '@/components/MkButton.vue';
 import { transformPlayerUrl } from '@/scripts/player-url-transform.js';
 import { defaultStore } from '@/store.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
+import { maybeMakeRelative } from '@@/js/url.js';
 
 const XNoteSimple = defineAsyncComponent<typeof MkNoteSimple | typeof SkNoteSimple>(() =>
 	defaultStore.state.noteDesign === 'misskey'
@@ -126,7 +127,8 @@ const MOBILE_THRESHOLD = 500;
 const isMobile = ref(deviceKind === 'smartphone' || window.innerWidth <= MOBILE_THRESHOLD);
 
 const hidePreview = ref<boolean>(false);
-const self = props.url.startsWith(local);
+const maybeRelativeUrl = maybeMakeRelative(props.url, local);
+const self = maybeRelativeUrl !== props.url;
 const attr = self ? 'to' : 'href';
 const target = self ? null : '_blank';
 const fetching = ref(true);
