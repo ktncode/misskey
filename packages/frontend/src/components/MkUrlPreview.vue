@@ -88,7 +88,7 @@ import { defineAsyncComponent, onDeactivated, onUnmounted, ref, watch } from 'vu
 import { url as local } from '@@/js/config.js';
 import { versatileLang } from '@@/js/intl-const.js';
 import * as Misskey from 'misskey-js';
-import type { summaly } from '@misskey-dev/summaly';
+import type { summaly } from '@transfem-org/summaly';
 import type MkNoteSimple from '@/components/MkNoteSimple.vue';
 import type SkNoteSimple from '@/components/SkNoteSimple.vue';
 import { i18n } from '@/i18n.js';
