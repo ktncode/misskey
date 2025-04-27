@@ -125,9 +125,6 @@ importers:
       '@misskey-dev/sharp-read-bmp':
         specifier: 1.2.0
         version: 1.2.0
-      '@transfem-org/summaly':
-        specifier: 5.2.0
-        version: 5.2.0
       '@nestjs/common':
         specifier: 10.4.7
         version: 10.4.7(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -164,6 +161,9 @@ importers:
       '@transfem-org/sfm-js':
         specifier: 0.24.5
         version: 0.24.5
+      '@transfem-org/summaly':
+        specifier: 5.2.1
+        version: 5.2.1
       '@twemoji/parser':
         specifier: 15.1.1
         version: 15.1.1
@@ -894,9 +894,6 @@ importers:
         specifier: 13.15.2
         version: 13.15.2
     devDependencies:
-      '@transfem-org/summaly':
-        specifier: 5.2.0
-        version: 5.2.0
       '@storybook/addon-actions':
         specifier: 8.4.4
         version: 8.4.4(storybook@8.4.4(bufferutil@4.0.8)(prettier@3.3.3)(utf-8-validate@6.0.4))
@@ -954,6 +951,9 @@ importers:
       '@testing-library/vue':
         specifier: 8.1.0
         version: 8.1.0(@vue/compiler-sfc@3.5.12)(@vue/server-renderer@3.5.12(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))
+      '@transfem-org/summaly':
+        specifier: 5.2.1
+        version: 5.2.1
       '@types/canvas-confetti':
         specifier: ^1.6.4
         version: 1.6.4
@@ -1159,12 +1159,12 @@ importers:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
     devDependencies:
-      '@transfem-org/summaly':
-        specifier: 5.2.0
-        version: 5.2.0
       '@testing-library/vue':
         specifier: 8.1.0
         version: 8.1.0(@vue/compiler-sfc@3.5.12)(@vue/server-renderer@3.5.12(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))
+      '@transfem-org/summaly':
+        specifier: 5.2.1
+        version: 5.2.1
       '@types/estree':
         specifier: 1.0.6
         version: 1.0.6
@@ -2969,9 +2969,6 @@ packages:
   '@misskey-dev/sharp-read-bmp@1.2.0':
     resolution: {integrity: sha512-er4pRakXzHYfEgOFAFfQagqDouG+wLm+kwNq1I30oSdIHDa0wM3KjFpfIGQ25Fks4GcmOl1s7Zh6xoQu5dNjTw==}
 
-  '@transfem-org/summaly@5.2.1':
-    resolution: {integrity: sha512-Djg6emAOdcY81a8TMTFi/qgIdTO96Z2qZfhHE+k+YRd8z9V/5MxauJr+U9z4kUVjSJJ1yzdOWqi26OsmVUaXZA==}
-
   '@mole-inc/bin-wrapper@8.0.1':
     resolution: {integrity: sha512-sTGoeZnjI8N4KS+sW2AN95gDBErhAguvkw/tWdCjeM8bvxpz5lqrnd0vOJABA1A+Ic3zED7PYoLP/RANLgVotA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -4282,6 +4279,9 @@ packages:
 
   '@transfem-org/sfm-js@0.24.5':
     resolution: {integrity: sha1-c9qJO12lIG+kovDGKjZmK2qPqcw=, tarball: https://activitypub.software/api/v4/projects/2/packages/npm/@transfem-org/sfm-js/-/@transfem-org/sfm-js-0.24.5.tgz}
+
+  '@transfem-org/summaly@5.2.1':
+    resolution: {integrity: sha1-bSQjLRWt0g/UkhYnGjT5/UPig20=, tarball: https://activitypub.software/api/v4/projects/217/packages/npm/@transfem-org/summaly/-/@transfem-org/summaly-5.2.1.tgz}
 
   '@trysound/sax@0.2.0':
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
@@ -13133,16 +13133,6 @@ snapshots:
       decode-ico: 0.4.1
       sharp: 0.33.5
 
-  '@transfem-org/summaly@5.2.1':
-    dependencies:
-      cheerio: 1.0.0
-      escape-regexp: 0.0.1
-      got: 14.4.7
-      html-entities: 2.5.2
-      iconv-lite: 0.6.3
-      jschardet: 3.1.4
-      private-ip: 3.0.2
-
   '@mole-inc/bin-wrapper@8.0.1':
     dependencies:
       bin-check: 4.1.0
@@ -14768,6 +14758,16 @@ snapshots:
   '@transfem-org/sfm-js@0.24.5':
     dependencies:
       '@twemoji/parser': 15.0.0
+
+  '@transfem-org/summaly@5.2.1':
+    dependencies:
+      cheerio: 1.0.0
+      escape-regexp: 0.0.1
+      got: 14.4.7
+      html-entities: 2.5.2
+      iconv-lite: 0.6.3
+      jschardet: 3.1.4
+      private-ip: 3.0.2
 
   '@trysound/sax@0.2.0': {}
 
