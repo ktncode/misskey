@@ -59,6 +59,20 @@
 #
 # publishTarballInsteadOfProvideRepositoryUrl: true
 
+#   ┌────────────────────────┐
+#───┘ Initial Setup Password └─────────────────────────────────────────────────────
+
+# Password to initiate setting up admin account.
+# It will not be used after the initial setup is complete.
+#
+# Be sure to change this when you set up Sharkey via the Internet.
+#
+# The provider of the service who sets up Sharkey on behalf of the customer should
+# set this value to something unique when generating the Sharkey config file,
+# and provide it to the customer.
+#
+# setupPassword: example_password_please_change_this_or_you_will_get_hacked
+
 #   ┌─────┐
 #───┘ URL └─────────────────────────────────────────────────────
 
@@ -138,6 +152,8 @@ redis:
   #pass: example-pass
   #prefix: example-prefix
   #db: 1
+  # You can specify more ioredis options...
+  #username: example-username
 
 #redisForPubsub:
 #  host: redis
@@ -146,6 +162,8 @@ redis:
 #  #pass: example-pass
 #  #prefix: example-prefix
 #  #db: 1
+#  # You can specify more ioredis options...
+#  #username: example-username
 
 #redisForJobQueue:
 #  host: redis
@@ -154,6 +172,8 @@ redis:
 #  #pass: example-pass
 #  #prefix: example-prefix
 #  #db: 1
+#  # You can specify more ioredis options...
+#  #username: example-username
 
 #redisForTimelines:
 #  host: redis
@@ -162,6 +182,8 @@ redis:
 #  #pass: example-pass
 #  #prefix: example-prefix
 #  #db: 1
+#  # You can specify more ioredis options...
+#  #username: example-username
 
 #redisForReactions:
 #  host: redis
@@ -170,6 +192,8 @@ redis:
 #  #pass: example-pass
 #  #prefix: example-prefix
 #  #db: 1
+#  # You can specify more ioredis options...
+#  #username: example-username
 
 #redisForRateLimit:
 #  host: localhost
@@ -195,6 +219,19 @@ fulltextSearch:
   #   You need to install pgroonga and configure it as a PostgreSQL extension.
   #   In addition to the above, you need to create a pgroonga index on the text column of the note table.
   #   see: https://pgroonga.github.io/tutorial/
+  # - sqlTsvector
+  #   Use Postgres tsvectors.
+  #   You need to create a generated column and index on the note table to use this, followed by an ANALYZE on the table. Beware, this will take a while to be created and the database will remain locked during this process.
+  #   This also enables advanced search syntax, see documentation of websearch_to_tsquery: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
+  #   Support for multiple languages is currently rather poor and will be improved once post languages become a feature.
+  #
+  #   Example to set up tsvectors for an English instance:
+  #   ALTER TABLE note ADD COLUMN tsvector_embedding tsvector GENERATED ALWAYS AS ( to_tsvector('english', COALESCE(text, '') || ' ' || COALESCE(cw, '') || ' ' || COALESCE(name, ''))) STORED;
+  #   CREATE INDEX vector_idx ON note USING GIN (tsvector_embedding);
+  #   ANALYZE note;
+  #
+  #   Note: You can opt to use a different dictionary for better results if your main instance language is not English.
+  #   To get a list, use "SELECT cfgname FROM pg_ts_config;" and replace 'english' with the desired dictionary name.
   # - meilisearch
   #   Use Meilisearch.
   #   You need to install Meilisearch and configure.
@@ -262,20 +299,20 @@ id: 'aidx'
 #clusterLimit: 1
 
 # Job concurrency per worker
-# deliverJobConcurrency: 128
-# inboxJobConcurrency: 16
-# relationshipJobConcurrency: 16
-#  What's relationshipJob?:
-#   Follow, unfollow, block and unblock(ings) while following-imports, etc. or account migrations.
+#deliverJobConcurrency: 128
+#inboxJobConcurrency: 16
+#relationshipJobConcurrency: 16
+# What's relationshipJob?:
+#  Follow, unfollow, block and unblock(ings) while following-imports, etc. or account migrations.
 
 # Job rate limiter
-# deliverJobPerSec: 128
-# inboxJobPerSec: 32
-# relationshipJobPerSec: 64
+#deliverJobPerSec: 128
+#inboxJobPerSec: 32
+#relationshipJobPerSec: 64
 
 # Job attempts
-# deliverJobMaxAttempts: 12
-# inboxJobMaxAttempts: 8
+#deliverJobMaxAttempts: 12
+#inboxJobMaxAttempts: 8
 
 # Local address used for outgoing requests
 #outgoingAddress: 127.0.0.1
@@ -312,6 +349,9 @@ proxyBypassHosts:
 #proxySmtp: socks5://127.0.0.1:1080 # use SOCKS5
 
 # Media Proxy
+# Reference Implementation: https://github.com/misskey-dev/media-proxy
+# * Deliver a common cache between instances
+# * Perform image compression (on a different server resource than the main process)
 #mediaProxy: https://example.com/proxy
 
 # Proxy remote files (default: true)
@@ -320,7 +360,7 @@ proxyRemoteFiles: true
 
 # Movie Thumbnail Generation URL
 # There is no reference implementation.
-# For example, Misskey will point to the following URL:
+# For example, Sharkey will point to the following URL:
 #   https://example.com/thumbnail.webp?thumbnail=1&url=https%3A%2F%2Fstorage.example.com%2Fpath%2Fto%2Fvideo.mp4
 #videoThumbnailGenerator: https://example.com
 
@@ -348,6 +388,11 @@ attachLdSignatureForRelays: true
 
 # Upload or download file size limits (bytes)
 #maxFileSize: 262144000
+
+# timeout (in milliseconds) and maximum size for imports (e.g. note imports)
+#import:
+#  downloadTimeout: 30000
+#  maxFileSize: 262144000
 
 # CHMod-style permission bits to apply to uploaded files.
 # Permission bits are specified as a base-8 string representing User/Group/Other permissions.
@@ -378,3 +423,17 @@ attachLdSignatureForRelays: true
   # How long to save each log entry before deleting it.
   # Default: 2592000000 (1 week)
   #maxAge: 2592000000
+
+# Transparently compress every websocket message on clients that support it.
+# Trades server CPU usage for reduced bandwidth usage and a faster frontend on the client.
+# If you're not using jemalloc, this may cause memory fragmentation and performance issues! (https://www.npmjs.com/package/ws#websocket-compression)
+# jemalloc is used by default in the Sharkey Docker image and may be set up manually otherwise: https://github.com/jemalloc/jemalloc/wiki/getting-started
+websocketCompression: false
+
+# Inject arbitrary HTML tags to customize Sharkey without having to fork it
+#customHtml:
+#  head: |
+#    <!-- The possibilities are limitless! -->
+#    <script>console.log("Hello, world!")</script>
+#    <style>.whatever { color: red; }</style>
+#    <link rel="stylesheet" href="https://example.com/styles.css">

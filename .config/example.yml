@@ -45,7 +45,7 @@
 #           option will automatically generate and publish a
 #           tarball at build time, protecting you from
 #           inadvertent license violations. (There is no legal
-#           guarantee, of course.)  The tarball will generated
+#           guarantee, of course.)  The tarball will be generated
 #           from the root directory of your codebase.  So it is
 #           also recommended to check <built/tarball> directory
 #           once after building and before activating the server
