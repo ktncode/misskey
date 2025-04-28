@@ -45,8 +45,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 <div v-else-if="theNote" :class="[$style.link, { [$style.compact]: compact }]"><DynamicNoteSimple :note="theNote" :class="$style.body"/></div>
 <div v-else-if="!hidePreview">
-	<component :is="self ? 'MkA' : 'a'" :class="[$style.link, { [$style.compact]: compact }]" :[attr]="self ? url.substring(local.length) : url" rel="nofollow noopener" :target="target" :title="url" @click.prevent="self ? true : warningExternalWebsite(url)" @click.stop>
-		<div v-if="thumbnail && !sensitive" :class="$style.thumbnail" :style="prefer.s.dataSaver.urlPreview ? '' : `background-image: url('${thumbnail}')`">
+	<component :is="self ? 'MkA' : 'a'" :class="[$style.link, { [$style.compact]: compact }]" :[attr]="maybeRelativeUrl" rel="nofollow noopener" :target="target" :title="url" @click.prevent="self ? true : warningExternalWebsite(url)" @click.stop>
+		<div v-if="thumbnail && !sensitive" :class="$style.thumbnail" :style="prefer.s.dataSaver.urlPreview ? '' : { backgroundImage: `url('${thumbnail}')` }">
 		</div>
 		<article :class="$style.body">
 			<header :class="$style.header">
@@ -104,6 +104,7 @@ import { prefer } from '@/preferences.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { warningExternalWebsite } from '@/utility/warning-external-website.js';
 import DynamicNoteSimple from '@/components/DynamicNoteSimple.vue';
+import { maybeMakeRelative } from '@@/js/url.js';
 
 type SummalyResult = Awaited<ReturnType<typeof summaly>>;
 
@@ -126,7 +127,8 @@ const MOBILE_THRESHOLD = 500;
 const isMobile = ref(deviceKind === 'smartphone' || window.innerWidth <= MOBILE_THRESHOLD);
 
 const hidePreview = ref<boolean>(false);
-const self = props.url.startsWith(local);
+const maybeRelativeUrl = maybeMakeRelative(props.url, local);
+const self = maybeRelativeUrl !== props.url;
 const attr = self ? 'to' : 'href';
 const target = self ? null : '_blank';
 const fetching = ref(true);

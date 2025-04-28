@@ -562,30 +562,10 @@ export class ApRendererService {
 			this.userProfilesRepository.findOneByOrFail({ userId: user.id }),
 		]);
 
-		// TODO remove this when we merge the MFM change
-		const tryRewriteUrl = (maybeUrl: string) => {
-			const urlSafeRegex = /^(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
-			try {
-				const match = maybeUrl.match(urlSafeRegex);
-				if (!match) {
-					return maybeUrl;
-				}
-				const urlPart = match[0];
-				const urlPartParsed = new URL(urlPart);
-				const restPart = maybeUrl.slice(match[0].length);
-
-				return `<a href="${urlPartParsed.href}" rel="me nofollow noopener" target="_blank">${urlPart}</a>${restPart}`;
-			} catch (e) {
-				return maybeUrl;
-			}
-		};
-
 		const attachment = profile.fields.map(field => ({
 			type: 'PropertyValue',
 			name: field.name,
-			value: (field.value.startsWith('http://') || field.value.startsWith('https://'))
-				? tryRewriteUrl(field.value)
-				: field.value,
+			value: this.mfmService.toHtml(mfm.parse(field.value)),
 		}));
 
 		const emojis = await this.getEmojis(user.emojis);
