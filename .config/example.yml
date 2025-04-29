@@ -127,6 +127,9 @@ db:
   # Extra Connection options
   #extra:
   #  ssl: true
+  #  # Set a higher value if you have timeout issues during migration
+  #  statement_timeout: 10000
+
 
 dbReplications: false
 
