@@ -16,4 +16,13 @@ introMisskey: "ยินดีต้อนรับทุกคนจ้า! Sha
 misskeyUpdated: "Sharkey ได้รับการอัปเดตแล้ว!"
 didYoulikeMisskey: "คุณชอบ Sharkey ไหม?"
 pleaseDonate: "Sharkey เป็นซอฟต์แวร์ฟรีที่ใช้งานโดย {host} เราขอขอบคุณการสนับสนุนของคุณอย่างสูงเพื่อให้การพัฒนา Sharkey สามารถดำเนินต่อไปได้!"
+scheduleNoteFailed: "การกำหนดเวลาเผยแพร่โพสต์ล้มเหลว" 
+
+scheduleNotePosted: "มีการโพสต์กำหนดการแล้ว"
+
+schedulePost: "กำหนดเวลาการโพสต์"
+schedulePostList: "รายการของโพสต์ที่กำหนดเวลาไว้"
+postOn: "โพสต์เมื่อ"
+ScheduledNotes: "การโพสต์ตามกำหนดเวลา"
+
 mutuals: "ติดตามกันและกัน"
