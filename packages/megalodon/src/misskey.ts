@@ -2,28 +2,24 @@ import FormData from 'form-data'
 import fs from 'fs';
 import MisskeyAPI from './misskey/api_client'
 import { DEFAULT_UA } from './default'
-import { ProxyConfig } from './proxy_config'
 import OAuth from './oauth'
 import Response from './response'
-import { MegalodonInterface, WebSocketInterface, NoImplementedError, ArgumentError, UnexpectedError } from './megalodon'
+import { MegalodonInterface, NoImplementedError, ArgumentError, UnexpectedError } from './megalodon'
 import { UnknownNotificationTypeError } from './notification'
 
 export default class Misskey implements MegalodonInterface {
   public client: MisskeyAPI.Interface
   public baseUrl: string
-  public proxyConfig: ProxyConfig | false
 
   /**
    * @param baseUrl hostname or base URL
    * @param accessToken access token from OAuth2 authorization
    * @param userAgent UserAgent is specified in header on request.
-   * @param proxyConfig Proxy setting, or set false if don't use proxy.
    */
   constructor(
     baseUrl: string,
     accessToken: string | null = null,
     userAgent: string | null = DEFAULT_UA,
-    proxyConfig: ProxyConfig | false = false
   ) {
     let token: string = ''
     if (accessToken) {
@@ -33,9 +29,8 @@ export default class Misskey implements MegalodonInterface {
     if (userAgent) {
       agent = userAgent
     }
-    this.client = new MisskeyAPI.Client(baseUrl, token, agent, proxyConfig)
+    this.client = new MisskeyAPI.Client(baseUrl, token, agent)
     this.baseUrl = baseUrl
-    this.proxyConfig = proxyConfig
   }
 
   public cancel(): void {
@@ -2561,29 +2556,5 @@ export default class Misskey implements MegalodonInterface {
       const err = new NoImplementedError('misskey does not support')
       reject(err)
     })
-  }
-
-  public userSocket(): WebSocketInterface {
-    return this.client.socket('user')
-  }
-
-  public publicSocket(): WebSocketInterface {
-    return this.client.socket('globalTimeline')
-  }
-
-  public localSocket(): WebSocketInterface {
-    return this.client.socket('localTimeline')
-  }
-
-  public tagSocket(_tag: string): WebSocketInterface {
-    throw new NoImplementedError('TODO: implement')
-  }
-
-  public listSocket(list_id: string): WebSocketInterface {
-    return this.client.socket('list', list_id)
-  }
-
-  public directSocket(): WebSocketInterface {
-    return this.client.socket('conversation')
   }
 }

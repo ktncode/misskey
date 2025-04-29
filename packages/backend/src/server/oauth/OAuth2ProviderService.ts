@@ -156,7 +156,7 @@ export class OAuth2ProviderService {
 				const secret = String(body.client_secret);
 				const code = body.code ? String(body.code) : '';
 
-				// TODO fetch the access token directly
+				// TODO fetch the access token directly, then remove all oauth code from megalodon
 				const client = this.mastodonClientService.getClient(request);
 				const atData = await client.fetchAccessToken(clientId, secret, code);
 
