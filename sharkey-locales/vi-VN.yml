@@ -29,4 +29,9 @@ scheduledNotes: "Bài viết đã lên lịch"
 _timelines:
     bubble: "Điều hảo huyền"
 
+_externalNavigationWarning:
+    title: "Điều hướng đến một trang web bên ngoài"
+      description: "Rời khỏi {host} và đi đến một trang web bên ngoài"
+        trustThisDomain: "Tin tưởng tên miền này trên thiết bị này trong tương lai"
+
 mutuals: "Theo dõi nhau"
