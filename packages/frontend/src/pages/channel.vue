@@ -4,8 +4,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
-	<MkSpacer :contentMax="700">
+<PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs" :swipable="true">
+	<div class="_spacer" style="--MI_SPACER-w: 700px;">
 		<MkSwiper v-model:tab="tab" :tabs="headerTabs">
 			<div v-if="channel && tab === 'overview'" class="_gaps">
 				<div class="_panel" :class="$style.bannerContainer">
@@ -58,14 +58,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</div>
 		</MkSwiper>
-	</MkSpacer>
+	</div>
 	<template #footer>
 		<div :class="$style.footer">
-			<MkSpacer :contentMax="700" :marginMin="16" :marginMax="16">
+			<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 16px;">
 				<div class="_buttonsCenter">
 					<MkButton inline rounded primary gradate @click="openPostForm()"><i class="ti ti-pencil"></i> {{ i18n.ts.postToTheChannel }}</MkButton>
 				</div>
-			</MkSpacer>
+			</div>
 		</div>
 	</template>
 </PageWithHeader>
@@ -93,7 +93,6 @@ import { prefer } from '@/preferences.js';
 import MkNote from '@/components/MkNote.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkFoldableSection from '@/components/MkFoldableSection.vue';
-import MkSwiper from '@/components/MkSwiper.vue';
 import { isSupportShare } from '@/utility/navigator.js';
 import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
 import { notesSearchAvailable } from '@/utility/check-permissions.js';

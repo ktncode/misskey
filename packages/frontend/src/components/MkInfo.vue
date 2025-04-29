@@ -39,7 +39,6 @@ function closeInfo() {
 	background: color-mix(in srgb, var(--MI_THEME-infoBg) 65%, transparent);
 	color: var(--MI_THEME-infoFg);
 	border-radius: var(--MI-radius);
-	white-space: pre-wrap;
 	z-index: 1;
 
 	&.warn {

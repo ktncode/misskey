@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkSpacer :contentMax="narrow ? 800 : 1100" :style="background" style="transform: none !important;">
+<div class="_spacer" :style="{ '--MI_SPACER-w': narrow ? '800px' : '1100px', ...background, transform: 'none !important;' }">
 	<div ref="rootEl" class="ftskorzw" :class="{ wide: !narrow }" style="container-type: inline-size;">
 		<div class="main _gaps">
 			<MkInfo v-if="user.isSuspended" :warn="true">{{ i18n.ts.userSuspended }}</MkInfo>
@@ -192,7 +192,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 	</div>
 	<div class="background"></div>
-</MkSpacer>
+</div>
 </template>
 
 <script lang="ts" setup>

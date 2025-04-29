@@ -4,8 +4,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
-	<MkSpacer v-if="instance" :contentMax="600" :marginMin="16" :marginMax="32">
+<PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs" :swipable="true">
+	<div v-if="instance" class="_spacer" style="--MI_SPACER-w: 600px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<MkSwiper v-model:tab="tab" :tabs="headerTabs">
 			<div v-if="tab === 'overview'" class="_gaps_m">
 				<div class="fnfelxur">
@@ -166,7 +166,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkObjectView>
 			</div>
 		</MkSwiper>
-	</MkSpacer>
+	</div>
 </PageWithHeader>
 </template>
 
@@ -192,7 +192,6 @@ import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
 import MkUserCardMini from '@/components/MkUserCardMini.vue';
 import MkPagination from '@/components/MkPagination.vue';
-import MkSwiper from '@/components/MkSwiper.vue';
 import { getProxiedImageUrlNullable } from '@/utility/media-proxy.js';
 import { dateString } from '@/filters/date.js';
 import MkTextarea from '@/components/MkTextarea.vue';

@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
-	<MkSpacer :contentMax="700">
+	<div class="_spacer" style="--MI_SPACER-w: 700px;">
 		<div class="_gaps">
 			<MkFolder>
 				<template #label>{{ i18n.ts._role.baseRole }}</template>
@@ -165,6 +165,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</MkInput>
 					</MkFolder>
 
+					<MkFolder v-if="matchQuery([i18n.ts._role._options.maxFileSize, 'maxFileSizeMb'])">
+						<template #label>{{ i18n.ts._role._options.maxFileSize }}</template>
+						<template #suffix>{{ policies.maxFileSizeMb }}MB</template>
+						<MkInput v-model="policies.maxFileSizeMb" type="number">
+							<template #suffix>MB</template>
+						</MkInput>
+					</MkFolder>
+
 					<MkFolder v-if="matchQuery([i18n.ts._role._options.alwaysMarkNsfw, 'alwaysMarkNsfw'])">
 						<template #label>{{ i18n.ts._role._options.alwaysMarkNsfw }}</template>
 						<template #suffix>{{ policies.alwaysMarkNsfw ? i18n.ts.yes : i18n.ts.no }}</template>
@@ -310,7 +318,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkFoldableSection>
 			</div>
 		</div>
-	</MkSpacer>
+	</div>
 </PageWithHeader>
 </template>
 
