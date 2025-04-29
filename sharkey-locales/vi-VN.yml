@@ -15,6 +15,9 @@ intro: "Đã cài đặt Sharkey! Xin hãy tạo tài khoản admin."
 aboutMisskey: "Về Sharkey"
 lookup: "Tra cứu"
 announcements: "Thông báo máy chủ"
+_timelineDescription:
+    bubble: "Trong dòng thời gian Điều hảo huyền, bạn có thể xem các bài viết từ các máy chủ được kết nối do quản trị viên của bạn chọn."
+
 scheduleNoteFailed: "Đăng bài viết theo lịch trình không thành công"
 scheduleNotePosted: "Bài viết theo lịch trình đã được đăng"
 
@@ -22,5 +25,8 @@ schedulePost: "Lên lịch bài viết"
 schedulePostList: "Danh sách bài viết đã lên lịch"
 postOn: "Đăng vào"
 scheduledNotes: "Bài viết đã lên lịch"
+
+_timelines:
+    bubble: "Điều hảo huyền"
 
 mutuals: "Theo dõi nhau"
