@@ -9,9 +9,8 @@ import { attachMinMaxPagination, attachOffsetPagination } from '@/server/api/mas
 import { MastodonConverters } from '../MastodonConverters.js';
 import { parseTimelineArgs, TimelineArgs, toBoolean, toInt } from '../argsUtils.js';
 import { ApiError } from '../../error.js';
-import Account = Entity.Account;
-import Status = Entity.Status;
 import type { FastifyInstance } from 'fastify';
+import type { Entity } from 'megalodon';
 
 interface ApiSearchMastodonRoute {
 	Querystring: TimelineArgs & {
@@ -53,8 +52,8 @@ export class ApiSearchMastodon {
 			const { data } = await client.search(request.query.q, { type, ...query });
 			const response = {
 				...data,
-				accounts: await Promise.all(data.accounts.map((account: Account) => this.mastoConverters.convertAccount(account))),
-				statuses: await Promise.all(data.statuses.map((status: Status) => this.mastoConverters.convertStatus(status, me))),
+				accounts: await Promise.all(data.accounts.map((account: Entity.Account) => this.mastoConverters.convertAccount(account))),
+				statuses: await Promise.all(data.statuses.map((status: Entity.Status) => this.mastoConverters.convertStatus(status, me))),
 			};
 
 			if (type === 'hashtags') {
@@ -90,8 +89,8 @@ export class ApiSearchMastodon {
 			const stat = !type || type === 'statuses' ? await client.search(request.query.q, { type: 'statuses', ...query }) : null;
 			const tags = !type || type === 'hashtags' ? await client.search(request.query.q, { type: 'hashtags', ...query }) : null;
 			const response = {
-				accounts: await Promise.all(acct?.data.accounts.map((account: Account) => this.mastoConverters.convertAccount(account)) ?? []),
-				statuses: await Promise.all(stat?.data.statuses.map((status: Status) => this.mastoConverters.convertStatus(status, me)) ?? []),
+				accounts: await Promise.all(acct?.data.accounts.map((account: Entity.Account) => this.mastoConverters.convertAccount(account)) ?? []),
+				statuses: await Promise.all(stat?.data.statuses.map((status: Entity.Status) => this.mastoConverters.convertStatus(status, me)) ?? []),
 				hashtags: tags?.data.hashtags ?? [],
 			};
 
@@ -113,7 +112,7 @@ export class ApiSearchMastodon {
 				{
 					method: 'POST',
 					headers: {
-						...request.headers as HeadersInit,
+						...request.headers,
 						'Accept': 'application/json',
 						'Content-Type': 'application/json',
 					},
@@ -122,7 +121,7 @@ export class ApiSearchMastodon {
 
 			await verifyResponse(res);
 
-			const data = await res.json() as Status[];
+			const data = await res.json() as Entity.Status[];
 			const me = await this.clientService.getAuth(request);
 			const response = await Promise.all(data.map(status => this.mastoConverters.convertStatus(status, me)));
 
@@ -136,7 +135,7 @@ export class ApiSearchMastodon {
 				{
 					method: 'POST',
 					headers: {
-						...request.headers as HeadersInit,
+						...request.headers,
 						'Accept': 'application/json',
 						'Content-Type': 'application/json',
 					},
@@ -150,7 +149,7 @@ export class ApiSearchMastodon {
 
 			await verifyResponse(res);
 
-			const data = await res.json() as Account[];
+			const data = await res.json() as Entity.Account[];
 			const response = await Promise.all(data.map(async entry => {
 				return {
 					source: 'global',
