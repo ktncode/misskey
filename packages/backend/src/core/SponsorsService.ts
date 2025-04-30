@@ -63,7 +63,7 @@ export class SponsorsService implements OnApplicationShutdown {
 		}
 
 		try {
-			const backers: Sponsor[] = await fetch(`${this.meta.donationUrl}/members/users.json`).then((response) => response.json());
+			const backers = await fetch(`${this.meta.donationUrl}/members/users.json`).then((response) => response.json() as Promise<Sponsor[]>);
 
 			// Merge both together into one array and make sure it only has Active subscriptions
 			const allSponsors = [...backers].filter(sponsor => sponsor.isActive && sponsor.role === 'BACKER' && sponsor.tier);
@@ -78,8 +78,8 @@ export class SponsorsService implements OnApplicationShutdown {
 	@bindThis
 	private async fetchSharkeySponsors(): Promise<Sponsor[]> {
 		try {
-			const backers: Sponsor[] = await fetch('https://opencollective.com/sharkey/tiers/backer/all.json').then((response) => response.json());
-			const sponsorsOC: Sponsor[] = await fetch('https://opencollective.com/sharkey/tiers/sponsor/all.json').then((response) => response.json());
+			const backers = await fetch('https://opencollective.com/sharkey/tiers/backer/all.json').then((response) => response.json() as Promise<Sponsor[]>);
+			const sponsorsOC = await fetch('https://opencollective.com/sharkey/tiers/sponsor/all.json').then((response) => response.json() as Promise<Sponsor[]>);
 
 			// Merge both together into one array and make sure it only has Active subscriptions
 			const allSponsors = [...sponsorsOC, ...backers].filter(sponsor => sponsor.isActive);
