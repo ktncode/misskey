@@ -11,7 +11,7 @@ import { inspect } from 'node:util';
 import WebSocket, { ClientOptions } from 'ws';
 import fetch, { File, RequestInit, type Headers } from 'node-fetch';
 import { DataSource } from 'typeorm';
-import { JSDOM } from 'jsdom';
+import { load as cheerio, CheerioAPI } from 'cheerio';
 import { type Response } from 'node-fetch';
 import Fastify from 'fastify';
 import { entities } from '../src/postgres.js';
@@ -464,7 +464,7 @@ export function makeStreamCatcher<T>(
 
 export type SimpleGetResponse = {
 	status: number,
-	body: any | JSDOM | null,
+	body: any | CheerioAPI | null,
 	type: string | null,
 	location: string | null
 };
@@ -495,7 +495,7 @@ export const simpleGet = async (path: string, accept = '*/*', cookie: any = unde
 
 	const body =
 		jsonTypes.includes(res.headers.get('content-type') ?? '') ? await res.json() :
-		htmlTypes.includes(res.headers.get('content-type') ?? '') ? new JSDOM(await res.text()) :
+		htmlTypes.includes(res.headers.get('content-type') ?? '') ? cheerio(await res.text()) :
 		await bodyExtractor(res);
 
 	return {
