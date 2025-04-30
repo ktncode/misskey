@@ -253,7 +253,6 @@ export class ActivityPubServerService {
 			return httpSignature.verifySignature(signatureWithoutQuery, authUser!.key!.keyPem);
 		}
 
-		console.warn('starting verification');
 		let httpSignatureValidated = verifyWithOrWithoutQuery();
 
 		// maybe they changed their key? refetch it
