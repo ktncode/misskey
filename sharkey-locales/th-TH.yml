@@ -16,6 +16,9 @@ introMisskey: "ยินดีต้อนรับทุกคนจ้า! Sha
 misskeyUpdated: "Sharkey ได้รับการอัปเดตแล้ว!"
 didYoulikeMisskey: "คุณชอบ Sharkey ไหม?"
 pleaseDonate: "Sharkey เป็นซอฟต์แวร์ฟรีที่ใช้งานโดย {host} เราขอขอบคุณการสนับสนุนของคุณอย่างสูงเพื่อให้การพัฒนา Sharkey สามารถดำเนินต่อไปได้!"
+thisPostIsMissingAltTextCancel: "ยกเลิก"
+thisPostIsMissingAltTextIgnore: "โพสต์ต่อไป"
+thisPostIsMissingAltText: "ไฟล์หนึ่งที่แนบไปกับโพสต์นี้ไม่มีข้อความอื่น โปรดตรวจสอบให้แน่ใจว่าไฟล์แนบทั้งหมดมีข้อความอื่น"
 _timelineDescription:
     bubble: "ในไทม์ไลน์ Bubble คุณสามารถดูบันทึกจากเซิร์ฟเวอร์ที่เชื่อมต่อซึ่งผู้ดูแลระบบของคุณเลือก"
 
