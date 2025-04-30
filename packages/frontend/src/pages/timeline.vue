@@ -48,6 +48,7 @@ import { deepMerge } from '@/utility/merge.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { availableBasicTimelines, hasWithReplies, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass } from '@/timelines.js';
 import { prefer } from '@/preferences.js';
+import { useRouter } from '@/router';
 
 provide('shouldOmitHeaderTitle', true);
 
@@ -247,6 +248,8 @@ onMounted(() => {
 onActivated(() => {
 	switchTlIfNeeded();
 });
+
+const router = useRouter();
 
 const headerActions = computed(() => {
 	const tmp = [
