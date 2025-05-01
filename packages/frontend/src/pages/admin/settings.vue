@@ -275,6 +275,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div class="_gaps">
 					<MkInfo>{{ i18n.ts.proxyAccountDescription }}</MkInfo>
 
+					<MkSwitch v-model="proxyAccountForm.state.enabled">
+						<template #label>{{ i18n.ts.enableProxyAccount }}</template>
+						<template #caption>{{ i18n.ts.enableProxyAccountDescription }}</template>
+					</MkSwitch>
+
 					<MkTextarea v-model="proxyAccountForm.state.description" :max="500" tall mfmAutocomplete :mfmPreview="true">
 						<template #label>{{ i18n.ts._profile.description }}</template>
 						<template #caption>{{ i18n.ts._profile.youCanIncludeHashtags }}</template>
@@ -425,10 +430,18 @@ const federationForm = useForm({
 
 const proxyAccountForm = useForm({
 	description: proxyAccount.description,
+	enabled: meta.enableProxyAccount,
 }, async (state) => {
-	await os.apiWithDialog('admin/update-proxy-account', {
-		description: state.description,
-	});
+	if (state.description !== proxyAccount.description) {
+		await os.apiWithDialog('admin/update-proxy-account', {
+			description: state.description,
+		});
+	}
+	if (state.enabled !== proxyAccount.enabled) {
+		await os.apiWithDialog('admin/update-meta', {
+			enableProxyAccount: state.enabled,
+		});
+	}
 	fetchInstance(true);
 });
 

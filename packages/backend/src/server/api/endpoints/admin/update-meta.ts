@@ -210,6 +210,10 @@ export const paramDef = {
 			enum: instanceUnsignedFetchOptions,
 			nullable: false,
 		},
+		enableProxyAccount: {
+			type: 'boolean',
+			nullable: false,
+		},
 	},
 	required: [],
 } as const;
@@ -756,6 +760,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.allowUnsignedFetch !== undefined) {
 				set.allowUnsignedFetch = ps.allowUnsignedFetch;
+			}
+
+			if (ps.enableProxyAccount !== undefined) {
+				set.enableProxyAccount = ps.enableProxyAccount;
 			}
 
 			const before = await this.metaService.fetch(true);

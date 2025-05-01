@@ -12939,6 +12939,14 @@ export interface Locale extends ILocale {
      * Deleted
      */
     "deleted": string;
+    /**
+     * Enable the proxy account.
+     */
+    "enableProxyAccount": string;
+    /**
+     * If disabled, then the proxy account will not be used.
+     */
+    "enableProxyAccountDescription": string;
 }
 declare const locales: {
     [lang: string]: Locale;

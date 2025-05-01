@@ -601,6 +601,10 @@ export const meta = {
 				enum: instanceUnsignedFetchOptions,
 				optional: false, nullable: false,
 			},
+			enableProxyAccount: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
 		},
 	},
 } as const;
@@ -762,6 +766,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				federationHosts: instance.federationHosts,
 				hasLegacyAuthFetchSetting: config.checkActivityPubGetSignature != null,
 				allowUnsignedFetch: instance.allowUnsignedFetch,
+				enableProxyAccount: instance.enableProxyAccount,
 			};
 		});
 	}

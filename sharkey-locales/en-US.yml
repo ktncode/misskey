@@ -533,3 +533,6 @@ _followRequest:
   sent: "Sent"
 
 deleted: "Deleted"
+
+enableProxyAccount: "Enable the proxy account."
+enableProxyAccountDescription: "If disabled, then the proxy account will not be used."

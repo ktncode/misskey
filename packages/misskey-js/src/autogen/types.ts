@@ -9279,6 +9279,7 @@ export type operations = {
             hasLegacyAuthFetchSetting: boolean;
             /** @enum {string} */
             allowUnsignedFetch: 'never' | 'always' | 'essential';
+            enableProxyAccount: boolean;
           };
         };
       };
@@ -12225,6 +12226,7 @@ export type operations = {
           federationHosts?: string[];
           /** @enum {string} */
           allowUnsignedFetch?: 'never' | 'always' | 'essential';
+          enableProxyAccount?: boolean;
         };
       };
     };

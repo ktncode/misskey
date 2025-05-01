@@ -759,4 +759,9 @@ export class MiMeta {
 		default: 'always',
 	})
 	public allowUnsignedFetch: InstanceUnsignedFetchOption;
+
+	@Column('boolean', {
+		default: false,
+	})
+	public enableProxyAccount: boolean;
 }
