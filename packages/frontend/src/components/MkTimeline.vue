@@ -26,12 +26,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 			>
 				<template v-for="(note, i) in notes" :key="note.id">
 					<div v-if="note._shouldInsertAd_" :class="[$style.noteWithAd, { '_gaps': !noGap }]" :data-scroll-anchor="note.id">
-						<MkNote :class="$style.note" :note="note" :withHardMute="true"/>
+						<DynamicNote :class="$style.note" :note="note" :withHardMute="true"/>
 						<div :class="$style.ad">
 							<MkAd :preferForms="['horizontal', 'horizontal-big']"/>
 						</div>
 					</div>
-					<MkNote v-else :class="$style.note" :note="note" :withHardMute="true" :data-scroll-anchor="note.id"/>
+					<DynamicNote v-else :class="$style.note" :note="note" :withHardMute="true" :data-scroll-anchor="note.id"/>
 				</template>
 			</component>
 		</template>
@@ -50,7 +50,7 @@ import * as sound from '@/utility/sound.js';
 import { $i } from '@/i.js';
 import { instance } from '@/instance.js';
 import { prefer } from '@/preferences.js';
-import MkNote from '@/components/MkNote.vue';
+import DynamicNote from '@/components/DynamicNote.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import { i18n } from '@/i18n.js';
 import { infoImageUrl } from '@/instance.js';
