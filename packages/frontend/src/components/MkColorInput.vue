@@ -19,12 +19,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 			@input="onInput"
 		>
 	</div>
+	<MkButton @click="removeColor">{{ i18n.ts.reset }}</MkButton>
 	<div :class="$style.caption"><slot name="caption"></slot></div>
 </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, useTemplateRef, toRefs } from 'vue';
+import MkButton from '@/components/MkButton.vue';
+import { i18n } from '@/i18n.js';
 
 const props = defineProps<{
 	modelValue: string | null;
@@ -44,6 +47,10 @@ const inputEl = useTemplateRef('inputEl');
 const onInput = () => {
 	emit('update:modelValue', v.value ?? '');
 };
+const removeColor = () => {
+	v.value = null;
+	onInput();
+}
 </script>
 
 <style lang="scss" module>
