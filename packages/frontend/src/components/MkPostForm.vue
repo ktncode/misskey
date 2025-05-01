@@ -1221,6 +1221,7 @@ onMounted(() => {
 					scheduledAt: new Date(init.createdAt).getTime(),
 				};
 			}
+			saveDraft();
 		}
 
 		nextTick(() => watchForDraft());
