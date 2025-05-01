@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div :class="$style.root">
 	<div :class="$style.title">
-		<img :src="instance.iconUrl || instance.faviconUrl || '/favicon.ico'" alt="" :class="$style.instanceIcon"/>
+		<img :src="instance.sidebarLogoUrl || instance.iconUrl || instance.faviconUrl || '/favicon.ico'" alt="" :class="instance.sidebarLogoUrl ? $style.wideInstanceIcon : $style.instanceIcon"/>
 		<span :class="$style.instanceTitle">{{ instance.name ?? host }}</span>
 	</div>
 	<div :class="$style.controls">
@@ -65,6 +65,13 @@ function goBack() {
 	aspect-ratio: 1;
 	border-radius: 5px;
 	margin-right: 8px;
+}
+
+.wideInstanceIcon {
+	display: inline-block;
+	min-width: 38px;
+	max-width: 100%;
+	max-height: var(--height);
 }
 
 .instanceTitle {
