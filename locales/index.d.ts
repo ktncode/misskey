@@ -12944,7 +12944,7 @@ export interface Locale extends ILocale {
      */
     "enableProxyAccount": string;
     /**
-     * If disabled, then the proxy account will not be used.
+     * If disabled, then the proxy account will not be used. User lists will only include notes from local or followed users.
      */
     "enableProxyAccountDescription": string;
 }

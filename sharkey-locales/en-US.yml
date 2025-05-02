@@ -535,4 +535,4 @@ _followRequest:
 deleted: "Deleted"
 
 enableProxyAccount: "Enable the proxy account."
-enableProxyAccountDescription: "If disabled, then the proxy account will not be used."
+enableProxyAccountDescription: "If disabled, then the proxy account will not be used. User lists will only include notes from local or followed users."
