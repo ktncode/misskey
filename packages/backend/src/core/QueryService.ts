@@ -261,8 +261,7 @@ export class QueryService {
 		if (this.meta.blockedHosts.length === 0) {
 			nonBlockedHostQuery = () => '1=1';
 		} else {
-			nonBlockedHostQuery = (match: string) => `${match} NOT ILIKE ALL(ARRAY[:...blocked])`;
-			q.setParameters({ blocked: this.meta.blockedHosts.flatMap(x => [x, `%.${x}`]) });
+			nonBlockedHostQuery = (match: string) => `('.' || ${match}) NOT ILIKE ALL(select '%.' || x from (select unnest("blockedHosts") as x from "meta") t)`;
 		}
 
 		if (excludeAuthor) {

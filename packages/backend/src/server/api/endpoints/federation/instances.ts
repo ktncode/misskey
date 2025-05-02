@@ -115,9 +115,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (typeof ps.blocked === 'boolean') {
 				const meta = await this.metaService.fetch(true);
 				if (ps.blocked) {
-					query.andWhere(meta.blockedHosts.length === 0 ? '1=0' : 'instance.host IN (:...blocks)', { blocks: meta.blockedHosts });
+					query.andWhere(meta.blockedHosts.length === 0 ? '1=0' : 'instance.host IN (select unnest("blockedHosts") as x from "meta")');
 				} else {
-					query.andWhere(meta.blockedHosts.length === 0 ? '1=1' : 'instance.host NOT IN (:...blocks)', { blocks: meta.blockedHosts });
+					query.andWhere(meta.blockedHosts.length === 0 ? '1=1' : 'instance.host NOT IN (select unnest("blockedHosts") as x from "meta")');
 				}
 			}
 
