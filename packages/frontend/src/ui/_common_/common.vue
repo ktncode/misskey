@@ -161,7 +161,7 @@ if ($i) {
 }
 
 function getPointerEvents() {
-	return store.s.notificationClickable ? 'all' : 'none';
+	return prefer.s.notificationClickable ? 'all' : 'none';
 }
 </script>
 
