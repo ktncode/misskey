@@ -522,11 +522,16 @@ export class DriveService {
 			if (maxFileSize < info.size) {
 				if (isLocalUser) {
 					throw new IdentifiableError('f9e4e5f3-4df4-40b5-b400-f236945f7073', 'Max file size exceeded.');
+				} else {
+					// For remote users, throwing an exception will break Activity processing.
+					// Instead, force "link" mode which does not cache the file locally.
+					isLink = true;
 				}
 			}
 
 			// If usage limit exceeded
-			if (driveCapacity < usage + info.size) {
+			// Repeat the "!isLink" check because it could be set to true by the previous block.
+			if (driveCapacity < usage + info.size && !isLink) {
 				if (isLocalUser) {
 					throw new IdentifiableError('c6244ed2-a39a-4e1c-bf93-f0fbd7764fa6', 'No free space.', true);
 				}
