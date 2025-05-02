@@ -344,7 +344,7 @@ const canRenote = computed(() => ['public', 'home'].includes(appearNote.value.vi
 const renoteCollapsed = ref(
 	prefer.s.collapseRenotes && isRenote && (
 		($i && ($i.id === note.value.userId || $i.id === appearNote.value.userId
-				 || $i.id === note.value.renote?.userId || $i.id === appearNote.value.renote.userId )) || // `||` must be `||`! See https://github.com/misskey-dev/misskey/issues/13131
+				 || $i.id === note.value.renote?.userId || $i.id === appearNote.value.renote?.userId )) || // `||` must be `||`! See https://github.com/misskey-dev/misskey/issues/13131
 		(appearNote.value.myReaction != null)
 	),
 );
