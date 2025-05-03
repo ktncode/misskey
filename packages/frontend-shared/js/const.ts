@@ -178,7 +178,7 @@ export const ROLE_POLICIES = [
 	'chatAvailability',
 ] as const;
 
-export const DEFAULT_SERVER_ERROR_IMAGE_URL = '/client-assets/status/error.jpg';
+export const DEFAULT_SERVER_ERROR_IMAGE_URL = '/client-assets/status/error.png';
 export const DEFAULT_NOT_FOUND_IMAGE_URL = '/client-assets/status/missingpage.webp';
 export const DEFAULT_INFO_IMAGE_URL = '/client-assets/status/nothinghere.png';
 
