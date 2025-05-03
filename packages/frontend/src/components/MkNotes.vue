@@ -60,7 +60,7 @@ defineExpose({
 	container-type: inline-size;
 
 	&.noGap {
-		background: var(--MI_THEME-panel);
+		background: color-mix(in srgb, var(--MI_THEME-panel) 65%, transparent);
 
 		.note {
 			border-bottom: solid 0.5px var(--MI_THEME-divider);
@@ -78,7 +78,7 @@ defineExpose({
 		background: var(--MI_THEME-bg);
 
 		.note {
-			background: var(--MI_THEME-panel);
+			background: color-mix(in srgb, var(--MI_THEME-panel) 65%, transparent);
 			border-radius: var(--MI-radius);
 		}
 	}
