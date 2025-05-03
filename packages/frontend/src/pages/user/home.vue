@@ -857,8 +857,8 @@ onUnmounted(() => {
 }
 
 .tab {
-	margin-bottom: calc(var(--margin) / 2);
-	padding: calc(var(--margin) / 2) 0;
+	margin-bottom: calc(5px / 2);
+	padding: calc(5px / 2) 0;
 	background: color-mix(in srgb, var(--MI_THEME-bg) 65%, transparent);
 	backdrop-filter: var(--MI-blur, blur(15px));
 	border-radius: var(--MI-radius-sm);
