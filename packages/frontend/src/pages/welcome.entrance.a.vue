@@ -124,6 +124,7 @@ misskeyApiGet('federation/instances', {
 		pointer-events: none;
 
 		> .powered-by {
+			color: var(--MI_THEME-fgOnAccent);
 			margin-bottom: 2px;
 		}
 
