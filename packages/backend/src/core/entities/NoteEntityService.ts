@@ -402,7 +402,8 @@ export class NoteEntityService implements OnModuleInit {
 				bufferedReactions: Map<MiNote['id'], { deltas: Record<string, number>; pairs: ([MiUser['id'], string])[] }> | null;
 				myReactions: Map<MiNote['id'], string | null>;
 				packedFiles: Map<MiNote['fileIds'][number], Packed<'DriveFile'> | null>;
-				packedUsers: Map<MiUser['id'], Packed<'UserLite'>>
+				packedUsers: Map<MiUser['id'], Packed<'UserLite'>>;
+				mentionHandles: Record<string, string | undefined>;
 			};
 		},
 	): Promise<Packed<'Note'>> {
@@ -443,6 +444,9 @@ export class NoteEntityService implements OnModuleInit {
 		const packedFiles = options?._hint_?.packedFiles;
 		const packedUsers = options?._hint_?.packedUsers;
 
+		// Do not await - defer until the awaitAll below
+		const mentionHandles = this.getUserHandles(note.mentions, options?._hint_?.mentionHandles);
+
 		const packed: Packed<'Note'> = await awaitAll({
 			id: note.id,
 			createdAt: this.idService.parse(note.id).date.toISOString(),
@@ -476,7 +480,8 @@ export class NoteEntityService implements OnModuleInit {
 				allowRenoteToExternal: channel.allowRenoteToExternal,
 				userId: channel.userId,
 			} : undefined,
-			mentions: note.mentions && note.mentions.length > 0 ? note.mentions : undefined,
+			mentions: note.mentions.length > 0 ? note.mentions : undefined,
+			mentionHandles: note.mentions.length > 0 ? mentionHandles : undefined,
 			uri: note.uri ?? undefined,
 			url: note.url ?? undefined,
 			poll: note.hasPoll ? this.populatePoll(note, meId) : undefined,
@@ -594,6 +599,22 @@ export class NoteEntityService implements OnModuleInit {
 		const packedUsers = await this.userEntityService.packMany(users, me)
 			.then(users => new Map(users.map(u => [u.id, u])));
 
+		// Recursively add all mentioned users from all notes + replies + renotes
+		const allMentionedUsers = notes.reduce((users, note) => {
+			function add(n: MiNote) {
+				for (const user of n.mentions) {
+					users.add(user);
+				}
+
+				if (n.reply) add(n.reply);
+				if (n.renote) add(n.renote);
+			}
+
+			add(note);
+			return users;
+		}, new Set<string>());
+		const mentionHandles = await this.getUserHandles(Array.from(allMentionedUsers));
+
 		return await Promise.all(notes.map(n => this.pack(n, me, {
 			...options,
 			_hint_: {
@@ -601,6 +622,7 @@ export class NoteEntityService implements OnModuleInit {
 				myReactions: myReactionsMap,
 				packedFiles,
 				packedUsers,
+				mentionHandles,
 			},
 		})));
 	}
@@ -635,5 +657,37 @@ export class NoteEntityService implements OnModuleInit {
 			where: { id },
 			relations: ['user'],
 		});
+	}
+
+	private async getUserHandles(userIds: string[], hint?: Record<string, string | undefined>): Promise<Record<string, string | undefined>> {
+		if (userIds.length < 1) return {};
+
+		// Hint is provided by packMany to avoid N+1 queries.
+		// It should already include all existing mentioned users.
+		if (hint) {
+			const handles = {} as Record<string, string | undefined>;
+			for (const id of userIds) {
+				handles[id] = hint[id];
+			}
+			return handles;
+		}
+
+		const users = await this.usersRepository.find({
+			select: {
+				id: true,
+				username: true,
+				host: true,
+			},
+			where: {
+				id: In(userIds),
+			},
+		});
+
+		return users.reduce((map, user) => {
+			map[user.id] = user.host
+				? `@${user.username}@${user.host}`
+				: `@${user.username}`;
+			return map;
+		}, {} as Record<string, string | undefined>);
 	}
 }
