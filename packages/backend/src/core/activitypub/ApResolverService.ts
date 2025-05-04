@@ -187,7 +187,7 @@ export class Resolver {
 		}
 
 		// This ensures the input has a string ID, protecting against type confusion and rejecting anonymous objects.
-		const id = getApId(value);
+		const id = getApId(value, sentFromUri);
 
 		// Check if we can use the provided object as-is.
 		// Our security requires that the object ID matches the host authority that sent it, otherwise it can't be trusted.
@@ -329,7 +329,7 @@ export class Resolver {
 
 		// The object ID is already validated to match the final URL's authority by signedGet / getActivityJson.
 		// We only need to validate that it also matches the original URL's authority, in case of redirects.
-		const objectId = getApId(object);
+		const objectId = getApId(object, value);
 
 		// We allow some limited cross-domain redirects, which means the host may have changed during fetch.
 		// Additional checks are needed to validate the scope of cross-domain redirects.

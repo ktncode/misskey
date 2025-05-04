@@ -75,14 +75,17 @@ export function getOneApId(value: ApObject): string {
 /**
  * Get ActivityStreams Object id
  */
-export function getApId(source: string | IObject | [string | IObject]): string {
-	const value = getNullableApId(source);
+export function getApId(value: string | IObject | [string | IObject], sourceForLogs?: string): string {
+	const id = getNullableApId(value);
 
-	if (value == null) {
-		throw new IdentifiableError('ad2dc287-75c1-44c4-839d-3d2e64576675', `invalid AP object ${value}: missing or invalid id`);
+	if (id == null) {
+		const message = sourceForLogs
+			? `invalid AP object ${value} (sent from ${sourceForLogs}): missing id`
+			: `invalid AP object ${value}: missing id`;
+		throw new IdentifiableError('ad2dc287-75c1-44c4-839d-3d2e64576675', message);
 	}
 
-	return value;
+	return id;
 }
 
 /**
