@@ -6,7 +6,7 @@
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Bull from 'bullmq';
 import * as Sentry from '@sentry/node';
-import { AbortError } from 'node-fetch';
+import { AbortError, FetchError } from 'node-fetch';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import type Logger from '@/logger.js';
@@ -141,7 +141,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 			// 何故かeがundefinedで来ることがある
 			if (!e) return '?';
 
-			if (e instanceof Bull.UnrecoverableError || e instanceof AbortError || e.name === 'AbortError' || e instanceof StatusError || e instanceof IdentifiableError) {
+			if (e instanceof Bull.UnrecoverableError || e instanceof AbortError || e.name === 'AbortError' || e instanceof FetchError || e.name === 'FetchError' || e instanceof StatusError || e instanceof IdentifiableError || e instanceof FetchError) {
 				return renderInlineError(e);
 			}
 
