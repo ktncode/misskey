@@ -12,6 +12,8 @@ import { FeaturedService } from '@/core/FeaturedService.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
 import { CacheService } from '@/core/CacheService.js';
 import { QueryService } from '@/core/QueryService.js';
+import { ApiError } from '@/server/api/error.js';
+import { RoleService } from '@/core/RoleService.js';
 
 export const meta = {
 	tags: ['notes'],
@@ -30,10 +32,19 @@ export const meta = {
 		},
 	},
 
-	// 10 calls per 5 seconds
+	errors: {
+		ltlDisabled: {
+			message: 'Local timeline has been disabled.',
+			code: 'LTL_DISABLED',
+			id: '45a6eb02-7695-4393-b023-dd3be9aaaefd',
+		},
+	},
+
+	// Burst of 10 calls to handle tab reload, then 4/second for refresh
 	limit: {
-		duration: 1000 * 5,
-		max: 10,
+		type: 'bucket',
+		size: 10,
+		dripSize: 4,
 	},
 } as const;
 
@@ -60,8 +71,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private noteEntityService: NoteEntityService,
 		private featuredService: FeaturedService,
 		private queryService: QueryService,
+		private readonly roleService: RoleService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
+			const policies = await this.roleService.getUserPolicies(me ? me.id : null);
+			if (!policies.ltlAvailable) {
+				throw new ApiError(meta.errors.ltlDisabled);
+			}
+
 			let noteIds: string[];
 			if (ps.channelId) {
 				noteIds = await this.featuredService.getInChannelNotesRanking(ps.channelId, 50);
