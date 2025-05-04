@@ -412,7 +412,7 @@ function checkMissingMention() {
 		const ast = mfm.parse(text.value);
 
 		for (const x of extractMentions(ast)) {
-			if (!visibleUsers.value.some(u => (u.username === x.username) && (u.host === x.host))) {
+			if (!visibleUsers.value.some(u => (u.username.toLowerCase() === x.username.toLowerCase()) && (u.host === x.host))) {
 				hasNotSpecifiedMentions.value = true;
 				return;
 			}
@@ -425,7 +425,7 @@ function addMissingMention() {
 	const ast = mfm.parse(text.value);
 
 	for (const x of extractMentions(ast)) {
-		if (!visibleUsers.value.some(u => (u.username === x.username) && (u.host === x.host))) {
+		if (!visibleUsers.value.some(u => (u.username.toLowerCase() === x.username.toLowerCase()) && (u.host === x.host))) {
 			misskeyApi('users/show', { username: x.username, host: x.host }).then(user => {
 				pushVisibleUser(user);
 			});
@@ -641,7 +641,7 @@ function showOtherSettings() {
 //#endregion
 
 function pushVisibleUser(user: Misskey.entities.UserDetailed) {
-	if (!visibleUsers.value.some(u => u.username === user.username && u.host === user.host)) {
+	if (!visibleUsers.value.some(u => u.username.toLowerCase() === user.username.toLowerCase() && u.host === user.host)) {
 		visibleUsers.value.push(user);
 	}
 }
