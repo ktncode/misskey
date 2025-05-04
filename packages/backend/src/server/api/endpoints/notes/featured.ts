@@ -30,10 +30,11 @@ export const meta = {
 		},
 	},
 
-	// 10 calls per 5 seconds
+	// Burst of 10 calls to handle tab reload, then 4/second for refresh
 	limit: {
-		duration: 1000 * 5,
-		max: 10,
+		type: 'bucket',
+		size: 10,
+		dripSize: 4,
 	},
 } as const;
 
