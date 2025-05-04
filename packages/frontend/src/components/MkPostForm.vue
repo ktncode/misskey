@@ -317,7 +317,10 @@ if (props.reply && (props.reply.user.username !== $i.username || (props.reply.us
 }
 
 if (props.reply && props.reply.mentionHandles) {
-	for (const mention of Object.values(props.reply.mentionHandles)) {
+	for (const [user, mention] of Object.entries(props.reply.mentionHandles)) {
+		// Don't mention ourself
+		if (user === $i.id) continue;
+
 		// 重複は除外
 		if (text.value.includes(`${mention} `)) continue;
 
