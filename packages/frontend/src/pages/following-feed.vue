@@ -110,9 +110,6 @@ definePage(() => ({
 </script>
 
 <style lang="scss" module>
-//This inspection complains about duplicate "height" properties, but this is needed because "dvh" units are not supported in all browsers.
-//The earlier "vh" provide a "close enough" approximation for older browsers.
-//noinspection CssOverwrittenProperties
 .root {
 	display: grid;
 	grid-template-columns: min-content 1fr min-content;
@@ -122,18 +119,7 @@ definePage(() => ({
 		"lm notes rm";
 	gap: 12px;
 
-	height: 100vh;
-	height: 100dvh;
-
-	// The universal layout inserts a "spacer" thing that causes a stray scroll bar.
-	// We have to create fake "space" for it to "roll up" and back into the viewport, which removes the scrollbar.
-	margin-bottom: calc(-1 * var(--MI-minBottomSpacing));
-
-	// Some "just in case" backup properties.
-	// These should not be needed, but help to maintain the layout if the above trick ever stops working.
-	overflow: hidden;
-	position: sticky;
-	top: 0;
+	height: 100%;
 }
 
 .header {
