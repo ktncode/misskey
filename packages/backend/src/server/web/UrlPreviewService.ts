@@ -172,7 +172,8 @@ export class UrlPreviewService {
 				await this.inferActivityPubLink(summary);
 			}
 
-			this.previewCache.set(cacheKey, summary);
+			// Await this to avoid hammering redis when a bunch of URLs are fetched at once
+			await this.previewCache.set(cacheKey, summary);
 
 			// Cache 1 day (matching redis)
 			reply.header('Cache-Control', 'public, max-age=86400');
