@@ -7,6 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { summaly } from '@misskey-dev/summaly';
 import { SummalyResult } from '@misskey-dev/summaly/built/summary.js';
 import * as Redis from 'ioredis';
+import { IsNull, Not } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
@@ -19,10 +20,11 @@ import { MiMeta } from '@/models/Meta.js';
 import { RedisKVCache } from '@/misc/cache.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { ApDbResolverService } from '@/core/activitypub/ApDbResolverService.js';
-import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { NotesRepository } from '@/models/_.js';
 import { ApUtilityService } from '@/core/activitypub/ApUtilityService.js';
-import { IsNull, Not } from 'typeorm';
+import { ApRequestService } from '@/core/activitypub/ApRequestService.js';
+import { SystemAccountService } from '@/core/SystemAccountService.js';
+import type { FastifyRequest, FastifyReply } from 'fastify';
 
 export type LocalSummalyResult = SummalyResult & {
 	haveNoteLocally?: boolean;
@@ -51,6 +53,8 @@ export class UrlPreviewService {
 		private readonly utilityService: UtilityService,
 		private readonly apUtilityService: ApUtilityService,
 		private readonly apDbResolverService: ApDbResolverService,
+		private readonly apRequestService: ApRequestService,
+		private readonly systemAccountService: SystemAccountService,
 	) {
 		this.logger = this.loggerService.getLogger('url-preview');
 		this.previewCache = new RedisKVCache<LocalSummalyResult>(this.redisClient, 'summaly', {
@@ -216,6 +220,7 @@ export class UrlPreviewService {
 		if (isCanonicalUri) {
 			summary.activityPub = summary.url;
 			summary.haveNoteLocally = true;
+			return;
 		}
 
 		// Try public URL next.
@@ -235,6 +240,16 @@ export class UrlPreviewService {
 		if (matchByUrl) {
 			summary.activityPub = matchByUrl.uri;
 			summary.haveNoteLocally = true;
+			return;
+		}
+
+		// Finally, attempt a signed GET in case it's a direct link to an instance with authorized fetch.
+		const instanceActor = await this.systemAccountService.getInstanceActor();
+		const remoteObject = await this.apRequestService.signedGet(summary.url, instanceActor).catch(() => null);
+		if (remoteObject) {
+			summary.activityPub = remoteObject.id;
+			summary.haveNoteLocally = false;
+			return;
 		}
 	}
 }
