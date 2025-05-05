@@ -125,7 +125,6 @@ export class UrlPreviewService {
 		const cacheKey = `${url}@${lang}@${cacheFormatVersion}`;
 		const cached = await this.previewCache.get(cacheKey);
 		if (cached !== undefined) {
-			this.logger.info(`Returning cache preview of ${cacheKey}`);
 			// Cache 1 day (matching redis)
 			reply.header('Cache-Control', 'public, max-age=86400');
 
@@ -135,10 +134,6 @@ export class UrlPreviewService {
 
 			return cached;
 		}
-
-		this.logger.info(this.meta.urlPreviewSummaryProxyUrl
-			? `(Proxy) Getting preview of ${cacheKey} ...`
-			: `Getting preview of ${cacheKey} ...`);
 
 		try {
 			const summary: LocalSummalyResult = this.meta.urlPreviewSummaryProxyUrl
@@ -157,7 +152,7 @@ export class UrlPreviewService {
 				};
 			}
 
-			this.logger.succ(`Got preview of ${url}: ${summary.title}`);
+			this.logger.info(`Got preview of ${url} in ${lang}: ${summary.title}`);
 
 			if (!(summary.url.startsWith('http://') || summary.url.startsWith('https://'))) {
 				throw new Error('unsupported schema included');
@@ -184,7 +179,7 @@ export class UrlPreviewService {
 
 			return summary;
 		} catch (err) {
-			this.logger.warn(`Failed to get preview of ${url}: ${err}`);
+			this.logger.warn(`Failed to get preview of ${url} for ${lang}: ${err}`);
 
 			reply.code(422);
 			reply.header('Cache-Control', 'max-age=86400, immutable');
