@@ -68,12 +68,16 @@ export class UrlPreviewService {
 
 	@bindThis
 	private wrap(url?: string | null): string | null {
-		return url != null
-			? `${this.config.mediaProxy}/preview.webp?${query({
-				url,
-				preview: '1',
-			})}`
-			: null;
+		if (url == null) return null;
+
+		// Don't proxy our own media
+		if (this.utilityService.isUriLocal(url)) {
+			return url;
+		}
+
+		// But proxy everything else!
+		const mediaQuery = query({ url, preview: '1' });
+		return `${this.config.mediaProxy}/preview.webp?${mediaQuery}`;
 	}
 
 	@bindThis
