@@ -104,8 +104,7 @@ export class UrlPreviewService {
 			};
 		}
 
-		const host = new URL(url).host;
-		if (this.utilityService.isBlockedHost(this.meta.blockedHosts, host)) {
+		if (this.utilityService.isBlockedHost(this.meta.blockedHosts, new URL(url).host)) {
 			reply.code(403);
 			return {
 				error: new ApiError({
@@ -138,6 +137,18 @@ export class UrlPreviewService {
 			const summary: LocalSummalyResult = this.meta.urlPreviewSummaryProxyUrl
 				? await this.fetchSummaryFromProxy(url, this.meta, lang)
 				: await this.fetchSummary(url, this.meta, lang);
+
+			// Repeat check, since redirects are allowed.
+			if (this.utilityService.isBlockedHost(this.meta.blockedHosts, new URL(summary.url).host)) {
+				reply.code(403);
+				return {
+					error: new ApiError({
+						message: 'URL is blocked',
+						code: 'URL_PREVIEW_BLOCKED',
+						id: '50294652-857b-4b13-9700-8e5c7a8deae8',
+					}),
+				};
+			}
 
 			this.logger.succ(`Got preview of ${url}: ${summary.title}`);
 
@@ -189,7 +200,7 @@ export class UrlPreviewService {
 			: undefined;
 
 		return summaly(url, {
-			followRedirects: false,
+			followRedirects: true,
 			lang: lang ?? 'ja-JP',
 			agent: agent,
 			userAgent: meta.urlPreviewUserAgent ?? undefined,
@@ -202,6 +213,7 @@ export class UrlPreviewService {
 	private fetchSummaryFromProxy(url: string, meta: MiMeta, lang?: string): Promise<LocalSummalyResult> {
 		const proxy = meta.urlPreviewSummaryProxyUrl!;
 		const queryStr = query({
+			followRedirects: true,
 			url: url,
 			lang: lang ?? 'ja-JP',
 			userAgent: meta.urlPreviewUserAgent ?? undefined,
