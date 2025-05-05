@@ -182,7 +182,7 @@ export class UrlPreviewService {
 			this.logger.warn(`Failed to get preview of ${url} for ${lang}: ${err}`);
 
 			reply.code(422);
-			reply.header('Cache-Control', 'max-age=86400, immutable');
+			reply.header('Cache-Control', 'max-age=3600');
 			return {
 				error: new ApiError({
 					message: 'Failed to get preview',
