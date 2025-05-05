@@ -160,10 +160,13 @@ export class UrlPreviewService {
 			summary.thumbnail = this.wrap(summary.thumbnail);
 
 			// Summaly cannot always detect links to a fedi post, so do some additional tests to try and find missed cases.
-			summary.activityPub ??= await this.inferActivityPubLink(summary);
+			if (!summary.activityPub) {
+				await this.inferActivityPubLink(summary);
+			}
 
 			if (summary.activityPub) {
-				summary.haveNoteLocally = !!await this.apDbResolverService.getNoteFromApId(summary.activityPub);
+				// Avoid duplicate checks in case inferActivityPubLink already set this.
+				summary.haveNoteLocally ||= !!await this.apDbResolverService.getNoteFromApId(summary.activityPub);
 			}
 
 			// Await this to avoid hammering redis when a bunch of URLs are fetched at once
@@ -261,12 +264,14 @@ export class UrlPreviewService {
 		}
 	}
 
-	private async inferActivityPubLink(summary: LocalSummalyResult): Promise<string | null> {
+	private async inferActivityPubLink(summary: LocalSummalyResult) {
 		// Match canonical URI first.
 		// This covers local and remote links.
 		const isCanonicalUri = !!await this.apDbResolverService.getNoteFromApId(summary.url);
 		if (isCanonicalUri) {
-			return summary.url;
+			summary.activityPub = summary.url;
+			summary.haveNoteLocally = true;
+			return;
 		}
 
 		// Try public URL next.
@@ -284,17 +289,17 @@ export class UrlPreviewService {
 		// Older versions did not validate URL, so do it now to avoid impersonation.
 		const matchByUrl = urlMatches.find(({ uri }) => this.apUtilityService.haveSameAuthority(uri, summary.url));
 		if (matchByUrl) {
-			return matchByUrl.uri;
+			summary.activityPub = matchByUrl.uri;
+			summary.haveNoteLocally = true;
+			return;
 		}
 
 		// Finally, attempt a signed GET in case it's a direct link to an instance with authorized fetch.
 		const instanceActor = await this.systemAccountService.getInstanceActor();
 		const remoteObject = await this.apRequestService.signedGet(summary.url, instanceActor).catch(() => null);
 		if (remoteObject) {
-			return remoteObject.id;
+			summary.activityPub = remoteObject.id;
+			return;
 		}
-
-		// No match :(
-		return null;
 	}
 }
