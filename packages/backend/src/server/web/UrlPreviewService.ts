@@ -31,7 +31,7 @@ export type LocalSummalyResult = SummalyResult & {
 };
 
 // Increment this to invalidate cached previews after a major change.
-const cacheFormatVersion = 1;
+const cacheFormatVersion = 2;
 
 @Injectable()
 export class UrlPreviewService {
@@ -159,11 +159,11 @@ export class UrlPreviewService {
 			summary.icon = this.wrap(summary.icon);
 			summary.thumbnail = this.wrap(summary.thumbnail);
 
+			// Summaly cannot always detect links to a fedi post, so do some additional tests to try and find missed cases.
+			summary.activityPub ??= await this.inferActivityPubLink(summary);
+
 			if (summary.activityPub) {
 				summary.haveNoteLocally = !!await this.apDbResolverService.getNoteFromApId(summary.activityPub);
-			} else {
-				// Summaly cannot always detect links to a fedi post, so check if it matches anything we already have
-				await this.inferActivityPubLink(summary);
 			}
 
 			// Await this to avoid hammering redis when a bunch of URLs are fetched at once
@@ -261,14 +261,12 @@ export class UrlPreviewService {
 		}
 	}
 
-	private async inferActivityPubLink(summary: LocalSummalyResult) {
+	private async inferActivityPubLink(summary: LocalSummalyResult): Promise<string | null> {
 		// Match canonical URI first.
 		// This covers local and remote links.
 		const isCanonicalUri = !!await this.apDbResolverService.getNoteFromApId(summary.url);
 		if (isCanonicalUri) {
-			summary.activityPub = summary.url;
-			summary.haveNoteLocally = true;
-			return;
+			return summary.url;
 		}
 
 		// Try public URL next.
@@ -286,18 +284,17 @@ export class UrlPreviewService {
 		// Older versions did not validate URL, so do it now to avoid impersonation.
 		const matchByUrl = urlMatches.find(({ uri }) => this.apUtilityService.haveSameAuthority(uri, summary.url));
 		if (matchByUrl) {
-			summary.activityPub = matchByUrl.uri;
-			summary.haveNoteLocally = true;
-			return;
+			return matchByUrl.uri;
 		}
 
 		// Finally, attempt a signed GET in case it's a direct link to an instance with authorized fetch.
 		const instanceActor = await this.systemAccountService.getInstanceActor();
 		const remoteObject = await this.apRequestService.signedGet(summary.url, instanceActor).catch(() => null);
 		if (remoteObject) {
-			summary.activityPub = remoteObject.id;
-			summary.haveNoteLocally = false;
-			return;
+			return remoteObject.id;
 		}
+
+		// No match :(
+		return null;
 	}
 }
