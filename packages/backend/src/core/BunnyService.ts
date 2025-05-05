@@ -71,7 +71,7 @@ export class BunnyService {
 
 		const req = https.request(options);
 
-		// Log and throw error if BunnyCDN detects wrong data and return to prevent console spam as this event occurs multiple times
+		// Log and return if BunnyCDN detects wrong data (return is used to prevent console spam as this event occurs multiple times)
 		req.on('response', (res) => {
 			if (res.statusCode === 401) {
 				this.bunnyCdnLogger.error('Invalid AccessKey or region hostname');
