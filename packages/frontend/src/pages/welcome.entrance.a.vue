@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div v-if="meta" :class="$style.root">
 	<MkFeaturedPhotos :class="$style.bg"/>
-	<XTimeline :class="$style.tl"/>
+	<XTimeline v-if="meta.policies.ltlAvailable" :class="$style.tl"/>
 	<div :class="$style.shape1"></div>
 	<div :class="$style.shape2"></div>
 	<div :class="$style.logoWrapper">
@@ -123,6 +123,7 @@ misskeyApiGet('federation/instances', {
 }
 
 .poweredBy {
+	color: var(--MI_THEME-fgOnAccent);
 	margin-bottom: 2px;
 }
 
