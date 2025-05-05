@@ -18,31 +18,35 @@ import { ApiError } from '@/server/api/error.js';
 import { MiMeta } from '@/models/Meta.js';
 import { RedisKVCache } from '@/misc/cache.js';
 import { UtilityService } from '@/core/UtilityService.js';
-import type { FastifyRequest, FastifyReply } from 'fastify';
 import { ApDbResolverService } from '@/core/activitypub/ApDbResolverService.js';
+import type { FastifyRequest, FastifyReply } from 'fastify';
+
+export type LocalSummalyResult = SummalyResult & {
+	haveNoteLocally?: boolean;
+};
 
 @Injectable()
 export class UrlPreviewService {
 	private logger: Logger;
-	private previewCache: RedisKVCache<SummalyResult>;
+	private previewCache: RedisKVCache<LocalSummalyResult>;
 
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
 
 		@Inject(DI.redis)
-		private redisClient: Redis.Redis,
+		private readonly redisClient: Redis.Redis,
 
 		@Inject(DI.meta)
-		private meta: MiMeta,
+		private readonly meta: MiMeta,
 
 		private httpRequestService: HttpRequestService,
 		private loggerService: LoggerService,
-		private utilityService: UtilityService,
-		private apDbResolverService: ApDbResolverService,
+		private readonly utilityService: UtilityService,
+		private readonly apDbResolverService: ApDbResolverService,
 	) {
 		this.logger = this.loggerService.getLogger('url-preview');
-		this.previewCache = new RedisKVCache<SummalyResult>(this.redisClient, 'summaly', {
+		this.previewCache = new RedisKVCache<LocalSummalyResult>(this.redisClient, 'summaly', {
 			lifetime: 1000 * 60 * 60 * 24, // 1d
 			memoryCacheLifetime: 1000 * 60 * 10, // 10m
 			fetcher: () => { throw new Error('the UrlPreview cache should never fetch'); },
@@ -102,7 +106,7 @@ export class UrlPreviewService {
 		}
 
 		const key = `${url}@${lang}`;
-		const cached = await this.previewCache.get(key) as SummalyResult & { haveNoteLocally?: boolean };
+		const cached = await this.previewCache.get(key);
 		if (cached !== undefined) {
 			this.logger.info(`Returning cache preview of ${key}`);
 			// Cache 7days
@@ -120,7 +124,7 @@ export class UrlPreviewService {
 			: `Getting preview of ${key} ...`);
 
 		try {
-			const summary: SummalyResult & { haveNoteLocally?: boolean } = this.meta.urlPreviewSummaryProxyUrl
+			const summary: LocalSummalyResult = this.meta.urlPreviewSummaryProxyUrl
 				? await this.fetchSummaryFromProxy(url, this.meta, lang)
 				: await this.fetchSummary(url, this.meta, lang);
 
@@ -162,7 +166,7 @@ export class UrlPreviewService {
 		}
 	}
 
-	private fetchSummary(url: string, meta: MiMeta, lang?: string): Promise<SummalyResult> {
+	private fetchSummary(url: string, meta: MiMeta, lang?: string): Promise<LocalSummalyResult> {
 		const agent = this.config.proxy
 			? {
 				http: this.httpRequestService.httpAgent,
@@ -181,7 +185,7 @@ export class UrlPreviewService {
 		});
 	}
 
-	private fetchSummaryFromProxy(url: string, meta: MiMeta, lang?: string): Promise<SummalyResult> {
+	private fetchSummaryFromProxy(url: string, meta: MiMeta, lang?: string): Promise<LocalSummalyResult> {
 		const proxy = meta.urlPreviewSummaryProxyUrl!;
 		const queryStr = query({
 			url: url,
@@ -192,6 +196,6 @@ export class UrlPreviewService {
 			contentLengthRequired: meta.urlPreviewRequireContentLength,
 		});
 
-		return this.httpRequestService.getJson<SummalyResult>(`${proxy}?${queryStr}`, 'application/json, */*', undefined, true);
+		return this.httpRequestService.getJson<LocalSummalyResult>(`${proxy}?${queryStr}`, 'application/json, */*', undefined, true);
 	}
 }
