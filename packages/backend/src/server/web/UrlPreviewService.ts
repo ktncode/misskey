@@ -126,8 +126,8 @@ export class UrlPreviewService {
 		const cached = await this.previewCache.get(cacheKey);
 		if (cached !== undefined) {
 			this.logger.info(`Returning cache preview of ${cacheKey}`);
-			// Cache 7days
-			reply.header('Cache-Control', 'max-age=604800, immutable');
+			// Cache 1 day (matching redis)
+			reply.header('Cache-Control', 'public, max-age=86400');
 
 			if (cached.activityPub) {
 				cached.haveNoteLocally = !! await this.apDbResolverService.getNoteFromApId(cached.activityPub);
@@ -179,8 +179,8 @@ export class UrlPreviewService {
 
 			this.previewCache.set(cacheKey, summary);
 
-			// Cache 7days
-			reply.header('Cache-Control', 'max-age=604800, immutable');
+			// Cache 1 day (matching redis)
+			reply.header('Cache-Control', 'public, max-age=86400');
 
 			return summary;
 		} catch (err) {
