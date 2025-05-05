@@ -140,6 +140,8 @@ export class UrlPreviewService {
 				? await this.fetchSummaryFromProxy(url, this.meta, lang)
 				: await this.fetchSummary(url, this.meta, lang);
 
+			this.validateUrls(summary);
+
 			// Repeat check, since redirects are allowed.
 			if (this.utilityService.isBlockedHost(this.meta.blockedHosts, new URL(summary.url).host)) {
 				reply.code(403);
@@ -153,14 +155,6 @@ export class UrlPreviewService {
 			}
 
 			this.logger.info(`Got preview of ${url} in ${lang}: ${summary.title}`);
-
-			if (!(summary.url.startsWith('http://') || summary.url.startsWith('https://'))) {
-				throw new Error('unsupported schema included');
-			}
-
-			if (summary.player.url && !(summary.player.url.startsWith('http://') || summary.player.url.startsWith('https://'))) {
-				throw new Error('unsupported schema included');
-			}
 
 			summary.icon = this.wrap(summary.icon);
 			summary.thumbnail = this.wrap(summary.thumbnail);
@@ -226,6 +220,41 @@ export class UrlPreviewService {
 		});
 
 		return this.httpRequestService.getJson<LocalSummalyResult>(`${proxy}?${queryStr}`, 'application/json, */*', undefined, true);
+	}
+
+	private validateUrls(summary: LocalSummalyResult) {
+		const urlScheme = this.utilityService.getUrlScheme(summary.url);
+		if (urlScheme !== 'http:' && urlScheme !== 'https:') {
+			throw new Error(`unsupported scheme in preview URL: "${urlScheme}"`);
+		}
+
+		if (summary.player.url) {
+			const playerScheme = this.utilityService.getUrlScheme(summary.player.url);
+			if (playerScheme !== 'http:' && playerScheme !== 'https:') {
+				throw new Error(`unsupported scheme in player URL: "${playerScheme}"`);
+			}
+		}
+
+		if (summary.icon) {
+			const iconScheme = this.utilityService.getUrlScheme(summary.icon);
+			if (iconScheme !== 'http:' && iconScheme !== 'https:') {
+				throw new Error(`unsupported scheme in icon URL: "${iconScheme}"`);
+			}
+		}
+
+		if (summary.thumbnail) {
+			const thumbnailScheme = this.utilityService.getUrlScheme(summary.thumbnail);
+			if (thumbnailScheme !== 'http:' && thumbnailScheme !== 'https:') {
+				throw new Error(`unsupported scheme in thumbnail URL: "${thumbnailScheme}"`);
+			}
+		}
+
+		if (summary.activityPub) {
+			const activityPubScheme = this.utilityService.getUrlScheme(summary.activityPub);
+			if (activityPubScheme !== 'http:' && activityPubScheme !== 'https:') {
+				throw new Error(`unsupported scheme in ActivityPub URL: "${activityPubScheme}"`);
+			}
+		}
 	}
 
 	private async inferActivityPubLink(summary: LocalSummalyResult) {
