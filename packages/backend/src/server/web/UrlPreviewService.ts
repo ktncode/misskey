@@ -297,7 +297,7 @@ export class UrlPreviewService {
 		// Finally, attempt a signed GET in case it's a direct link to an instance with authorized fetch.
 		const instanceActor = await this.systemAccountService.getInstanceActor();
 		const remoteObject = await this.apRequestService.signedGet(summary.url, instanceActor).catch(() => null);
-		if (remoteObject) {
+		if (remoteObject && this.apUtilityService.haveSameAuthority(remoteObject.id, summary.url)) {
 			summary.activityPub = remoteObject.id;
 			return;
 		}
