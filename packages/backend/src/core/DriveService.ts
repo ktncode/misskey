@@ -408,7 +408,11 @@ export class DriveService {
 		if (this.meta.objectStorageSetPublicRead) params.ACL = 'public-read';
 
 		if (this.bunnyService.usingBunnyCDN(this.meta)) {
-			await this.bunnyService.upload(this.meta, key, stream);
+			await this.bunnyService.upload(this.meta, key, stream).catch(
+				err => {
+					this.registerLogger.error(`Upload Failed: key = ${key}, filename = ${filename}`, err);
+				},
+			);
 		} else {
 			await this.s3Service.upload(this.meta, params)
 				.then(

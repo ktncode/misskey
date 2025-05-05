@@ -12,12 +12,16 @@ import type { MiMeta } from '@/models/Meta.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import { bindThis } from '@/decorators.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
+import Logger from '@/logger.js';
 
 @Injectable()
 export class BunnyService {
+	private bunnyCdnLogger: Logger;
+
 	constructor(
 		private httpRequestService: HttpRequestService,
 	) {
+		this.bunnyCdnLogger = new Logger('bunnycdn', 'blue');
 	}
 
 	@bindThis
@@ -40,7 +44,8 @@ export class BunnyService {
 
 	@bindThis
 	public usingBunnyCDN(meta: MiMeta) {
-		return meta.objectStorageEndpoint && meta.objectStorageEndpoint.includes('bunnycdn.com') ? true : false;
+		const client = this.getBunnyInfo(meta);
+		return new URL(client.fullUrl).hostname.endsWith('bunnycdn.com');
 	}
 
 	@bindThis
@@ -66,8 +71,19 @@ export class BunnyService {
 
 		const req = https.request(options);
 
+		// Log and throw error if BunnyCDN detects wrong data and return to prevent console spam as this event occurs multiple times
+		req.on('response', (res) => {
+			if (res.statusCode === 401) {
+				this.bunnyCdnLogger.error('Invalid AccessKey or region hostname');
+				data.destroy();
+				return;
+			}
+		});
+
 		req.on('error', (error) => {
-			console.error(error);
+			this.bunnyCdnLogger.error(error);
+			data.destroy();
+			throw new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140bf91', 'An error has occured during the connectiong to BunnyCDN');
 		});
 
 		data.pipe(req).on('finish', () => {
