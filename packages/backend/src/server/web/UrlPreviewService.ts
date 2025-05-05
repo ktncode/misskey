@@ -30,6 +30,9 @@ export type LocalSummalyResult = SummalyResult & {
 	haveNoteLocally?: boolean;
 };
 
+// Increment this to invalidate cached previews after a major change.
+const cacheFormatVersion = 1;
+
 @Injectable()
 export class UrlPreviewService {
 	private logger: Logger;
@@ -119,10 +122,10 @@ export class UrlPreviewService {
 			};
 		}
 
-		const key = `${url}@${lang}`;
-		const cached = await this.previewCache.get(key);
+		const cacheKey = `${url}@${lang}@${cacheFormatVersion}`;
+		const cached = await this.previewCache.get(cacheKey);
 		if (cached !== undefined) {
-			this.logger.info(`Returning cache preview of ${key}`);
+			this.logger.info(`Returning cache preview of ${cacheKey}`);
 			// Cache 7days
 			reply.header('Cache-Control', 'max-age=604800, immutable');
 
@@ -134,8 +137,8 @@ export class UrlPreviewService {
 		}
 
 		this.logger.info(this.meta.urlPreviewSummaryProxyUrl
-			? `(Proxy) Getting preview of ${key} ...`
-			: `Getting preview of ${key} ...`);
+			? `(Proxy) Getting preview of ${cacheKey} ...`
+			: `Getting preview of ${cacheKey} ...`);
 
 		try {
 			const summary: LocalSummalyResult = this.meta.urlPreviewSummaryProxyUrl
@@ -174,7 +177,7 @@ export class UrlPreviewService {
 				await this.inferActivityPubLink(summary);
 			}
 
-			this.previewCache.set(key, summary);
+			this.previewCache.set(cacheKey, summary);
 
 			// Cache 7days
 			reply.header('Cache-Control', 'max-age=604800, immutable');
