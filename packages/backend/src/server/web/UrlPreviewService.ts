@@ -137,11 +137,11 @@ export class UrlPreviewService {
 			summary.icon = this.wrap(summary.icon);
 			summary.thumbnail = this.wrap(summary.thumbnail);
 
-			this.previewCache.set(key, summary);
-
 			if (summary.activityPub) {
-				summary.haveNoteLocally = !! await this.apDbResolverService.getNoteFromApId(summary.activityPub);
+				summary.haveNoteLocally = !!await this.apDbResolverService.getNoteFromApId(summary.activityPub);
 			}
+
+			this.previewCache.set(key, summary);
 
 			// Cache 7days
 			reply.header('Cache-Control', 'max-age=604800, immutable');
