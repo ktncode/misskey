@@ -20,6 +20,9 @@ import { RedisKVCache } from '@/misc/cache.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { ApDbResolverService } from '@/core/activitypub/ApDbResolverService.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
+import type { NotesRepository } from '@/models/_.js';
+import { ApUtilityService } from '@/core/activitypub/ApUtilityService.js';
+import { IsNull, Not } from 'typeorm';
 
 export type LocalSummalyResult = SummalyResult & {
 	haveNoteLocally?: boolean;
@@ -40,9 +43,13 @@ export class UrlPreviewService {
 		@Inject(DI.meta)
 		private readonly meta: MiMeta,
 
+		@Inject(DI.notesRepository)
+		private readonly notesRepository: NotesRepository,
+
 		private httpRequestService: HttpRequestService,
 		private loggerService: LoggerService,
 		private readonly utilityService: UtilityService,
+		private readonly apUtilityService: ApUtilityService,
 		private readonly apDbResolverService: ApDbResolverService,
 	) {
 		this.logger = this.loggerService.getLogger('url-preview');
@@ -143,6 +150,9 @@ export class UrlPreviewService {
 
 			if (summary.activityPub) {
 				summary.haveNoteLocally = !!await this.apDbResolverService.getNoteFromApId(summary.activityPub);
+			} else {
+				// Summaly cannot always detect links to a fedi post, so check if it matches anything we already have
+				await this.inferActivityPubLink(summary);
 			}
 
 			this.previewCache.set(key, summary);
@@ -197,5 +207,34 @@ export class UrlPreviewService {
 		});
 
 		return this.httpRequestService.getJson<LocalSummalyResult>(`${proxy}?${queryStr}`, 'application/json, */*', undefined, true);
+	}
+
+	private async inferActivityPubLink(summary: LocalSummalyResult) {
+		// Match canonical URI first.
+		// This covers local and remote links.
+		const isCanonicalUri = !!await this.apDbResolverService.getNoteFromApId(summary.url);
+		if (isCanonicalUri) {
+			summary.activityPub = summary.url;
+			summary.haveNoteLocally = true;
+		}
+
+		// Try public URL next.
+		// This is necessary for Mastodon and other software with a different public URL.
+		const urlMatches = await this.notesRepository.find({
+			select: {
+				uri: true,
+			},
+			where: {
+				url: summary.url,
+				uri: Not(IsNull()),
+			},
+		}) as { uri: string }[];
+
+		// Older versions did not validate URL, so do it now to avoid impersonation.
+		const matchByUrl = urlMatches.find(({ uri }) => this.apUtilityService.haveSameAuthority(uri, summary.url));
+		if (matchByUrl) {
+			summary.activityPub = matchByUrl.uri;
+			summary.haveNoteLocally = true;
+		}
 	}
 }
