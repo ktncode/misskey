@@ -231,28 +231,32 @@ export class UrlPreviewService {
 		if (summary.player.url) {
 			const playerScheme = this.utilityService.getUrlScheme(summary.player.url);
 			if (playerScheme !== 'http:' && playerScheme !== 'https:') {
-				throw new Error(`unsupported scheme in player URL: "${playerScheme}"`);
+				this.logger.warn(`Redacting preview for ${summary.url}: player URL has unsupported scheme "${playerScheme}"`);
+				summary.player.url = null;
 			}
 		}
 
 		if (summary.icon) {
 			const iconScheme = this.utilityService.getUrlScheme(summary.icon);
 			if (iconScheme !== 'http:' && iconScheme !== 'https:') {
-				throw new Error(`unsupported scheme in icon URL: "${iconScheme}"`);
+				this.logger.warn(`Redacting preview for ${summary.url}: icon URL has unsupported scheme "${iconScheme}"`);
+				summary.icon = null;
 			}
 		}
 
 		if (summary.thumbnail) {
 			const thumbnailScheme = this.utilityService.getUrlScheme(summary.thumbnail);
 			if (thumbnailScheme !== 'http:' && thumbnailScheme !== 'https:') {
-				throw new Error(`unsupported scheme in thumbnail URL: "${thumbnailScheme}"`);
+				this.logger.warn(`Redacting preview for ${summary.url}: thumbnail URL has unsupported scheme "${thumbnailScheme}"`);
+				summary.thumbnail = null;
 			}
 		}
 
 		if (summary.activityPub) {
 			const activityPubScheme = this.utilityService.getUrlScheme(summary.activityPub);
 			if (activityPubScheme !== 'http:' && activityPubScheme !== 'https:') {
-				throw new Error(`unsupported scheme in ActivityPub URL: "${activityPubScheme}"`);
+				this.logger.warn(`Redacting preview for ${summary.url}: ActivityPub URL has unsupported scheme "${activityPubScheme}"`);
+				summary.activityPub = null;
 			}
 		}
 	}
