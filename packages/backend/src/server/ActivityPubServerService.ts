@@ -177,7 +177,7 @@ export class ActivityPubServerService {
 			 this is also inspired by FireFish's `checkFetch`
 		*/
 
-		let signature;
+		let signature: httpSignature.IParsedSignature;
 
 		try {
 			signature = httpSignature.parseRequest(request.raw, {
@@ -230,14 +230,37 @@ export class ActivityPubServerService {
 			return `${logPrefix} signer is suspended: refuse`;
 		}
 
-		let httpSignatureValidated = httpSignature.verifySignature(signature, authUser.key.keyPem);
+		// some fedi implementations include the query (`?foo=bar`) in the
+		// signature, some don't, so we have to handle both cases
+		function verifyWithOrWithoutQuery() {
+			const httpSignatureValidated = httpSignature.verifySignature(signature, authUser!.key!.keyPem);
+			if (httpSignatureValidated) return true;
+
+			const requestUrl = new URL(`http://whatever${request.raw.url}`);
+			if (! requestUrl.search) return false;
+
+			// verification failed, the request URL contained a query, let's try without
+			const semiRawRequest = request.raw;
+			semiRawRequest.url = requestUrl.pathname;
+
+			// no need for try/catch, if the original request parsed, this
+			// one will, too
+			const signatureWithoutQuery = httpSignature.parseRequest(semiRawRequest, {
+				headers: ['(request-target)', 'host', 'date'],
+				authorizationHeaderName: 'signature',
+			});
+
+			return httpSignature.verifySignature(signatureWithoutQuery, authUser!.key!.keyPem);
+		}
+
+		let httpSignatureValidated = verifyWithOrWithoutQuery();
 
 		// maybe they changed their key? refetch it
 		// TODO rate-limit this using lastFetchedAt
 		if (!httpSignatureValidated) {
 			authUser.key = await this.apDbResolverService.refetchPublicKeyForApId(authUser.user);
 			if (authUser.key != null) {
-				httpSignatureValidated = httpSignature.verifySignature(signature, authUser.key.keyPem);
+				httpSignatureValidated = verifyWithOrWithoutQuery();
 			}
 		}
 
