@@ -51,7 +51,7 @@ import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { UserBlockingService } from '@/core/UserBlockingService.js';
 import { isReply } from '@/misc/is-reply.js';
-import { trackPromise } from '@/misc/promise-tracker.js';
+import { trackTask } from '@/misc/promise-tracker.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { LatestNoteService } from '@/core/LatestNoteService.js';
@@ -729,7 +729,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 			//#region AP deliver
 			if (!data.localOnly && this.userEntityService.isLocalUser(user)) {
-				(async () => {
+				trackTask(async () => {
 					const noteActivity = await this.renderNoteOrRenoteActivity(data, note, user);
 					const dm = this.apDeliverManagerService.createDeliverManager(user, noteActivity);
 
@@ -755,12 +755,12 @@ export class NoteCreateService implements OnApplicationShutdown {
 						dm.addFollowersRecipe();
 					}
 
-					if (['public'].includes(note.visibility)) {
-						this.relayService.deliverToRelays(user, noteActivity);
-					}
+					await dm.execute();
 
-					trackPromise(dm.execute());
-				})();
+					if (['public'].includes(note.visibility)) {
+						await this.relayService.deliverToRelays(user, noteActivity);
+					}
+				});
 			}
 			//#endregion
 		}

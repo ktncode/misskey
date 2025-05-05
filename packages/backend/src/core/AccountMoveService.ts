@@ -95,11 +95,12 @@ export class AccountMoveService {
 		const srcPerson = await this.apRendererService.renderPerson(src);
 		const updateAct = this.apRendererService.addContext(this.apRendererService.renderUpdate(srcPerson, src));
 		await this.apDeliverManagerService.deliverToFollowers(src, updateAct);
-		this.relayService.deliverToRelays(src, updateAct);
+		await this.relayService.deliverToRelays(src, updateAct);
 
 		// Deliver Move activity to the followers of the old account
 		const moveAct = this.apRendererService.addContext(this.apRendererService.renderMove(src, dst));
 		await this.apDeliverManagerService.deliverToFollowers(src, moveAct);
+		await this.relayService.deliverToRelays(src, moveAct);
 
 		// Publish meUpdated event
 		const iObj = await this.userEntityService.pack(src.id, src, { schema: 'MeDetailed', includeSecrets: true });
