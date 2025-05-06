@@ -28,7 +28,7 @@ export class ServerUtilityService {
 
 		// Default behavior saves files to memory - we don't want that!
 		// Store to temporary file instead, and copy the body fields while we're at it.
-		fastify.addHook<{ Body?: Record<string, string | string[] | undefined> }>('onRequest', async request => {
+		fastify.addHook<{ Body?: Record<string, string | string[] | undefined> }>('preValidation', async request => {
 			if (request.isMultipart()) {
 				// We can't use saveRequestFiles() because it erases all the data fields.
 				// Instead, recreate it manually.
@@ -94,7 +94,7 @@ export class ServerUtilityService {
 	}
 
 	public addCORS(fastify: FastifyInstance) {
-		fastify.addHook('onRequest', (_, reply, done) => {
+		fastify.addHook('preHandler', (_, reply, done) => {
 			// Allow web-based clients to connect from other origins.
 			reply.header('Access-Control-Allow-Origin', '*');
 
