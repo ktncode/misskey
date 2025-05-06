@@ -47,12 +47,16 @@ export class MastodonApiServerService {
 		this.serverUtilityService.addFlattenedQueryType(fastify);
 
 		fastify.setErrorHandler((error, request, reply) => {
-			const data = getErrorData(error);
-			const status = getErrorStatus(error);
+			try {
+				const data = getErrorData(error);
+				const status = getErrorStatus(error);
 
-			this.logger.error(request, data, status);
+				this.logger.error(request, data, status);
 
-			reply.code(status).send(data);
+				reply.code(status).send(data);
+			} catch (e) {
+				this.logger.logger.error('Recursive error in mastodon API - this is a bug!', { e }, true);
+			}
 		});
 
 		// External endpoints
