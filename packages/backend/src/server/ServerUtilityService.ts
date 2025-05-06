@@ -9,6 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { FastifyInstance } from 'fastify';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
+import { saveToTempFile } from '@/misc/create-temp.js';
 
 @Injectable()
 export class ServerUtilityService {
@@ -29,17 +30,16 @@ export class ServerUtilityService {
 		// Store to temporary file instead, and copy the body fields while we're at it.
 		fastify.addHook<{ Body?: Record<string, string | string[] | undefined> }>('onRequest', async request => {
 			if (request.isMultipart()) {
-				const body = request.body ??= {};
+				// We can't use saveRequestFiles() because it erases all the data fields.
+				// Instead, recreate it manually.
+				// https://github.com/fastify/fastify-multipart/issues/549
 
-				// Save upload to temp directory.
-				// These are attached to request.savedRequestFiles
-				await request.saveRequestFiles();
+				for await (const part of request.parts()) {
+					if (part.type === 'field') {
+						const k = part.fieldname;
+						const v = String(part.value);
+						const body = request.body ??= {};
 
-				// Copy fields to body
-				const formData = await request.formData();
-				formData.forEach((v, k) => {
-					// This can be string or File, and we handle files above.
-					if (typeof(v) === 'string') {
 						// This is just progressive conversion from undefined -> string -> string[]
 						if (body[k]) {
 							if (Array.isArray(body[k])) {
@@ -50,8 +50,27 @@ export class ServerUtilityService {
 						} else {
 							body[k] = v;
 						}
+					} else { // Otherwise it's a file
+						try {
+							const [filepath] = await saveToTempFile(part.file);
+
+							const tmpUploads = (request.tmpUploads ??= []);
+							tmpUploads.push(filepath);
+
+							const requestSavedFiles = (request.savedRequestFiles ??= []);
+							requestSavedFiles.push({
+								...part,
+								filepath,
+							});
+						} catch (e) {
+							// Cleanup to avoid file leak in case of errors
+							await request.cleanRequestFiles();
+							request.tmpUploads = null;
+							request.savedRequestFiles = null;
+							throw e;
+						}
 					}
-				});
+				}
 			}
 		});
 	}
