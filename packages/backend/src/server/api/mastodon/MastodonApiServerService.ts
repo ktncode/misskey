@@ -46,17 +46,21 @@ export class MastodonApiServerService {
 		this.serverUtilityService.addCORS(fastify);
 		this.serverUtilityService.addFlattenedQueryType(fastify);
 
-		fastify.setErrorHandler((error, request, reply) => {
-			try {
-				const data = getErrorData(error);
-				const status = getErrorStatus(error);
+		// Convert JS exceptions into error responses
+		fastify.setErrorHandler((error, _, reply) => {
+			const data = getErrorData(error);
+			const status = getErrorStatus(error);
 
-				this.logger.error(request, data, status);
+			reply.code(status).send(data);
+		});
 
-				reply.code(status).send(data);
-			} catch (e) {
-				this.logger.logger.error('Recursive error in mastodon API - this is a bug!', { e }, true);
+		// Log error responses (including converted JSON exceptions)
+		fastify.addHook('onSend', (request, reply, payload, done) => {
+			if (reply.statusCode >= 400) {
+				const data = getErrorData(payload);
+				this.logger.error(request, data, reply.statusCode);
 			}
+			done();
 		});
 
 		// External endpoints

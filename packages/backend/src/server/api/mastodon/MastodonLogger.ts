@@ -65,6 +65,13 @@ export function getErrorData(error: unknown): MastodonError {
 		return convertGenericError(error);
 	}
 
+	if ('error' in error && typeof(error.error) === 'string') {
+		// "error_description" is string, undefined, or not present.
+		if (!('error_description' in error) || typeof(error.error_description) === 'string' || typeof(error.error_description) === 'undefined') {
+			return error as MastodonError;
+		}
+	}
+
 	return convertUnknownError(error);
 }
 
