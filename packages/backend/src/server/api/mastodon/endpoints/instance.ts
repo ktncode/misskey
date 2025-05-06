@@ -39,7 +39,7 @@ export class ApiInstanceMastodon {
 
 			const instance = data.data;
 			const response: MastodonEntity.Instance = {
-				uri: this.config.url,
+				uri: this.config.host,
 				title: this.meta.name || 'Sharkey',
 				description: this.meta.description || 'This is a vanilla Sharkey Instance. It doesn\'t seem to have a description.',
 				email: instance.email || '',
