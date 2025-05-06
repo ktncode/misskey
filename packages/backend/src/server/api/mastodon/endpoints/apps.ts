@@ -6,7 +6,6 @@
 import { Injectable } from '@nestjs/common';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
 import type { FastifyInstance } from 'fastify';
-import type multer from 'fastify-multer';
 
 const readScope = [
 	'read:account',
@@ -62,8 +61,8 @@ export class ApiAppsMastodon {
 		private readonly clientService: MastodonClientService,
 	) {}
 
-	public register(fastify: FastifyInstance, upload: ReturnType<typeof multer>): void {
-		fastify.post<AuthMastodonRoute>('/v1/apps', { preHandler: upload.single('none') }, async (_request, reply) => {
+	public register(fastify: FastifyInstance): void {
+		fastify.post<AuthMastodonRoute>('/v1/apps', async (_request, reply) => {
 			const body = _request.body ?? _request.query;
 			if (!body.scopes) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required payload "scopes"' });
 			if (!body.redirect_uris) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required payload "redirect_uris"' });

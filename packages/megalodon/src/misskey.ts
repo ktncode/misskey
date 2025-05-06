@@ -1502,13 +1502,13 @@ export default class Misskey implements MegalodonInterface {
   /**
    * POST /api/drive/files/create
    */
-  public async uploadMedia(file: any, _options?: { description?: string; focus?: string }): Promise<Response<Entity.Attachment>> {
+  public async uploadMedia(file: { filepath: fs.PathLike, mimetype: string, filename: string }, _options?: { description?: string; focus?: string }): Promise<Response<Entity.Attachment>> {
     const formData = new FormData()
-    formData.append('file', fs.createReadStream(file.path), {
+    formData.append('file', fs.createReadStream(file.filepath), {
 			contentType: file.mimetype,
 		});
 
-		if (file.originalname != null && file.originalname !== "file") formData.append("name", file.originalname);
+		if (file.filename && file.filename !== "file") formData.append("name", file.filename);
 
 		if (_options?.description != null) formData.append("comment", _options.description);
     let headers: { [key: string]: string } = {}

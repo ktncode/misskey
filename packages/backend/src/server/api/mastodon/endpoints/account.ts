@@ -11,7 +11,6 @@ import { DI } from '@/di-symbols.js';
 import type { AccessTokensRepository, UserProfilesRepository } from '@/models/_.js';
 import { attachMinMaxPagination } from '@/server/api/mastodon/pagination.js';
 import { MastodonConverters, convertRelationship, convertFeaturedTag, convertList } from '../MastodonConverters.js';
-import type multer from 'fastify-multer';
 import type { FastifyInstance } from 'fastify';
 
 interface ApiAccountMastodonRoute {
@@ -34,7 +33,7 @@ export class ApiAccountMastodon {
 		private readonly driveService: DriveService,
 	) {}
 
-	public register(fastify: FastifyInstance, upload: ReturnType<typeof multer>): void {
+	public register(fastify: FastifyInstance): void {
 		fastify.get<ApiAccountMastodonRoute>('/v1/accounts/verify_credentials', async (_request, reply) => {
 			const client = this.clientService.getClient(_request);
 			const data = await client.verifyAccountCredentials();
@@ -70,60 +69,50 @@ export class ApiAccountMastodon {
 					value: string,
 				}[],
 			},
-		}>('/v1/accounts/update_credentials', { preHandler: upload.any() }, async (_request, reply) => {
+		}>('/v1/accounts/update_credentials', async (_request, reply) => {
 			const accessTokens = _request.headers.authorization;
 			const client = this.clientService.getClient(_request);
 			// Check if there is a Header or Avatar being uploaded, if there is proceed to upload it to the drive of the user and then set it.
-			if (_request.files.length > 0 && accessTokens) {
+			if (_request.savedRequestFiles?.length && accessTokens) {
 				const tokeninfo = await this.accessTokensRepository.findOneBy({ token: accessTokens.replace('Bearer ', '') });
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const avatar = (_request.files as any).find((obj: any) => {
+				const avatar = _request.savedRequestFiles.find(obj => {
 					return obj.fieldname === 'avatar';
 				});
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const header = (_request.files as any).find((obj: any) => {
+				const header = _request.savedRequestFiles.find(obj => {
 					return obj.fieldname === 'header';
 				});
 
 				if (tokeninfo && avatar) {
 					const upload = await this.driveService.addFile({
 						user: { id: tokeninfo.userId, host: null },
-						path: avatar.path,
-						name: avatar.originalname !== null && avatar.originalname !== 'file' ? avatar.originalname : undefined,
+						path: avatar.filepath,
+						name: avatar.filename && avatar.filename !== 'file' ? avatar.filename : undefined,
 						sensitive: false,
 					});
 					if (upload.type.startsWith('image/')) {
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						(_request.body as any).avatar = upload.id;
+						_request.body.avatar = upload.id;
 					}
 				} else if (tokeninfo && header) {
 					const upload = await this.driveService.addFile({
 						user: { id: tokeninfo.userId, host: null },
-						path: header.path,
-						name: header.originalname !== null && header.originalname !== 'file' ? header.originalname : undefined,
+						path: header.filepath,
+						name: header.filename && header.filename !== 'file' ? header.filename : undefined,
 						sensitive: false,
 					});
 					if (upload.type.startsWith('image/')) {
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						(_request.body as any).header = upload.id;
+						_request.body.header = upload.id;
 					}
 				}
 			}
 
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			if ((_request.body as any).fields_attributes) {
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const fields = (_request.body as any).fields_attributes.map((field: any) => {
+			if (_request.body.fields_attributes) {
+				for (const field of _request.body.fields_attributes) {
 					if (!(field.name.trim() === '' && field.value.trim() === '')) {
 						if (field.name.trim() === '') return reply.code(400).send('Field name can not be empty');
 						if (field.value.trim() === '') return reply.code(400).send('Field value can not be empty');
 					}
-					return {
-						...field,
-					};
-				});
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				(_request.body as any).fields_attributes = fields.filter((field: any) => field.name.trim().length > 0 && field.value.length > 0);
+				}
+				_request.body.fields_attributes = _request.body.fields_attributes.filter(field => field.name.trim().length > 0 && field.value.length > 0);
 			}
 
 			const options = {
@@ -234,7 +223,7 @@ export class ApiAccountMastodon {
 			reply.send(response);
 		});
 
-		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/follow', { preHandler: upload.single('none') }, async (_request, reply) => {
+		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/follow', async (_request, reply) => {
 			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
@@ -245,7 +234,7 @@ export class ApiAccountMastodon {
 			reply.send(acct);
 		});
 
-		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/unfollow', { preHandler: upload.single('none') }, async (_request, reply) => {
+		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/unfollow', async (_request, reply) => {
 			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
@@ -256,7 +245,7 @@ export class ApiAccountMastodon {
 			reply.send(acct);
 		});
 
-		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/block', { preHandler: upload.single('none') }, async (_request, reply) => {
+		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/block', async (_request, reply) => {
 			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
@@ -266,7 +255,7 @@ export class ApiAccountMastodon {
 			reply.send(response);
 		});
 
-		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/unblock', { preHandler: upload.single('none') }, async (_request, reply) => {
+		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/unblock', async (_request, reply) => {
 			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
@@ -276,7 +265,7 @@ export class ApiAccountMastodon {
 			return reply.send(response);
 		});
 
-		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/mute', { preHandler: upload.single('none') }, async (_request, reply) => {
+		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/mute', async (_request, reply) => {
 			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);
@@ -289,7 +278,7 @@ export class ApiAccountMastodon {
 			reply.send(response);
 		});
 
-		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/unmute', { preHandler: upload.single('none') }, async (_request, reply) => {
+		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/unmute', async (_request, reply) => {
 			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 
 			const client = this.clientService.getClient(_request);

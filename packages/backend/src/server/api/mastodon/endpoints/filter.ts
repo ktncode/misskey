@@ -8,7 +8,6 @@ import { toBoolean } from '@/server/api/mastodon/argsUtils.js';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
 import { convertFilter } from '../MastodonConverters.js';
 import type { FastifyInstance } from 'fastify';
-import type multer from 'fastify-multer';
 
 interface ApiFilterMastodonRoute {
 	Params: {
@@ -29,7 +28,7 @@ export class ApiFilterMastodon {
 		private readonly clientService: MastodonClientService,
 	) {}
 
-	public register(fastify: FastifyInstance, upload: ReturnType<typeof multer>): void {
+	public register(fastify: FastifyInstance): void {
 		fastify.get('/v1/filters', async (_request, reply) => {
 			const client = this.clientService.getClient(_request);
 
@@ -49,7 +48,7 @@ export class ApiFilterMastodon {
 			reply.send(response);
 		});
 
-		fastify.post<ApiFilterMastodonRoute>('/v1/filters', { preHandler: upload.single('none') }, async (_request, reply) => {
+		fastify.post<ApiFilterMastodonRoute>('/v1/filters', async (_request, reply) => {
 			if (!_request.body.phrase) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required payload "phrase"' });
 			if (!_request.body.context) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required payload "context"' });
 
@@ -68,7 +67,7 @@ export class ApiFilterMastodon {
 			reply.send(response);
 		});
 
-		fastify.post<ApiFilterMastodonRoute & { Params: { id?: string } }>('/v1/filters/:id', { preHandler: upload.single('none') }, async (_request, reply) => {
+		fastify.post<ApiFilterMastodonRoute & { Params: { id?: string } }>('/v1/filters/:id', async (_request, reply) => {
 			if (!_request.params.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required parameter "id"' });
 			if (!_request.body.phrase) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required payload "phrase"' });
 			if (!_request.body.context) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required payload "context"' });
