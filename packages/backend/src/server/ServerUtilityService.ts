@@ -37,8 +37,12 @@ export class ServerUtilityService {
 				for await (const part of request.parts()) {
 					if (part.type === 'field') {
 						const k = part.fieldname;
-						const v = String(part.value);
+						const v = part.value;
 						const body = request.body ??= {};
+
+						// Value can be string, buffer, or undefined.
+						// We only support the first one.
+						if (typeof(v) !== 'string') continue;
 
 						// This is just progressive conversion from undefined -> string -> string[]
 						if (body[k]) {
