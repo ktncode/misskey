@@ -25,8 +25,10 @@ export class MastodonLogger {
 	}
 
 	public error(request: FastifyRequest, error: MastodonError, status: number): void {
-		if ((status < 400 && status > 499) || this.envService.env.NODE_ENV === 'development') {
-			const path = new URL(request.url, getBaseUrl(request)).pathname;
+		const path = new URL(request.url, getBaseUrl(request)).pathname;
+		if (status >= 400 && status <= 499) { // Client errors
+			this.logger.debug(`Error in mastodon endpoint ${request.method} ${path}:`, error);
+		} else { // Server errors
 			this.logger.error(`Error in mastodon endpoint ${request.method} ${path}:`, error);
 		}
 	}
