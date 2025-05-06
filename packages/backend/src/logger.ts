@@ -27,7 +27,7 @@ export type DataObject = Record<string, unknown> | (object & { length?: never; }
 export default class Logger {
 	private context: Context;
 	private parentLogger: Logger | null = null;
-	private readonly verbose: boolean;
+	public readonly verbose: boolean;
 
 	constructor(context: string, color?: KEYWORD, verbose?: boolean) {
 		this.context = {

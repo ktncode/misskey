@@ -56,9 +56,12 @@ export class MastodonApiServerService {
 
 		// Log error responses (including converted JSON exceptions)
 		fastify.addHook('onSend', (request, reply, payload, done) => {
-			if (reply.statusCode >= 400) {
-				const data = getErrorData(payload);
-				this.logger.error(request, data, reply.statusCode);
+			if (reply.statusCode >= 500 || (reply.statusCode >= 400 && this.logger.verbose)) {
+				if (typeof(payload) === 'string' && String(reply.getHeader('content-type')).toLowerCase().includes('application/json')) {
+					const body = JSON.parse(payload);
+					const data = getErrorData(body);
+					this.logger.error(request, data, reply.statusCode);
+				}
 			}
 			done();
 		});

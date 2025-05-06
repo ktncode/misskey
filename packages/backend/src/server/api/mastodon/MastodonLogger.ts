@@ -3,22 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
 import Logger from '@/logger.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { ApiError } from '@/server/api/error.js';
-import { EnvService } from '@/core/EnvService.js';
 import { getBaseUrl } from '@/server/api/mastodon/MastodonClientService.js';
 
 @Injectable()
 export class MastodonLogger {
 	public readonly logger: Logger;
 
-	constructor(
-		@Inject(EnvService)
-		private readonly envService: EnvService,
+	public get verbose() {
+		return this.logger.verbose;
+	}
 
+	constructor(
 		loggerService: LoggerService,
 	) {
 		this.logger = loggerService.getLogger('masto-api');
