@@ -50,7 +50,7 @@ export class ApiInstanceMastodon {
 			const roles = await this.roleService.getUserPolicies(me?.id ?? null);
 
 			const response: MastodonEntity.Instance = {
-				uri: this.config.url,
+				uri: this.config.host,
 				title: this.meta.name || 'Sharkey',
 				description: this.meta.description || 'This is a vanilla Sharkey Instance. It doesn\'t seem to have a description.',
 				email: instance.email || '',
