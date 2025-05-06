@@ -39,7 +39,7 @@ export default class Misskey implements MegalodonInterface {
 
   public async registerApp(
     client_name: string,
-    options: Partial<{ scopes: Array<string>; redirect_uri: string; website: string }> = {
+    options: Partial<{ scopes: Array<string>; redirect_uri: string; website?: string }> = {
       scopes: MisskeyAPI.DEFAULT_SCOPE,
       redirect_uri: this.baseUrl
     }
@@ -62,13 +62,14 @@ export default class Misskey implements MegalodonInterface {
    */
   public async createApp(
     client_name: string,
-    options: Partial<{ scopes: Array<string>; redirect_uri: string; website: string }> = {
+    options: Partial<{ scopes: Array<string>; redirect_uri: string; website?: string }> = {
       scopes: MisskeyAPI.DEFAULT_SCOPE,
       redirect_uri: this.baseUrl
     }
   ): Promise<OAuth.AppData> {
     const redirect_uri = options.redirect_uri || this.baseUrl
     const scopes = options.scopes || MisskeyAPI.DEFAULT_SCOPE
+		const website = options.website ?? '';
 
     const params: {
       name: string
@@ -77,7 +78,7 @@ export default class Misskey implements MegalodonInterface {
       callbackUrl: string
     } = {
       name: client_name,
-      description: '',
+      description: website,
       permission: scopes,
       callbackUrl: redirect_uri
     }
