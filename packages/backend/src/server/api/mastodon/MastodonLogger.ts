@@ -4,6 +4,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
+import { isAxiosError } from 'axios';
 import type Logger from '@/logger.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { ApiError } from '@/server/api/error.js';
@@ -59,14 +60,14 @@ export function getErrorException(error: unknown): Error | null {
 	}
 
 	// AxiosErrors need special decoding
-	if (error.name === 'AxiosError') {
+	if (isAxiosError(error)) {
 		// Axios errors with a response are from the remote
-		if ('response' in error && error.response && typeof (error.response) === 'object') {
+		if (error.response) {
 			return null;
 		}
 
 		// This is the inner exception, basically
-		if ('cause' in error && error.cause instanceof Error) {
+		if (error.cause && !isAxiosError(error.cause)) {
 			return error.cause;
 		}
 
@@ -131,9 +132,9 @@ export function getErrorData(error: unknown): MastodonError {
 }
 
 function unpackAxiosError(error: unknown): unknown {
-	if (error && typeof(error) === 'object') {
-		if ('response' in error && error.response && typeof (error.response) === 'object') {
-			if ('data' in error.response && error.response.data && typeof (error.response.data) === 'object') {
+	if (isAxiosError(error)) {
+		if (error.response) {
+			if (error.response.data) {
 				if ('error' in error.response.data && error.response.data.error && typeof(error.response.data.error) === 'object') {
 					return error.response.data.error;
 				}
@@ -145,14 +146,12 @@ function unpackAxiosError(error: unknown): unknown {
 			return undefined;
 		}
 
-		if (error instanceof Error && error.name === 'AxiosError') {
-			if ('cause' in error) {
-				return error.cause;
-			}
-
-			// No data - this is a fallback to avoid leaking request/response details in the error
-			return String(error);
+		if (error.cause && !isAxiosError(error.cause)) {
+			return error.cause;
 		}
+
+		// No data - this is a fallback to avoid leaking request/response details in the error
+		return String(error);
 	}
 
 	return error;
