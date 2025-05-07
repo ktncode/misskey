@@ -4,8 +4,8 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import { summaly } from '@transfem-org/summaly';
-import { SummalyResult } from '@transfem-org/summaly/built/summary.js';
+import { summaly } from '@misskey-dev/summaly';
+import { SummalyResult } from '@misskey-dev/summaly/built/summary.js';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';

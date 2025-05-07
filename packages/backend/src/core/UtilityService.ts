@@ -39,6 +39,16 @@ export class UtilityService {
 		return this.punyHost(uri) === this.toPuny(this.config.host);
 	}
 
+	// メールアドレスのバリデーションを行う
+	// https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
+	@bindThis
+	public validateEmailFormat(email: string): boolean {
+		// Note: replaced MK's complicated regex with a simpler one that is more efficient and reliable.
+		const regexp = /^.+@.+$/;
+		//const regexp = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+		return regexp.test(email);
+	}
+
 	@bindThis
 	public isBlockedHost(blockedHosts: string[], host: string | null): boolean {
 		if (host == null) return false;

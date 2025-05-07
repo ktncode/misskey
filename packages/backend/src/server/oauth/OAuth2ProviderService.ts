@@ -6,9 +6,6 @@
 import querystring from 'querystring';
 import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
-/* import { kinds } from '@/misc/api-permissions.js';
-import type { Config } from '@/config.js';
-import { DI } from '@/di-symbols.js'; */
 import multer from 'fastify-multer';
 import { bindThis } from '@/decorators.js';
 import type { Config } from '@/config.js';
@@ -159,7 +156,7 @@ export class OAuth2ProviderService {
 				const secret = String(body.client_secret);
 				const code = body.code ? String(body.code) : '';
 
-				// TODO fetch the access token directly
+				// TODO fetch the access token directly, then remove all oauth code from megalodon
 				const client = this.mastodonClientService.getClient(request);
 				const atData = await client.fetchAccessToken(clientId, secret, code);
 

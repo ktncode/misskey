@@ -28,7 +28,6 @@ import { ActivityPubServerService } from './ActivityPubServerService.js';
 import { ApiLoggerService } from './api/ApiLoggerService.js';
 import { ApiServerService } from './api/ApiServerService.js';
 import { AuthenticateService } from './api/AuthenticateService.js';
-import { RateLimiterService } from './api/RateLimiterService.js';
 import { SigninApiService } from './api/SigninApiService.js';
 import { SigninService } from './api/SigninService.js';
 import { SignupApiService } from './api/SignupApiService.js';
@@ -59,6 +58,8 @@ import { ServerStatsChannelService } from './api/stream/channels/server-stats.js
 import { UserListChannelService } from './api/stream/channels/user-list.js';
 import { MastodonApiServerService } from './api/mastodon/MastodonApiServerService.js';
 import { RoleTimelineChannelService } from './api/stream/channels/role-timeline.js';
+import { ChatUserChannelService } from './api/stream/channels/chat-user.js';
+import { ChatRoomChannelService } from './api/stream/channels/chat-room.js';
 import { ReversiChannelService } from './api/stream/channels/reversi.js';
 import { ReversiGameChannelService } from './api/stream/channels/reversi-game.js';
 import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.js';
@@ -86,8 +87,6 @@ import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.j
 		ApiServerService,
 		AuthenticateService,
 		SkRateLimiterService,
-		// No longer used, but kept for backwards compatibility
-		RateLimiterService,
 		SigninApiService,
 		SigninWithPasskeyApiService,
 		SigninService,
@@ -102,6 +101,8 @@ import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.j
 		BubbleTimelineChannelService,
 		HashtagChannelService,
 		RoleTimelineChannelService,
+		ChatUserChannelService,
+		ChatRoomChannelService,
 		ReversiChannelService,
 		ReversiGameChannelService,
 		HomeTimelineChannelService,

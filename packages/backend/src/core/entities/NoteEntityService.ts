@@ -480,6 +480,7 @@ export class NoteEntityService implements OnModuleInit {
 			uri: note.uri ?? undefined,
 			url: note.url ?? undefined,
 			poll: note.hasPoll ? this.populatePoll(note, meId) : undefined,
+
 			...(meId && Object.keys(reactions).length > 0 ? {
 				myReaction: this.populateMyReaction({
 					id: note.id,
