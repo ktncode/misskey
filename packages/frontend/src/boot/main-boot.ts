@@ -349,7 +349,7 @@ export async function mainBoot() {
 		}
 
 		function attemptShowNotificationDot() {
-			if (store.s.enableFaviconNotificationDot) {
+			if (prefer.s.enableFaviconNotificationDot) {
 				setFavIconDot(true);
 			}
 		}
