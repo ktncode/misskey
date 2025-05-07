@@ -138,7 +138,7 @@ export function getErrorData(error: unknown): MastodonError {
 function unpackAxiosError(error: unknown): unknown {
 	if (isAxiosError(error)) {
 		if (error.response) {
-			if (error.response.data) {
+			if (error.response.data && typeof(error.response.data) === 'object') {
 				if ('error' in error.response.data && error.response.data.error && typeof(error.response.data.error) === 'object') {
 					return error.response.data.error;
 				}
