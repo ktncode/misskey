@@ -68,7 +68,7 @@ const sortMode = ref('+size');
 const pagination = {
 	endpoint: 'drive/files' as const,
 	limit: 10,
-	params: computed(() => ({ sort: sortMode.value })),
+	params: computed(() => ({ sort: sortMode.value, notShowAll: false })),
 	offsetMode: true,
 };
 
