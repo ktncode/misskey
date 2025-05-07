@@ -68,6 +68,10 @@ export function getErrorException(error: unknown): Error | null {
 
 		// This is the inner exception, basically
 		if (error.cause && !isAxiosError(error.cause)) {
+			if (!error.cause.stack) {
+				error.cause.stack = error.stack;
+			}
+
 			return error.cause;
 		}
 
@@ -147,6 +151,10 @@ function unpackAxiosError(error: unknown): unknown {
 		}
 
 		if (error.cause && !isAxiosError(error.cause)) {
+			if (!error.cause.stack) {
+				error.cause.stack = error.stack;
+			}
+
 			return error.cause;
 		}
 
