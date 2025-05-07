@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { bindThis } from '@/decorators.js';
-import { getErrorData, getErrorStatus, MastodonLogger } from '@/server/api/mastodon/MastodonLogger.js';
+import { getErrorData, getErrorException, getErrorStatus, MastodonLogger } from '@/server/api/mastodon/MastodonLogger.js';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
 import { ApiAccountMastodon } from '@/server/api/mastodon/endpoints/account.js';
 import { ApiAppsMastodon } from '@/server/api/mastodon/endpoints/apps.js';
@@ -47,16 +47,20 @@ export class MastodonApiServerService {
 		this.serverUtilityService.addFlattenedQueryType(fastify);
 
 		// Convert JS exceptions into error responses
-		fastify.setErrorHandler((error, _, reply) => {
+		fastify.setErrorHandler((error, request, reply) => {
 			const data = getErrorData(error);
 			const status = getErrorStatus(error);
+			const exception = getErrorException(error);
+			if (exception) {
+				this.logger.exception(request, exception);
+			}
 
 			reply.code(status).send(data);
 		});
 
 		// Log error responses (including converted JSON exceptions)
 		fastify.addHook('onSend', (request, reply, payload, done) => {
-			if (reply.statusCode >= 500 || (reply.statusCode >= 400 && this.logger.verbose)) {
+			if (reply.statusCode >= 400 && reply.statusCode <= 500) {
 				if (typeof(payload) === 'string' && String(reply.getHeader('content-type')).toLowerCase().includes('application/json')) {
 					const body = JSON.parse(payload);
 					const data = getErrorData(body);

@@ -25,12 +25,28 @@ export class MastodonLogger {
 	}
 
 	public error(request: FastifyRequest, error: MastodonError, status: number): void {
-		const path = new URL(request.url, getBaseUrl(request)).pathname;
+		const path = getPath(request);
+
 		if (status >= 400 && status <= 499) { // Client errors
 			this.logger.debug(`Error in mastodon endpoint ${request.method} ${path}:`, error);
 		} else { // Server errors
 			this.logger.error(`Error in mastodon endpoint ${request.method} ${path}:`, error);
 		}
+	}
+
+	public exception(request: FastifyRequest, ex: Error): void {
+		const path = getPath(request);
+
+		// Exceptions are always server errors, and should therefore always be logged.
+		this.logger.error(`Error in mastodon endpoint ${request.method} ${path}:`, ex);
+	}
+}
+
+function getPath(request: FastifyRequest): string {
+	try {
+		return new URL(request.url, getBaseUrl(request)).pathname;
+	} catch {
+		return request.url;
 	}
 }
 
@@ -38,6 +54,17 @@ export class MastodonLogger {
 export interface MastodonError {
 	error: string;
 	error_description?: string;
+}
+
+export function getErrorException(error: unknown): Error | null {
+	if (error instanceof Error) {
+		// Axios errors are not exceptions - they're from the remote
+		if (!('response' in error) || !error.response || typeof (error.response) !== 'object') {
+			return error;
+		}
+	}
+
+	return null;
 }
 
 export function getErrorData(error: unknown): MastodonError {
@@ -78,7 +105,10 @@ export function getErrorData(error: unknown): MastodonError {
 		}
 	}
 
-	return convertUnknownError(error);
+	return {
+		error: 'INTERNAL_ERROR',
+		error_description: 'Internal error occurred. Please contact us if the error persists.',
+	};
 }
 
 function unpackAxiosError(error: unknown): unknown {
@@ -101,66 +131,25 @@ function unpackAxiosError(error: unknown): unknown {
 }
 
 function convertApiError(apiError: ApiError): MastodonError {
-	const mastoError: MastodonError & Partial<ApiError> & { stack?: unknown, statusCode?: number } = {
-		...apiError,
+	return {
 		error: apiError.code,
 		error_description: apiError.message,
 	};
-
-	delete mastoError.code;
-	delete mastoError.stack;
-	delete mastoError.message;
-	delete mastoError.httpStatusCode;
-
-	return mastoError;
 }
 
 function convertErrorMessageError(error: { error: string, message: string }): MastodonError {
-	const mastoError: MastodonError & { stack?: unknown, message?: string, statusCode?: number } = {
-		...error,
+	return {
 		error: error.error,
 		error_description: error.message,
 	};
-
-	delete mastoError.stack;
-	delete mastoError.message;
-	delete mastoError.statusCode;
-
-	return mastoError;
-}
-
-function convertUnknownError(data: object = {}): MastodonError {
-	const mastoError = Object.assign({}, data, {
-		error: 'INTERNAL_ERROR',
-		error_description: 'Internal error occurred. Please contact us if the error persists.',
-		id: '5d37dbcb-891e-41ca-a3d6-e690c97775ac',
-		kind: 'server',
-	});
-
-	if ('statusCode' in mastoError) {
-		delete mastoError.statusCode;
-	}
-
-	if ('stack' in mastoError) {
-		delete mastoError.stack;
-	}
-
-	return mastoError;
 }
 
 function convertGenericError(error: Error): MastodonError {
-	const mastoError: MastodonError & Partial<Error> & { statusCode?: number } = {
+	return {
 		...error,
 		error: 'INTERNAL_ERROR',
 		error_description: String(error),
 	};
-
-	delete mastoError.name;
-	delete mastoError.message;
-	delete mastoError.stack;
-	delete mastoError.statusCode;
-
-	return mastoError;
 }
 
 export function getErrorStatus(error: unknown): number {
