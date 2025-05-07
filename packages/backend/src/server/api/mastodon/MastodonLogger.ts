@@ -4,11 +4,12 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { FastifyRequest } from 'fastify';
-import Logger from '@/logger.js';
+import type Logger from '@/logger.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { ApiError } from '@/server/api/error.js';
 import { getBaseUrl } from '@/server/api/mastodon/MastodonClientService.js';
+import { AuthenticationError } from '@/server/api/AuthenticateService.js';
+import type { FastifyRequest } from 'fastify';
 
 @Injectable()
 export class MastodonLogger {
@@ -53,24 +54,36 @@ export interface MastodonError {
 }
 
 export function getErrorException(error: unknown): Error | null {
-	if (error instanceof Error && error.name === 'AxiosError') {
-		// Axios errors with a response are from the remote
-		if (!('response' in error) || !error.response || typeof (error.response) !== 'object') {
-			// This is the inner exception, basically
-			if ('cause' in error && error.cause instanceof Error) {
-				return error.cause;
-			}
-
-			const ex = new Error();
-			ex.name = error.name;
-			ex.stack = error.stack;
-			ex.message = error.message;
-			ex.cause = error.cause;
-			return ex;
-		}
+	if (!(error instanceof Error)) {
+		return null;
 	}
 
-	return null;
+	// AxiosErrors need special decoding
+	if (error.name === 'AxiosError') {
+		// Axios errors with a response are from the remote
+		if ('response' in error && error.response && typeof (error.response) === 'object') {
+			return null;
+		}
+
+		// This is the inner exception, basically
+		if ('cause' in error && error.cause instanceof Error) {
+			return error.cause;
+		}
+
+		const ex = new Error();
+		ex.name = error.name;
+		ex.stack = error.stack;
+		ex.message = error.message;
+		ex.cause = error.cause;
+		return ex;
+	}
+
+	// AuthenticationError is a client error
+	if (error instanceof AuthenticationError) {
+		return null;
+	}
+
+	return error;
 }
 
 export function getErrorData(error: unknown): MastodonError {
@@ -107,7 +120,7 @@ export function getErrorData(error: unknown): MastodonError {
 	if ('error' in error && typeof(error.error) === 'string') {
 		// "error_description" is string, undefined, or not present.
 		if (!('error_description' in error) || typeof(error.error_description) === 'string' || typeof(error.error_description) === 'undefined') {
-			return error as MastodonError;
+			return convertMastodonError(error as MastodonError);
 		}
 	}
 
@@ -161,9 +174,15 @@ function convertErrorMessageError(error: { error: string, message: string }): Ma
 
 function convertGenericError(error: Error): MastodonError {
 	return {
-		...error,
 		error: 'INTERNAL_ERROR',
 		error_description: String(error),
+	};
+}
+
+function convertMastodonError(error: MastodonError): MastodonError {
+	return {
+		error: error.error,
+		error_description: error.error_description,
 	};
 }
 
