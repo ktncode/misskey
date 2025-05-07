@@ -34,7 +34,7 @@ export class MastodonLogger {
 		const path = getPath(request);
 
 		// Exceptions are always server errors, and should therefore always be logged.
-		this.logger.error(`Error in mastodon endpoint ${request.method} ${path}:`, ex);
+		this.logger.error(`Exception in mastodon endpoint ${request.method} ${path}:`, ex);
 	}
 }
 
