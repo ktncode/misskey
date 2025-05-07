@@ -45,14 +45,12 @@ export class ServerUtilityService {
 						if (typeof(v) !== 'string') continue;
 
 						// This is just progressive conversion from undefined -> string -> string[]
-						if (body[k]) {
-							if (Array.isArray(body[k])) {
-								body[k].push(v);
-							} else {
-								body[k] = [body[k], v];
-							}
-						} else {
+						if (!body[k]) {
 							body[k] = v;
+						} else if (Array.isArray(body[k])) {
+							body[k].push(v);
+						} else {
+							body[k] = [body[k], v];
 						}
 					} else { // Otherwise it's a file
 						try {
