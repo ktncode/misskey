@@ -137,8 +137,8 @@ export class OAuth2ProviderService {
 				const ret = {
 					access_token: atData.accessToken,
 					token_type: 'Bearer',
-					scope: body.scope || 'read write follow push',
-					created_at: Math.floor(new Date().getTime() / 1000),
+					scope: atData.scope || body.scope || 'read write follow push',
+					created_at: atData.createdAt || Math.floor(new Date().getTime() / 1000),
 				};
 				return reply.send(ret);
 			} catch (e: unknown) {
