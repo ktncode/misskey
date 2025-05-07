@@ -54,7 +54,7 @@ export class ServerUtilityService {
 						}
 					} else { // Otherwise it's a file
 						try {
-							const [filepath] = await saveToTempFile(part.file);
+							const filepath = await saveToTempFile(part.file);
 
 							const tmpUploads = (request.tmpUploads ??= []);
 							tmpUploads.push(filepath);
