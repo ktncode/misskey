@@ -61,6 +61,12 @@ export function getErrorData(error: unknown): MastodonError {
 		}
 	}
 
+	if ('error' in error && typeof (error.error) === 'string') {
+		if ('message' in error && typeof (error.message) === 'string') {
+			return convertErrorMessageError(error as { error: string, message: string });
+		}
+	}
+
 	if (error instanceof Error) {
 		return convertGenericError(error);
 	}
@@ -95,38 +101,64 @@ function unpackAxiosError(error: unknown): unknown {
 }
 
 function convertApiError(apiError: ApiError): MastodonError {
-	const mastoError: MastodonError & Partial<ApiError> = {
+	const mastoError: MastodonError & Partial<ApiError> & { stack?: unknown, statusCode?: number } = {
+		...apiError,
 		error: apiError.code,
 		error_description: apiError.message,
-		...apiError,
 	};
 
 	delete mastoError.code;
+	delete mastoError.stack;
 	delete mastoError.message;
 	delete mastoError.httpStatusCode;
 
 	return mastoError;
 }
 
+function convertErrorMessageError(error: { error: string, message: string }): MastodonError {
+	const mastoError: MastodonError & { stack?: unknown, message?: string, statusCode?: number } = {
+		...error,
+		error: error.error,
+		error_description: error.message,
+	};
+
+	delete mastoError.stack;
+	delete mastoError.message;
+	delete mastoError.statusCode;
+
+	return mastoError;
+}
+
 function convertUnknownError(data: object = {}): MastodonError {
-	return Object.assign({}, data, {
+	const mastoError = Object.assign({}, data, {
 		error: 'INTERNAL_ERROR',
 		error_description: 'Internal error occurred. Please contact us if the error persists.',
 		id: '5d37dbcb-891e-41ca-a3d6-e690c97775ac',
 		kind: 'server',
 	});
+
+	if ('statusCode' in mastoError) {
+		delete mastoError.statusCode;
+	}
+
+	if ('stack' in mastoError) {
+		delete mastoError.stack;
+	}
+
+	return mastoError;
 }
 
 function convertGenericError(error: Error): MastodonError {
-	const mastoError: MastodonError & Partial<Error> = {
+	const mastoError: MastodonError & Partial<Error> & { statusCode?: number } = {
+		...error,
 		error: 'INTERNAL_ERROR',
 		error_description: String(error),
-		...error,
 	};
 
 	delete mastoError.name;
 	delete mastoError.message;
 	delete mastoError.stack;
+	delete mastoError.statusCode;
 
 	return mastoError;
 }
@@ -142,6 +174,10 @@ export function getErrorStatus(error: unknown): number {
 
 		if ('httpStatusCode' in error && typeof(error.httpStatusCode) === 'number') {
 			return error.httpStatusCode;
+		}
+
+		if ('statusCode' in error && typeof(error.statusCode) === 'number') {
+			return error.statusCode;
 		}
 	}
 
