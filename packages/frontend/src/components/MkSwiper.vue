@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	@touchend.passive="touchEnd"
 >
 	<Transition
-		:class="[$style.transitionChildren, { [$style.swiping]: isSwipingForClass }]"
+		:class="[{ [$style.swiping]: isSwipingForClass, [$style.transitionChildren]: isUserHome }]"
 		:enterActiveClass="$style.swipeAnimation_enterActive"
 		:leaveActiveClass="$style.swipeAnimation_leaveActive"
 		:enterFromClass="transitionName === 'swipeAnimationLeft' ? $style.swipeAnimationLeft_enterFrom : $style.swipeAnimationRight_enterFrom"
@@ -37,6 +37,7 @@ const tabModel = defineModel<string>('tab');
 
 const props = defineProps<{
 	tabs: Tab[];
+	page?: string;
 }>();
 
 const emit = defineEmits<{
@@ -69,6 +70,7 @@ const currentTabIndex = computed(() => props.tabs.findIndex(tab => tab.key === t
 const pullDistance = ref(0);
 const isSwipingForClass = ref(false);
 let swipeAborted = false;
+const isUserHome = !(props.page === 'user' && tabModel.value === 'home');
 
 function touchStart(event: TouchEvent) {
 	if (!prefer.r.enableHorizontalSwipe.value) return;

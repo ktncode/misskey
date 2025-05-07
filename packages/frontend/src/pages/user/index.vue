@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<PageWithHeader v-model:tab="tab" :displayBackButton="true" :tabs="headerTabs" :actions="headerActions" :swipable="isTouchUsing">
+<PageWithHeader v-model:tab="tab" :displayBackButton="true" :tabs="headerTabs" :actions="headerActions" :swipable="isTouchUsing" :page="'user'">
 	<div v-if="user">
 		<XHome v-if="tab === 'home'" :user="user" @unfoldFiles="() => { tab = 'files'; }"/>
 		<div v-else-if="tab === 'notes'" class="_spacer" style="--MI_SPACER-w: 800px;">

@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkStickyContainer>
 		<template #header><MkPageHeader v-model:tab="tab" v-bind="pageHeaderProps"/></template>
 		<div :class="$style.body">
-			<MkSwiper v-if="swipable && (props.tabs?.length ?? 1) > 1" v-model:tab="tab" :class="$style.swiper" :tabs="props.tabs">
+			<MkSwiper v-if="swipable && (props.tabs?.length ?? 1) > 1" v-model:tab="tab" :class="$style.swiper" :tabs="props.tabs" :page="props.page">
 				<slot></slot>
 			</MkSwiper>
 			<slot v-else></slot>
@@ -29,6 +29,7 @@ import { useRouter } from '@/router.js';
 const props = withDefaults(defineProps<PageHeaderProps & {
 	reversed?: boolean;
 	swipable?: boolean;
+	page?: string;
 }>(), {
 	reversed: false,
 	swipable: true,
