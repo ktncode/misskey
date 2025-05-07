@@ -102,7 +102,7 @@ export default class Misskey implements MegalodonInterface {
         website: null,
         redirect_uri: res.data.callbackUrl,
         client_id: '',
-        client_secret: res.data.secret
+        client_secret: res.data.secret!
       }
       return OAuth.AppData.from(appData)
     })
@@ -122,11 +122,8 @@ export default class Misskey implements MegalodonInterface {
   // ======================================
   // apps
   // ======================================
-  public async verifyAppCredentials(): Promise<Response<Entity.Application>> {
-    return new Promise((_, reject) => {
-      const err = new NoImplementedError('misskey does not support')
-      reject(err)
-    })
+  public async verifyAppCredentials(): Promise<Response<MisskeyAPI.Entity.App>> {
+		return await this.client.post<MisskeyAPI.Entity.App>('/api/app/current');
   }
 
   // ======================================

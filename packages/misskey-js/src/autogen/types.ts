@@ -1086,6 +1086,15 @@ export type paths = {
      */
     post: operations['app___create'];
   };
+  '/app/current': {
+    /**
+     * app/current
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
+    post: operations['app___current'];
+  };
   '/app/show': {
     /**
      * app/show
@@ -13026,6 +13035,58 @@ export type operations = {
         };
       };
     };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['App'];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Too many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * app/current
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  app___current: {
     responses: {
       /** @description OK (with results) */
       200: {

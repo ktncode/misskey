@@ -5,6 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { MastodonClientService } from '@/server/api/mastodon/MastodonClientService.js';
+import { MastodonConverters } from '@/server/api/mastodon/MastodonConverters.js';
 import type { FastifyInstance } from 'fastify';
 
 const readScope = [
@@ -59,6 +60,7 @@ type AuthMastodonRoute = { Body?: AuthPayload, Querystring: AuthPayload };
 export class ApiAppsMastodon {
 	constructor(
 		private readonly clientService: MastodonClientService,
+		private readonly mastoConverters: MastodonConverters,
 	) {}
 
 	public register(fastify: FastifyInstance): void {
@@ -106,6 +108,13 @@ export class ApiAppsMastodon {
 				client_secret: appData.clientSecret,
 			};
 
+			return reply.send(response);
+		});
+
+		fastify.get('/v1/apps/verify_credentials', async (_request, reply) => {
+			const client = this.clientService.getClient(_request);
+			const data = await client.verifyAppCredentials();
+			const response = this.mastoConverters.convertApplication(data.data);
 			return reply.send(response);
 		});
 	}
