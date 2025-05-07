@@ -46,7 +46,7 @@ export const paramDef = {
 		type: { type: 'string', nullable: true, pattern: /^[a-zA-Z\/\-*]+$/.toString().slice(1, -1) },
 		sort: { type: 'string', nullable: true, enum: ['+createdAt', '-createdAt', '+name', '-name', '+size', '-size', null] },
 		searchQuery: { type: 'string', default: '' },
-		notShowAll: { type: 'boolean', default: true },
+		showAll: { type: 'boolean', default: false },
 	},
 	required: [],
 } as const;
@@ -64,7 +64,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const query = this.queryService.makePaginationQuery(this.driveFilesRepository.createQueryBuilder('file'), ps.sinceId, ps.untilId)
 				.andWhere('file.userId = :userId', { userId: me.id });
 
-			if (ps.notShowAll) {
+			if (!ps.showAll) {
 				if (ps.folderId) {
 					query.andWhere('file.folderId = :folderId', { folderId: ps.folderId });
 				} else {
