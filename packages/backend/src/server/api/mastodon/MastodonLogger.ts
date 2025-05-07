@@ -14,10 +14,6 @@ import { getBaseUrl } from '@/server/api/mastodon/MastodonClientService.js';
 export class MastodonLogger {
 	public readonly logger: Logger;
 
-	public get verbose() {
-		return this.logger.verbose;
-	}
-
 	constructor(
 		loggerService: LoggerService,
 	) {
@@ -65,13 +61,12 @@ export function getErrorException(error: unknown): Error | null {
 				return error.cause;
 			}
 
-			// Horrible hack to "recreate" the error without calling a constructor (since we want to re-use the stack).
-			return Object.assign(Object.create(Error), {
-				name: error.name,
-				stack: error.stack,
-				message: error.message,
-				cause: error.cause,
-			});
+			const ex = new Error();
+			ex.name = error.name;
+			ex.stack = error.stack;
+			ex.message = error.message;
+			ex.cause = error.cause;
+			return ex;
 		}
 	}
 
@@ -140,13 +135,6 @@ function unpackAxiosError(error: unknown): unknown {
 		if (error instanceof Error && error.name === 'AxiosError') {
 			if ('cause' in error) {
 				return error.cause;
-			}
-
-			if ('code' in error) {
-				return {
-					code: error.code,
-					message: String(error),
-				};
 			}
 
 			// No data - this is a fallback to avoid leaking request/response details in the error
