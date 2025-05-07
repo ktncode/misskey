@@ -47,7 +47,7 @@ export class ApiAccountMastodon {
 					language: '',
 				},
 			});
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.patch<{
@@ -128,7 +128,7 @@ export class ApiAccountMastodon {
 			const data = await client.updateCredentials(options);
 			const response = await this.mastoConverters.convertAccount(data.data);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<{ Querystring: { acct?: string } }>('/v1/accounts/lookup', async (_request, reply) => {
@@ -140,7 +140,7 @@ export class ApiAccountMastodon {
 			data.data.accounts[0].fields = profile?.fields.map(f => ({ ...f, verified_at: null })) ?? [];
 			const response = await this.mastoConverters.convertAccount(data.data.accounts[0]);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<ApiAccountMastodonRoute & { Querystring: { id?: string | string[] } }>('/v1/accounts/relationships', async (_request, reply) => {
@@ -150,7 +150,7 @@ export class ApiAccountMastodon {
 			const data = await client.getRelationships(_request.query.id);
 			const response = data.data.map(relationship => convertRelationship(relationship));
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<{ Params: { id?: string } }>('/v1/accounts/:id', async (_request, reply) => {
@@ -160,7 +160,7 @@ export class ApiAccountMastodon {
 			const data = await client.getAccount(_request.params.id);
 			const account = await this.mastoConverters.convertAccount(data.data);
 
-			reply.send(account);
+			return reply.send(account);
 		});
 
 		fastify.get<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/statuses', async (request, reply) => {
@@ -172,7 +172,7 @@ export class ApiAccountMastodon {
 			const response = await Promise.all(data.data.map(async (status) => await this.mastoConverters.convertStatus(status, me)));
 
 			attachMinMaxPagination(request, reply, response);
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<{ Params: { id?: string } }>('/v1/accounts/:id/featured_tags', async (_request, reply) => {
@@ -182,7 +182,7 @@ export class ApiAccountMastodon {
 			const data = await client.getFeaturedTags();
 			const response = data.data.map((tag) => convertFeaturedTag(tag));
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/followers', async (request, reply) => {
@@ -196,7 +196,7 @@ export class ApiAccountMastodon {
 			const response = await Promise.all(data.data.map(async (account) => await this.mastoConverters.convertAccount(account)));
 
 			attachMinMaxPagination(request, reply, response);
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/following', async (request, reply) => {
@@ -210,7 +210,7 @@ export class ApiAccountMastodon {
 			const response = await Promise.all(data.data.map(async (account) => await this.mastoConverters.convertAccount(account)));
 
 			attachMinMaxPagination(request, reply, response);
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<{ Params: { id?: string } }>('/v1/accounts/:id/lists', async (_request, reply) => {
@@ -220,7 +220,7 @@ export class ApiAccountMastodon {
 			const data = await client.getAccountLists(_request.params.id);
 			const response = data.data.map((list) => convertList(list));
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/follow', async (_request, reply) => {
@@ -231,7 +231,7 @@ export class ApiAccountMastodon {
 			const acct = convertRelationship(data.data);
 			acct.following = true; // TODO this is wrong, follow may not have processed immediately
 
-			reply.send(acct);
+			return reply.send(acct);
 		});
 
 		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/unfollow', async (_request, reply) => {
@@ -242,7 +242,7 @@ export class ApiAccountMastodon {
 			const acct = convertRelationship(data.data);
 			acct.following = false;
 
-			reply.send(acct);
+			return reply.send(acct);
 		});
 
 		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/block', async (_request, reply) => {
@@ -252,7 +252,7 @@ export class ApiAccountMastodon {
 			const data = await client.blockAccount(_request.params.id);
 			const response = convertRelationship(data.data);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/unblock', async (_request, reply) => {
@@ -275,7 +275,7 @@ export class ApiAccountMastodon {
 			);
 			const response = convertRelationship(data.data);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.post<ApiAccountMastodonRoute & { Params: { id?: string } }>('/v1/accounts/:id/unmute', async (_request, reply) => {
@@ -285,7 +285,7 @@ export class ApiAccountMastodon {
 			const data = await client.unmuteAccount(_request.params.id);
 			const response = convertRelationship(data.data);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 	}
 }

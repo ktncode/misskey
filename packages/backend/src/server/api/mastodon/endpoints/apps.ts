@@ -106,7 +106,7 @@ export class ApiAppsMastodon {
 				client_secret: appData.clientSecret,
 			};
 
-			reply.send(response);
+			return reply.send(response);
 		});
 	}
 }

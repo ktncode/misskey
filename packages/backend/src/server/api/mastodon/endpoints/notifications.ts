@@ -45,7 +45,7 @@ export class ApiNotificationsMastodon {
 			}
 
 			attachMinMaxPagination(request, reply, response);
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<ApiNotifyMastodonRoute & { Params: { id?: string } }>('/v1/notification/:id', async (_request, reply) => {
@@ -62,7 +62,7 @@ export class ApiNotificationsMastodon {
 				});
 			}
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.post<ApiNotifyMastodonRoute & { Params: { id?: string } }>('/v1/notification/:id/dismiss', async (_request, reply) => {
@@ -71,14 +71,14 @@ export class ApiNotificationsMastodon {
 			const client = this.clientService.getClient(_request);
 			const data = await client.dismissNotification(_request.params.id);
 
-			reply.send(data.data);
+			return reply.send(data.data);
 		});
 
 		fastify.post<ApiNotifyMastodonRoute>('/v1/notifications/clear', async (_request, reply) => {
 			const client = this.clientService.getClient(_request);
 			const data = await client.dismissNotifications();
 
-			reply.send(data.data);
+			return reply.send(data.data);
 		});
 	}
 }

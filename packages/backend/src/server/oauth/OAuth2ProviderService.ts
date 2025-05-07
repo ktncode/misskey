@@ -106,7 +106,7 @@ export class OAuth2ProviderService {
 				if (request.query.state) redirectUri.searchParams.set('state', String(request.query.state));
 				if (request.query.redirect_uri) redirectUri.searchParams.set('redirect_uri', String(request.query.redirect_uri));
 
-				reply.redirect(redirectUri.toString());
+				return reply.redirect(redirectUri.toString());
 			});
 		}
 
@@ -120,7 +120,7 @@ export class OAuth2ProviderService {
 					scope: 'read',
 					created_at: Math.floor(new Date().getTime() / 1000),
 				};
-				reply.send(ret);
+				return reply.send(ret);
 			}
 
 			try {
@@ -140,10 +140,10 @@ export class OAuth2ProviderService {
 					scope: body.scope || 'read write follow push',
 					created_at: Math.floor(new Date().getTime() / 1000),
 				};
-				reply.send(ret);
+				return reply.send(ret);
 			} catch (e: unknown) {
 				const data = getErrorData(e);
-				reply.code(401).send(data);
+				return reply.code(401).send(data);
 			}
 		});
 	}

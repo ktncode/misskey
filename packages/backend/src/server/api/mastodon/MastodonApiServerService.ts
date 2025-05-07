@@ -56,7 +56,7 @@ export class MastodonApiServerService {
 				this.logger.exception(request, exception);
 			}
 
-			reply.code(status).send(data);
+			return reply.code(status).send(data);
 		});
 
 		// Log error responses (including converted JSON exceptions)
@@ -84,7 +84,7 @@ export class MastodonApiServerService {
 		fastify.get('/v1/custom_emojis', async (_request, reply) => {
 			const client = this.clientService.getClient(_request);
 			const data = await client.getInstanceCustomEmojis();
-			reply.send(data.data);
+			return reply.send(data.data);
 		});
 
 		fastify.get('/v1/announcements', async (_request, reply) => {
@@ -92,7 +92,7 @@ export class MastodonApiServerService {
 			const data = await client.getInstanceAnnouncements();
 			const response = data.data.map((announcement) => convertAnnouncement(announcement));
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.post<{ Body: { id?: string } }>('/v1/announcements/:id/dismiss', async (_request, reply) => {
@@ -101,7 +101,7 @@ export class MastodonApiServerService {
 			const client = this.clientService.getClient(_request);
 			const data = await client.dismissInstanceAnnouncement(_request.body.id);
 
-			reply.send(data.data);
+			return reply.send(data.data);
 		});
 
 		fastify.post('/v1/media', async (_request, reply) => {
@@ -114,7 +114,7 @@ export class MastodonApiServerService {
 			const data = await client.uploadMedia(multipartData);
 			const response = convertAttachment(data.data as Entity.Attachment);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.post<{ Body: { description?: string; focus?: string } }>('/v2/media', async (_request, reply) => {
@@ -127,36 +127,36 @@ export class MastodonApiServerService {
 			const data = await client.uploadMedia(multipartData, _request.body);
 			const response = convertAttachment(data.data as Entity.Attachment);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get('/v1/trends', async (_request, reply) => {
 			const client = this.clientService.getClient(_request);
 			const data = await client.getInstanceTrends();
-			reply.send(data.data);
+			return reply.send(data.data);
 		});
 
 		fastify.get('/v1/trends/tags', async (_request, reply) => {
 			const client = this.clientService.getClient(_request);
 			const data = await client.getInstanceTrends();
-			reply.send(data.data);
+			return reply.send(data.data);
 		});
 
 		fastify.get('/v1/trends/links', async (_request, reply) => {
 			// As we do not have any system for news/links this will just return empty
-			reply.send([]);
+			return reply.send([]);
 		});
 
 		fastify.get('/v1/preferences', async (_request, reply) => {
 			const client = this.clientService.getClient(_request);
 			const data = await client.getPreferences();
-			reply.send(data.data);
+			return reply.send(data.data);
 		});
 
 		fastify.get('/v1/followed_tags', async (_request, reply) => {
 			const client = this.clientService.getClient(_request);
 			const data = await client.getFollowedTags();
-			reply.send(data.data);
+			return reply.send(data.data);
 		});
 
 		fastify.get<{ Querystring: TimelineArgs }>('/v1/bookmarks', async (_request, reply) => {
@@ -165,7 +165,7 @@ export class MastodonApiServerService {
 			const data = await client.getBookmarks(parseTimelineArgs(_request.query));
 			const response = await Promise.all(data.data.map((status) => this.mastoConverters.convertStatus(status, me)));
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<{ Querystring: TimelineArgs }>('/v1/favourites', async (_request, reply) => {
@@ -187,7 +187,7 @@ export class MastodonApiServerService {
 			const data = await client.getFavourites(args);
 			const response = await Promise.all(data.data.map((status) => this.mastoConverters.convertStatus(status, me)));
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<{ Querystring: TimelineArgs }>('/v1/mutes', async (_request, reply) => {
@@ -196,7 +196,7 @@ export class MastodonApiServerService {
 			const data = await client.getMutes(parseTimelineArgs(_request.query));
 			const response = await Promise.all(data.data.map((account) => this.mastoConverters.convertAccount(account)));
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<{ Querystring: TimelineArgs }>('/v1/blocks', async (_request, reply) => {
@@ -205,7 +205,7 @@ export class MastodonApiServerService {
 			const data = await client.getBlocks(parseTimelineArgs(_request.query));
 			const response = await Promise.all(data.data.map((account) => this.mastoConverters.convertAccount(account)));
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<{ Querystring: { limit?: string } }>('/v1/follow_requests', async (_request, reply) => {
@@ -215,7 +215,7 @@ export class MastodonApiServerService {
 			const data = await client.getFollowRequests(limit);
 			const response = await Promise.all(data.data.map((account) => this.mastoConverters.convertAccount(account as Entity.Account)));
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.post<{ Params: { id?: string } }>('/v1/follow_requests/:id/authorize', async (_request, reply) => {
@@ -225,7 +225,7 @@ export class MastodonApiServerService {
 			const data = await client.acceptFollowRequest(_request.params.id);
 			const response = convertRelationship(data.data);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.post<{ Params: { id?: string } }>('/v1/follow_requests/:id/reject', async (_request, reply) => {
@@ -235,7 +235,7 @@ export class MastodonApiServerService {
 			const data = await client.rejectFollowRequest(_request.params.id);
 			const response = convertRelationship(data.data);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 		//#endregion
 
@@ -260,7 +260,7 @@ export class MastodonApiServerService {
 			const data = await client.updateMedia(_request.params.id, options);
 			const response = convertAttachment(data.data);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		done();

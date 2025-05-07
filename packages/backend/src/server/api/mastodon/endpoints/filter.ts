@@ -35,7 +35,7 @@ export class ApiFilterMastodon {
 			const data = await client.getFilters();
 			const response = data.data.map((filter) => convertFilter(filter));
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<ApiFilterMastodonRoute & { Params: { id?: string } }>('/v1/filters/:id', async (_request, reply) => {
@@ -45,7 +45,7 @@ export class ApiFilterMastodon {
 			const data = await client.getFilter(_request.params.id);
 			const response = convertFilter(data.data);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.post<ApiFilterMastodonRoute>('/v1/filters', async (_request, reply) => {
@@ -64,7 +64,7 @@ export class ApiFilterMastodon {
 			const data = await client.createFilter(_request.body.phrase, _request.body.context, options);
 			const response = convertFilter(data.data);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.post<ApiFilterMastodonRoute & { Params: { id?: string } }>('/v1/filters/:id', async (_request, reply) => {
@@ -84,7 +84,7 @@ export class ApiFilterMastodon {
 			const data = await client.updateFilter(_request.params.id, _request.body.phrase, _request.body.context, options);
 			const response = convertFilter(data.data);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.delete<ApiFilterMastodonRoute & { Params: { id?: string } }>('/v1/filters/:id', async (_request, reply) => {
@@ -93,7 +93,7 @@ export class ApiFilterMastodon {
 			const client = this.clientService.getClient(_request);
 			const data = await client.deleteFilter(_request.params.id);
 
-			reply.send(data.data);
+			return reply.send(data.data);
 		});
 	}
 }
