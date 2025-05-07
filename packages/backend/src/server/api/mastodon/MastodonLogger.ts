@@ -57,10 +57,21 @@ export interface MastodonError {
 }
 
 export function getErrorException(error: unknown): Error | null {
-	if (error instanceof Error) {
-		// Axios errors are not exceptions - they're from the remote
+	if (error instanceof Error && error.name === 'AxiosError') {
+		// Axios errors with a response are from the remote
 		if (!('response' in error) || !error.response || typeof (error.response) !== 'object') {
-			return error;
+			// This is the inner exception, basically
+			if ('cause' in error && error.cause instanceof Error) {
+				return error.cause;
+			}
+
+			// Horrible hack to "recreate" the error without calling a constructor (since we want to re-use the stack).
+			return Object.assign(Object.create(Error), {
+				name: error.name,
+				stack: error.stack,
+				message: error.message,
+				cause: error.cause,
+			});
 		}
 	}
 
@@ -124,6 +135,22 @@ function unpackAxiosError(error: unknown): unknown {
 
 			// No data - this is a fallback to avoid leaking request/response details in the error
 			return undefined;
+		}
+
+		if (error instanceof Error && error.name === 'AxiosError') {
+			if ('cause' in error) {
+				return error.cause;
+			}
+
+			if ('code' in error) {
+				return {
+					code: error.code,
+					message: String(error),
+				};
+			}
+
+			// No data - this is a fallback to avoid leaking request/response details in the error
+			return String(error);
 		}
 	}
 
