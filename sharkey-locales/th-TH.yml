@@ -36,8 +36,8 @@ postOn: "โพสต์เมื่อ"
 ScheduledNotes: "การโพสต์ตามกำหนดเวลา"
 
 _externalNavigationWarning:
-      title: "นำทางไปยังไซต์ภายนอก"
-            description: "ออกจาก {host} และไปยังไซต์ภายนอก"
-                    trustThisDomain: "วางใจโดเมนนี้บนอุปกรณ์นี้ในอนาคต"
+    title: "นำทางไปยังไซต์ภายนอก"
+    description: "ออกจาก {host} และไปยังไซต์ภายนอก"
+    trustThisDomain: "วางใจโดเมนนี้บนอุปกรณ์นี้ในอนาคต"
 
 mutuals: "ติดตามกันและกัน"
