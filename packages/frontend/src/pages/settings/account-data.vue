@@ -15,27 +15,28 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkFolder>
 					<template #icon><i class="ti ti-pencil"></i></template>
 					<template #label><SearchLabel>{{ i18n.ts._exportOrImport.allNotes }}</SearchLabel></template>
-					<MkFolder :defaultOpen="true">
-						<template #label>{{ i18n.ts.export }}</template>
-						<template #icon><i class="ti ti-download"></i></template>
-						<MkButton primary :class="$style.button" inline @click="exportNotes()"><i class="ti ti-download"></i> {{ i18n.ts.export }}</MkButton>
-					</MkFolder>
-				</MkFolder>
-			</SearchMarker>
-
-			<SearchMarker :keywords="['notes', 'import']">
-				<MkFolder v-if="$i && $i.policies.canImportNotes">
-					<template #label><SearchLabel>{{ i18n.ts.import }}</SearchLabel></template>
-					<template #icon><i class="ph-upload ph-bold ph-lg"></i></template>
-					<MkRadios v-model="noteType" style="padding-bottom: 8px;" small>
-						<template #label>Origin</template>
-						<option value="Misskey">Misskey/Firefish</option>
-						<option value="Mastodon">Mastodon/Pleroma/Akkoma</option>
-						<option value="Twitter">Twitter</option>
-						<option value="Instagram">Instagram</option>
-						<option value="Facebook">Facebook</option>
-					</MkRadios>
-					<MkButton primary :class="$style.button" inline @click="importNotes($event)"><i class="ph-upload ph-bold ph-lg"></i> {{ i18n.ts.import }}</MkButton>
+					<div class="_gaps_s">
+						<MkFolder :defaultOpen="true">
+							<template #label>{{ i18n.ts.export }}</template>
+							<template #icon><i class="ti ti-download"></i></template>
+							<MkButton primary :class="$style.button" inline @click="exportNotes()"><i class="ti ti-download"></i> {{ i18n.ts.export }}</MkButton>
+						</MkFolder>
+						<SearchMarker :keywords="['notes', 'import']">
+							<MkFolder v-if="$i && $i.policies.canImportNotes">
+								<template #label><SearchLabel>{{ i18n.ts.import }}</SearchLabel></template>
+								<template #icon><i class="ph-upload ph-bold ph-lg"></i></template>
+								<MkRadios v-model="noteType" style="padding-bottom: 8px;" small>
+									<template #label>Origin</template>
+									<option value="Misskey">Misskey/Firefish</option>
+									<option value="Mastodon">Mastodon/Pleroma/Akkoma</option>
+									<option value="Twitter">Twitter</option>
+									<option value="Instagram">Instagram</option>
+									<option value="Facebook">Facebook</option>
+								</MkRadios>
+								<MkButton primary :class="$style.button" inline @click="importNotes($event)"><i class="ph-upload ph-bold ph-lg"></i> {{ i18n.ts.import }}</MkButton>
+							</MkFolder>
+						</SearchMarker>
+					</div>
 				</MkFolder>
 			</SearchMarker>
 

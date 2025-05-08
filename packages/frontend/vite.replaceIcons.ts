@@ -232,7 +232,7 @@ export function pluginReplaceIcons() {
 					'ti ti-external-link': 'ph-arrow-square-out ph-bold ph-lg',
 					'ti ti-eye': 'ph-eye ph-bold ph-lg',
 					'ti ti-eye-exclamation': 'ph-eye-slash ph-bold ph-lg',
-					'ti ti-eye-off': 'ti ti-eye-exclamation',
+					'ti ti-eye-off': 'ph-eye-slash ph-bold ph-lg',
 					'ti ti-feather': 'ph-feather ph-bold ph-lg',
 					'ti ti-file': 'ph-file ph-bold ph-lg',
 					'ti ti-file-invoice': 'ph-newspaper-clipping ph-bold ph-lg',
