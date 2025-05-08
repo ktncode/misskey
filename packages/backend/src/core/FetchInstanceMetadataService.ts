@@ -7,7 +7,7 @@ import { URL } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
 import tinycolor from 'tinycolor2';
 import * as Redis from 'ioredis';
-import { load as cheerio, CheerioAPI } from 'cheerio';
+import { load as cheerio } from 'cheerio';
 import type { MiInstance } from '@/models/Instance.js';
 import type Logger from '@/logger.js';
 import { DI } from '@/di-symbols.js';
@@ -15,6 +15,7 @@ import { LoggerService } from '@/core/LoggerService.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import { bindThis } from '@/decorators.js';
 import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
+import type { CheerioAPI } from 'cheerio';
 
 type NodeInfo = {
 	openRegistrations?: unknown;
