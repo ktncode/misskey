@@ -213,6 +213,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			? request.headers.authorization.slice(7)
 			: fields['i'];
 		if (token != null && typeof token !== 'string') {
+			cleanup();
 			reply.code(400);
 			return;
 		}
@@ -223,6 +224,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			}, request, reply).then((res) => {
 				this.send(reply, res);
 			}).catch((err: ApiError) => {
+				cleanup();
 				this.#sendApiError(reply, err);
 			});
 
@@ -230,6 +232,7 @@ export class ApiCallService implements OnApplicationShutdown {
 				this.logIp(request, user);
 			}
 		}).catch(err => {
+			cleanup();
 			this.#sendAuthenticationError(reply, err);
 		});
 	}
