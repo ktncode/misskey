@@ -531,31 +531,31 @@ export class NoteEntityService implements OnModuleInit {
 	) {
 		if (notes.length === 0) return [];
 
+		const targetNotes: MiNote[] = [];
+		for (const note of notes) {
+			if (isPureRenote(note)) {
+				// we may need to fetch 'my reaction' for renote target.
+				targetNotes.push(note.renote);
+				if (note.renote.reply) {
+					// idem if the renote is also a reply.
+					targetNotes.push(note.renote.reply);
+				}
+			} else {
+				if (note.reply) {
+					// idem for OP of a regular reply.
+					targetNotes.push(note.reply);
+				}
+
+				targetNotes.push(note);
+			}
+		}
+
 		const bufferedReactions = this.meta.enableReactionsBuffering ? await this.reactionsBufferingService.getMany([...getAppearNoteIds(notes)]) : null;
 
 		const meId = me ? me.id : null;
 		const myReactionsMap = new Map<MiNote['id'], string | null>();
 		if (meId) {
 			const idsNeedFetchMyReaction = new Set<MiNote['id']>();
-
-			const targetNotes: MiNote[] = [];
-			for (const note of notes) {
-				if (isPureRenote(note)) {
-					// we may need to fetch 'my reaction' for renote target.
-					targetNotes.push(note.renote);
-					if (note.renote.reply) {
-						// idem if the renote is also a reply.
-						targetNotes.push(note.renote.reply);
-					}
-				} else {
-					if (note.reply) {
-						// idem for OP of a regular reply.
-						targetNotes.push(note.reply);
-					}
-
-					targetNotes.push(note);
-				}
-			}
 
 			for (const note of targetNotes) {
 				const reactionsCount = Object.values(this.reactionsBufferingService.mergeReactions(note.reactions, bufferedReactions?.get(note.id)?.deltas ?? {})).reduce((a, b) => a + b, 0);
@@ -597,17 +597,10 @@ export class NoteEntityService implements OnModuleInit {
 			.then(users => new Map(users.map(u => [u.id, u])));
 
 		// Recursively add all mentioned users from all notes + replies + renotes
-		const allMentionedUsers = notes.reduce((users, note) => {
-			function add(n: MiNote) {
-				for (const user of n.mentions) {
-					users.add(user);
-				}
-
-				if (n.reply) add(n.reply);
-				if (n.renote) add(n.renote);
+		const allMentionedUsers = targetNotes.reduce((users, note) => {
+			for (const user of note.mentions) {
+				users.add(user);
 			}
-
-			add(note);
 			return users;
 		}, new Set<string>());
 		const mentionHandles = await this.getUserHandles(Array.from(allMentionedUsers));
