@@ -30,13 +30,20 @@ export function createTempDir(): Promise<[string, () => void]> {
 	});
 }
 
-export async function saveToTempFile(stream: NodeJS.ReadableStream): Promise<[string, () => void]> {
+export async function saveToTempFile(stream: NodeJS.ReadableStream & { truncated?: boolean }): Promise<[string, () => void]> {
 	const [filepath, cleanup] = await createTemp();
+
 	try {
 		await pipeline(stream, fs.createWriteStream(filepath));
-		return [filepath, cleanup];
 	} catch (e) {
 		cleanup();
 		throw e;
 	}
+
+	if (stream.truncated) {
+		cleanup();
+		throw new Error('Read failed: input stream truncated');
+	}
+
+	return [filepath, cleanup];
 }
