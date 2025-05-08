@@ -52,6 +52,7 @@ export const QUEUE_TYPES = [
 	'objectStorage',
 	'userWebhookDeliver',
 	'systemWebhookDeliver',
+	'scheduleNotePost',
 ] as const;
 
 @Injectable()
@@ -783,6 +784,7 @@ export class QueueService {
 			case 'objectStorage': return this.objectStorageQueue;
 			case 'userWebhookDeliver': return this.userWebhookDeliverQueue;
 			case 'systemWebhookDeliver': return this.systemWebhookDeliverQueue;
+			case 'scheduleNotePost': return this.ScheduleNotePostQueue;
 			default: throw new Error(`Unrecognized queue type: ${type}`);
 		}
 	}
