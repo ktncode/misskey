@@ -35,7 +35,7 @@ _timelines:
 
 _externalNavigationWarning:
     title: "Điều hướng đến một trang web bên ngoài"
-      description: "Rời khỏi {host} và đi đến một trang web bên ngoài"
-        trustThisDomain: "Tin tưởng tên miền này trên thiết bị này trong tương lai"
+    description: "Rời khỏi {host} và đi đến một trang web bên ngoài"
+    trustThisDomain: "Tin tưởng tên miền này trên thiết bị này trong tương lai"
 misskeyUpdated: "Sharkey vừa được cập nhật!"
 mutuals: "Theo dõi nhau"
