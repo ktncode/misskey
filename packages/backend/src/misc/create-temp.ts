@@ -30,11 +30,11 @@ export function createTempDir(): Promise<[string, () => void]> {
 	});
 }
 
-export async function saveToTempFile(stream: NodeJS.ReadableStream): Promise<string> {
+export async function saveToTempFile(stream: NodeJS.ReadableStream): Promise<[string, () => void]> {
 	const [filepath, cleanup] = await createTemp();
 	try {
 		await pipeline(stream, fs.createWriteStream(filepath));
-		return filepath;
+		return [filepath, cleanup];
 	} catch (e) {
 		cleanup();
 		throw e;
