@@ -553,6 +553,9 @@ type AppCreateRequest = operations['app___create']['requestBody']['content']['ap
 type AppCreateResponse = operations['app___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
+type AppCurrentResponse = operations['app___current']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
 type AppShowRequest = operations['app___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -1643,6 +1646,7 @@ declare namespace entities {
         ApShowResponse,
         AppCreateRequest,
         AppCreateResponse,
+        AppCurrentResponse,
         AppShowRequest,
         AppShowResponse,
         AuthAcceptRequest,

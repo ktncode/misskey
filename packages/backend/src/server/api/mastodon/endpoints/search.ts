@@ -62,7 +62,7 @@ export class ApiSearchMastodon {
 				attachMinMaxPagination(request, reply, response[type]);
 			}
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<ApiSearchMastodonRoute>('/v2/search', async (request, reply) => {
@@ -103,7 +103,7 @@ export class ApiSearchMastodon {
 			// Offset pagination is the only possible option
 			attachOffsetPagination(request, reply, longestResult);
 
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<ApiSearchMastodonRoute>('/v1/trends/statuses', async (request, reply) => {
@@ -126,7 +126,7 @@ export class ApiSearchMastodon {
 			const response = await Promise.all(data.map(status => this.mastoConverters.convertStatus(status, me)));
 
 			attachMinMaxPagination(request, reply, response);
-			reply.send(response);
+			return reply.send(response);
 		});
 
 		fastify.get<ApiSearchMastodonRoute>('/v2/suggestions', async (request, reply) => {
@@ -158,7 +158,7 @@ export class ApiSearchMastodon {
 			}));
 
 			attachOffsetPagination(request, reply, response);
-			reply.send(response);
+			return reply.send(response);
 		});
 	}
 }

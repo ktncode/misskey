@@ -87,7 +87,7 @@ export class ApiInstanceMastodon {
 				rules: instance.rules ?? [],
 			};
 
-			reply.send(response);
+			return reply.send(response);
 		});
 	}
 }

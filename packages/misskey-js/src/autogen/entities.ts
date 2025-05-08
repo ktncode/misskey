@@ -162,6 +162,7 @@ export type ApShowRequest = operations['ap___show']['requestBody']['content']['a
 export type ApShowResponse = operations['ap___show']['responses']['200']['content']['application/json'];
 export type AppCreateRequest = operations['app___create']['requestBody']['content']['application/json'];
 export type AppCreateResponse = operations['app___create']['responses']['200']['content']['application/json'];
+export type AppCurrentResponse = operations['app___current']['responses']['200']['content']['application/json'];
 export type AppShowRequest = operations['app___show']['requestBody']['content']['application/json'];
 export type AppShowResponse = operations['app___show']['responses']['200']['content']['application/json'];
 export type AuthAcceptRequest = operations['auth___accept']['requestBody']['content']['application/json'];

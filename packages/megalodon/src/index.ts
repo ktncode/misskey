@@ -9,6 +9,7 @@ import * as NotificationType from './notification'
 import FilterContext from './filter_context'
 import Converter from './converter'
 import MastodonEntity from './mastodon/entity';
+import MisskeyEntity from './misskey/entity';
 
 export {
   Response,
@@ -23,4 +24,5 @@ export {
   Entity,
   Converter,
 	MastodonEntity,
+	MisskeyEntity,
 }

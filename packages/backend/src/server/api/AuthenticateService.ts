@@ -84,6 +84,8 @@ export class AuthenticateService implements OnApplicationShutdown {
 				return [user, {
 					id: accessToken.id,
 					permission: app.permission,
+					appId: app.id,
+					app,
 				} as MiAccessToken];
 			} else {
 				return [user, accessToken];

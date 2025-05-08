@@ -16,6 +16,7 @@ import { ApiTimelineMastodon } from '@/server/api/mastodon/endpoints/timeline.js
 import { ApiAppsMastodon } from '@/server/api/mastodon/endpoints/apps.js';
 import { ApiInstanceMastodon } from '@/server/api/mastodon/endpoints/instance.js';
 import { ApiStatusMastodon } from '@/server/api/mastodon/endpoints/status.js';
+import { ServerUtilityService } from '@/server/ServerUtilityService.js';
 import { ApiCallService } from './api/ApiCallService.js';
 import { FileServerService } from './FileServerService.js';
 import { HealthServerService } from './HealthServerService.js';
@@ -126,6 +127,7 @@ import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.j
 		ApiSearchMastodon,
 		ApiStatusMastodon,
 		ApiTimelineMastodon,
+		ServerUtilityService,
 	],
 	exports: [
 		ServerService,
