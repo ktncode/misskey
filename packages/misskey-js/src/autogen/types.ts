@@ -9578,7 +9578,7 @@ export type operations = {
         'application/json': {
           /** @enum {string} */
           queue: 'system' | 'endedPollNotification' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
-          state: ('active' | 'wait' | 'delayed' | 'completed' | 'failed')[];
+          state: ('active' | 'paused' | 'wait' | 'delayed' | 'completed' | 'failed')[];
           search?: string;
         };
       };
@@ -17529,6 +17529,8 @@ export type operations = {
           sort?: '+createdAt' | '-createdAt' | '+name' | '-name' | '+size' | '-size' | null;
           /** @default */
           searchQuery?: string;
+          /** @default false */
+          showAll?: boolean;
         };
       };
     };
