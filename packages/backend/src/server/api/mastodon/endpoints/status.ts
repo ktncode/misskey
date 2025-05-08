@@ -55,8 +55,8 @@ export class ApiStatusMastodon {
 
 			const { client, me } = await this.clientService.getAuthClient(_request);
 			const { data } = await client.getStatusContext(_request.params.id, parseTimelineArgs(_request.query));
-			const ancestors = await Promise.all(data.ancestors.map(async status => await this.mastoConverters.convertStatus(status, me)));
-			const descendants = await Promise.all(data.descendants.map(async status => await this.mastoConverters.convertStatus(status, me)));
+			const ancestors = await Promise.all(data.ancestors.map(async (status: Entity.Status) => await this.mastoConverters.convertStatus(status, me)));
+			const descendants = await Promise.all(data.descendants.map(async (status: Entity.Status) => await this.mastoConverters.convertStatus(status, me)));
 			const response = { ancestors, descendants };
 
 			reply.send(response);
@@ -166,7 +166,7 @@ export class ApiStatusMastodon {
 			if (body.in_reply_to_id && removed === '/unreact') {
 				const id = body.in_reply_to_id;
 				const post = await client.getStatus(id);
-				const react = post.data.emoji_reactions.filter(e => e.me)[0].name;
+				const react = post.data.emoji_reactions.filter((e: Entity.Emoji) => e.me)[0].name;
 				const data = await client.deleteEmojiReaction(id, react);
 				reply.send(data.data);
 			}

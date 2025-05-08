@@ -35,7 +35,7 @@ export type SystemWebhookPayload = {
 	createdAt: string;
 	type: string;
 	body: any;
-}
+};
 
 const config = loadConfig();
 export const port = config.port;
@@ -44,10 +44,6 @@ export const host = new URL(config.url).host;
 
 export const WEBHOOK_HOST = 'http://localhost:15080';
 export const WEBHOOK_PORT = 15080;
-
-export const cookie = (me: UserToken): string => {
-	return `token=${me.token};`;
-};
 
 export type ApiRequest<E extends keyof misskey.Endpoints, P extends misskey.Endpoints[E]['req'] = misskey.Endpoints[E]['req']> = {
 	endpoint: E,
@@ -665,7 +661,9 @@ export async function captureWebhook<T = SystemWebhookPayload>(postAction: () =>
 	let timeoutHandle: NodeJS.Timeout | null = null;
 	const result = await new Promise<string>(async (resolve, reject) => {
 		fastify.all('/', async (req, res) => {
-			timeoutHandle && clearTimeout(timeoutHandle);
+			if (timeoutHandle) {
+				clearTimeout(timeoutHandle);
+			}
 
 			const body = JSON.stringify(req.body);
 			res.status(200).send('ok');

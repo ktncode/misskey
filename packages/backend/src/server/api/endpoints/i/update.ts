@@ -31,6 +31,7 @@ import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.j
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import type { Config } from '@/config.js';
 import { safeForSql } from '@/misc/safe-for-sql.js';
+import { verifyFieldLinks } from '@/misc/verify-field-link.js';
 import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
 import { notificationRecieveConfig } from '@/models/json-schema/user.js';
 import { userUnsignedFetchOptions } from '@/const.js';
@@ -215,6 +216,7 @@ export const paramDef = {
 		autoSensitive: { type: 'boolean' },
 		followingVisibility: { type: 'string', enum: ['public', 'followers', 'private'] },
 		followersVisibility: { type: 'string', enum: ['public', 'followers', 'private'] },
+		chatScope: { type: 'string', enum: ['everyone', 'followers', 'following', 'mutual', 'none'] },
 		pinnedPageId: { type: 'string', format: 'misskey:id', nullable: true },
 		mutedWords: muteWords,
 		hardMutedWords: muteWords,
@@ -236,6 +238,7 @@ export const paramDef = {
 				receiveFollowRequest: notificationRecieveConfig,
 				followRequestAccepted: notificationRecieveConfig,
 				roleAssigned: notificationRecieveConfig,
+				chatRoomInvitationReceived: notificationRecieveConfig,
 				achievementEarned: notificationRecieveConfig,
 				app: notificationRecieveConfig,
 				test: notificationRecieveConfig,
@@ -325,6 +328,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (ps.listenbrainz !== undefined) profileUpdates.listenbrainz = ps.listenbrainz;
 			if (ps.followingVisibility !== undefined) profileUpdates.followingVisibility = ps.followingVisibility;
 			if (ps.followersVisibility !== undefined) profileUpdates.followersVisibility = ps.followersVisibility;
+			if (ps.chatScope !== undefined) updates.chatScope = ps.chatScope;
 
 			function checkMuteWordCount(mutedWords: (string[] | string)[], limit: number) {
 				// TODO: ちゃんと数える
@@ -584,9 +588,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				this.globalEventService.publishInternalEvent('localUserUpdated', { id: user.id });
 			}
 
+			const verified_links = await verifyFieldLinks(newFields, `${this.config.url}/@${user.username}`, this.httpRequestService);
+
 			await this.userProfilesRepository.update(user.id, {
 				...profileUpdates,
-				verifiedLinks: [],
+				verifiedLinks: verified_links,
 			});
 
 			const iObj = await this.userEntityService.pack(user.id, user, {
@@ -608,18 +614,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			// フォロワーにUpdateを配信
 			if (this.userNeedsPublishing(user, updates) || this.profileNeedsPublishing(profile, updatedProfile)) {
-				this.accountUpdateService.publishToFollowers(user.id);
-			}
-
-			const urls = updatedProfile.fields.filter(x => x.value.startsWith('https://'));
-			for (const url of urls) {
-				this.verifyLink(url.value, user);
+				this.accountUpdateService.publishToFollowers(user);
 			}
 
 			return iObj;
 		});
 	}
 
+	// this function is superseded by '@/misc/verify-field-link.ts'
 	private async verifyLink(url: string, user: MiLocalUser) {
 		if (!safeForSql(url)) return;
 

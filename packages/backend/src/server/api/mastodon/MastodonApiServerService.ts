@@ -192,7 +192,7 @@ export class MastodonApiServerService {
 			reply.send(response);
 		});
 
-		fastify.post<{ Body: { description?: string; focus?: string }}>('/v2/media', { preHandler: upload.single('file') }, async (_request, reply) => {
+		fastify.post<{ Body: { description?: string; focus?: string } }>('/v2/media', { preHandler: upload.single('file') }, async (_request, reply) => {
 			const multipartData = await _request.file();
 			if (!multipartData) {
 				reply.code(401).send({ error: 'No image' });
@@ -284,7 +284,7 @@ export class MastodonApiServerService {
 			reply.send(response);
 		});
 
-		fastify.get<{ Querystring: { limit?: string }}>('/v1/follow_requests', async (_request, reply) => {
+		fastify.get<{ Querystring: { limit?: string } }>('/v1/follow_requests', async (_request, reply) => {
 			const client = this.clientService.getClient(_request);
 
 			const limit = _request.query.limit ? parseInt(_request.query.limit) : 20;

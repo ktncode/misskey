@@ -4,6 +4,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
+import { MastodonEntity } from 'megalodon';
 import { parseTimelineArgs, TimelineArgs } from '@/server/api/mastodon/argsUtils.js';
 import { MastodonConverters } from '@/server/api/mastodon/MastodonConverters.js';
 import { attachMinMaxPagination } from '@/server/api/mastodon/pagination.js';

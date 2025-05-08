@@ -142,7 +142,7 @@ export class ApiAccountMastodon {
 			reply.send(response);
 		});
 
-		fastify.get<{ Querystring: { acct?: string }}>('/v1/accounts/lookup', async (_request, reply) => {
+		fastify.get<{ Querystring: { acct?: string } }>('/v1/accounts/lookup', async (_request, reply) => {
 			if (!_request.query.acct) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required property "acct"' });
 
 			const client = this.clientService.getClient(_request);
@@ -154,7 +154,7 @@ export class ApiAccountMastodon {
 			reply.send(response);
 		});
 
-		fastify.get<ApiAccountMastodonRoute & { Querystring: { id?: string | string[] }}>('/v1/accounts/relationships', async (_request, reply) => {
+		fastify.get<ApiAccountMastodonRoute & { Querystring: { id?: string | string[] } }>('/v1/accounts/relationships', async (_request, reply) => {
 			if (!_request.query.id) return reply.code(400).send({ error: 'BAD_REQUEST', error_description: 'Missing required property "id"' });
 
 			const client = this.clientService.getClient(_request);

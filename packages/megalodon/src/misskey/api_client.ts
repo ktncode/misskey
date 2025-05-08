@@ -3,11 +3,9 @@ import dayjs from 'dayjs'
 import FormData from 'form-data'
 
 import { DEFAULT_UA } from '../default'
-import proxyAgent, { ProxyConfig } from '../proxy_config'
 import Response from '../response'
 import MisskeyEntity from './entity'
 import MegalodonEntity from '../entity'
-import WebSocket from './web_socket'
 import MisskeyNotificationType from './notification'
 import * as NotificationType from '../notification'
 import { UnknownNotificationTypeError } from '../notification';
@@ -555,32 +553,28 @@ namespace MisskeyAPI {
     get<T = any>(path: string, params?: any, headers?: { [key: string]: string }): Promise<Response<T>>
     post<T = any>(path: string, params?: any, headers?: { [key: string]: string }): Promise<Response<T>>
     cancel(): void
-    socket(channel: 'user' | 'localTimeline' | 'hybridTimeline' | 'globalTimeline' | 'conversation' | 'list', listId?: string): WebSocket
   }
 
   /**
    * Misskey API client.
    *
-   * Usign axios for request, you will handle promises.
+   * Using axios for request, you will handle promises.
    */
   export class Client implements Interface {
     private accessToken: string | null
     private baseUrl: string
     private userAgent: string
     private abortController: AbortController
-    private proxyConfig: ProxyConfig | false = false
 
     /**
      * @param baseUrl hostname or base URL
      * @param accessToken access token from OAuth2 authorization
      * @param userAgent UserAgent is specified in header on request.
-     * @param proxyConfig Proxy setting, or set false if don't use proxy.
      */
-    constructor(baseUrl: string, accessToken: string | null, userAgent: string = DEFAULT_UA, proxyConfig: ProxyConfig | false = false) {
+    constructor(baseUrl: string, accessToken: string | null, userAgent: string = DEFAULT_UA) {
       this.accessToken = accessToken
       this.baseUrl = baseUrl
       this.userAgent = userAgent
-      this.proxyConfig = proxyConfig
       this.abortController = new AbortController()
       axios.defaults.signal = this.abortController.signal
     }
@@ -591,15 +585,12 @@ namespace MisskeyAPI {
     public async get<T>(path: string, params: any = {}, headers: { [key: string]: string } = {}): Promise<Response<T>> {
       let options: AxiosRequestConfig = {
         params: params,
-        headers: headers,
+        headers: {
+					'User-Agent': this.userAgent,
+					...headers,
+				},
         maxContentLength: Infinity,
         maxBodyLength: Infinity
-      }
-      if (this.proxyConfig) {
-        options = Object.assign(options, {
-          httpAgent: proxyAgent(this.proxyConfig),
-          httpsAgent: proxyAgent(this.proxyConfig)
-        })
       }
       return axios.get<T>(this.baseUrl + path, options).then((resp: AxiosResponse<T>) => {
         const res: Response<T> = {
@@ -623,12 +614,6 @@ namespace MisskeyAPI {
         headers: headers,
         maxContentLength: Infinity,
         maxBodyLength: Infinity
-      }
-      if (this.proxyConfig) {
-        options = Object.assign(options, {
-          httpAgent: proxyAgent(this.proxyConfig),
-          httpsAgent: proxyAgent(this.proxyConfig)
-        })
       }
       let bodyParams = params
       if (this.accessToken) {
@@ -657,27 +642,6 @@ namespace MisskeyAPI {
      */
     public cancel(): void {
       return this.abortController.abort()
-    }
-
-    /**
-     * Get connection and receive websocket connection for Misskey API.
-     *
-     * @param channel Channel name is user, localTimeline, hybridTimeline, globalTimeline, conversation or list.
-     * @param listId This parameter is required only list channel.
-     */
-    public socket(
-      channel: 'user' | 'localTimeline' | 'hybridTimeline' | 'globalTimeline' | 'conversation' | 'list',
-      listId?: string
-    ): WebSocket {
-      if (!this.accessToken) {
-        throw new Error('accessToken is required')
-      }
-      const url = this.baseUrl + '/streaming'
-      const streaming = new WebSocket(url, channel, this.accessToken, listId, this.userAgent, this.proxyConfig)
-      process.nextTick(() => {
-        streaming.start()
-      })
-      return streaming
     }
   }
 }

@@ -354,7 +354,7 @@ export class ApInboxService {
 			try {
 				// The target ID is verified by secureResolve, so we know it shares host authority with the actor who sent it.
 				// This means we can pass that ID to resolveNote and avoid an extra fetch, which will fail if the note is private.
-				renote = await this.apNoteService.resolveNote(target, { resolver, sentFrom: new URL(getApId(target)) });
+				renote = await this.apNoteService.resolveNote(target, { resolver, sentFrom: getApId(target) });
 				if (renote == null) return 'announce target is null';
 			} catch (err) {
 				// 対象が4xxならスキップ
@@ -598,18 +598,11 @@ export class ApInboxService {
 			return `skip: delete actor ${actor.uri} !== ${uri}`;
 		}
 
-		const user = await this.usersRepository.findOneBy({ id: actor.id });
-		if (user == null) {
-			return 'skip: actor not found';
-		} else if (user.isDeleted) {
-			return 'skip: already deleted';
+		if (!(await this.usersRepository.update({ id: actor.id, isDeleted: false }, { isDeleted: true })).affected) {
+			return 'skip: already deleted or actor not found';
 		}
 
 		const job = await this.queueService.createDeleteAccountJob(actor);
-
-		await this.usersRepository.update(actor.id, {
-			isDeleted: true,
-		});
 
 		this.globalEventService.publishInternalEvent('remoteUserUpdated', { id: actor.id });
 
