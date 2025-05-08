@@ -13,8 +13,6 @@ initialPasswordForSetupDescription: "Nếu bạn tự cài đặt Sharkey, hãy 
 deleteAndEdit: "Xóa và soạn thảo lại"
 intro: "Đã cài đặt Sharkey! Xin hãy tạo tài khoản admin."
 aboutMisskey: "Về Sharkey"
-lookup: "Tra cứu"
-announcements: "Thông báo máy chủ"
 thisPostIsMissingAltTextCancel: "Huỷ"
 thisPostIsMissingAltTextIgnore: "Đăng bài viết vẫn được"
 thisPostIsMissingAltText: "Một trong các tệp đính kèm vào bài viết này bị thiếu văn bản thay thế. Vui lòng đảm bảo tất cả các tệp đính kèm đều có văn bản thay thế."
