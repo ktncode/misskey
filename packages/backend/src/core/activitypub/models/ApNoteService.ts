@@ -296,7 +296,7 @@ export class ApNoteService {
 					await this.pollService.vote(actor, reply, index);
 
 					// リモートフォロワーにUpdate配信
-					this.pollService.deliverQuestionUpdate(reply.id);
+					this.pollService.deliverQuestionUpdate(reply);
 				}
 				return null;
 			};
@@ -493,7 +493,7 @@ export class ApNoteService {
 					await this.pollService.vote(actor, reply, index);
 
 					// リモートフォロワーにUpdate配信
-					this.pollService.deliverQuestionUpdate(reply.id);
+					this.pollService.deliverQuestionUpdate(reply);
 				}
 				return null;
 			};

@@ -614,7 +614,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			// フォロワーにUpdateを配信
 			if (this.userNeedsPublishing(user, updates) || this.profileNeedsPublishing(profile, updatedProfile)) {
-				this.accountUpdateService.publishToFollowers(user.id);
+				this.accountUpdateService.publishToFollowers(user);
 			}
 
 			return iObj;
