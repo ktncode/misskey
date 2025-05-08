@@ -44,8 +44,7 @@ export class BunnyService {
 
 	@bindThis
 	public usingBunnyCDN(meta: MiMeta) {
-		const client = this.getBunnyInfo(meta);
-		return new URL(client.fullUrl).hostname.endsWith('bunnycdn.com');
+		return meta.objectStorageEndpoint && meta.objectStorageEndpoint.endsWith('bunnycdn.com');
 	}
 
 	@bindThis

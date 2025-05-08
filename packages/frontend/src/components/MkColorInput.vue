@@ -50,7 +50,7 @@ const onInput = () => {
 const removeColor = () => {
 	v.value = null;
 	onInput();
-}
+};
 </script>
 
 <style lang="scss" module>
