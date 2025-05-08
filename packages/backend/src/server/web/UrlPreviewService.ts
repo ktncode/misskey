@@ -191,7 +191,7 @@ export class UrlPreviewService {
 		}
 	}
 
-	private fetchSummary(url: string, meta: MiMeta, lang?: string): Promise<LocalSummalyResult> {
+	private fetchSummary(url: string, meta: MiMeta, lang?: string): Promise<SummalyResult> {
 		const agent = this.config.proxy
 			? {
 				http: this.httpRequestService.httpAgent,
@@ -210,7 +210,7 @@ export class UrlPreviewService {
 		});
 	}
 
-	private fetchSummaryFromProxy(url: string, meta: MiMeta, lang?: string): Promise<LocalSummalyResult> {
+	private fetchSummaryFromProxy(url: string, meta: MiMeta, lang?: string): Promise<SummalyResult> {
 		const proxy = meta.urlPreviewSummaryProxyUrl!;
 		const queryStr = query({
 			followRedirects: true,
