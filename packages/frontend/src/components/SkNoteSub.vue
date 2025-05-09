@@ -73,7 +73,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</footer>
 		</div>
 	</div>
-	<template v-if="depth < store.s.numberOfReplies">
+	<template v-if="depth < prefer.s.numberOfReplies">
 		<SkNoteSub v-for="reply in replies" :key="reply.id" :note="reply" :class="[$style.reply, { [$style.single]: replies.length === 1 }]" :detail="true" :depth="depth + 1" :expandAllCws="props.expandAllCws" :onDeleteCallback="removeReply" :isReply="props.isReply"/>
 	</template>
 	<div v-else :class="$style.more">
@@ -119,7 +119,6 @@ import { getNoteMenu } from '@/utility/get-note-menu.js';
 import { boostMenuItems, computeRenoteTooltip } from '@/utility/boost-quote.js';
 import { prefer } from '@/preferences.js';
 import { useNoteCapture } from '@/use/use-note-capture.js';
-import { store } from '@/store.js';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -192,8 +191,8 @@ useNoteCapture({
 	note: appearNote,
 	isDeletedRef: isDeleted,
 	// only update replies if we are, in fact, showing replies
-	onReplyCallback: props.detail && props.depth < store.s.numberOfReplies ? addReplyTo : undefined,
-	onDeleteCallback: props.detail && props.depth < store.s.numberOfReplies ? props.onDeleteCallback : undefined,
+	onReplyCallback: props.detail && props.depth < prefer.s.numberOfReplies ? addReplyTo : undefined,
+	onDeleteCallback: props.detail && props.depth < prefer.s.numberOfReplies ? props.onDeleteCallback : undefined,
 });
 
 if ($i) {
@@ -398,7 +397,7 @@ function menu(): void {
 if (props.detail) {
 	misskeyApi('notes/children', {
 		noteId: props.note.id,
-		limit: store.s.numberOfReplies,
+		limit: prefer.s.numberOfReplies,
 		showQuotes: false,
 	}).then(res => {
 		replies.value = res;

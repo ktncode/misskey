@@ -58,7 +58,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<SkNoteHeader :note="appearNote" :mini="true"/>
 			</div>
 		</div>
-		<div :class="[{ [$style.clickToOpen]: store.s.clickToOpen }]" @click.stop="store.s.clickToOpen ? noteclick(appearNote.id) : undefined">
+		<div :class="[{ [$style.clickToOpen]: prefer.s.clickToOpen }]" @click.stop="prefer.s.clickToOpen ? noteclick(appearNote.id) : undefined">
 			<div style="container-type: inline-size;">
 				<p v-if="mergedCW != null" :class="$style.cw">
 					<Mfm
@@ -259,7 +259,6 @@ import { prefer } from '@/preferences.js';
 import { getPluginHandlers } from '@/plugin.js';
 import { DI } from '@/di.js';
 import { useRouter } from '@/router.js';
-import { store } from '@/store';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
