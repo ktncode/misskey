@@ -91,7 +91,7 @@ export class FetchInstanceMetadataService {
 				}
 			}
 
-			this.logger.info(`Fetching metadata of ${instance.host} ...`);
+			this.logger.debug(`Fetching metadata of ${instance.host} ...`);
 
 			const [info, dom, manifest] = await Promise.all([
 				this.fetchNodeinfo(instance).catch(() => null),
@@ -107,7 +107,7 @@ export class FetchInstanceMetadataService {
 				this.getDescription(info, dom, manifest).catch(() => null),
 			]);
 
-			this.logger.succ(`Successfuly fetched metadata of ${instance.host}`);
+			this.logger.debug(`Successfuly fetched metadata of ${instance.host}`);
 
 			const updates = {
 				infoUpdatedAt: new Date(),
@@ -129,7 +129,7 @@ export class FetchInstanceMetadataService {
 
 			await this.federatedInstanceService.update(instance.id, updates);
 
-			this.logger.succ(`Successfuly updated metadata of ${instance.host}`);
+			this.logger.succ(`Successfully updated metadata of ${instance.host}`);
 		} catch (e) {
 			this.logger.error(`Failed to update metadata of ${instance.host}: ${renderInlineError(e)}`);
 		} finally {
@@ -139,7 +139,7 @@ export class FetchInstanceMetadataService {
 
 	@bindThis
 	private async fetchNodeinfo(instance: MiInstance): Promise<NodeInfo> {
-		this.logger.info(`Fetching nodeinfo of ${instance.host} ...`);
+		this.logger.debug(`Fetching nodeinfo of ${instance.host} ...`);
 
 		try {
 			const wellknown = await this.httpRequestService.getJson('https://' + instance.host + '/.well-known/nodeinfo')
@@ -171,11 +171,11 @@ export class FetchInstanceMetadataService {
 					throw err.statusCode ?? err.message;
 				});
 
-			this.logger.succ(`Successfuly fetched nodeinfo of ${instance.host}`);
+			this.logger.debug(`Successfuly fetched nodeinfo of ${instance.host}`);
 
 			return info as NodeInfo;
 		} catch (err) {
-			this.logger.error(`Failed to fetch nodeinfo of ${instance.host}: ${err}`);
+			this.logger.warn(`Failed to fetch nodeinfo of ${instance.host}: ${renderInlineError(err)}`);
 
 			throw err;
 		}
@@ -183,7 +183,7 @@ export class FetchInstanceMetadataService {
 
 	@bindThis
 	private async fetchDom(instance: MiInstance): Promise<CheerioAPI> {
-		this.logger.info(`Fetching HTML of ${instance.host} ...`);
+		this.logger.debug(`Fetching HTML of ${instance.host} ...`);
 
 		const url = 'https://' + instance.host;
 
