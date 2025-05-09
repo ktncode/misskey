@@ -1,6 +1,5 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios'
 import dayjs from 'dayjs'
-import FormData from 'form-data'
 
 import { DEFAULT_UA } from '../default'
 import Response from '../response'
@@ -575,22 +574,26 @@ namespace MisskeyAPI {
       this.accessToken = accessToken
       this.baseUrl = baseUrl
       this.userAgent = userAgent
-      this.abortController = new AbortController()
-      axios.defaults.signal = this.abortController.signal
+      this.abortController = new AbortController();
     }
 
     /**
      * GET request to misskey API.
      **/
     public async get<T>(path: string, params: any = {}, headers: { [key: string]: string } = {}): Promise<Response<T>> {
+			if (!headers['Authorization'] && this.accessToken) {
+				headers['Authorization'] = `Bearer ${this.accessToken}`;
+			}
+			if (!headers['User-Agent']) {
+				headers['User-Agent'] = this.userAgent;
+			}
+
       let options: AxiosRequestConfig = {
         params: params,
-        headers: {
-					'User-Agent': this.userAgent,
-					...headers,
-				},
+        headers,
         maxContentLength: Infinity,
-        maxBodyLength: Infinity
+        maxBodyLength: Infinity,
+				signal: this.abortController.signal,
       }
       return axios.get<T>(this.baseUrl + path, options).then((resp: AxiosResponse<T>) => {
         const res: Response<T> = {
@@ -610,22 +613,21 @@ namespace MisskeyAPI {
      * @param headers Request header object
      */
     public async post<T>(path: string, params: any = {}, headers: { [key: string]: string } = {}): Promise<Response<T>> {
+			if (!headers['Authorization'] && this.accessToken) {
+				headers['Authorization'] = `Bearer ${this.accessToken}`;
+			}
+			if (!headers['User-Agent']) {
+				headers['User-Agent'] = this.userAgent;
+			}
+
       let options: AxiosRequestConfig = {
         headers: headers,
         maxContentLength: Infinity,
-        maxBodyLength: Infinity
+        maxBodyLength: Infinity,
+				signal: this.abortController.signal,
       }
-      let bodyParams = params
-      if (this.accessToken) {
-        if (params instanceof FormData) {
-          bodyParams.append('i', this.accessToken)
-        } else {
-          bodyParams = Object.assign(params, {
-            i: this.accessToken
-          })
-        }
-      }
-      return axios.post<T>(this.baseUrl + path, bodyParams, options).then((resp: AxiosResponse<T>) => {
+
+      return axios.post<T>(this.baseUrl + path, params, options).then((resp: AxiosResponse<T>) => {
         const res: Response<T> = {
           data: resp.data,
           status: resp.status,

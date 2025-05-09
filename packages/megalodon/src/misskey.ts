@@ -39,9 +39,9 @@ export default class Misskey implements MegalodonInterface {
 
   public async registerApp(
     client_name: string,
-    options: Partial<{ scopes: Array<string>; redirect_uris: string; website: string }> = {
+    options: Partial<{ scopes: Array<string>; redirect_uri: string; website?: string }> = {
       scopes: MisskeyAPI.DEFAULT_SCOPE,
-      redirect_uris: this.baseUrl
+      redirect_uri: this.baseUrl
     }
   ): Promise<OAuth.AppData> {
     return this.createApp(client_name, options).then(async appData => {
@@ -62,13 +62,14 @@ export default class Misskey implements MegalodonInterface {
    */
   public async createApp(
     client_name: string,
-    options: Partial<{ scopes: Array<string>; redirect_uris: string; website: string }> = {
+    options: Partial<{ scopes: Array<string>; redirect_uri: string; website?: string }> = {
       scopes: MisskeyAPI.DEFAULT_SCOPE,
-      redirect_uris: this.baseUrl
+      redirect_uri: this.baseUrl
     }
   ): Promise<OAuth.AppData> {
-    const redirect_uris = options.redirect_uris || this.baseUrl
+    const redirect_uri = options.redirect_uri || this.baseUrl
     const scopes = options.scopes || MisskeyAPI.DEFAULT_SCOPE
+		const website = options.website ?? '';
 
     const params: {
       name: string
@@ -77,9 +78,9 @@ export default class Misskey implements MegalodonInterface {
       callbackUrl: string
     } = {
       name: client_name,
-      description: '',
+      description: website,
       permission: scopes,
-      callbackUrl: redirect_uris
+      callbackUrl: redirect_uri
     }
 
     /**
@@ -101,7 +102,7 @@ export default class Misskey implements MegalodonInterface {
         website: null,
         redirect_uri: res.data.callbackUrl,
         client_id: '',
-        client_secret: res.data.secret
+        client_secret: res.data.secret!
       }
       return OAuth.AppData.from(appData)
     })
@@ -121,11 +122,8 @@ export default class Misskey implements MegalodonInterface {
   // ======================================
   // apps
   // ======================================
-  public async verifyAppCredentials(): Promise<Response<Entity.Application>> {
-    return new Promise((_, reject) => {
-      const err = new NoImplementedError('misskey does not support')
-      reject(err)
-    })
+  public async verifyAppCredentials(): Promise<Response<MisskeyAPI.Entity.App>> {
+		return await this.client.post<MisskeyAPI.Entity.App>('/api/app/current');
   }
 
   // ======================================
@@ -1502,13 +1500,13 @@ export default class Misskey implements MegalodonInterface {
   /**
    * POST /api/drive/files/create
    */
-  public async uploadMedia(file: any, _options?: { description?: string; focus?: string }): Promise<Response<Entity.Attachment>> {
+  public async uploadMedia(file: { filepath: fs.PathLike, mimetype: string, filename: string }, _options?: { description?: string; focus?: string }): Promise<Response<Entity.Attachment>> {
     const formData = new FormData()
-    formData.append('file', fs.createReadStream(file.path), {
+    formData.append('file', fs.createReadStream(file.filepath), {
 			contentType: file.mimetype,
 		});
 
-		if (file.originalname != null && file.originalname !== "file") formData.append("name", file.originalname);
+		if (file.filename && file.filename !== "file") formData.append("name", file.filename);
 
 		if (_options?.description != null) formData.append("comment", _options.description);
     let headers: { [key: string]: string } = {}

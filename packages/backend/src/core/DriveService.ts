@@ -45,6 +45,7 @@ import { isMimeImage } from '@/misc/is-mime-image.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { BunnyService } from '@/core/BunnyService.js';
+import { LoggerService } from './LoggerService.js';
 
 type AddFileArgs = {
 	/** User who wish to add file */
@@ -133,8 +134,10 @@ export class DriveService {
 		private perUserDriveChart: PerUserDriveChart,
 		private instanceChart: InstanceChart,
 		private utilityService: UtilityService,
+
+		loggerService: LoggerService,
 	) {
-		const logger = new Logger('drive', 'blue');
+		const logger = loggerService.getLogger('drive', 'blue');
 		this.registerLogger = logger.createSubLogger('register', 'yellow');
 		this.downloaderLogger = logger.createSubLogger('downloader');
 		this.deleteLogger = logger.createSubLogger('delete');

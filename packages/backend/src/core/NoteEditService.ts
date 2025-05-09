@@ -574,12 +574,15 @@ export class NoteEditService implements OnApplicationShutdown {
 				await this.notesRepository.update(oldnote.id, note);
 			}
 
+			// Re-fetch note to get the default values of null / unset fields.
+			const edited = await this.notesRepository.findOneByOrFail({ id: note.id });
+
 			setImmediate('post edited', { signal: this.#shutdownController.signal }).then(
-				() => this.postNoteEdited(note, oldnote, user, data, silent, tags!, mentionedUsers!),
+				() => this.postNoteEdited(edited, oldnote, user, data, silent, tags!, mentionedUsers!),
 				() => { /* aborted, ignore this */ },
 			);
 
-			return note;
+			return edited;
 		} else {
 			return oldnote;
 		}

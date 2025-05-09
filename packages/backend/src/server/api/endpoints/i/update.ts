@@ -6,7 +6,6 @@
 import * as mfm from '@transfem-org/sfm-js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
-import { JSDOM } from 'jsdom';
 import { extractCustomEmojisFromMfm } from '@/misc/extract-custom-emojis-from-mfm.js';
 import { extractHashtags } from '@/misc/extract-hashtags.js';
 import * as Acct from '@/misc/acct.js';
@@ -622,6 +621,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	}
 
 	// this function is superseded by '@/misc/verify-field-link.ts'
+	/*
 	private async verifyLink(url: string, user: MiLocalUser) {
 		if (!safeForSql(url)) return;
 
@@ -653,6 +653,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			// なにもしない
 		}
 	}
+	*/
 
 	// these two methods need to be kept in sync with
 	// `ApRendererService.renderPerson`

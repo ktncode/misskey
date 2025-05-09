@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import { Entity, MastodonEntity } from 'megalodon';
+import { Entity, MastodonEntity, MisskeyEntity } from 'megalodon';
 import mfm from '@transfem-org/sfm-js';
 import { MastodonNotificationType } from 'megalodon/lib/src/mastodon/notification.js';
 import { NotificationType } from 'megalodon/lib/src/notification.js';
@@ -369,6 +369,15 @@ export class MastodonConverters {
 			type: convertNotificationType(notification.type as NotificationType),
 		};
 	}
+
+	public convertApplication(app: MisskeyEntity.App): MastodonEntity.Application {
+		return {
+			name: app.name,
+			scopes: app.permission,
+			redirect_uri: app.callbackUrl,
+			redirect_uris: [app.callbackUrl],
+		};
+	}
 }
 
 function simpleConvert<T>(data: T): T {
@@ -459,4 +468,3 @@ export function convertRelationship(relationship: Partial<Entity.Relationship> &
 		note: relationship.note ?? '',
 	};
 }
-

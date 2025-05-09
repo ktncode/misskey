@@ -159,6 +159,7 @@ import type {
 	ApShowResponse,
 	AppCreateRequest,
 	AppCreateResponse,
+	AppCurrentResponse,
 	AppShowRequest,
 	AppShowResponse,
 	AuthAcceptRequest,
@@ -778,6 +779,7 @@ export type Endpoints = {
 	'ap/get': { req: ApGetRequest; res: ApGetResponse };
 	'ap/show': { req: ApShowRequest; res: ApShowResponse };
 	'app/create': { req: AppCreateRequest; res: AppCreateResponse };
+	'app/current': { req: EmptyRequest; res: AppCurrentResponse };
 	'app/show': { req: AppShowRequest; res: AppShowResponse };
 	'auth/accept': { req: AuthAcceptRequest; res: EmptyResponse };
 	'auth/session/generate': { req: AuthSessionGenerateRequest; res: AuthSessionGenerateResponse };

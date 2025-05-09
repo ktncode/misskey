@@ -176,4 +176,14 @@ export class UtilityService {
 		const host = this.extractDbHost(uri);
 		return this.isFederationAllowedHost(host);
 	}
+
+	@bindThis
+	public getUrlScheme(url: string): string {
+		try {
+			// Returns in the format "https:" or an empty string
+			return new URL(url).protocol;
+		} catch {
+			return '';
+		}
+	}
 }
