@@ -317,19 +317,10 @@ if (props.reply && (props.reply.user.username !== $i.username || (props.reply.us
 	text.value = `@${props.reply.user.username}${props.reply.user.host != null ? '@' + toASCII(props.reply.user.host) : ''} `;
 }
 
-if (props.reply && props.reply.text != null) {
-	const ast = mfm.parse(props.reply.text);
-	const otherHost = props.reply.user.host;
-
-	for (const x of extractMentions(ast)) {
-		const mention = x.host ?
-			`@${x.username}@${toASCII(x.host)}` :
-			(otherHost == null || otherHost === host) ?
-				`@${x.username}` :
-				`@${x.username}@${toASCII(otherHost)}`;
-
-		// 自分は除外
-		if ($i.username === x.username && (x.host == null || x.host === host)) continue;
+if (props.reply && props.reply.mentionHandles) {
+	for (const [user, mention] of Object.entries(props.reply.mentionHandles)) {
+		// Don't mention ourself
+		if (user === $i.id) continue;
 
 		// 重複は除外
 		if (text.value.includes(`${mention} `)) continue;
@@ -425,7 +416,7 @@ function checkMissingMention() {
 		const ast = mfm.parse(text.value);
 
 		for (const x of extractMentions(ast)) {
-			if (!visibleUsers.value.some(u => (u.username === x.username) && (u.host === x.host))) {
+			if (!visibleUsers.value.some(u => (u.username.toLowerCase() === x.username.toLowerCase()) && (u.host === x.host))) {
 				hasNotSpecifiedMentions.value = true;
 				return;
 			}
@@ -438,7 +429,7 @@ function addMissingMention() {
 	const ast = mfm.parse(text.value);
 
 	for (const x of extractMentions(ast)) {
-		if (!visibleUsers.value.some(u => (u.username === x.username) && (u.host === x.host))) {
+		if (!visibleUsers.value.some(u => (u.username.toLowerCase() === x.username.toLowerCase()) && (u.host === x.host))) {
 			misskeyApi('users/show', { username: x.username, host: x.host }).then(user => {
 				pushVisibleUser(user);
 			});
@@ -654,7 +645,7 @@ function showOtherSettings() {
 //#endregion
 
 function pushVisibleUser(user: Misskey.entities.UserDetailed) {
-	if (!visibleUsers.value.some(u => u.username === user.username && u.host === user.host)) {
+	if (!visibleUsers.value.some(u => u.username.toLowerCase() === user.username.toLowerCase() && u.host === user.host)) {
 		visibleUsers.value.push(user);
 	}
 }

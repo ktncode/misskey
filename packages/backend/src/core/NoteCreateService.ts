@@ -539,7 +539,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 				await this.notesRepository.insert(insert);
 			}
 
-			return insert;
+			// Re-fetch note to get the default values of null / unset fields.
+			return await this.notesRepository.findOneByOrFail({ id: insert.id });
 		} catch (e) {
 			// duplicate key error
 			if (isDuplicateKeyValueError(e)) {
