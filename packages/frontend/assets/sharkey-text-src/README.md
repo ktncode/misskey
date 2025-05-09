@@ -12,4 +12,6 @@ Preferably, you should use Inkscape when wanting to make modifications to the lo
 
 The logo should preferably be modified using Inkscape, but should work in any other software. If any weird issues appear, try opening it with Inkscape first or try using the version under [`../sharkey.svg`](../sharkey.svg) if you prefer to work with your software. Follow the instructions for Using Inkscape.
 
+## Licence
+
 This logo is distributed under the same licence as Sharkey (AGPL ≥3).
