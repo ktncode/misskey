@@ -12947,6 +12947,16 @@ export interface Locale extends ILocale {
      * If disabled, then the proxy account will not be used. User lists will only include notes from local or followed users.
      */
     "enableProxyAccountDescription": string;
+    "_confirmPollEdit": {
+        /**
+         * Are you sure you want to edit this poll?
+         */
+        "title": string;
+        /**
+         * Editing this poll will cause it to lose all previous votes
+         */
+        "text": string;
+    };
 }
 declare const locales: {
     [lang: string]: Locale;

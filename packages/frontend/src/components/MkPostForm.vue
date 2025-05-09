@@ -186,6 +186,7 @@ const posted = ref(false);
 const text = ref(props.initialText ?? '');
 const files = ref(props.initialFiles ?? []);
 const poll = ref<PollEditorModelValue | null>(null);
+const initialPoll = ref<PollEditorModelValue | null>(null);
 const useCw = ref<boolean>(!!props.initialCw);
 const showPreview = ref(store.s.showPreview);
 watch(showPreview, () => store.set('showPreview', showPreview.value));
@@ -978,6 +979,15 @@ async function post(ev?: MouseEvent) {
 		token = storedAccounts.find(x => x.id === postAccount.value?.id)?.token;
 	}
 
+	if (postData.editId && postData.poll !== initialPoll.value) {
+		const { canceled } = await os.confirm({
+			type: 'warning',
+			title: i18n.ts._confirmPollEdit.title,
+			text: i18n.ts._confirmPollEdit.text,
+		});
+		if (canceled) return;
+	}
+
 	posting.value = true;
 	misskeyApi(postData.editId ? 'notes/edit' : (postData.scheduleNote ? 'notes/schedule/create' : 'notes/create'), postData, token).then(() => {
 		if (props.freezeAfterPosted) {
@@ -1201,6 +1211,7 @@ onMounted(() => {
 					expiresAt: init.poll.expiresAt ? (new Date(init.poll.expiresAt)).getTime() : null,
 					expiredAfter: null,
 				};
+				if (props.editId) initialPoll.value = poll.value;
 			}
 			if (init.visibleUserIds) {
 				misskeyApi('users/show', { userIds: init.visibleUserIds }).then(users => {
