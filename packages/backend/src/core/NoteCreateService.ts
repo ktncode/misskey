@@ -227,7 +227,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	public async  create(user: MiUser & {
+	public async create(user: MiUser & {
 		id: MiUser['id'];
 		username: MiUser['username'];
 		host: MiUser['host'];
