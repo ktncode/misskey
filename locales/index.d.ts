@@ -7689,6 +7689,38 @@ export interface Locale extends ILocale {
              * Match subdomains
              */
             "isFromInstanceSubdomains": string;
+            /**
+             * Has X or fewer local followers
+             */
+            "localFollowersLessThanOrEq": string;
+            /**
+             * Has X or more local followers
+             */
+            "localFollowersMoreThanOrEq": string;
+            /**
+             * Follows X or fewer local accounts
+             */
+            "localFollowingLessThanOrEq": string;
+            /**
+             * Follows X or more local accounts
+             */
+            "localFollowingMoreThanOrEq": string;
+            /**
+             * Has X or fewer remote followers
+             */
+            "remoteFollowersLessThanOrEq": string;
+            /**
+             * Has X or more remote followers
+             */
+            "remoteFollowersMoreThanOrEq": string;
+            /**
+             * Follows X or fewer remote accounts
+             */
+            "remoteFollowingLessThanOrEq": string;
+            /**
+             * Follows X or more remote accounts
+             */
+            "remoteFollowingMoreThanOrEq": string;
         };
     };
     "_sensitiveMediaDetection": {

@@ -22,6 +22,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<option value="followersMoreThanOrEq">{{ i18n.ts._role._condition.followersMoreThanOrEq }}</option>
 			<option value="followingLessThanOrEq">{{ i18n.ts._role._condition.followingLessThanOrEq }}</option>
 			<option value="followingMoreThanOrEq">{{ i18n.ts._role._condition.followingMoreThanOrEq }}</option>
+			<option value="localFollowersLessThanOrEq">{{ i18n.ts._role._condition.localFollowersLessThanOrEq }}</option>
+			<option value="localFollowersMoreThanOrEq">{{ i18n.ts._role._condition.localFollowersMoreThanOrEq }}</option>
+			<option value="localFollowingLessThanOrEq">{{ i18n.ts._role._condition.localFollowingLessThanOrEq }}</option>
+			<option value="localFollowingMoreThanOrEq">{{ i18n.ts._role._condition.localFollowingMoreThanOrEq }}</option>
+			<option value="remoteFollowersLessThanOrEq">{{ i18n.ts._role._condition.remoteFollowersLessThanOrEq }}</option>
+			<option value="remoteFollowersMoreThanOrEq">{{ i18n.ts._role._condition.remoteFollowersMoreThanOrEq }}</option>
+			<option value="remoteFollowingLessThanOrEq">{{ i18n.ts._role._condition.remoteFollowingLessThanOrEq }}</option>
+			<option value="remoteFollowingMoreThanOrEq">{{ i18n.ts._role._condition.remoteFollowingMoreThanOrEq }}</option>
 			<option value="notesLessThanOrEq">{{ i18n.ts._role._condition.notesLessThanOrEq }}</option>
 			<option value="notesMoreThanOrEq">{{ i18n.ts._role._condition.notesMoreThanOrEq }}</option>
 			<option value="and">{{ i18n.ts._role._condition.and }}</option>
@@ -56,7 +64,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #suffix>sec</template>
 	</MkInput>
 
-	<MkInput v-else-if="['followersLessThanOrEq', 'followersMoreThanOrEq', 'followingLessThanOrEq', 'followingMoreThanOrEq', 'notesLessThanOrEq', 'notesMoreThanOrEq'].includes(type)" v-model="v.value" type="number">
+	<MkInput
+		v-else-if="[
+			'followersLessThanOrEq',
+			'followersMoreThanOrEq',
+			'followingLessThanOrEq',
+			'followingMoreThanOrEq',
+			'localFollowersLessThanOrEq',
+			'localFollowersMoreThanOrEq',
+			'localFollowingLessThanOrEq',
+			'localFollowingMoreThanOrEq',
+			'remoteFollowersLessThanOrEq',
+			'remoteFollowersMoreThanOrEq',
+			'remoteFollowingLessThanOrEq',
+			'remoteFollowingMoreThanOrEq',
+			'notesLessThanOrEq',
+			'notesMoreThanOrEq'
+		].includes(type)"
+		v-model="v.value"
+		type="number"
+	>
 	</MkInput>
 
 	<MkSelect v-else-if="type === 'roleAssignedTo'" v-model="v.roleId">
