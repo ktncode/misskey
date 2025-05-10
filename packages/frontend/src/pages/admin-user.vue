@@ -149,7 +149,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 						<div :class="$style.buttonStrip">
 							<MkButton v-if="user.host != null" inline @click="updateRemoteUser"><i class="ph-cloud-arrow-down ph-bold ph-lg"></i> {{ i18n.ts.updateRemoteUser }}</MkButton>
-							<MkButton v-if="user.host == null" accent @click="resetPassword"><i class="ph-password ph-bold ph-lg"></i> {{ i18n.ts.resetPassword }}</MkButton>
+							<MkButton v-if="user.host == null" inline accent @click="resetPassword"><i class="ph-password ph-bold ph-lg"></i> {{ i18n.ts.resetPassword }}</MkButton>
 							<MkButton inline accent @click="unsetUserAvatar"><i class="ph-camera-slash ph-bold ph-lg"></i> {{ i18n.ts.unsetUserAvatar }}</MkButton>
 							<MkButton inline accent @click="unsetUserBanner"><i class="ph-image-broken ph-bold ph-lg"></i> {{ i18n.ts.unsetUserBanner }}</MkButton>
 							<MkButton inline danger @click="deleteAllFiles"><i class="ph-trash ph-bold ph-lg"></i> {{ i18n.ts.deleteAllFiles }}</MkButton>
