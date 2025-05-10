@@ -814,6 +814,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 										<template #label><SearchLabel>{{ i18n.ts.withRepliesByDefaultForNewlyFollowed }}</SearchLabel></template>
 									</MkSwitch>
 								</MkPreferenceContainer>
+								<div class="_buttons">
+									<MkButton danger @click="updateRepliesAll(true)"><i class="ph-chats ph-bold ph-lg"></i> {{ i18n.ts.showRepliesToOthersInTimelineAll }}</MkButton>
+									<MkButton danger @click="updateRepliesAll(false)"><i class="ph-chat ph-bold ph-lg"></i> {{ i18n.ts.hideRepliesToOthersInTimelineAll }}</MkButton>
+								</div>
 							</SearchMarker>
 						</div>
 
@@ -1216,6 +1220,16 @@ async function testNotificationDot() {
 	} else {
 		os.toast(i18n.ts.notificationDotNotWorking);
 	}
+}
+
+async function updateRepliesAll(withReplies: boolean) {
+	const { canceled } = await os.confirm({
+		type: 'warning',
+		text: withReplies ? i18n.ts.confirmShowRepliesAll : i18n.ts.confirmHideRepliesAll,
+	});
+	if (canceled) return;
+
+	misskeyApi('following/update-all', { withReplies });
 }
 
 function save() {
