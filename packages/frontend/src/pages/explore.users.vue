@@ -97,6 +97,7 @@ const tagUsers = computed(() => ({
 		tag: props.tag,
 		origin: 'combined',
 		sort: '+follower',
+		trending: true,
 	},
 }));
 
@@ -105,33 +106,40 @@ const popularUsers = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	state: 'alive',
 	origin: 'local',
 	sort: '+follower',
+	trending: true,
 } };
 const recentlyUpdatedUsers = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	origin: 'local',
 	sort: '+updatedAt',
+	trending: true,
 } };
 const recentlyRegisteredUsers = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	origin: 'local',
 	state: 'alive',
 	sort: '+createdAt',
+	trending: true,
 } };
 const popularUsersF = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	state: 'alive',
 	origin: 'remote',
 	sort: '+follower',
+	trending: true,
 } };
 const popularUsersLocalF = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	state: 'alive',
 	origin: 'remote',
 	sort: '+localFollower',
+	trending: true,
 } };
 const recentlyUpdatedUsersF = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	origin: 'combined',
 	sort: '+updatedAt',
+	trending: true,
 } };
 const recentlyRegisteredUsersF = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	origin: 'combined',
 	sort: '+createdAt',
+	trending: true,
 } };
 
 misskeyApi('hashtags/list', {

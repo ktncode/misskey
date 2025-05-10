@@ -10,6 +10,7 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
+import { RoleService } from '@/core/RoleService.js';
 import type { SelectQueryBuilder } from 'typeorm';
 
 export const meta = {
@@ -49,6 +50,7 @@ export const paramDef = {
 			default: null,
 			description: 'The local host is represented with `null`.',
 		},
+		trending: { type: 'boolean', default: false },
 	},
 	required: [],
 } as const;
@@ -61,6 +63,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 		private userEntityService: UserEntityService,
 		private queryService: QueryService,
+		private readonly roleService: RoleService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const query = this.usersRepository.createQueryBuilder('user')
@@ -98,7 +101,18 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			query.limit(ps.limit);
 			query.offset(ps.offset);
 
-			const users = await query.getMany();
+			let users = await query.getMany();
+
+			// This is not ideal, for a couple of reasons:
+			// 1. It may return less than "limit" results.
+			// 2. A span of more than "limit" consecutive non-trendable users may cause the pagination to stop early.
+			// Unfortunately, there's no better solution unless we refactor role policies to be persisted to the DB.
+			if (ps.trending) {
+				const usersWithRoles = await Promise.all(users.map(async u => [u, await this.roleService.getUserPolicies(u)] as const));
+				users = usersWithRoles
+					.filter(([,p]) => p.canTrend)
+					.map(([u]) => u);
+			}
 
 			return await this.userEntityService.packMany(users, me, { schema: 'UserDetailed' });
 		});
