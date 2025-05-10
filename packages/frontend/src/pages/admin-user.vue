@@ -111,10 +111,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</template>
 				</MkFolder>
 
-				<MkTextarea v-model="moderationNote" manualSave @update:modelValue="onModerationNoteChanged">
+				<MkFolder v-if="iAmModerator" :defaultOpen="moderationNote.length > 0">
+					<template #icon><i class="ph-stamp ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts.moderationNote }}</template>
-					<template #caption>{{ i18n.ts.moderationNoteDescription }}</template>
-				</MkTextarea>
+					<MkTextarea v-model="moderationNote" manualSave @update:modelValue="onModerationNoteChanged">
+						<template #label>{{ i18n.ts.moderationNote }}</template>
+						<template #caption>{{ i18n.ts.moderationNoteDescription }}</template>
+					</MkTextarea>
+				</MkFolder>
 
 				<FormSection v-if="user?.host">
 					<template #label>{{ i18n.ts.activityPub }}</template>
