@@ -457,7 +457,7 @@ export const store = markRaw(new Pizzax('base', {
 	},
 	sound_note: {
 		where: 'device',
-		default: { type: 'syuilo/n-aec', volume: 1 },
+		default: { type: 'syuilo/n-aec', volume: 0 },
 	},
 	sound_noteMy: {
 		where: 'device',
