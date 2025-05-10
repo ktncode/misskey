@@ -242,6 +242,9 @@ _role:
   _condition:
     isLocked: "Private account"
     isExplorable: "Account is discoverable"
+    isFromInstance: "Is from a specific instance"
+    isFromInstanceHost: "Hostname (case-insensitive)"
+    isFromInstanceSubdomains: "Match subdomains"
 _emailUnavailable:
   banned: "This email address is banned"
 _signup:
