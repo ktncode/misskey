@@ -169,7 +169,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<i v-if="!expandedRoles.includes(role.id)" class="ti ti-chevron-down"></i>
 							<i v-if="expandedRoles.includes(role.id)" class="ti ti-chevron-left"></i>
 						</button>
-						<button v-if="role.target === 'manual'" class="_button" :class="$style.roleUnassign" @click="unassignRole(role, $event)"><i class="ti ti-x"></i></button>
+						<button v-if="role.target === 'manual' || info.roleAssigns.some(a => a.roleId === role.id)" class="_button" :class="$style.roleUnassign" @click="unassignRole(role, $event)"><i class="ti ti-x"></i></button>
 						<button v-else class="_button" :class="$style.roleUnassign" disabled><i class="ti ti-ban"></i></button>
 					</div>
 					<div v-if="expandedRoles.includes(role.id)" :class="$style.roleItemSub">
