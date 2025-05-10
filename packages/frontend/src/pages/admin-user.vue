@@ -165,7 +165,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div v-for="role in info.roles" :key="role.id">
 					<div :class="$style.roleItemMain">
 						<MkRolePreview :class="$style.role" :role="role" :forModeration="true"/>
-						<button class="_button" @click="toggleRoleItem(role)"><i class="ti ti-chevron-down"></i></button>
+						<button class="_button" @click="toggleRoleItem(role)">
+							<i v-if="!expandedRoles.includes(role.id)" class="ti ti-chevron-down"></i>
+							<i v-if="expandedRoles.includes(role.id)" class="ti ti-chevron-left"></i>
+						</button>
 						<button v-if="role.target === 'manual'" class="_button" :class="$style.roleUnassign" @click="unassignRole(role, $event)"><i class="ti ti-x"></i></button>
 						<button v-else class="_button" :class="$style.roleUnassign" disabled><i class="ti ti-ban"></i></button>
 					</div>
