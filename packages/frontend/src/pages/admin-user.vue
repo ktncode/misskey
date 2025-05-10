@@ -103,12 +103,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #icon><i class="ph-network ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts.ip }}</template>
 					<MkInfo>{{ i18n.ts.ipTip }}</MkInfo>
-					<template>
-						<div v-for="record in ips" :key="record.ip" class="_monospace" :class="$style.ip" style="margin: 1em 0;">
-							<span class="date">{{ record.createdAt }}</span>
-							<span class="ip">{{ record.ip }}</span>
-						</div>
-					</template>
+					<div v-for="record in ips" :key="record.ip" class="_monospace" :class="$style.ip" style="margin: 1em 0;">
+						<span class="date">{{ record.createdAt }}</span>
+						<span class="ip">{{ record.ip }}</span>
+					</div>
 				</MkFolder>
 
 				<MkFolder v-if="iAmModerator" :defaultOpen="moderationNote.length > 0">
