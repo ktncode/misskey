@@ -7722,6 +7722,10 @@ export interface Locale extends ILocale {
              */
             "remoteFollowingMoreThanOrEq": string;
         };
+        /**
+         * This condition may be incorrect for remote users.
+         */
+        "remoteDataWarning": string;
     };
     "_sensitiveMediaDetection": {
         /**

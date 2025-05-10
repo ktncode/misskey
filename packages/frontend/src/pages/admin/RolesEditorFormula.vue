@@ -97,6 +97,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkSwitch v-if="type === 'isFromInstance'" v-model="v.subdomains">
 		<template #label>{{ i18n.ts._role._condition.isFromInstanceSubdomains }}</template>
 	</MkSwitch>
+
+	<div v-if="['remoteFollowersLessThanOrEq', 'remoteFollowersMoreThanOrEq', 'remoteFollowingLessThanOrEq', 'remoteFollowingMoreThanOrEq'].includes(type)" :class="$style.warningBanner">
+		<i class="ti ti-alert-triangle"></i>
+		{{ i18n.ts._role.remoteDataWarning }}
+	</div>
 </div>
 </template>
 
@@ -203,6 +208,16 @@ function removeSelf() {
 
 	&:hover {
 		border-color: var(--MI_THEME-accent);
+	}
+}
+
+.warningBanner {
+	color: var(--MI_THEME-warn);
+	width: 100%;
+	padding: 0 6px;
+
+	> i {
+		margin-right: 4px;
 	}
 }
 </style>
