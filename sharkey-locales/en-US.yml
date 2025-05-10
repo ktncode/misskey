@@ -566,5 +566,8 @@ bubbleTimeline: "Bubble timeline"
 bubbleTimelineDescription: "Choose which instances should be displayed in the bubble."
 bubbleTimelineMustBeEnabled: "Note: the bubble timeline is hidden by default, and must be enabled via roles."
 
+popularUsersGlobal: "Users popular on the global network"
+popularUsersLocal: "Users popular on {host}"
+
 translationTimeoutLabel: "Translation timeout"
 translationTimeoutCaption: "Timeout in milliseconds for translation API requests."

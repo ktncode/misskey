@@ -13050,6 +13050,14 @@ export interface Locale extends ILocale {
      */
     "bubbleTimelineMustBeEnabled": string;
     /**
+     * Users popular on the global network
+     */
+    "popularUsersGlobal": string;
+    /**
+     * Users popular on {host}
+     */
+    "popularUsersLocal": ParameterizedString<"host">;
+    /**
      * Translation timeout
      */
     "translationTimeoutLabel": string;

@@ -31523,7 +31523,7 @@ export type operations = {
           /** @default 0 */
           offset?: number;
           /** @enum {string} */
-          sort?: '+follower' | '-follower' | '+createdAt' | '-createdAt' | '+updatedAt' | '-updatedAt';
+          sort?: '+follower' | '-follower' | '+localFollower' | '-localFollower' | '+createdAt' | '-createdAt' | '+updatedAt' | '-updatedAt';
           /**
            * @default all
            * @enum {string}

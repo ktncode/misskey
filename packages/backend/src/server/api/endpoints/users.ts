@@ -4,11 +4,13 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import type { UsersRepository } from '@/models/_.js';
+import { MiFollowing } from '@/models/_.js';
+import type { MiUser, UsersRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
+import type { SelectQueryBuilder } from 'typeorm';
 
 export const meta = {
 	tags: ['users'],
@@ -38,7 +40,7 @@ export const paramDef = {
 	properties: {
 		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
 		offset: { type: 'integer', default: 0 },
-		sort: { type: 'string', enum: ['+follower', '-follower', '+createdAt', '-createdAt', '+updatedAt', '-updatedAt'] },
+		sort: { type: 'string', enum: ['+follower', '-follower', '+localFollower', '-localFollower', '+createdAt', '-createdAt', '+updatedAt', '-updatedAt'] },
 		state: { type: 'string', enum: ['all', 'alive'], default: 'all' },
 		origin: { type: 'string', enum: ['combined', 'local', 'remote'], default: 'local' },
 		hostname: {
@@ -81,6 +83,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			switch (ps.sort) {
 				case '+follower': query.orderBy('user.followersCount', 'DESC'); break;
 				case '-follower': query.orderBy('user.followersCount', 'ASC'); break;
+				case '+localFollower': this.addLocalFollowers(query); query.orderBy('f."localFollowers"', 'DESC'); break;
+				case '-localFollower': this.addLocalFollowers(query); query.orderBy('f."localFollowers"', 'ASC'); break;
 				case '+createdAt': query.orderBy('user.id', 'DESC'); break;
 				case '-createdAt': query.orderBy('user.id', 'ASC'); break;
 				case '+updatedAt': query.andWhere('user.updatedAt IS NOT NULL').orderBy('user.updatedAt', 'DESC'); break;
@@ -98,5 +102,16 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			return await this.userEntityService.packMany(users, me, { schema: 'UserDetailed' });
 		});
+	}
+
+	private addLocalFollowers(query: SelectQueryBuilder<MiUser>) {
+		query.innerJoin(qb => {
+			return qb
+				.from(MiFollowing, 'f')
+				.addSelect('f."followeeId"')
+				.addSelect('COUNT(*) FILTER (where f."followerHost" IS NULL)', 'localFollowers')
+				.addSelect('COUNT(*) FILTER (where f."followeeHost" IS NOT NULL)', 'remoteFollowers')
+				.groupBy('"followeeId"');
+		}, 'f', 'user.id = f."followeeId"');
 	}
 }

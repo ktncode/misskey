@@ -46,7 +46,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<template v-if="tag == null">
 			<MkFoldableSection class="_margin">
-				<template #header><i class="ti ti-chart-line ti-fw" style="margin-right: 0.5em;"></i>{{ i18n.ts.popularUsers }}</template>
+				<template #header><i class="ti ti-chart-line ti-fw" style="margin-right: 0.5em;"></i>{{ i18n.tsx.popularUsersLocal({ host: instance.name ?? host }) }}</template>
+				<MkUserList :pagination="popularUsersLocalF"/>
+			</MkFoldableSection>
+			<MkFoldableSection class="_margin">
+				<template #header><i class="ti ti-chart-line ti-fw" style="margin-right: 0.5em;"></i>{{ i18n.ts.popularUsersGlobal }}</template>
 				<MkUserList :pagination="popularUsersF"/>
 			</MkFoldableSection>
 			<MkFoldableSection class="_margin">
@@ -71,6 +75,7 @@ import MkTab from '@/components/MkTab.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { instance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
+import { host } from '@@/js/config';
 
 const props = defineProps<{
 	tag?: string;
@@ -114,6 +119,11 @@ const popularUsersF = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	state: 'alive',
 	origin: 'remote',
 	sort: '+follower',
+} };
+const popularUsersLocalF = { endpoint: 'users', limit: 10, noPaging: true, params: {
+	state: 'alive',
+	origin: 'remote',
+	sort: '+localFollower',
 } };
 const recentlyUpdatedUsersF = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	origin: 'combined',
