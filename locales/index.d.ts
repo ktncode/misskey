@@ -7677,6 +7677,18 @@ export interface Locale extends ILocale {
              * ～ではない
              */
             "not": string;
+            /**
+             * Is from a specific instance
+             */
+            "isFromInstance": string;
+            /**
+             * Hostname (case-insensitive)
+             */
+            "isFromInstanceHost": string;
+            /**
+             * Match subdomains
+             */
+            "isFromInstanceSubdomains": string;
         };
     };
     "_sensitiveMediaDetection": {
@@ -12949,7 +12961,7 @@ export interface Locale extends ILocale {
     "enableProxyAccountDescription": string;
     "_confirmPollEdit": {
         /**
-         * Are you sure you want to edit this poll?
+         * Are you sure you want to edit this poll
          */
         "title": string;
         /**

@@ -248,6 +248,19 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				case 'isRemote': {
 					return this.userEntityService.isRemoteUser(user);
 				}
+				// User is from a specific instance
+				case 'isFromInstance': {
+					if (user.host == null) {
+						return false;
+					}
+					if (value.subdomains) {
+						const userHost = '.' + user.host.toLowerCase();
+						const targetHost = '.' + value.host.toLowerCase();
+						return userHost.endsWith(targetHost);
+					} else {
+						return user.host.toLowerCase() === value.host.toLowerCase();
+					}
+				}
 				// サスペンド済みユーザである
 				case 'isSuspended': {
 					return user.isSuspended;
