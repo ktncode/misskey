@@ -826,12 +826,12 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (Math.random() < 0.3 && (Date.now() - this.idService.parse(renote.id).date.getTime()) < 1000 * 60 * 60 * 24 * 3) {
 			if (renote.channelId != null) {
 				if (renote.replyId == null) {
-					this.featuredService.updateInChannelNotesRanking(renote.channelId, renote.id, 5);
+					this.featuredService.updateInChannelNotesRanking(renote.channelId, renote, 5);
 				}
 			} else {
 				if (renote.visibility === 'public' && renote.userHost == null && renote.replyId == null) {
-					this.featuredService.updateGlobalNotesRanking(renote.id, 5);
-					this.featuredService.updatePerUserNotesRanking(renote.userId, renote.id, 5);
+					this.featuredService.updateGlobalNotesRanking(renote, 5);
+					this.featuredService.updatePerUserNotesRanking(renote.userId, renote, 5);
 				}
 			}
 		}

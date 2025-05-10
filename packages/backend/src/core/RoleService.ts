@@ -69,6 +69,7 @@ export type RolePolicies = {
 	canImportMuting: boolean;
 	canImportUserLists: boolean;
 	chatAvailability: 'available' | 'readonly' | 'unavailable';
+	canTrend: boolean;
 };
 
 export const DEFAULT_POLICIES: RolePolicies = {
@@ -108,6 +109,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canImportMuting: true,
 	canImportUserLists: true,
 	chatAvailability: 'available',
+	canTrend: true,
 };
 
 @Injectable()
@@ -149,6 +151,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	) {
 		this.rolesCache = new MemorySingleCache<MiRole[]>(1000 * 60 * 60); // 1h
 		this.roleAssignmentByUserIdCache = new MemoryKVCache<MiRoleAssignment[]>(1000 * 60 * 5); // 5m
+		// TODO additional cache for final calculation?
 
 		this.redisForSub.on('message', this.onMessage);
 	}
@@ -465,6 +468,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canImportMuting: calc('canImportMuting', vs => vs.some(v => v === true)),
 			canImportUserLists: calc('canImportUserLists', vs => vs.some(v => v === true)),
 			chatAvailability: calc('chatAvailability', aggregateChatAvailability),
+			canTrend: calc('canTrend', vs => vs.some(v => v === true)),
 		};
 	}
 

@@ -5520,6 +5520,7 @@ export type components = {
       scheduleNoteMax: number;
       /** @enum {string} */
       chatAvailability: 'available' | 'readonly' | 'unavailable';
+      canTrend: boolean;
     };
     ReversiGameLite: {
       /** Format: id */

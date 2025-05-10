@@ -7599,6 +7599,10 @@ export interface Locale extends ILocale {
              * Maximum number of scheduled notes
              */
             "scheduleNoteMax": string;
+            /**
+             * Can appear in trending notes / users
+             */
+            "canTrend": string;
         };
         "_condition": {
             /**

@@ -239,6 +239,7 @@ _role:
     canImportNotes: "Can import notes"
     canUpdateBioMedia: "Allow users to edit their avatar or banner"
     scheduleNoteMax: "Maximum number of scheduled notes"
+    canTrend: "Can appear in trending notes / users"
   _condition:
     isLocked: "Private account"
     isExplorable: "Account is discoverable"
