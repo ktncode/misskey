@@ -13130,6 +13130,18 @@ export interface Locale extends ILocale {
      */
     "ipTip": string;
     /**
+     * Period
+     */
+    "rolePeriod": string;
+    /**
+     * Assigned
+     */
+    "roleAssigned": string;
+    /**
+     * automatic
+     */
+    "roleAutomatic": string;
+    /**
      * Translation timeout
      */
     "translationTimeoutLabel": string;
