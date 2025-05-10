@@ -10,6 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<option value="isLocal">{{ i18n.ts._role._condition.isLocal }}</option>
 			<option value="isRemote">{{ i18n.ts._role._condition.isRemote }}</option>
 			<option value="isFromInstance">{{ i18n.ts._role._condition.isFromInstance }}</option>
+			<option value="fromBubbleInstance">{{ i18n.ts._role._condition.fromBubbleInstance }}</option>
 			<option value="isSuspended">{{ i18n.ts._role._condition.isSuspended }}</option>
 			<option value="isLocked">{{ i18n.ts._role._condition.isLocked }}</option>
 			<option value="isBot">{{ i18n.ts._role._condition.isBot }}</option>

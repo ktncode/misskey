@@ -262,6 +262,10 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 						return user.host.toLowerCase() === value.host.toLowerCase();
 					}
 				}
+				// Is the user from a local bubble instance
+				case 'fromBubbleInstance': {
+					return user.host != null && this.meta.bubbleInstances.includes(user.host);
+				}
 				// サスペンド済みユーザである
 				case 'isSuspended': {
 					return user.isSuspended;

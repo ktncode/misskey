@@ -245,6 +245,7 @@ _role:
     isFromInstance: "Is from a specific instance"
     isFromInstanceHost: "Hostname (case-insensitive)"
     isFromInstanceSubdomains: "Match subdomains"
+    fromBubbleInstance: "User is from a local bubble instance"
     localFollowersLessThanOrEq: "Has X or fewer local followers"
     localFollowersMoreThanOrEq: "Has X or more local followers"
     localFollowingLessThanOrEq: "Follows X or fewer local accounts"

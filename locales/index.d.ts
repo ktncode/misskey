@@ -7690,6 +7690,10 @@ export interface Locale extends ILocale {
              */
             "isFromInstanceSubdomains": string;
             /**
+             * User is from a local bubble instance
+             */
+            "fromBubbleInstance": string;
+            /**
              * Has X or fewer local followers
              */
             "localFollowersLessThanOrEq": string;
