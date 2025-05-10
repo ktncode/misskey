@@ -155,6 +155,14 @@ const type = computed({
 		if (t === 'followersMoreThanOrEq') v.value.value = 10;
 		if (t === 'followingLessThanOrEq') v.value.value = 10;
 		if (t === 'followingMoreThanOrEq') v.value.value = 10;
+		if (t === 'localFollowersLessThanOrEq') v.value.value = 10;
+		if (t === 'localFollowersMoreThanOrEq') v.value.value = 10;
+		if (t === 'localFollowingLessThanOrEq') v.value.value = 10;
+		if (t === 'localFollowingMoreThanOrEq') v.value.value = 10;
+		if (t === 'remoteFollowersLessThanOrEq') v.value.value = 10;
+		if (t === 'remoteFollowersMoreThanOrEq') v.value.value = 10;
+		if (t === 'remoteFollowingLessThanOrEq') v.value.value = 10;
+		if (t === 'remoteFollowingMoreThanOrEq') v.value.value = 10;
 		if (t === 'notesLessThanOrEq') v.value.value = 10;
 		if (t === 'notesMoreThanOrEq') v.value.value = 10;
 		if (t === 'isFromInstance') {
