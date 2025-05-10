@@ -569,5 +569,17 @@ bubbleTimelineMustBeEnabled: "Note: the bubble timeline is hidden by default, an
 popularUsersGlobal: "Users popular on the global network"
 popularUsersLocal: "Users popular on {name}"
 
+silenced: "Silenced"
+totalFollowers: "Total followers"
+totalFollowing: "Total following"
+localFollowers: "Local followers"
+localFollowing: "Local following"
+remoteFollowers: "Remote followers"
+remoteFollowing: "Remote following"
+updateRemoteUser: "Refresh remote data"
+activityPub: "Activity Pub"
+ip: "IP"
+ipTip: "The date is the IP address was first acknowledged."
+
 translationTimeoutLabel: "Translation timeout"
 translationTimeoutCaption: "Timeout in milliseconds for translation API requests."
