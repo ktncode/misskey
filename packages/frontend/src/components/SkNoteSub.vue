@@ -81,19 +81,33 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 </div>
 <div v-else :class="$style.muted" @click="muted = false">
-	<I18n :src="i18n.ts.userSaysSomething" tag="small">
+	<I18n v-if="muted === 'sensitiveMute'" :src="i18n.ts.userSaysSomethingSensitive" tag="small">
 		<template #name>
 			<MkUserName :user="appearNote.user"/>
+		</template>
+	</I18n>
+	<I18n v-else-if="showSoftWordMutedWord !== true" :src="i18n.ts.userSaysSomething" tag="small">
+		<template #name>
+			<MkUserName :user="appearNote.user"/>
+		</template>
+	</I18n>
+	<I18n v-else :src="i18n.ts.userSaysSomethingAbout" tag="small">
+		<template #name>
+			<MkUserName :user="appearNote.user"/>
+		</template>
+		<template #word>
+			{{ Array.isArray(muted) ? muted.map(words => Array.isArray(words) ? words.join() : words).slice(0, 3).join(' ') : muted }}
 		</template>
 	</I18n>
 </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, shallowRef, watch } from 'vue';
+import { computed, inject, ref, shallowRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { computeMergedCw } from '@@/js/compute-merged-cw.js';
 import { host } from '@@/js/config.js';
+import type { Ref } from 'vue';
 import type { Visibility } from '@/utility/boost-quote.js';
 import type { OpenOnRemoteOptions } from '@/utility/please-login.js';
 import SkNoteHeader from '@/components/SkNoteHeader.vue';
@@ -140,7 +154,6 @@ const canRenote = computed(() => ['public', 'home'].includes(props.note.visibili
 const hideLine = computed(() => props.detail);
 
 const el = shallowRef<HTMLElement>();
-const muted = ref($i ? checkWordMute(props.note, $i, $i.mutedWords) : false);
 const translation = ref<any>(null);
 const translating = ref(false);
 const isDeleted = ref(false);
@@ -182,6 +195,36 @@ async function removeReply(id: Misskey.entities.Note['id']) {
 		replies.value.splice(replyIdx, 1);
 		appearNote.value.repliesCount -= 1;
 	}
+}
+
+const inTimeline = inject<boolean>('inTimeline', false);
+const tl_withSensitive = inject<Ref<boolean>>('tl_withSensitive', ref(true));
+const muted = ref(checkMute(appearNote.value, $i?.mutedWords));
+const showSoftWordMutedWord = computed(() => prefer.s.showSoftWordMutedWord);
+
+/* Overload FunctionにLintが対応していないのでコメントアウト
+function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly: true): boolean;
+function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly: false): Array<string | string[]> | false | 'sensitiveMute';
+*/
+function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly = false): Array<string | string[]> | false | 'sensitiveMute' {
+	if (mutedWords != null) {
+		const result = checkWordMute(noteToCheck, $i, mutedWords);
+		if (Array.isArray(result)) return result;
+
+		const replyResult = noteToCheck.reply && checkWordMute(noteToCheck.reply, $i, mutedWords);
+		if (Array.isArray(replyResult)) return replyResult;
+
+		const renoteResult = noteToCheck.renote && checkWordMute(noteToCheck.renote, $i, mutedWords);
+		if (Array.isArray(renoteResult)) return renoteResult;
+	}
+
+	if (checkOnly) return false;
+
+	if (inTimeline && tl_withSensitive.value === false && noteToCheck.files?.some((v) => v.isSensitive)) {
+		return 'sensitiveMute';
+	}
+
+	return false;
 }
 
 useNoteCapture({
