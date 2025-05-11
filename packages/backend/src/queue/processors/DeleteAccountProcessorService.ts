@@ -65,6 +65,37 @@ export class DeleteAccountProcessorService {
 			return;
 		}
 
+		{ // Delete reactions
+			let cursor: MiNoteReaction['id'] | null = null;
+
+			while (true) {
+				const reactions = await this.noteReactionsRepository.find({
+					where: {
+						userId: user.id,
+						...(cursor ? { id: MoreThan(cursor) } : {}),
+					},
+					take: 100,
+					order: {
+						id: 1,
+					},
+				}) as MiNoteReaction[];
+
+				if (reactions.length === 0) {
+					break;
+				}
+
+				cursor = reactions.at(-1)?.id ?? null;
+
+				for (const reaction of reactions) {
+					const note = await this.notesRepository.findOneBy({ id: reaction.noteId }) as MiNote;
+
+					await this.reactionService.delete(user, note);
+				}
+			}
+
+			this.logger.succ('All reactions have been deleted');
+		}
+
 		{ // Delete scheduled notes
 			const scheduledNotes = await this.noteScheduleRepository.findBy({
 				userId: user.id,
@@ -117,37 +148,6 @@ export class DeleteAccountProcessorService {
 			}
 
 			this.logger.succ('All of notes deleted');
-		}
-
-		{ // Delete reactions
-			let cursor: MiNoteReaction['id'] | null = null;
-
-			while (true) {
-				const reactions = await this.noteReactionsRepository.find({
-					where: {
-						userId: user.id,
-						...(cursor ? { id: MoreThan(cursor) } : {}),
-					},
-					take: 100,
-					order: {
-						id: 1,
-					},
-				}) as MiNoteReaction[];
-
-				if (reactions.length === 0) {
-					break;
-				}
-
-				cursor = reactions.at(-1)?.id ?? null;
-
-				for (const reaction of reactions) {
-					const note = await this.notesRepository.findOneBy({ id: reaction.noteId }) as MiNote;
-
-					await this.reactionService.delete(user, note);
-				}
-			}
-
-			this.logger.succ('All reactions have been deleted');
 		}
 
 		{ // Delete files
