@@ -69,16 +69,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { watch, ref, useTemplateRef, computed } from 'vue';
 import * as Misskey from 'misskey-js';
+import { host } from '@@/js/config';
 import MkUserList from '@/components/MkUserList.vue';
 import MkFoldableSection from '@/components/MkFoldableSection.vue';
 import MkTab from '@/components/MkTab.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { instance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
-import { host } from '@@/js/config';
 
 const props = defineProps<{
-	tag?: string;
+	tag?: string | undefined;
 }>();
 
 const origin = ref('local');
@@ -91,7 +91,7 @@ watch(() => props.tag, () => {
 });
 
 const tagUsers = computed(() => ({
-	endpoint: 'hashtags/users' as const,
+	endpoint: 'hashtags/users',
 	limit: 30,
 	params: {
 		tag: props.tag,
@@ -99,48 +99,48 @@ const tagUsers = computed(() => ({
 		sort: '+follower',
 		trending: true,
 	},
-}));
+} as const));
 
-const pinnedUsers = { endpoint: 'pinned-users', noPaging: true };
+const pinnedUsers = { endpoint: 'pinned-users', limit: 10, noPaging: true } as const;
 const popularUsers = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	state: 'alive',
 	origin: 'local',
 	sort: '+follower',
 	trending: true,
-} };
+} } as const;
 const recentlyUpdatedUsers = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	origin: 'local',
 	sort: '+updatedAt',
 	trending: true,
-} };
+} } as const;
 const recentlyRegisteredUsers = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	origin: 'local',
 	state: 'alive',
 	sort: '+createdAt',
 	trending: true,
-} };
+} } as const;
 const popularUsersF = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	state: 'alive',
 	origin: 'remote',
 	sort: '+follower',
 	trending: true,
-} };
+} } as const;
 const popularUsersLocalF = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	state: 'alive',
 	origin: 'remote',
 	sort: '+localFollower',
 	trending: true,
-} };
+} } as const;
 const recentlyUpdatedUsersF = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	origin: 'combined',
 	sort: '+updatedAt',
 	trending: true,
-} };
+} } as const;
 const recentlyRegisteredUsersF = { endpoint: 'users', limit: 10, noPaging: true, params: {
 	origin: 'combined',
 	sort: '+createdAt',
 	trending: true,
-} };
+} } as const;
 
 misskeyApi('hashtags/list', {
 	sort: '+attachedLocalUsers',
