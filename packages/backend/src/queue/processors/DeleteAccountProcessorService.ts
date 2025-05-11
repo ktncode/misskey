@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { In, MoreThan } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, NoteReactionsRepository, NotesRepository, UserProfilesRepository, UsersRepository, NoteScheduleRepository, MiNoteSchedule, FollowingsRepository, FollowRequestsRepository, BlockingsRepository, MutingsRepository, ClipsRepository, ClipNotesRepository, LatestNotesRepository, NoteEditRepository, NoteFavoritesRepository, PollVotesRepository, PollsRepository, SigninsRepository, UserIpsRepository } from '@/models/_.js';
+import type { DriveFilesRepository, NoteReactionsRepository, NotesRepository, UserProfilesRepository, UsersRepository, NoteScheduleRepository, MiNoteSchedule, FollowingsRepository, FollowRequestsRepository, BlockingsRepository, MutingsRepository, ClipsRepository, ClipNotesRepository, LatestNotesRepository, NoteEditRepository, NoteFavoritesRepository, PollVotesRepository, PollsRepository, SigninsRepository, UserIpsRepository, RegistryItemsRepository } from '@/models/_.js';
 import type Logger from '@/logger.js';
 import { DriveService } from '@/core/DriveService.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
@@ -83,6 +83,9 @@ export class DeleteAccountProcessorService {
 
 		@Inject(DI.userIpsRepository)
 		private readonly userIpsRepository: UserIpsRepository,
+
+		@Inject(DI.registryItemsRepository)
+		private readonly registryItemsRepository: RegistryItemsRepository,
 
 		private queueService: QueueService,
 		private driveService: DriveService,
@@ -362,6 +365,10 @@ export class DeleteAccountProcessorService {
 			});
 
 			await this.signinsRepository.delete({
+				userId: user.id,
+			});
+
+			await this.registryItemsRepository.delete({
 				userId: user.id,
 			});
 
