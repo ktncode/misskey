@@ -560,6 +560,7 @@ wordMuteTestTest: "Test"
 wordMuteTestMatch: "Matched words: {words}"
 wordMuteTestNoResults: "No results yet, enter some text and click \"Test\" to check it."
 wordMuteTestNoMatch: "Text does not match any patterns."
+wordMuteWarning: "Except for regular expressions, all word mutes are *case-sensitive* and match on any substring, including part of a longer word or name."
 
 bubbleTimeline: "Bubble timeline"
 bubbleTimelineDescription: "Choose which instances should be displayed in the bubble."
