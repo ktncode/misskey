@@ -13,30 +13,37 @@ export function checkWordMute(note: string | Misskey.entities.Note, me: Misskey.
 
 		if (text === '') return false;
 
-		const matched = mutedWords.filter(filter => {
+		const matched = mutedWords.reduce((matchedWords, filter) => {
 			if (Array.isArray(filter)) {
 				// Clean up
 				const filteredFilter = filter.filter(keyword => keyword !== '');
-				if (filteredFilter.length === 0) return false;
-
-				return filteredFilter.every(keyword => text.includes(keyword));
+				if (filteredFilter.length > 0 && filteredFilter.every(keyword => text.includes(keyword))) {
+					const fullFilter = filteredFilter.join(' ');
+					matchedWords.add(fullFilter);
+				}
 			} else {
 				// represents RegExp
 				const regexp = filter.match(/^\/(.+)\/(.*)$/);
 
 				// This should never happen due to input sanitisation.
-				if (!regexp) return false;
-
-				try {
-					return new RegExp(regexp[1], regexp[2]).test(text);
-				} catch (err) {
-					// This should never happen due to input sanitisation.
-					return false;
+				if (regexp) {
+					try {
+						const flags = regexp[2].includes('g') ? regexp[2] : (regexp[2] + 'g');
+						const matches = text.matchAll(new RegExp(regexp[1], flags));
+						for (const match of matches) {
+							matchedWords.add(match[0]);
+						}
+					} catch {
+						// This should never happen due to input sanitisation.
+					}
 				}
 			}
-		});
 
-		if (matched.length > 0) return matched;
+			return matchedWords;
+		}, new Set<string>());
+
+		// Nested arrays are intentional, otherwise the note components will join with space (" ") and it's confusing.
+		if (matched.size > 0) return [[Array.from(matched).join(', ')]];
 	}
 
 	return false;
