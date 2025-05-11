@@ -4,9 +4,9 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import { MoreThan } from 'typeorm';
+import { In, MoreThan } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, NoteReactionsRepository, NotesRepository, UserProfilesRepository, UsersRepository, NoteScheduleRepository, MiNoteSchedule } from '@/models/_.js';
+import type { DriveFilesRepository, NoteReactionsRepository, NotesRepository, UserProfilesRepository, UsersRepository, NoteScheduleRepository, MiNoteSchedule, FollowingsRepository, FollowRequestsRepository, BlockingsRepository, MutingsRepository, ClipsRepository, ClipNotesRepository, LatestNotesRepository, NoteEditRepository, NoteFavoritesRepository, PollVotesRepository, PollsRepository, SigninsRepository, UserIpsRepository } from '@/models/_.js';
 import type Logger from '@/logger.js';
 import { DriveService } from '@/core/DriveService.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
@@ -17,10 +17,10 @@ import { bindThis } from '@/decorators.js';
 import { SearchService } from '@/core/SearchService.js';
 import { ApLogService } from '@/core/ApLogService.js';
 import { ReactionService } from '@/core/ReactionService.js';
+import { QueueService } from '@/core/QueueService.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 import type { DbUserDeleteJobData } from '../types.js';
-import { QueueService } from '@/core/QueueService.js';
 
 @Injectable()
 export class DeleteAccountProcessorService {
@@ -45,6 +45,45 @@ export class DeleteAccountProcessorService {
 		@Inject(DI.noteScheduleRepository)
 		private noteScheduleRepository: NoteScheduleRepository,
 
+		@Inject(DI.followingsRepository)
+		private readonly followingsRepository: FollowingsRepository,
+
+		@Inject(DI.followRequestsRepository)
+		private readonly followRequestsRepository: FollowRequestsRepository,
+
+		@Inject(DI.blockingsRepository)
+		private readonly blockingsRepository: BlockingsRepository,
+
+		@Inject(DI.mutingsRepository)
+		private readonly mutingsRepository: MutingsRepository,
+
+		@Inject(DI.clipsRepository)
+		private readonly clipsRepository: ClipsRepository,
+
+		@Inject(DI.clipNotesRepository)
+		private readonly clipNotesRepository: ClipNotesRepository,
+
+		@Inject(DI.latestNotesRepository)
+		private readonly latestNotesRepository: LatestNotesRepository,
+
+		@Inject(DI.noteEditRepository)
+		private readonly noteEditRepository: NoteEditRepository,
+
+		@Inject(DI.noteFavoritesRepository)
+		private readonly noteFavoritesRepository: NoteFavoritesRepository,
+
+		@Inject(DI.pollVotesRepository)
+		private readonly pollVotesRepository: PollVotesRepository,
+
+		@Inject(DI.pollsRepository)
+		private readonly pollsRepository: PollsRepository,
+
+		@Inject(DI.signinsRepository)
+		private readonly signinsRepository: SigninsRepository,
+
+		@Inject(DI.userIpsRepository)
+		private readonly userIpsRepository: UserIpsRepository,
+
 		private queueService: QueueService,
 		private driveService: DriveService,
 		private emailService: EmailService,
@@ -65,6 +104,74 @@ export class DeleteAccountProcessorService {
 			return;
 		}
 
+		{ // Delete user clips
+			const userClips = await this.clipsRepository.find({
+				select: {
+					id: true,
+				},
+				where: {
+					userId: user.id,
+				},
+			}) as { id: string }[];
+
+			// Delete one-at-a-time because there can be a lot
+			for (const clip of userClips) {
+				await this.clipNotesRepository.delete({
+					id: clip.id,
+				});
+			}
+
+			await this.clipsRepository.delete({
+				userId: user.id,
+			});
+
+			this.logger.succ('All clips have been deleted.');
+		}
+
+		{ // Delete favorites
+			await this.noteFavoritesRepository.delete({
+				userId: user.id,
+			});
+
+			this.logger.succ('All favorites have been deleted.');
+		}
+
+		{ // Delete user relations
+			await this.followingsRepository.delete({
+				followerId: user.id,
+			});
+
+			await this.followingsRepository.delete({
+				followeeId: user.id,
+			});
+
+			await this.followRequestsRepository.delete({
+				followerId: user.id,
+			});
+
+			await this.followRequestsRepository.delete({
+				followeeId: user.id,
+			});
+
+			await this.blockingsRepository.delete({
+				blockerId: user.id,
+			});
+
+			await this.blockingsRepository.delete({
+				blockeeId: user.id,
+			});
+
+			await this.mutingsRepository.delete({
+				muterId: user.id,
+			});
+
+			await this.mutingsRepository.delete({
+				muteeId: user.id,
+			});
+
+			this.logger.succ('All user relations have been deleted.');
+		}
+
 		{ // Delete reactions
 			let cursor: MiNoteReaction['id'] | null = null;
 
@@ -78,6 +185,9 @@ export class DeleteAccountProcessorService {
 					order: {
 						id: 1,
 					},
+					relations: {
+						note: true,
+					},
 				}) as MiNoteReaction[];
 
 				if (reactions.length === 0) {
@@ -87,13 +197,45 @@ export class DeleteAccountProcessorService {
 				cursor = reactions.at(-1)?.id ?? null;
 
 				for (const reaction of reactions) {
-					const note = await this.notesRepository.findOneBy({ id: reaction.noteId }) as MiNote;
-
-					await this.reactionService.delete(user, note);
+					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+					const note = reaction.note!;
+					await this.reactionService.delete(user, note, reaction);
 				}
 			}
 
 			this.logger.succ('All reactions have been deleted');
+		}
+
+		{ // Poll votes
+			let cursor: MiNoteReaction['id'] | null = null;
+
+			while (true) {
+				const votes = await this.pollVotesRepository.find({
+					where: {
+						userId: user.id,
+						...(cursor ? { id: MoreThan(cursor) } : {}),
+					},
+					select: {
+						id: true,
+					},
+					take: 100,
+					order: {
+						id: 1,
+					},
+				}) as { id: string }[];
+
+				if (votes.length === 0) {
+					break;
+				}
+
+				cursor = votes.at(-1)?.id ?? null;
+
+				await this.pollVotesRepository.delete({
+					id: In(votes.map(v => v.id)),
+				});
+			}
+
+			this.logger.succ('All poll votes have been deleted');
 		}
 
 		{ // Delete scheduled notes
@@ -113,6 +255,10 @@ export class DeleteAccountProcessorService {
 		}
 
 		{ // Delete notes
+			await this.latestNotesRepository.delete({
+				userId: user.id,
+			});
+
 			let cursor: MiNote['id'] | null = null;
 
 			while (true) {
@@ -133,7 +279,23 @@ export class DeleteAccountProcessorService {
 
 				cursor = notes.at(-1)?.id ?? null;
 
-				await this.notesRepository.delete(notes.map(note => note.id));
+				// Delete associated polls one-at-a-time, since it can cascade to a LOT of vote entries
+				for (const note of notes) {
+					if (note.hasPoll) {
+						await this.pollsRepository.delete({
+							noteId: note.id,
+						});
+					}
+				}
+
+				const ids = notes.map(note => note.id);
+
+				await this.noteEditRepository.delete({
+					noteId: In(ids),
+				});
+				await this.notesRepository.delete({
+					id: In(ids),
+				});
 
 				for (const note of notes) {
 					await this.searchService.unindexNote(note);
