@@ -518,5 +518,10 @@ if (props.detail) {
 	border: 1px solid var(--MI_THEME-divider);
 	margin: 8px 8px 0 8px;
 	border-radius: var(--MI-radius-sm);
+	cursor: pointer;
+}
+
+.muted:hover {
+	background: var(--MI_THEME-buttonBg);
 }
 </style>

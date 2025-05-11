@@ -1199,5 +1199,10 @@ function animatedMFM() {
 	padding: 8px;
 	text-align: center;
 	opacity: 0.7;
+	cursor: pointer;
+}
+
+.muted:hover {
+	background: var(--MI_THEME-buttonBg);
 }
 </style>
