@@ -12970,11 +12970,11 @@ export interface Locale extends ILocale {
         "text": string;
     };
     /**
-     * Test word mutes
+     * Test patterns
      */
     "wordMuteTestLabel": string;
     /**
-     * Enter some text here to test your word mute patterns. The matched words, if any, will be displayed below.
+     * Enter some text here to test your word patterns. The matched words, if any, will be displayed below.
      */
     "wordMuteTestDescription": string;
     /**
@@ -12990,7 +12990,7 @@ export interface Locale extends ILocale {
      */
     "wordMuteTestNoResults": string;
     /**
-     * Text does not match any word mutes.
+     * Text does not match any patterns.
      */
     "wordMuteTestNoMatch": string;
 }
