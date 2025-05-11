@@ -357,7 +357,7 @@ export class DeleteAccountProcessorService {
 		}
 
 		// Do this BEFORE deleting the account!
-		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
+		const profile = await this.userProfilesRepository.findOneBy({ userId: user.id });
 
 		{ // Delete the actual account
 			await this.userIpsRepository.delete({
@@ -383,7 +383,7 @@ export class DeleteAccountProcessorService {
 		}
 
 		{ // Send email notification
-			if (profile.email && profile.emailVerified) {
+			if (profile && profile.email && profile.emailVerified) {
 				try {
 					await this.emailService.sendEmail(profile.email, 'Account deleted',
 						'Your account has been deleted.',
