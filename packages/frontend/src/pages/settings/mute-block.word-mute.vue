@@ -12,32 +12,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkTextarea>
 	</div>
 
-	<MkFolder>
-		<template #label>{{ i18n.ts.wordMuteTestLabel }}</template>
-
-		<div class="_gaps">
-			<MkTextarea v-model="testWords">
-				<template #caption>{{ i18n.ts.wordMuteTestDescription }}</template>
-			</MkTextarea>
-			<div><MkButton :disabled="!testWords" @click="testWordMutes">{{ i18n.ts.wordMuteTestTest }}</MkButton></div>
-			<div v-if="testMatches == null">{{ i18n.ts.wordMuteTestNoResults}}</div>
-			<div v-else-if="testMatches === ''">{{ i18n.ts.wordMuteTestNoMatch }}</div>
-			<div v-else>{{ i18n.tsx.wordMuteTestMatch({ words: testMatches }) }}</div>
-		</div>
-	</MkFolder>
+	<SkWordMuteTest :mutedWords="mutedWords"></SkWordMuteTest>
 
 	<MkButton primary inline :disabled="!changed" @click="save()"><i class="ti ti-device-floppy"></i> {{ i18n.ts.save }}</MkButton>
 </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkButton from '@/components/MkButton.vue';
 import { i18n } from '@/i18n.js';
-import MkFolder from '@/components/MkFolder.vue';
-import { checkWordMute } from '@/utility/check-word-mute';
 import { parseMutes } from '@/utility/parse-mutes';
+import SkWordMuteTest from '@/components/SkWordMuteTest.vue';
 
 const props = defineProps<{
 	muted: (string[] | string)[];
@@ -57,10 +44,6 @@ const render = (mutedWords: (string | string[])[]) => mutedWords.map(x => {
 
 const mutedWords = ref(render(props.muted));
 const changed = ref(false);
-const testWords = ref<string | null>(null);
-
-const testMatches = ref<string | null>(null); computed(() => {
-});
 
 watch(mutedWords, () => {
 	changed.value = true;
@@ -76,22 +59,6 @@ async function save() {
 	} catch {
 		// already displayed error message in parseMutes
 		return;
-	}
-}
-
-function testWordMutes() {
-	if (!testWords.value || !mutedWords.value) {
-		testMatches.value = null;
-		return;
-	}
-
-	try {
-		const mutes = parseMutes(mutedWords.value);
-		const matches = checkWordMute(testWords.value, null, mutes);
-		testMatches.value = matches ? matches.flat(2).join(', ') : '';
-	} catch {
-		// Error is displayed by above function
-		testMatches.value = null;
 	}
 }
 </script>
