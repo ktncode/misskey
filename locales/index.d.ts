@@ -13029,6 +13029,14 @@ export interface Locale extends ILocale {
      * Text does not match any patterns.
      */
     "wordMuteTestNoMatch": string;
+    /**
+     * Bubble timeline
+     */
+    "bubbleTimeline": string;
+    /**
+     * Choose which instances should be displayed in the bubble.
+     */
+    "bubbleTimelineDescription": string;
 }
 declare const locales: {
     [lang: string]: Locale;

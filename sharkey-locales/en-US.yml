@@ -559,3 +559,6 @@ wordMuteTestTest: "Test"
 wordMuteTestMatch: "Matched words: {words}"
 wordMuteTestNoResults: "No results yet, enter some text and click \"Test\" to check it."
 wordMuteTestNoMatch: "Text does not match any patterns."
+
+bubbleTimeline: "Bubble timeline"
+bubbleTimelineDescription: "Choose which instances should be displayed in the bubble."

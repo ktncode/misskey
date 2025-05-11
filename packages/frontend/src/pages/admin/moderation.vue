@@ -28,11 +28,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<MkFolder>
 					<template #icon><i class="ph-drop ph-bold ph-lg"></i></template>
-					<template #label>Bubble timeline</template>
+					<template #label>{{ i18n.ts.bubbleTimeline }}</template>
 
 					<div class="_gaps">
 						<MkTextarea v-model="bubbleTimeline">
-							<template #caption>Choose which instances should be displayed in the bubble.</template>
+							<template #caption>{{ i18n.ts.bubbleTimelineDescription }}</template>
 						</MkTextarea>
 						<MkButton primary @click="save_bubbleTimeline">{{ i18n.ts.save }}</MkButton>
 					</div>
