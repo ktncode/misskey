@@ -165,8 +165,11 @@ export class NoteDeleteService {
 			});
 		}
 
-		if (note.uri) {
-			this.apLogService.deleteObjectLogs(note.uri)
+		const deletedUris = [note, ...cascadingNotes]
+			.map(n => n.uri)
+			.filter((u): u is string => u != null);
+		if (deletedUris.length > 0) {
+			this.apLogService.deleteObjectLogs(deletedUris)
 				.catch(err => this.logger.error(err, `Failed to delete AP logs for note '${note.uri}'`));
 		}
 	}
