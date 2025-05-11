@@ -212,6 +212,8 @@ export class ReactionService {
 				.execute();
 		}
 
+		this.usersRepository.update({ id: user.id }, { updatedAt: new Date() });
+
 		// 30%の確率、セルフではない、3日以内に投稿されたノートの場合ハイライト用ランキング更新
 		if (
 			Math.random() < 0.3 &&
@@ -329,6 +331,8 @@ export class ReactionService {
 				.where('id = :id', { id: note.id })
 				.execute();
 		}
+
+		this.usersRepository.update({ id: user.id }, { updatedAt: new Date() });
 
 		this.globalEventService.publishNoteStream(note.id, 'unreacted', {
 			reaction: this.decodeReaction(exist.reaction).reaction,

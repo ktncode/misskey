@@ -592,6 +592,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (!this.isRenote(note) || this.isQuote(note)) {
 			// Increment notes count (user)
 			this.incNotesCountOfUser(user);
+		} else {
+			this.usersRepository.update({ id: user.id }, { updatedAt: new Date() });
 		}
 
 		this.pushToTl(note, user);

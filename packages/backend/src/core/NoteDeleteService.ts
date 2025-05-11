@@ -127,6 +127,8 @@ export class NoteDeleteService {
 			if (!isRenote(note) || isQuote(note)) {
 				// Decrement notes count (user)
 				this.decNotesCountOfUser(user);
+			} else {
+				this.usersRepository.update({ id: user.id }, { updatedAt: new Date() });
 			}
 
 			if (this.meta.enableStatsForFederatedInstances) {
