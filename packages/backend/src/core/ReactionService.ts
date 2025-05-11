@@ -298,9 +298,9 @@ export class ReactionService {
 	}
 
 	@bindThis
-	public async delete(user: { id: MiUser['id']; host: MiUser['host']; isBot: MiUser['isBot']; }, note: MiNote) {
+	public async delete(user: { id: MiUser['id']; host: MiUser['host']; isBot: MiUser['isBot']; }, note: MiNote, exist?: MiNoteReaction | null) {
 		// if already unreacted
-		const exist = await this.noteReactionsRepository.findOneBy({
+		exist ??= await this.noteReactionsRepository.findOneBy({
 			noteId: note.id,
 			userId: user.id,
 		});
