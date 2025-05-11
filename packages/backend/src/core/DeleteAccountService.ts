@@ -76,12 +76,12 @@ export class DeleteAccountService {
 
 			await this.queueService.deliverMany(user, content, queue);
 
-			this.queueService.createDeleteAccountJob(user, {
+			await this.queueService.createDeleteAccountJob(user, {
 				soft: false,
 			});
 		} else {
 			// リモートユーザーの削除は、完全にDBから物理削除してしまうと再度連合してきてアカウントが復活する可能性があるため、soft指定する
-			this.queueService.createDeleteAccountJob(user, {
+			await this.queueService.createDeleteAccountJob(user, {
 				soft: true,
 			});
 		}
