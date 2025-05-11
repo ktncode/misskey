@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkTextarea>
 	</div>
 
-	<SkWordMuteTest :mutedWords="mutedWords"></SkWordMuteTest>
+	<SkPatternTest :mutedWords="mutedWords"></SkPatternTest>
 
 	<MkButton primary inline :disabled="!changed" @click="save()"><i class="ti ti-device-floppy"></i> {{ i18n.ts.save }}</MkButton>
 </div>
@@ -24,7 +24,7 @@ import MkTextarea from '@/components/MkTextarea.vue';
 import MkButton from '@/components/MkButton.vue';
 import { i18n } from '@/i18n.js';
 import { parseMutes } from '@/utility/parse-mutes';
-import SkWordMuteTest from '@/components/SkWordMuteTest.vue';
+import SkPatternTest from '@/components/SkPatternTest.vue';
 
 const props = defineProps<{
 	muted: (string[] | string)[];

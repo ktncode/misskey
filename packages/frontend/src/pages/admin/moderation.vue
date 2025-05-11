@@ -48,7 +48,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #caption>{{ i18n.ts.trustedLinkUrlPatternsDescription }}</template>
 						</MkTextarea>
 
-						<SkWordMuteTest :mutedWords="trustedLinkUrlPatterns"></SkWordMuteTest>
+						<SkPatternTest :mutedWords="trustedLinkUrlPatterns"></SkPatternTest>
 
 						<MkButton primary @click="save_trustedLinkUrlPatterns">{{ i18n.ts.save }}</MkButton>
 					</div>
@@ -75,7 +75,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #caption>{{ i18n.ts.sensitiveWordsDescription }}<br>{{ i18n.ts.sensitiveWordsDescription2 }}</template>
 						</MkTextarea>
 
-						<SkWordMuteTest :mutedWords="sensitiveWords"></SkWordMuteTest>
+						<SkPatternTest :mutedWords="sensitiveWords"></SkPatternTest>
 
 						<MkButton primary @click="save_sensitiveWords">{{ i18n.ts.save }}</MkButton>
 					</div>
@@ -90,7 +90,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #caption>{{ i18n.ts.prohibitedWordsDescription }}<br>{{ i18n.ts.prohibitedWordsDescription2 }}</template>
 						</MkTextarea>
 
-						<SkWordMuteTest :mutedWords="prohibitedWords"></SkWordMuteTest>
+						<SkPatternTest :mutedWords="prohibitedWords"></SkPatternTest>
 
 						<MkButton primary @click="save_prohibitedWords">{{ i18n.ts.save }}</MkButton>
 					</div>
@@ -105,7 +105,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #caption>{{ i18n.ts.prohibitedWordsForNameOfUserDescription }}<br>{{ i18n.ts.prohibitedWordsDescription2 }}</template>
 						</MkTextarea>
 
-						<SkWordMuteTest :mutedWords="prohibitedWordsForNameOfUser"></SkWordMuteTest>
+						<SkPatternTest :mutedWords="prohibitedWordsForNameOfUser"></SkPatternTest>
 
 						<MkButton primary @click="save_prohibitedWordsForNameOfUser">{{ i18n.ts.save }}</MkButton>
 					</div>
@@ -178,7 +178,7 @@ import { definePage } from '@/page.js';
 import MkButton from '@/components/MkButton.vue';
 import FormLink from '@/components/form/link.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import SkWordMuteTest from '@/components/SkWordMuteTest.vue';
+import SkPatternTest from '@/components/SkPatternTest.vue';
 
 const enableRegistration = ref<boolean>(false);
 const emailRequiredForSignup = ref<boolean>(false);
