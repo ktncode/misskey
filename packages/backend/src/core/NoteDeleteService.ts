@@ -124,7 +124,7 @@ export class NoteDeleteService {
 				this.perUserNotesChart.update(user, note, false);
 			}
 
-			if (note.renoteId && note.text || !note.renoteId) {
+			if (!isRenote(note) || isQuote(note)) {
 				// Decrement notes count (user)
 				this.decNotesCountOfUser(user);
 			}
