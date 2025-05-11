@@ -353,20 +353,38 @@ export class DeleteAccountProcessorService {
 			this.logger.succ('All AP logs deleted');
 		}
 
-		{ // Send email notification
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
-			if (profile.email && profile.emailVerified) {
-				this.emailService.sendEmail(profile.email, 'Account deleted',
-					'Your account has been deleted.',
-					'Your account has been deleted.');
+		// Do this BEFORE deleting the account!
+		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
+
+		{ // Delete the actual account
+			await this.userIpsRepository.delete({
+				userId: user.id,
+			});
+
+			await this.signinsRepository.delete({
+				userId: user.id,
+			});
+
+			// soft指定されている場合は物理削除しない
+			if (job.data.soft) {
+				// nop
+			} else {
+				await this.usersRepository.delete(user.id);
 			}
+
+			this.logger.succ('Account data deleted');
 		}
 
-		// soft指定されている場合は物理削除しない
-		if (job.data.soft) {
-		// nop
-		} else {
-			await this.usersRepository.delete(job.data.user.id);
+		{ // Send email notification
+			if (profile.email && profile.emailVerified) {
+				try {
+					await this.emailService.sendEmail(profile.email, 'Account deleted',
+						'Your account has been deleted.',
+						'Your account has been deleted.');
+				} catch (e) {
+					this.logger.warn('Failed to send account deletion message:', { e });
+				}
+			}
 		}
 
 		return 'Account deleted';
