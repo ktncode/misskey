@@ -4,6 +4,7 @@
  */
 
 import { computed } from 'vue';
+import * as Misskey from 'misskey-js';
 import type { Ref, WritableComputedRef } from 'vue';
 import type { PageHeaderItem } from '@/types/page-header.js';
 import type { MenuItem } from '@/types/menu.js';
@@ -13,6 +14,8 @@ import { i18n } from '@/i18n.js';
 import { popupMenu } from '@/os.js';
 import { prefer } from '@/preferences.js';
 import { followingTab, followersTab, mutualsTab, defaultFollowingFeedState } from '@/types/following-feed.js';
+import { $i } from '@/i';
+import { checkWordMute } from '@/utility/check-word-mute';
 
 export function followingTabName(tab: FollowingFeedTab): string;
 export function followingTabName(tab: FollowingFeedTab | null | undefined): null;
@@ -148,4 +151,36 @@ function createDefaultStorage(): Ref<StorageInterface> {
 			prefer.commit('followingFeed', updated);
 		},
 	}));
+}
+
+export function getSoftMutedWords(note: Misskey.entities.Note): string | null {
+	return getMutedWords(note, $i?.mutedWords);
+}
+
+export function getHardMutedWords(note: Misskey.entities.Note): string | null {
+	return getMutedWords(note, $i?.hardMutedWords);
+}
+
+// Match the typing used by Misskey
+type Mutes = (string | string[])[] | null | undefined;
+
+// Adapted from MkNote.ts
+function getMutedWords(note: Misskey.entities.Note, mutes: Mutes): string | null {
+	return checkMute(note, mutes)
+		?? checkMute(note.reply, mutes)
+		?? checkMute(note.renote, mutes);
+}
+
+// Adapted from check-word-mute.ts
+function checkMute(note: Misskey.entities.Note | undefined | null, mutes: Mutes): string | null {
+	if (!note) {
+		return null;
+	}
+
+	if (!mutes || mutes.length < 1) {
+		return null;
+	}
+
+	const mutedWords = checkWordMute(note, $i, mutes);
+	return mutedWords ? mutedWords.flat(2).join(', ') : null;
 }

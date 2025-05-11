@@ -18,7 +18,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkA>
 		</header>
 		<div>
-			<div v-if="isMuted" :class="[$style.text, $style.muted]">({{ i18n.ts.postFiltered }})</div>
+			<div v-if="mutedWords" :class="[$style.text, $style.muted]">
+				<template v-if="prefer.s.showSoftWordMutedWord">{{ i18n.tsx.userSaysSomethingAbout({ name: i18n.ts.user, word: mutedWords}) }}</template>
+				<template v-else>{{ i18n.ts.postFiltered }}</template>
+			</div>
 			<Mfm v-else :class="$style.text" :text="getNoteSummary(note)" :isBlock="true" :plain="true" :nowrap="false" :isNote="true" nyaize="respect" :author="note.user"/>
 		</div>
 	</div>
@@ -27,17 +30,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import * as Misskey from 'misskey-js';
+import { computed } from 'vue';
 import { getNoteSummary } from '@/utility/get-note-summary.js';
 import { userPage } from '@/filters/user.js';
 import { notePage } from '@/filters/note.js';
 import { i18n } from '@/i18n.js';
+import { getSoftMutedWords } from '@/utility/following-feed-utils';
+import { prefer } from '@/preferences';
 
-withDefaults(defineProps<{
+const props = defineProps<{
 	note: Misskey.entities.Note,
-	isMuted: boolean
-}>(), {
-	isMuted: false,
-});
+}>();
+
+const mutedWords = computed(() => getSoftMutedWords(props.note));
 
 defineEmits<{
 	(event: 'select', user: Misskey.entities.UserLite): void
