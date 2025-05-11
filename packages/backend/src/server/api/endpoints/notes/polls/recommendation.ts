@@ -86,6 +86,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.leftJoinAndSelect('note.reply', 'reply')
 				.leftJoinAndSelect('renote.user', 'renoteUser')
 				.leftJoinAndSelect('reply.user', 'replyUser')
+				.andWhere('user.isExplorable = TRUE')
 			;
 
 			if (me) {
