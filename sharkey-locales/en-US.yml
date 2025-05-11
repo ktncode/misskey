@@ -572,6 +572,10 @@ bubbleTimelineMustBeEnabled: "Note: the bubble timeline is hidden by default, an
 popularUsersGlobal: "Users popular on the global network"
 popularUsersLocal: "Users popular on {name}"
 
+pollsOnLocal: "Polls trending on {host}"
+pollsOnRemote: "Polls trending on the global network"
+pollsExpired: "Polls that have ended recently"
+
 silenced: "Silenced"
 totalFollowers: "Total followers"
 totalFollowing: "Total following"
