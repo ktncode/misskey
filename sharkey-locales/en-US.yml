@@ -245,6 +245,15 @@ _role:
     isFromInstance: "Is from a specific instance"
     isFromInstanceHost: "Hostname (case-insensitive)"
     isFromInstanceSubdomains: "Match subdomains"
+    localFollowersLessThanOrEq: "Has X or fewer local followers"
+    localFollowersMoreThanOrEq: "Has X or more local followers"
+    localFollowingLessThanOrEq: "Follows X or fewer local accounts"
+    localFollowingMoreThanOrEq: "Follows X or more local accounts"
+    remoteFollowersLessThanOrEq: "Has X or fewer remote followers"
+    remoteFollowersMoreThanOrEq: "Has X or more remote followers"
+    remoteFollowingLessThanOrEq: "Follows X or fewer remote accounts"
+    remoteFollowingMoreThanOrEq: "Follows X or more remote accounts"
+  remoteDataWarning: "This condition may be incorrect for remote users."
 _emailUnavailable:
   banned: "This email address is banned"
 _signup:

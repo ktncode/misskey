@@ -15,6 +15,13 @@ import { bindThis } from '@/decorators.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 
+export interface FollowStats {
+	localFollowing: number;
+	localFollowers: number;
+	remoteFollowing: number;
+	remoteFollowers: number;
+}
+
 @Injectable()
 export class CacheService implements OnApplicationShutdown {
 	public userByIdCache: MemoryKVCache<MiUser>;
@@ -27,6 +34,7 @@ export class CacheService implements OnApplicationShutdown {
 	public userBlockedCache: RedisKVCache<Set<string>>; // NOTE: 「被」Blockキャッシュ
 	public renoteMutingsCache: RedisKVCache<Set<string>>;
 	public userFollowingsCache: RedisKVCache<Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>;
+	private readonly userFollowStatsCache = new MemoryKVCache<FollowStats>(1000 * 60 * 10); // 10 minutes
 
 	constructor(
 		@Inject(DI.redis)
@@ -167,6 +175,18 @@ export class CacheService implements OnApplicationShutdown {
 					const followee = this.userByIdCache.get(body.followeeId);
 					if (followee) followee.followersCount++;
 					this.userFollowingsCache.delete(body.followerId);
+					this.userFollowStatsCache.delete(body.followerId);
+					this.userFollowStatsCache.delete(body.followeeId);
+					break;
+				}
+				case 'unfollow': {
+					const follower = this.userByIdCache.get(body.followerId);
+					if (follower) follower.followingCount--;
+					const followee = this.userByIdCache.get(body.followeeId);
+					if (followee) followee.followersCount--;
+					this.userFollowingsCache.delete(body.followerId);
+					this.userFollowStatsCache.delete(body.followerId);
+					this.userFollowStatsCache.delete(body.followeeId);
 					break;
 				}
 				default:
@@ -185,6 +205,52 @@ export class CacheService implements OnApplicationShutdown {
 		return await this.localUserByIdCache.fetchMaybe(userId, async () => {
 			return await this.usersRepository.findOneBy({ id: userId, host: IsNull() }) as MiLocalUser | null ?? undefined;
 		}) ?? null;
+	}
+
+	@bindThis
+	public async getFollowStats(userId: MiUser['id']): Promise<FollowStats> {
+		return await this.userFollowStatsCache.fetch(userId, async () => {
+			const stats = {
+				localFollowing: 0,
+				localFollowers: 0,
+				remoteFollowing: 0,
+				remoteFollowers: 0,
+			};
+
+			const followings = await this.followingsRepository.findBy([
+				{ followerId: userId },
+				{ followeeId: userId },
+			]);
+
+			for (const following of followings) {
+				if (following.followerId === userId) {
+					// increment following; user is a follower of someone else
+					if (following.followeeHost == null) {
+						stats.localFollowing++;
+					} else {
+						stats.remoteFollowing++;
+					}
+				} else if (following.followeeId === userId) {
+					// increment followers; user is followed by someone else
+					if (following.followerHost == null) {
+						stats.localFollowers++;
+					} else {
+						stats.remoteFollowers++;
+					}
+				} else {
+					// Should never happen
+				}
+			}
+
+			// Infer remote-remote followers heuristically, since we don't track that info directly.
+			const user = await this.findUserById(userId);
+			if (user.host !== null) {
+				stats.remoteFollowing = Math.max(0, user.followingCount - stats.localFollowing);
+				stats.remoteFollowers = Math.max(0, user.followersCount - stats.localFollowers);
+			}
+
+			return stats;
+		});
 	}
 
 	@bindThis

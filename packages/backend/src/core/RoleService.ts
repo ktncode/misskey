@@ -20,6 +20,7 @@ import type { MiUser } from '@/models/User.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { CacheService } from '@/core/CacheService.js';
+import type { FollowStats } from '@/core/CacheService.js';
 import type { RoleCondFormulaValue } from '@/models/Role.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
@@ -221,20 +222,20 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	private evalCond(user: MiUser, roles: MiRole[], value: RoleCondFormulaValue): boolean {
+	private evalCond(user: MiUser, roles: MiRole[], value: RoleCondFormulaValue, followStats: FollowStats): boolean {
 		try {
 			switch (value.type) {
 				// ～かつ～
 				case 'and': {
-					return value.values.every(v => this.evalCond(user, roles, v));
+					return value.values.every(v => this.evalCond(user, roles, v, followStats));
 				}
 				// ～または～
 				case 'or': {
-					return value.values.some(v => this.evalCond(user, roles, v));
+					return value.values.some(v => this.evalCond(user, roles, v, followStats));
 				}
 				// ～ではない
 				case 'not': {
-					return !this.evalCond(user, roles, value.value);
+					return !this.evalCond(user, roles, value.value, followStats);
 				}
 				// マニュアルロールがアサインされている
 				case 'roleAssignedTo': {
@@ -305,6 +306,30 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				case 'followingMoreThanOrEq': {
 					return user.followingCount >= value.value;
 				}
+				case 'localFollowersLessThanOrEq': {
+					return followStats.localFollowers <= value.value;
+				}
+				case 'localFollowersMoreThanOrEq': {
+					return followStats.localFollowers >= value.value;
+				}
+				case 'localFollowingLessThanOrEq': {
+					return followStats.localFollowing <= value.value;
+				}
+				case 'localFollowingMoreThanOrEq': {
+					return followStats.localFollowing >= value.value;
+				}
+				case 'remoteFollowersLessThanOrEq': {
+					return followStats.remoteFollowers <= value.value;
+				}
+				case 'remoteFollowersMoreThanOrEq': {
+					return followStats.remoteFollowers >= value.value;
+				}
+				case 'remoteFollowingLessThanOrEq': {
+					return followStats.remoteFollowing <= value.value;
+				}
+				case 'remoteFollowingMoreThanOrEq': {
+					return followStats.remoteFollowing >= value.value;
+				}
 				// ノート数が指定値以下
 				case 'notesLessThanOrEq': {
 					return user.notesCount <= value.value;
@@ -340,10 +365,11 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	@bindThis
 	public async getUserRoles(userId: MiUser['id']) {
 		const roles = await this.rolesCache.fetch(() => this.rolesRepository.findBy({}));
+		const followStats = await this.cacheService.getFollowStats(userId);
 		const assigns = await this.getUserAssigns(userId);
 		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
 		const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
-		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, assignedRoles, r.condFormula));
+		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, assignedRoles, r.condFormula, followStats));
 		return [...assignedRoles, ...matchedCondRoles];
 	}
 
@@ -357,12 +383,13 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		// 期限切れのロールを除外
 		assigns = assigns.filter(a => a.expiresAt == null || (a.expiresAt.getTime() > now));
 		const roles = await this.rolesCache.fetch(() => this.rolesRepository.findBy({}));
+		const followStats = await this.cacheService.getFollowStats(userId);
 		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
 		const assignedBadgeRoles = assignedRoles.filter(r => r.asBadge);
 		const badgeCondRoles = roles.filter(r => r.asBadge && (r.target === 'conditional'));
 		if (badgeCondRoles.length > 0) {
 			const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
-			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user!, assignedRoles, r.condFormula));
+			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user!, assignedRoles, r.condFormula, followStats));
 			return [...assignedBadgeRoles, ...matchedBadgeCondRoles];
 		} else {
 			return assignedBadgeRoles;
