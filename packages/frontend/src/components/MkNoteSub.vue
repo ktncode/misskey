@@ -78,7 +78,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkUserName :user="appearNote.user"/>
 		</template>
 	</I18n>
-	<I18n v-else-if="showSoftWordMutedWord !== true" :src="i18n.ts.userSaysSomething" tag="small">
+	<I18n v-else-if="prefer.s.showSoftWordMutedWord" :src="i18n.ts.userSaysSomething" tag="small">
 		<template #name>
 			<MkUserName :user="appearNote.user"/>
 		</template>
@@ -186,7 +186,6 @@ async function removeReply(id: Misskey.entities.Note['id']) {
 const inTimeline = inject<boolean>('inTimeline', false);
 const tl_withSensitive = inject<Ref<boolean>>('tl_withSensitive', ref(true));
 const muted = ref(checkMute(appearNote.value, $i?.mutedWords));
-const showSoftWordMutedWord = computed(() => prefer.s.showSoftWordMutedWord);
 
 /* Overload FunctionにLintが対応していないのでコメントアウト
 function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly: true): boolean;

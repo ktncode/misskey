@@ -177,7 +177,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkUserName :user="appearNote.user"/>
 		</template>
 	</I18n>
-	<I18n v-else-if="showSoftWordMutedWord !== true" :src="i18n.ts.userSaysSomething" tag="small">
+	<I18n v-else-if="prefer.s.showSoftWordMutedWord" :src="i18n.ts.userSaysSomething" tag="small">
 		<template #name>
 			<MkUserName :user="appearNote.user"/>
 		</template>
@@ -329,7 +329,6 @@ const isDeleted = ref(false);
 const renoted = ref(false);
 const muted = ref(checkMute(appearNote.value, $i?.mutedWords));
 const hardMuted = ref(props.withHardMute && checkMute(appearNote.value, $i?.hardMutedWords, true));
-const showSoftWordMutedWord = computed(() => prefer.s.showSoftWordMutedWord);
 const translation = ref<Misskey.entities.NotesTranslateResponse | null>(null);
 const translating = ref(false);
 const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && appearNote.value.user.instance);
