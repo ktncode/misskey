@@ -13005,6 +13005,30 @@ export interface Locale extends ILocale {
          */
         "text": string;
     };
+    /**
+     * Test patterns
+     */
+    "wordMuteTestLabel": string;
+    /**
+     * Enter some text here to test your word patterns. The matched words, if any, will be displayed below.
+     */
+    "wordMuteTestDescription": string;
+    /**
+     * Test
+     */
+    "wordMuteTestTest": string;
+    /**
+     * Matched words: {words}
+     */
+    "wordMuteTestMatch": ParameterizedString<"words">;
+    /**
+     * No results yet, enter some text and click "Test" to check it.
+     */
+    "wordMuteTestNoResults": string;
+    /**
+     * Text does not match any patterns.
+     */
+    "wordMuteTestNoMatch": string;
 }
 declare const locales: {
     [lang: string]: Locale;

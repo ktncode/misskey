@@ -47,6 +47,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkTextarea v-model="trustedLinkUrlPatterns">
 							<template #caption>{{ i18n.ts.trustedLinkUrlPatternsDescription }}</template>
 						</MkTextarea>
+
+						<SkPatternTest :mutedWords="trustedLinkUrlPatterns"></SkPatternTest>
+
 						<MkButton primary @click="save_trustedLinkUrlPatterns">{{ i18n.ts.save }}</MkButton>
 					</div>
 				</MkFolder>
@@ -71,6 +74,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkTextarea v-model="sensitiveWords">
 							<template #caption>{{ i18n.ts.sensitiveWordsDescription }}<br>{{ i18n.ts.sensitiveWordsDescription2 }}</template>
 						</MkTextarea>
+
+						<SkPatternTest :mutedWords="sensitiveWords"></SkPatternTest>
+
 						<MkButton primary @click="save_sensitiveWords">{{ i18n.ts.save }}</MkButton>
 					</div>
 				</MkFolder>
@@ -83,6 +89,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkTextarea v-model="prohibitedWords">
 							<template #caption>{{ i18n.ts.prohibitedWordsDescription }}<br>{{ i18n.ts.prohibitedWordsDescription2 }}</template>
 						</MkTextarea>
+
+						<SkPatternTest :mutedWords="prohibitedWords"></SkPatternTest>
+
 						<MkButton primary @click="save_prohibitedWords">{{ i18n.ts.save }}</MkButton>
 					</div>
 				</MkFolder>
@@ -95,6 +104,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkTextarea v-model="prohibitedWordsForNameOfUser">
 							<template #caption>{{ i18n.ts.prohibitedWordsForNameOfUserDescription }}<br>{{ i18n.ts.prohibitedWordsDescription2 }}</template>
 						</MkTextarea>
+
+						<SkPatternTest :mutedWords="prohibitedWordsForNameOfUser"></SkPatternTest>
+
 						<MkButton primary @click="save_prohibitedWordsForNameOfUser">{{ i18n.ts.save }}</MkButton>
 					</div>
 				</MkFolder>
@@ -166,6 +178,7 @@ import { definePage } from '@/page.js';
 import MkButton from '@/components/MkButton.vue';
 import FormLink from '@/components/form/link.vue';
 import MkFolder from '@/components/MkFolder.vue';
+import SkPatternTest from '@/components/SkPatternTest.vue';
 
 const enableRegistration = ref<boolean>(false);
 const emailRequiredForSignup = ref<boolean>(false);

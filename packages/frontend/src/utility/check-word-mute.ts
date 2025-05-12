@@ -4,12 +4,12 @@
  */
 import * as Misskey from 'misskey-js';
 
-export function checkWordMute(note: Misskey.entities.Note, me: Misskey.entities.UserLite | null | undefined, mutedWords: Array<string | string[]>): Array<string | string[]> | false {
+export function checkWordMute(note: string | Misskey.entities.Note, me: Misskey.entities.UserLite | null | undefined, mutedWords: Array<string | string[]>): Array<string | string[]> | false {
 	// 自分自身
-	if (me && (note.userId === me.id)) return false;
+	if (me && typeof(note) === 'object' && (note.userId === me.id)) return false;
 
 	if (mutedWords.length > 0) {
-		const text = getNoteText(note);
+		const text = typeof(note) === 'object' ? getNoteText(note) : note;
 
 		if (text === '') return false;
 

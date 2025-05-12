@@ -552,3 +552,10 @@ enableProxyAccountDescription: "If disabled, then the proxy account will not be 
 _confirmPollEdit:
   title: Are you sure you want to edit this poll
   text: Editing this poll will cause it to lose all previous votes
+
+wordMuteTestLabel: "Test patterns"
+wordMuteTestDescription: "Enter some text here to test your word patterns. The matched words, if any, will be displayed below."
+wordMuteTestTest: "Test"
+wordMuteTestMatch: "Matched words: {words}"
+wordMuteTestNoResults: "No results yet, enter some text and click \"Test\" to check it."
+wordMuteTestNoMatch: "Text does not match any patterns."
