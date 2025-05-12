@@ -13029,6 +13029,18 @@ export interface Locale extends ILocale {
      * Text does not match any patterns.
      */
     "wordMuteTestNoMatch": string;
+    /**
+     * Bubble timeline
+     */
+    "bubbleTimeline": string;
+    /**
+     * Choose which instances should be displayed in the bubble.
+     */
+    "bubbleTimelineDescription": string;
+    /**
+     * Note: the bubble timeline is hidden by default, and must be enabled via roles.
+     */
+    "bubbleTimelineMustBeEnabled": string;
 }
 declare const locales: {
     [lang: string]: Locale;
