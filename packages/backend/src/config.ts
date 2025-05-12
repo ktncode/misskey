@@ -8,9 +8,11 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import * as yaml from 'js-yaml';
 import { globSync } from 'glob';
+import ipaddr from 'ipaddr.js';
 import type * as Sentry from '@sentry/node';
 import type * as SentryVue from '@sentry/vue';
 import type { RedisOptions } from 'ioredis';
+import type { IPv4, IPv6 } from 'ipaddr.js';
 
 type RedisOptionsSource = Partial<RedisOptions> & {
 	host?: string;
@@ -152,6 +154,33 @@ type Source = {
 	}
 };
 
+export type PrivateNetwork = {
+	/**
+	 * CIDR IP/netmask definition of the IP range to match.
+	 */
+	cidr: [ip: IPv4 | IPv6, mask: number];
+
+	/**
+	 * List of ports to match.
+	 * If undefined, then all ports match.
+	 * If empty, then NO ports match.
+	 */
+	ports?: number[];
+};
+
+export function parsePrivateNetworks(patterns: string[]): PrivateNetwork[];
+export function parsePrivateNetworks(patterns: undefined): undefined;
+export function parsePrivateNetworks(patterns: string[] | undefined): PrivateNetwork[] | undefined;
+export function parsePrivateNetworks(patterns: string[] | undefined): PrivateNetwork[] | undefined {
+	return patterns?.map(e => {
+		const [ip, ports] = e.split('#') as [string, ...(string | undefined)[]];
+		return {
+			cidr: ipaddr.parseCIDR(ip),
+			ports: ports?.split(',').map(p => parseInt(p)),
+		};
+	});
+}
+
 export type Config = {
 	url: string;
 	port: number;
@@ -190,7 +219,7 @@ export type Config = {
 	proxy: string | undefined;
 	proxySmtp: string | undefined;
 	proxyBypassHosts: string[] | undefined;
-	allowedPrivateNetworks: string[] | undefined;
+	allowedPrivateNetworks: PrivateNetwork[] | undefined;
 	disallowExternalApRedirect: boolean;
 	maxFileSize: number;
 	maxNoteLength: number;
@@ -382,7 +411,7 @@ export function loadConfig(): Config {
 		proxy: config.proxy,
 		proxySmtp: config.proxySmtp,
 		proxyBypassHosts: config.proxyBypassHosts,
-		allowedPrivateNetworks: config.allowedPrivateNetworks,
+		allowedPrivateNetworks: parsePrivateNetworks(config.allowedPrivateNetworks),
 		disallowExternalApRedirect: config.disallowExternalApRedirect ?? false,
 		maxFileSize: config.maxFileSize ?? 262144000,
 		maxNoteLength: config.maxNoteLength ?? 3000,
