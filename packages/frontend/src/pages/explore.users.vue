@@ -46,7 +46,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<template v-if="tag == null">
 			<MkFoldableSection class="_margin">
-				<template #header><i class="ti ti-chart-line ti-fw" style="margin-right: 0.5em;"></i>{{ i18n.tsx.popularUsersLocal({ host: instance.name ?? host }) }}</template>
+				<template #header><i class="ti ti-chart-line ti-fw" style="margin-right: 0.5em;"></i>{{ i18n.tsx.popularUsersLocal({ name: instance.name ?? host }) }}</template>
 				<MkUserList :pagination="popularUsersLocalF"/>
 			</MkFoldableSection>
 			<MkFoldableSection class="_margin">

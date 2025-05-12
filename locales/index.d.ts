@@ -13054,17 +13054,17 @@ export interface Locale extends ILocale {
      */
     "popularUsersGlobal": string;
     /**
-     * Users popular on {host}
+     * Users popular on {name}
      */
-    "popularUsersLocal": ParameterizedString<"host">;
-    /**
-     * Translation timeout
-     */
-    "translationTimeoutLabel": string;
-    /**
-     * Timeout in milliseconds for translation API requests.
-     */
-    "translationTimeoutCaption": string;
+    "popularUsersLocal": ParameterizedString<"name">;
+	/**
+	 * Translation timeout
+	 */
+	"translationTimeoutLabel": string;
+	/**
+	 * Timeout in milliseconds for translation API requests.
+	 */
+	"translationTimeoutCaption": string;
 }
 declare const locales: {
     [lang: string]: Locale;
