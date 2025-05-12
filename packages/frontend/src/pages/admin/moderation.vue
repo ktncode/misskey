@@ -182,7 +182,6 @@ import SkPatternTest from '@/components/SkPatternTest.vue';
 const enableRegistration = ref<boolean>(false);
 const emailRequiredForSignup = ref<boolean>(false);
 const approvalRequiredForSignup = ref<boolean>(false);
-const bubbleTimelineEnabled = ref<boolean>(false);
 const sensitiveWords = ref<string>('');
 const prohibitedWords = ref<string>('');
 const prohibitedWordsForNameOfUser = ref<string>('');
@@ -205,7 +204,6 @@ async function init() {
 	hiddenTags.value = meta.hiddenTags.join('\n');
 	preservedUsernames.value = meta.preservedUsernames.join('\n');
 	bubbleTimeline.value = meta.bubbleInstances.join('\n');
-	bubbleTimelineEnabled.value = meta.policies.btlAvailable;
 	trustedLinkUrlPatterns.value = meta.trustedLinkUrlPatterns.join('\n');
 	blockedHosts.value = meta.blockedHosts.join('\n');
 	silencedHosts.value = meta.silencedHosts?.join('\n') ?? '';
