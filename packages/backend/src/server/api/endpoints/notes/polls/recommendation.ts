@@ -95,7 +95,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.expired) {
 				query.andWhere('poll.expiresAt IS NOT NULL');
-				query.andWhere('poll.expiresAt < :expiresMax', {
+				query.andWhere('poll.expiresAt <= :expiresMax', {
 					expiresMax: new Date(),
 				});
 				query.andWhere('poll.expiresAt >= :expiresMin', {
