@@ -93,7 +93,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canUpdateBioMedia: true,
 	pinLimit: 5,
 	antennaLimit: 5,
-	wordMuteLimit: 200,
+	wordMuteLimit: 1000,
 	webhookLimit: 3,
 	clipLimit: 10,
 	noteEachClipsLimit: 200,
