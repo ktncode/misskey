@@ -25,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import * as Misskey from 'misskey-js';
 import { computed, shallowRef } from 'vue';
-import type { FollowingFeedTab } from '@/utility/following-feed-utils.js';
+import type { FollowingFeedTab } from '@/types/following-feed.js';
 import type { Paging } from '@/components/MkPagination.vue';
 import { infoImageUrl } from '@/instance.js';
 import { i18n } from '@/i18n.js';
