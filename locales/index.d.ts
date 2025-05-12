@@ -13082,6 +13082,14 @@ export interface Locale extends ILocale {
      */
     "pollsExpired": string;
     /**
+     * Trending polls are disabled on this instance.
+     */
+    "trendingPollsDisabled": string;
+    /**
+     * Please log in to view trending polls.
+     */
+    "trendingPollsDisabledLogIn": string;
+    /**
      * Silenced
      */
     "silenced": string;
