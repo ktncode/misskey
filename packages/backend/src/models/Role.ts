@@ -57,6 +57,13 @@ type CondFormulaValueIsFromInstance = {
 };
 
 /**
+ * Is the user from a local bubble instance
+ */
+type CondFormulaValueFromBubbleInstance = {
+	type: 'fromBubbleInstance';
+};
+
+/**
  * 既に指定のマニュアルロールにアサインされている場合のみ成立とする
  */
 type CondFormulaValueRoleAssignedTo = {
@@ -234,6 +241,7 @@ export type RoleCondFormulaValue = { id: string } & (
 	CondFormulaValueIsLocal |
 	CondFormulaValueIsRemote |
 	CondFormulaValueIsFromInstance |
+	CondFormulaValueFromBubbleInstance |
 	CondFormulaValueIsSuspended |
 	CondFormulaValueIsLocked |
 	CondFormulaValueIsBot |
