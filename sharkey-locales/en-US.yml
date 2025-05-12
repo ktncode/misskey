@@ -562,3 +562,4 @@ wordMuteTestNoMatch: "Text does not match any patterns."
 
 bubbleTimeline: "Bubble timeline"
 bubbleTimelineDescription: "Choose which instances should be displayed in the bubble."
+bubbleTimelineMustBeEnabled: "Note: the bubble timeline is hidden by default, and must be enabled via roles."

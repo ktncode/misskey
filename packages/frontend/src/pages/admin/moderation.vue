@@ -31,9 +31,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #label>{{ i18n.ts.bubbleTimeline }}</template>
 
 					<div class="_gaps">
+						<div v-if="!$i.policies.btlAvailable">
+							<i class="ti ti-alert-triangle"></i> {{ i18n.ts.bubbleTimelineMustBeEnabled }}
+						</div>
+
 						<MkTextarea v-model="bubbleTimeline">
 							<template #caption>{{ i18n.ts.bubbleTimelineDescription }}</template>
 						</MkTextarea>
+
 						<MkButton primary @click="save_bubbleTimeline">{{ i18n.ts.save }}</MkButton>
 					</div>
 				</MkFolder>
@@ -178,6 +183,7 @@ import MkButton from '@/components/MkButton.vue';
 import FormLink from '@/components/form/link.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import SkPatternTest from '@/components/SkPatternTest.vue';
+import { $i } from '@/i';
 
 const enableRegistration = ref<boolean>(false);
 const emailRequiredForSignup = ref<boolean>(false);
