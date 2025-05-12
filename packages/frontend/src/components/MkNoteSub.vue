@@ -75,9 +75,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div v-else :class="$style.muted" @click="muted = false">
 	<I18n :src="i18n.ts.userSaysSomething" tag="small">
 		<template #name>
-			<MkA v-user-preview="note.userId" :to="userPage(note.user)">
-				<MkUserName :user="note.user"/>
-			</MkA>
+			<MkUserName :user="appearNote.user"/>
 		</template>
 	</I18n>
 </div>
@@ -518,5 +516,10 @@ if (props.detail) {
 	border: 1px solid var(--MI_THEME-divider);
 	margin: 8px 8px 0 8px;
 	border-radius: var(--MI-radius-sm);
+	cursor: pointer;
+}
+
+.muted:hover {
+	background: var(--MI_THEME-buttonBg);
 }
 </style>

@@ -174,23 +174,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div v-else-if="!hardMuted" :class="$style.muted" @click="muted = false">
 	<I18n v-if="muted === 'sensitiveMute'" :src="i18n.ts.userSaysSomethingSensitive" tag="small">
 		<template #name>
-			<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
-				<MkUserName :user="appearNote.user"/>
-			</MkA>
+			<MkUserName :user="appearNote.user"/>
 		</template>
 	</I18n>
 	<I18n v-else-if="showSoftWordMutedWord !== true" :src="i18n.ts.userSaysSomething" tag="small">
 		<template #name>
-			<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
-				<MkUserName :user="appearNote.user"/>
-			</MkA>
+			<MkUserName :user="appearNote.user"/>
 		</template>
 	</I18n>
 	<I18n v-else :src="i18n.ts.userSaysSomethingAbout" tag="small">
 		<template #name>
-			<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
-				<MkUserName :user="appearNote.user"/>
-			</MkA>
+			<MkUserName :user="appearNote.user"/>
 		</template>
 		<template #word>
 			{{ Array.isArray(muted) ? muted.map(words => Array.isArray(words) ? words.join() : words).slice(0, 3).join(' ') : muted }}
@@ -1451,6 +1445,11 @@ function emitUpdReaction(emoji: string, delta: number) {
 	padding: 8px;
 	text-align: center;
 	opacity: 0.7;
+	cursor: pointer;
+}
+
+.muted:hover {
+	background: var(--MI_THEME-buttonBg);
 }
 
 .reactionOmitted {

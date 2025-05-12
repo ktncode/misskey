@@ -237,9 +237,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div v-else class="_panel" :class="$style.muted" @click="muted = false">
 	<I18n :src="i18n.ts.userSaysSomething" tag="small">
 		<template #name>
-			<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
-				<MkUserName :user="appearNote.user"/>
-			</MkA>
+			<MkUserName :user="appearNote.user"/>
 		</template>
 	</I18n>
 </div>
@@ -1273,6 +1271,11 @@ onUnmounted(() => {
 	padding: 8px;
 	text-align: center;
 	opacity: 0.7;
+	cursor: pointer;
+}
+
+.muted:hover {
+	background: var(--MI_THEME-buttonBg);
 }
 
 .badgeRoles {
