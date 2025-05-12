@@ -28709,14 +28709,10 @@ export type operations = {
       200: {
         content: {
           'application/json': {
-            sourceLang: string;
-            text: string;
+            sourceLang?: string;
+            text?: string;
           };
         };
-      };
-      /** @description OK (without any results) */
-      204: {
-        content: never;
       };
       /** @description Client error */
       400: {
