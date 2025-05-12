@@ -119,7 +119,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					query.andWhere('poll.userHost IS NOT NULL');
 				}
 			} else {
-				if (!policies.ltlAvailable) throw new ApiError(meta.errors.ltlDisabled);
 				if (!policies.gtlAvailable) throw new ApiError(meta.errors.gtlDisabled);
 			}
 
