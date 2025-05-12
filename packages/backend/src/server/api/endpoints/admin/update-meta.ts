@@ -103,6 +103,7 @@ export const paramDef = {
 				type: 'string',
 			},
 		},
+		translationTimeout: { type: 'number' },
 		deeplAuthKey: { type: 'string', nullable: true },
 		deeplIsPro: { type: 'boolean' },
 		deeplFreeMode: { type: 'boolean' },
@@ -558,6 +559,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.objectStorageS3ForcePathStyle !== undefined) {
 				set.objectStorageS3ForcePathStyle = ps.objectStorageS3ForcePathStyle;
+			}
+
+			if (ps.translationTimeout !== undefined) {
+				set.translationTimeout = ps.translationTimeout;
 			}
 
 			if (ps.deeplAuthKey !== undefined) {

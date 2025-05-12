@@ -382,6 +382,12 @@ export class MiMeta {
 	})
 	public swPrivateKey: string | null;
 
+	@Column('integer', {
+		default: 5000,
+		comment: 'Timeout in milliseconds for translation API requests',
+	})
+	public translationTimeout: number;
+
 	@Column('varchar', {
 		length: 1024,
 		nullable: true,

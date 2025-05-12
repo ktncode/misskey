@@ -9249,6 +9249,7 @@ export type operations = {
             enableReactionsBuffering: boolean;
             notesPerOneAd: number;
             backgroundImageUrl: string | null;
+            translationTimeout: number;
             deeplAuthKey: string | null;
             deeplIsPro: boolean;
             deeplFreeMode: boolean;
@@ -12159,6 +12160,7 @@ export type operations = {
           maintainerName?: string | null;
           maintainerEmail?: string | null;
           langs?: string[];
+          translationTimeout?: number;
           deeplAuthKey?: string | null;
           deeplIsPro?: boolean;
           deeplFreeMode?: boolean;
