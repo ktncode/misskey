@@ -13094,7 +13094,7 @@ export interface Locale extends ILocale {
      */
     "ip": string;
     /**
-     * The date is the IP address was first acknowledged.
+     * The date is when IP address was first used.
      */
     "ipTip": string;
     /**
