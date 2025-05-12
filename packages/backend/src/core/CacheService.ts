@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { IsNull } from 'typeorm';
-import type { BlockingsRepository, FollowingsRepository, MutingsRepository, RenoteMutingsRepository, MiUserProfile, UserProfilesRepository, UsersRepository, MiFollowing } from '@/models/_.js';
+import type { BlockingsRepository, FollowingsRepository, MutingsRepository, RenoteMutingsRepository, MiUserProfile, UserProfilesRepository, UsersRepository, MiFollowing, MiNote } from '@/models/_.js';
 import { MemoryKVCache, RedisKVCache } from '@/misc/cache.js';
 import type { MiLocalUser, MiUser } from '@/models/User.js';
 import { DI } from '@/di-symbols.js';
@@ -22,6 +22,17 @@ export interface FollowStats {
 	remoteFollowers: number;
 }
 
+export interface CachedTranslation {
+	sourceLang: string | undefined;
+	text: string | undefined;
+}
+
+interface CachedTranslationEntity {
+	l?: string;
+	t?: string;
+	u?: number;
+}
+
 @Injectable()
 export class CacheService implements OnApplicationShutdown {
 	public userByIdCache: MemoryKVCache<MiUser>;
@@ -35,6 +46,7 @@ export class CacheService implements OnApplicationShutdown {
 	public renoteMutingsCache: RedisKVCache<Set<string>>;
 	public userFollowingsCache: RedisKVCache<Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>;
 	private readonly userFollowStatsCache = new MemoryKVCache<FollowStats>(1000 * 60 * 10); // 10 minutes
+	private readonly translationsCache: RedisKVCache<CachedTranslationEntity>;
 
 	constructor(
 		@Inject(DI.redis)
@@ -122,6 +134,11 @@ export class CacheService implements OnApplicationShutdown {
 			}),
 			toRedisConverter: (value) => JSON.stringify(value),
 			fromRedisConverter: (value) => JSON.parse(value),
+		});
+
+		this.translationsCache = new RedisKVCache<CachedTranslationEntity>(this.redisClient, 'translations', {
+			lifetime: 1000 * 60 * 60 * 24 * 7, // 1 week,
+			memoryCacheLifetime: 1000 * 60, // 1 minute
 		});
 
 		// NOTE: チャンネルのフォロー状況キャッシュはChannelFollowingServiceで行っている
@@ -250,6 +267,34 @@ export class CacheService implements OnApplicationShutdown {
 			}
 
 			return stats;
+		});
+	}
+
+	@bindThis
+	public async getCachedTranslation(note: MiNote, targetLang: string): Promise<CachedTranslation | null> {
+		const cacheKey = `${note.id}@${targetLang}`;
+
+		// Use cached translation, if present and up-to-date
+		const cached = await this.translationsCache.get(cacheKey);
+		if (cached && cached.u === note.updatedAt?.valueOf()) {
+			return {
+				sourceLang: cached.l,
+				text: cached.t,
+			};
+		}
+
+		// No cache entry :(
+		return null;
+	}
+
+	@bindThis
+	public async setCachedTranslation(note: MiNote, targetLang: string, translation: CachedTranslation): Promise<void> {
+		const cacheKey = `${note.id}@${targetLang}`;
+
+		await this.translationsCache.set(cacheKey, {
+			l: translation.sourceLang,
+			t: translation.text,
+			u: note.updatedAt?.valueOf(),
 		});
 	}
 
