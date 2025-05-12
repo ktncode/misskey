@@ -264,3 +264,7 @@ export type IMentionedRemoteUsers = {
 	username: string;
 	host: string;
 }[];
+
+export function hasText(note: MiNote): note is MiNote & { text: string } {
+	return note.text != null;
+}
