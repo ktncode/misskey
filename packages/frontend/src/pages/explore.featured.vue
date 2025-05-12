@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkNotes v-if="tab === 'notes'" :pagination="paginationForNotes"/>
 	<div v-else-if="tab === 'polls'">
 		<MkFoldableSection class="_margin">
-			<template #header><i class="ph-house ph-bold ph-lg" style="margin-right: 0.5em;"></i>{{ i18n.tsx.pollsOnLocal({ host: instance.name ?? host }) }}</template>
+			<template #header><i class="ph-house ph-bold ph-lg" style="margin-right: 0.5em;"></i>{{ i18n.tsx.pollsOnLocal({ name: instance.name ?? host }) }}</template>
 			<MkNotes :pagination="paginationForPollsLocal" :disableAutoLoad="true"/>
 		</MkFoldableSection>
 

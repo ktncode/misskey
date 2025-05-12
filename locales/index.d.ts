@@ -13070,9 +13070,9 @@ export interface Locale extends ILocale {
      */
     "popularUsersLocal": ParameterizedString<"name">;
     /**
-     * Polls trending on {host}
+     * Polls trending on {name}
      */
-    "pollsOnLocal": ParameterizedString<"host">;
+    "pollsOnLocal": ParameterizedString<"name">;
     /**
      * Polls trending on the global network
      */
