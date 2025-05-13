@@ -6,8 +6,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { AchievementService, ACHIEVEMENT_TYPES } from '@/core/AchievementService.js';
+import { AchievementService } from '@/core/AchievementService.js';
+import { ACHIEVEMENT_TYPES } from '@/models/UserProfile.js';
 import type { MiMeta } from '@/models/_.js';
+
 
 export const meta = {
 	requireCredential: true,

@@ -1,4 +1,5 @@
 import tsParser from '@typescript-eslint/parser';
+import globals from 'globals';
 import sharedConfig from '../shared/eslint.config.js';
 import globals from 'globals';
 
@@ -6,6 +7,13 @@ export default [
 	...sharedConfig,
 	{
 		ignores: ['**/node_modules', 'built', '@types/**/*', 'migration'],
+	},
+	{
+		languageOptions: {
+			globals: {
+				...globals.node,
+			},
+		},
 	},
 	{
 		files: ['**/*.ts', '**/*.tsx'],
