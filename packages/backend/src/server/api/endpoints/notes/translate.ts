@@ -116,6 +116,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			let response = await this.cacheService.getCachedTranslation(note, targetLang);
 			if (!response) {
+				this.loggerService.logger.debug(`Fetching new translation for note=${note.id} lang=${targetLang}`);
 				response = await this.fetchTranslation(note, targetLang);
 				if (!response) {
 					throw new ApiError(meta.errors.translationFailed);
