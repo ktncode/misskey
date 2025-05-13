@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<FormSuspense :p="init">
 			<div class="_gaps_m">
-				<MkInput v-model="translationTimeout" type="number" debounce>
+				<MkInput v-model="translationTimeout" type="number" manualSave>
 					<template #label>{{ i18n.ts.translationTimeoutLabel }}</template>
 					<template #caption>{{ i18n.ts.translationTimeoutCaption }}</template>
 				</MkInput>
