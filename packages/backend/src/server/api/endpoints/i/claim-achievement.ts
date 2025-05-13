@@ -10,7 +10,6 @@ import { AchievementService } from '@/core/AchievementService.js';
 import { ACHIEVEMENT_TYPES } from '@/models/UserProfile.js';
 import type { MiMeta } from '@/models/_.js';
 
-
 export const meta = {
 	requireCredential: true,
 	prohibitMoved: true,
