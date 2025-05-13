@@ -20,6 +20,21 @@ function waitForPushToTl() {
 	return setTimeout(500);
 }
 
+// the packed user inside each note returned by `users/notes` has the
+// latest `notesCount`, not the count at the time the note was
+// created, so we override it
+function withNotesCount(notes, count) {
+	return notes.map( note => {
+		return {
+			...note,
+			user: {
+				...note.user,
+				notesCount: count,
+			},
+		};
+	});
+}
+
 let redisForTimelines: Redis;
 
 describe('Timelines', () => {
@@ -1435,7 +1450,7 @@ describe('Timelines', () => {
 			const note3 = await post(alice, { text: '3' });
 
 			const res = await api('users/notes', { userId: alice.id, sinceId: noteSince.id });
-			assert.deepStrictEqual(res.body, [note1, note2, note3]);
+			assert.deepStrictEqual(res.body, withNotesCount([note1, note2, note3], 4));
 		});
 
 		test.concurrent('FTT: sinceId にキャッシュより古いノートを指定しても、sinceId と untilId による絞り込みが正しく動作する', async () => {
@@ -1449,7 +1464,7 @@ describe('Timelines', () => {
 			await post(alice, { text: '4' });
 
 			const res = await api('users/notes', { userId: alice.id, sinceId: noteSince.id, untilId: noteUntil.id });
-			assert.deepStrictEqual(res.body, [note3, note2, note1]);
+			assert.deepStrictEqual(res.body, withNotesCount([note3, note2, note1], 6));
 		});
 	});
 
