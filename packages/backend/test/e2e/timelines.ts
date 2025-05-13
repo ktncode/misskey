@@ -9,7 +9,7 @@
 import * as assert from 'assert';
 import { setTimeout } from 'node:timers/promises';
 import { Redis } from 'ioredis';
-import { api, post, randomString, sendEnvUpdateRequest, signup, uploadUrl } from '../utils.js';
+import { api, post, randomString, sendEnvUpdateRequest, signup, uploadUrl, withNotesCount } from '../utils.js';
 import { loadConfig } from '@/config.js';
 
 function genHost() {
@@ -18,21 +18,6 @@ function genHost() {
 
 function waitForPushToTl() {
 	return setTimeout(500);
-}
-
-// the packed user inside each note returned by `users/notes` has the
-// latest `notesCount`, not the count at the time the note was
-// created, so we override it
-function withNotesCount(notes, count) {
-	return notes.map( note => {
-		return {
-			...note,
-			user: {
-				...note.user,
-				notesCount: count,
-			},
-		};
-	});
 }
 
 let redisForTimelines: Redis;
