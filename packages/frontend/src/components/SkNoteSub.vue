@@ -81,24 +81,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 </div>
 <div v-else :class="$style.muted" @click="muted = false">
-	<I18n v-if="muted === 'sensitiveMute'" :src="i18n.ts.userSaysSomethingSensitive" tag="small">
-		<template #name>
-			<MkUserName :user="appearNote.user"/>
-		</template>
-	</I18n>
-	<I18n v-else-if="prefer.s.showSoftWordMutedWord" :src="i18n.ts.userSaysSomething" tag="small">
-		<template #name>
-			<MkUserName :user="appearNote.user"/>
-		</template>
-	</I18n>
-	<I18n v-else :src="i18n.ts.userSaysSomethingAbout" tag="small">
-		<template #name>
-			<MkUserName :user="appearNote.user"/>
-		</template>
-		<template #word>
-			{{ Array.isArray(muted) ? muted.map(words => Array.isArray(words) ? words.join() : words).slice(0, 3).join(' ') : muted }}
-		</template>
-	</I18n>
+	<SkMutedNote :muted="muted" :note="appearNote"></SkMutedNote>
 </div>
 </template>
 
@@ -107,7 +90,6 @@ import { computed, inject, ref, shallowRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { computeMergedCw } from '@@/js/compute-merged-cw.js';
 import { host } from '@@/js/config.js';
-import type { Ref } from 'vue';
 import type { Visibility } from '@/utility/boost-quote.js';
 import type { OpenOnRemoteOptions } from '@/utility/please-login.js';
 import SkNoteHeader from '@/components/SkNoteHeader.vue';
@@ -121,7 +103,7 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import { userPage } from '@/filters/user.js';
-import { checkWordMute } from '@/utility/check-word-mute.js';
+import { checkMutes } from '@/utility/check-word-mute.js';
 import { pleaseLogin } from '@/utility/please-login.js';
 import { showMovedDialog } from '@/utility/show-moved-dialog.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
@@ -131,6 +113,7 @@ import { getNoteMenu } from '@/utility/get-note-menu.js';
 import { boostMenuItems, computeRenoteTooltip } from '@/utility/boost-quote.js';
 import { prefer } from '@/preferences.js';
 import { useNoteCapture } from '@/use/use-note-capture.js';
+import SkMutedNote from '@/components/SkMutedNote.vue';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -197,34 +180,7 @@ async function removeReply(id: Misskey.entities.Note['id']) {
 	}
 }
 
-const inTimeline = inject<boolean>('inTimeline', false);
-const tl_withSensitive = inject<Ref<boolean>>('tl_withSensitive', ref(true));
-const muted = ref(checkMute(appearNote.value, $i?.mutedWords));
-
-/* Overload FunctionにLintが対応していないのでコメントアウト
-function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly: true): boolean;
-function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly: false): Array<string | string[]> | false | 'sensitiveMute';
-*/
-function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly = false): Array<string | string[]> | false | 'sensitiveMute' {
-	if (mutedWords != null) {
-		const result = checkWordMute(noteToCheck, $i, mutedWords);
-		if (Array.isArray(result)) return result;
-
-		const replyResult = noteToCheck.reply && checkWordMute(noteToCheck.reply, $i, mutedWords);
-		if (Array.isArray(replyResult)) return replyResult;
-
-		const renoteResult = noteToCheck.renote && checkWordMute(noteToCheck.renote, $i, mutedWords);
-		if (Array.isArray(renoteResult)) return renoteResult;
-	}
-
-	if (checkOnly) return false;
-
-	if (inTimeline && tl_withSensitive.value === false && noteToCheck.files?.some((v) => v.isSensitive)) {
-		return 'sensitiveMute';
-	}
-
-	return false;
-}
+const { muted } = checkMutes(appearNote.value);
 
 useNoteCapture({
 	rootEl: el,

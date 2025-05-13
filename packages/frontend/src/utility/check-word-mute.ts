@@ -3,6 +3,42 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import * as Misskey from 'misskey-js';
+import { inject, ref } from 'vue';
+import type { Ref } from 'vue';
+import { $i } from '@/i';
+
+export function checkMutes(noteToCheck: Misskey.entities.Note, withHardMute = false) {
+	const muted = ref(checkMute(noteToCheck, $i?.mutedWords));
+	const hardMuted = ref(withHardMute && checkMute(noteToCheck, $i?.hardMutedWords, true));
+	return { muted, hardMuted };
+}
+
+/* Overload FunctionにLintが対応していないのでコメントアウト
+function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly: true): boolean;
+function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly: false): Array<string | string[]> | false | 'sensitiveMute';
+*/
+export function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly = false): Array<string | string[]> | false | 'sensitiveMute' {
+	if (mutedWords != null) {
+		const result = checkWordMute(noteToCheck, $i, mutedWords);
+		if (Array.isArray(result)) return result;
+
+		const replyResult = noteToCheck.reply && checkWordMute(noteToCheck.reply, $i, mutedWords);
+		if (Array.isArray(replyResult)) return replyResult;
+
+		const renoteResult = noteToCheck.renote && checkWordMute(noteToCheck.renote, $i, mutedWords);
+		if (Array.isArray(renoteResult)) return renoteResult;
+	}
+
+	if (checkOnly) return false;
+
+	const inTimeline = inject<boolean>('inTimeline', false);
+	const tl_withSensitive = inject<Ref<boolean> | null>('tl_withSensitive', null);
+	if (inTimeline && tl_withSensitive?.value === false && noteToCheck.files?.some((v) => v.isSensitive)) {
+		return 'sensitiveMute';
+	}
+
+	return false;
+}
 
 export function checkWordMute(note: string | Misskey.entities.Note, me: Misskey.entities.UserLite | null | undefined, mutedWords: Array<string | string[]>): Array<string | string[]> | false {
 	// 自分自身
