@@ -4243,6 +4243,11 @@ export type components = {
        * @example misskey.example.com
        */
       host: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      approved: boolean;
+      /** @example Hi masters, I am Ai! */
+      description: string | null;
       /** Format: url */
       avatarUrl: string | null;
       avatarBlurhash: string | null;
@@ -4282,6 +4287,9 @@ export type components = {
         faviconUrl: string | null;
         themeColor: string | null;
       };
+      followersCount: number;
+      followingCount: number;
+      notesCount: number;
       emojis: {
         [key: string]: string;
       };
@@ -4302,8 +4310,6 @@ export type components = {
       movedTo: string | null;
       alsoKnownAs: string[] | null;
       /** Format: date-time */
-      createdAt: string;
-      /** Format: date-time */
       updatedAt: string | null;
       /** Format: date-time */
       lastFetchedAt: string | null;
@@ -4317,8 +4323,6 @@ export type components = {
       isSilenced: boolean;
       /** @example false */
       isSuspended: boolean;
-      /** @example Hi masters, I am Ai! */
-      description: string | null;
       location: string | null;
       /** @example 2018-03-12 */
       birthday: string | null;
@@ -4331,9 +4335,6 @@ export type components = {
           value: string;
         }[];
       verifiedLinks: string[];
-      followersCount: number;
-      followingCount: number;
-      notesCount: number;
       pinnedNoteIds: string[];
       pinnedNotes: components['schemas']['Note'][];
       pinnedPageId: string | null;
@@ -4552,6 +4553,7 @@ export type components = {
       securityKeys: boolean;
       email?: string | null;
       emailVerified?: boolean | null;
+      signupReason?: string | null;
       securityKeysList?: {
           /**
            * Format: id

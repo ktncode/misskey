@@ -427,10 +427,12 @@ export class WebhookTestService {
 	private async toPackedUserLite(user: MiUser, override?: Packed<'UserLite'>): Promise<Packed<'UserLite'>> {
 		return {
 			...user,
+			createdAt: new Date(Date.now() - oneDayMillis * 9).toISOString(),
 			id: user.id,
 			name: user.name,
 			username: user.username,
 			host: user.host,
+			description: 'dummy user',
 			avatarUrl: user.avatarId == null ? null : user.avatarUrl,
 			avatarBlurhash: user.avatarId == null ? null : user.avatarBlurhash,
 			avatarDecorations: user.avatarDecorations.map(it => ({
