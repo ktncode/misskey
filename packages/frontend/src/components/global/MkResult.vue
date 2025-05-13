@@ -42,7 +42,7 @@ const props = defineProps<{
 	vertical-align: bottom;
 	height: 128px;
 	margin-bottom: 16px;
-	border-radius: 16px;
+	border-radius: var(--MI-radius-md);
 }
 
 .icon {
