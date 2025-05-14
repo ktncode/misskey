@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<FormSuspense :p="init">
 			<div class="_gaps_m">
-				<MkInput v-model="translationTimeout" type="number" manualSave>
+				<MkInput v-model="translationTimeout" type="number" manualSave @update:modelValue="saveTranslationTimeout">
 					<template #label>{{ i18n.ts.translationTimeoutLabel }}</template>
 					<template #caption>{{ i18n.ts.translationTimeoutCaption }}</template>
 				</MkInput>
@@ -62,7 +62,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import MkInput from '@/components/MkInput.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
@@ -91,13 +91,13 @@ async function init() {
 	deeplFreeInstance.value = meta.deeplFreeInstance;
 	libreTranslateURL.value = meta.libreTranslateURL;
 	libreTranslateKey.value = meta.libreTranslateKey;
+}
 
-	watch(translationTimeout, async newValue => {
-		await os.apiWithDialog('admin/update-meta', {
-			translationTimeout: newValue,
-		});
-		await os.promiseDialog(fetchInstance(true));
+async function saveTranslationTimeout() {
+	await os.apiWithDialog('admin/update-meta', {
+		translationTimeout: translationTimeout.value,
 	});
+	await os.promiseDialog(fetchInstance(true));
 }
 
 function save_deepl() {
