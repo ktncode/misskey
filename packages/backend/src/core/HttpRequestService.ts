@@ -32,7 +32,7 @@ export function isPrivateIp(allowedPrivateNetworks: PrivateNetwork[] | undefined
 
 	for (const { cidr, ports } of allowedPrivateNetworks ?? []) {
 		if (cidr[0].kind() === parsedIp.kind() && parsedIp.match(cidr)) {
-			if (port == null || ports == null || ports.includes(port)) {
+			if (ports == null || (port != null && ports.includes(port))) {
 				return false;
 			}
 		}
