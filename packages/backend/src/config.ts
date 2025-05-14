@@ -8,9 +8,11 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import * as yaml from 'js-yaml';
 import { globSync } from 'glob';
+import ipaddr from 'ipaddr.js';
 import type * as Sentry from '@sentry/node';
 import type * as SentryVue from '@sentry/vue';
 import type { RedisOptions } from 'ioredis';
+import type { IPv4, IPv6 } from 'ipaddr.js';
 
 type RedisOptionsSource = Partial<RedisOptions> & {
 	host?: string;
@@ -82,7 +84,7 @@ type Source = {
 	proxySmtp?: string;
 	proxyBypassHosts?: string[];
 
-	allowedPrivateNetworks?: string[];
+	allowedPrivateNetworks?: PrivateNetworkSource[];
 	disallowExternalApRedirect?: boolean;
 
 	maxFileSize?: number;
@@ -152,6 +154,60 @@ type Source = {
 	}
 };
 
+export type PrivateNetworkSource = string | { network?: string, ports?: number[] };
+
+export type PrivateNetwork = {
+	/**
+	 * CIDR IP/netmask definition of the IP range to match.
+	 */
+	cidr: CIDR;
+
+	/**
+	 * List of ports to match.
+	 * If undefined, then all ports match.
+	 * If empty, then NO ports match.
+	 */
+	ports?: number[];
+};
+
+export type CIDR = [ip: IPv4 | IPv6, prefixLength: number];
+
+export function parsePrivateNetworks(patterns: PrivateNetworkSource[]): PrivateNetwork[];
+export function parsePrivateNetworks(patterns: undefined): undefined;
+export function parsePrivateNetworks(patterns: PrivateNetworkSource[] | undefined): PrivateNetwork[] | undefined;
+export function parsePrivateNetworks(patterns: PrivateNetworkSource[] | undefined): PrivateNetwork[] | undefined {
+	if (!patterns) return undefined;
+	return patterns
+		.map(e => {
+			if (typeof(e) === 'string') {
+				const cidr = parseIpOrMask(e);
+				if (cidr) {
+					return { cidr } satisfies PrivateNetwork;
+				}
+			} else if (e.network) {
+				const cidr = parseIpOrMask(e.network);
+				if (cidr) {
+					return { cidr, ports: e.ports } satisfies PrivateNetwork;
+				}
+			}
+
+			console.warn('[config] Skipping invalid entry in allowedPrivateNetworks: ', e);
+			return null;
+		})
+		.filter(p => p != null);
+}
+
+function parseIpOrMask(ipOrMask: string): CIDR | null {
+	if (ipaddr.isValidCIDR(ipOrMask)) {
+		return ipaddr.parseCIDR(ipOrMask);
+	}
+	if (ipaddr.isValid(ipOrMask)) {
+		const ip = ipaddr.parse(ipOrMask);
+		return [ip, 32];
+	}
+	return null;
+}
+
 export type Config = {
 	url: string;
 	port: number;
@@ -190,7 +246,7 @@ export type Config = {
 	proxy: string | undefined;
 	proxySmtp: string | undefined;
 	proxyBypassHosts: string[] | undefined;
-	allowedPrivateNetworks: string[] | undefined;
+	allowedPrivateNetworks: PrivateNetwork[] | undefined;
 	disallowExternalApRedirect: boolean;
 	maxFileSize: number;
 	maxNoteLength: number;
@@ -382,7 +438,7 @@ export function loadConfig(): Config {
 		proxy: config.proxy,
 		proxySmtp: config.proxySmtp,
 		proxyBypassHosts: config.proxyBypassHosts,
-		allowedPrivateNetworks: config.allowedPrivateNetworks,
+		allowedPrivateNetworks: parsePrivateNetworks(config.allowedPrivateNetworks),
 		disallowExternalApRedirect: config.disallowExternalApRedirect ?? false,
 		maxFileSize: config.maxFileSize ?? 262144000,
 		maxNoteLength: config.maxNoteLength ?? 3000,
