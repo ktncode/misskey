@@ -293,12 +293,12 @@ export function getNoteMenu(props: {
 	async function translate(): Promise<void> {
 		if (props.translation.value != null) return;
 		props.translating.value = true;
-		const res = await misskeyApi('notes/translate', {
+		props.translation.value = await misskeyApi('notes/translate', {
 			noteId: appearNote.id,
 			targetLang: miLocalStorage.getItem('lang') ?? navigator.language,
+		}).finally(() => {
+			props.translating.value = false;
 		});
-		props.translating.value = false;
-		props.translation.value = res;
 	}
 
 	const menuItems: MenuItem[] = [];
