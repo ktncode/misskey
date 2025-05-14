@@ -13045,6 +13045,14 @@ export interface Locale extends ILocale {
      * Note: the bubble timeline is hidden by default, and must be enabled via roles.
      */
     "bubbleTimelineMustBeEnabled": string;
+    /**
+     * Translation timeout
+     */
+    "translationTimeoutLabel": string;
+    /**
+     * Timeout in milliseconds for translation API requests.
+     */
+    "translationTimeoutCaption": string;
 }
 declare const locales: {
     [lang: string]: Locale;

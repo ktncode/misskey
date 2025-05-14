@@ -116,6 +116,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						Accept: 'application/json, */*',
 					},
 					body: params.toString(),
+					timeout: this.serverSettings.translationTimeout,
 				});
 				if (this.serverSettings.deeplAuthKey) {
 					const json = (await res.json()) as {
@@ -165,6 +166,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						format: 'text',
 						api_key: this.serverSettings.libreTranslateKey ?? '',
 					}),
+					timeout: this.serverSettings.translationTimeout,
 				});
 
 				const json = (await res.json()) as {
