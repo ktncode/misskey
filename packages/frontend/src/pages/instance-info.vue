@@ -325,6 +325,8 @@ async function toggleMediaSilenced(): Promise<void> {
 async function toggleSuspended(): Promise<void> {
 	if (!iAmModerator) return;
 	if (!instance.value) throw new Error('No instance?');
+	if (suspensionState.value === 'softwareSuspended') return;
+
 	suspensionState.value = isSuspended.value ? 'manuallySuspended' : 'none';
 	await misskeyApi('admin/federation/update-instance', {
 		host: instance.value.host,
