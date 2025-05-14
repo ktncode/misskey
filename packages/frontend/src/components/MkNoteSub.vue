@@ -73,11 +73,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 </div>
 <div v-else :class="$style.muted" @click="muted = false">
-	<I18n :src="i18n.ts.userSaysSomething" tag="small">
-		<template #name>
-			<MkUserName :user="appearNote.user"/>
-		</template>
-	</I18n>
+	<SkMutedNote :muted="muted" :note="appearNote"></SkMutedNote>
 </div>
 </template>
 
@@ -99,7 +95,7 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import { userPage } from '@/filters/user.js';
-import { checkWordMute } from '@/utility/check-word-mute.js';
+import { checkMutes } from '@/utility/check-word-mute.js';
 import { pleaseLogin } from '@/utility/please-login.js';
 import { showMovedDialog } from '@/utility/show-moved-dialog.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
@@ -109,6 +105,7 @@ import { getNoteMenu } from '@/utility/get-note-menu.js';
 import { boostMenuItems, computeRenoteTooltip } from '@/utility/boost-quote.js';
 import { prefer } from '@/preferences.js';
 import { useNoteCapture } from '@/use/use-note-capture.js';
+import SkMutedNote from '@/components/SkMutedNote.vue';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -126,7 +123,6 @@ const props = withDefaults(defineProps<{
 const canRenote = computed(() => ['public', 'home'].includes(props.note.visibility) || props.note.userId === $i?.id);
 
 const el = shallowRef<HTMLElement>();
-const muted = computed(() => $i ? checkWordMute(props.note, $i, $i.mutedWords) : false);
 const translation = ref<any>(null);
 const translating = ref(false);
 const isDeleted = ref(false);
@@ -169,6 +165,8 @@ async function removeReply(id: Misskey.entities.Note['id']) {
 		appearNote.value.repliesCount -= 1;
 	}
 }
+
+const { muted } = checkMutes(appearNote.value);
 
 useNoteCapture({
 	rootEl: el,
