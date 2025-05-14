@@ -154,7 +154,7 @@ type Source = {
 	}
 };
 
-export type PrivateNetworkSource = string | { ip?: string, ports?: number[] };
+export type PrivateNetworkSource = string | { network?: string, ports?: number[] };
 
 export type PrivateNetwork = {
 	/**
@@ -184,8 +184,8 @@ export function parsePrivateNetworks(patterns: PrivateNetworkSource[] | undefine
 				if (cidr) {
 					return { cidr } satisfies PrivateNetwork;
 				}
-			} else if (e.ip) {
-				const cidr = parseIpOrMask(e.ip);
+			} else if (e.network) {
+				const cidr = parseIpOrMask(e.network);
 				if (cidr) {
 					return { cidr, ports: e.ports } satisfies PrivateNetwork;
 				}
