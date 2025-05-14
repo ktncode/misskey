@@ -566,4 +566,4 @@ bubbleTimelineDescription: "Choose which instances should be displayed in the bu
 bubbleTimelineMustBeEnabled: "Note: the bubble timeline is hidden by default, and must be enabled via roles."
 
 translationTimeoutLabel: "Translation timeout"
-translationTimeoutCaption: "Timeout in milliseconds for translation API requests (default 5000)"
+translationTimeoutCaption: "Timeout in milliseconds for translation API requests."

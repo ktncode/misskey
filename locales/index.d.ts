@@ -13050,7 +13050,7 @@ export interface Locale extends ILocale {
      */
     "translationTimeoutLabel": string;
     /**
-     * Timeout in milliseconds for translation API requests (default 5000)
+     * Timeout in milliseconds for translation API requests.
      */
     "translationTimeoutCaption": string;
 }
