@@ -202,7 +202,8 @@ function parseIpOrMask(ipOrMask: string): CIDR | null {
 		return ipaddr.parseCIDR(ipOrMask);
 	}
 	if (ipaddr.isValid(ipOrMask)) {
-		return ipaddr.parseCIDR(ipOrMask);
+		const ip = ipaddr.parse(ipOrMask);
+		return [ip, 32];
 	}
 	return null;
 }
