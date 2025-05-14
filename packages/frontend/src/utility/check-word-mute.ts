@@ -13,34 +13,39 @@ export function checkMutes(noteToCheck: Misskey.entities.Note, withHardMute = fa
 	return { muted, hardMuted };
 }
 
-/* Overload FunctionにLintが対応していないのでコメントアウト
-function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly: true): boolean;
-function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly: false): Array<string | string[]> | false | 'sensitiveMute';
-*/
-export function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly = false): Array<string | string[]> | false | 'sensitiveMute' {
-	if (mutedWords != null) {
-		const result = checkWordMute(noteToCheck, $i, mutedWords);
-		if (Array.isArray(result)) return result;
+export function checkMute(note: Misskey.entities.Note, mutes: undefined | null): false;
+export function checkMute(note: Misskey.entities.Note, mutes: undefined | null, checkOnly: false): false;
+export function checkMute(note: Misskey.entities.Note, mutes: undefined | null, checkOnly?: boolean): false | 'sensitiveMute';
+export function checkMute(note: Misskey.entities.Note, mutes: Array<string | string[]> | undefined | null): string[] | false;
+export function checkMute(note: Misskey.entities.Note, mutes: Array<string | string[]> | undefined | null, checkOnly: false): string[] | false;
+export function checkMute(note: Misskey.entities.Note, mutes: Array<string | string[]> | undefined | null, checkOnly?: boolean): string[] | false | 'sensitiveMute';
+export function checkMute(note: Misskey.entities.Note, mutes: Array<string | string[]> | undefined | null, checkOnly = false): string[] | false | 'sensitiveMute' {
+	if (mutes != null) {
+		const result =
+			checkWordMute(note, $i, mutes)
+			|| checkWordMute(note.reply, $i, mutes)
+			|| checkWordMute(note.renote, $i, mutes);
 
-		const replyResult = noteToCheck.reply && checkWordMute(noteToCheck.reply, $i, mutedWords);
-		if (Array.isArray(replyResult)) return replyResult;
-
-		const renoteResult = noteToCheck.renote && checkWordMute(noteToCheck.renote, $i, mutedWords);
-		if (Array.isArray(renoteResult)) return renoteResult;
+		// Only continue to sensitiveMute if we don't match any *actual* mutes
+		if (result) {
+			return result;
+		}
 	}
 
-	if (checkOnly) return false;
-
-	const inTimeline = inject<boolean>('inTimeline', false);
-	const tl_withSensitive = inject<Ref<boolean> | null>('tl_withSensitive', null);
-	if (inTimeline && tl_withSensitive?.value === false && noteToCheck.files?.some((v) => v.isSensitive)) {
-		return 'sensitiveMute';
+	if (checkOnly) {
+		const inTimeline = inject<boolean>('inTimeline', false);
+		const tl_withSensitive = inject<Ref<boolean> | null>('tl_withSensitive', null);
+		if (inTimeline && tl_withSensitive?.value === false && note.files?.some((v) => v.isSensitive)) {
+			return 'sensitiveMute';
+		}
 	}
 
 	return false;
 }
 
-export function checkWordMute(note: string | Misskey.entities.Note, me: Misskey.entities.UserLite | null | undefined, mutedWords: Array<string | string[]>): Array<string | string[]> | false {
+export function checkWordMute(note: string | Misskey.entities.Note | undefined | null, me: Misskey.entities.UserLite | null | undefined, mutedWords: Array<string | string[]>): string[] | false {
+	if (note == null) return false;
+
 	// 自分自身
 	if (me && typeof(note) === 'object' && (note.userId === me.id)) return false;
 
@@ -79,7 +84,7 @@ export function checkWordMute(note: string | Misskey.entities.Note, me: Misskey.
 		}, new Set<string>());
 
 		// Nested arrays are intentional, otherwise the note components will join with space (" ") and it's confusing.
-		if (matched.size > 0) return [[Array.from(matched).join(', ')]];
+		if (matched.size > 0) return Array.from(matched);
 	}
 
 	return false;

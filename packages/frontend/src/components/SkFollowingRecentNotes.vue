@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<template #default="{ items: notes }">
 			<MkDateSeparatedList v-slot="{ item: note }" :items="notes" :class="$style.panel" :noGap="true">
-				<SkFollowingFeedEntry v-if="!getHardMutedWords(note)" :note="note" :class="props.selectedUserId == note.userId && $style.selected" @select="u => selectUser(u.id)"/>
+				<SkFollowingFeedEntry :note="note" :class="props.selectedUserId == note.userId && $style.selected" @select="u => selectUser(u.id)"/>
 			</MkDateSeparatedList>
 		</template>
 	</MkPagination>
@@ -26,7 +26,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, shallowRef } from 'vue';
 import type { Paging } from '@/components/MkPagination.vue';
 import type { FollowingFeedTab } from '@/types/following-feed.js';
-import { getHardMutedWords } from '@/utility/following-feed-utils.js';
 import { infoImageUrl } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import MkDateSeparatedList from '@/components/MkDateSeparatedList.vue';

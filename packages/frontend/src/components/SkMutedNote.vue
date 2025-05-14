@@ -31,13 +31,12 @@ import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
 
 const props = defineProps<{
-	muted: false | 'sensitiveMute' | (string | string[])[];
+	muted: false | 'sensitiveMute' | string[];
 	note: Misskey.entities.Note;
-
 }>();
 
 const mutedWords = computed(() => Array.isArray(props.muted)
-	? props.muted.map(words => Array.isArray(words) ? words.join() : words).join(' ')
+	? props.muted.join(', ')
 	: props.muted);
 </script>
 
