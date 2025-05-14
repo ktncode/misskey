@@ -16,8 +16,8 @@ describe(HttpRequestService, () => {
 	beforeEach(() => {
 		allowedPrivateNetworks = parsePrivateNetworks([
 			'10.0.0.1/32',
-			'127.0.0.1/32#1',
-			'127.0.0.1/32#3,4,5',
+			{ network: '127.0.0.1/32', ports: [1] },
+			{ network: '127.0.0.1/32', ports: [3, 4, 5] },
 		]);
 	});
 
@@ -32,6 +32,11 @@ describe(HttpRequestService, () => {
 			expect(result).toBeFalsy();
 		});
 
+		it('should return false when ip private and all ports undefined', () => {
+			const result = isPrivateIp(allowedPrivateNetworks, '10.0.0.1', undefined);
+			expect(result).toBeFalsy();
+		});
+
 		it('should return true when ip private and no ports specified', () => {
 			const result = isPrivateIp(allowedPrivateNetworks, '10.0.0.2', 80);
 			expect(result).toBeTruthy();
@@ -39,6 +44,11 @@ describe(HttpRequestService, () => {
 
 		it('should return true when ip private and port does not match', () => {
 			const result = isPrivateIp(allowedPrivateNetworks, '127.0.0.1', 80);
+			expect(result).toBeTruthy();
+		});
+
+		it('should return true when ip private and port is null but ports are specified', () => {
+			const result = isPrivateIp(allowedPrivateNetworks, '127.0.0.1', undefined);
 			expect(result).toBeTruthy();
 		});
 	});
