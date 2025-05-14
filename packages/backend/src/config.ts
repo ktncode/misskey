@@ -170,7 +170,7 @@ export type PrivateNetwork = {
 	ports?: number[];
 };
 
-export type CIDR = [ip: IPv4 | IPv6, mask: number];
+export type CIDR = [ip: IPv4 | IPv6, prefixLength: number];
 
 export function parsePrivateNetworks(patterns: PrivateNetworkSource[]): PrivateNetwork[];
 export function parsePrivateNetworks(patterns: undefined): undefined;
