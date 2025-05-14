@@ -84,7 +84,7 @@ type Source = {
 	proxySmtp?: string;
 	proxyBypassHosts?: string[];
 
-	allowedPrivateNetworks?: string[];
+	allowedPrivateNetworks?: PrivateNetworkSource[];
 	disallowExternalApRedirect?: boolean;
 
 	maxFileSize?: number;
@@ -154,11 +154,13 @@ type Source = {
 	}
 };
 
+export type PrivateNetworkSource = string | { ip?: string, ports?: number[] };
+
 export type PrivateNetwork = {
 	/**
 	 * CIDR IP/netmask definition of the IP range to match.
 	 */
-	cidr: [ip: IPv4 | IPv6, mask: number];
+	cidr: CIDR;
 
 	/**
 	 * List of ports to match.
@@ -168,17 +170,41 @@ export type PrivateNetwork = {
 	ports?: number[];
 };
 
-export function parsePrivateNetworks(patterns: string[]): PrivateNetwork[];
+export type CIDR = [ip: IPv4 | IPv6, mask: number];
+
+export function parsePrivateNetworks(patterns: PrivateNetworkSource[]): PrivateNetwork[];
 export function parsePrivateNetworks(patterns: undefined): undefined;
-export function parsePrivateNetworks(patterns: string[] | undefined): PrivateNetwork[] | undefined;
-export function parsePrivateNetworks(patterns: string[] | undefined): PrivateNetwork[] | undefined {
-	return patterns?.map(e => {
-		const [ip, ports] = e.split('#') as [string, ...(string | undefined)[]];
-		return {
-			cidr: ipaddr.parseCIDR(ip),
-			ports: ports?.split(',').map(p => parseInt(p)),
-		};
-	});
+export function parsePrivateNetworks(patterns: PrivateNetworkSource[] | undefined): PrivateNetwork[] | undefined;
+export function parsePrivateNetworks(patterns: PrivateNetworkSource[] | undefined): PrivateNetwork[] | undefined {
+	if (!patterns) return undefined;
+	return patterns
+		.map(e => {
+			if (typeof(e) === 'string') {
+				const cidr = parseIpOrMask(e);
+				if (cidr) {
+					return { cidr } satisfies PrivateNetwork;
+				}
+			} else if (e.ip) {
+				const cidr = parseIpOrMask(e.ip);
+				if (cidr) {
+					return { cidr, ports: e.ports } satisfies PrivateNetwork;
+				}
+			}
+
+			console.warn('[config] Skipping invalid entry in allowedPrivateNetworks: ', e);
+			return null;
+		})
+		.filter(p => p != null);
+}
+
+function parseIpOrMask(ipOrMask: string): CIDR | null {
+	if (ipaddr.isValidCIDR(ipOrMask)) {
+		return ipaddr.parseCIDR(ipOrMask);
+	}
+	if (ipaddr.isValid(ipOrMask)) {
+		return ipaddr.parseCIDR(ipOrMask);
+	}
+	return null;
 }
 
 export type Config = {
