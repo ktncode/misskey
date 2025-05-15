@@ -66,7 +66,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const query = this.usersRepository.createQueryBuilder('user')
-				.andWhere('user.isExplorable = TRUE')
+				.where('user.isExplorable = TRUE')
 				.andWhere('user.isSuspended = FALSE');
 
 			switch (ps.state) {
