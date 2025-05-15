@@ -46,12 +46,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-// Bugs to fix:
-// Slices reseting
-// Slices not updating correctly when going backwards.
-// ^^ ¿ Fixed ? ^^
+// Don't forget to autohide the pattern.
 
-// Don't forgot to autohide the pattern.
+// Also don't forget to remove this. Yes, I'm that lazy.
+const debug = console.debug;
+const debug_w = console.warn;
+const debug_playpause = playPause;
 
 import { ref, nextTick, watch, onDeactivated, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
@@ -108,7 +108,6 @@ const url = props.module.url;
 let hide = ref((prefer.s.nsfw === 'force') ? true : isSensitive && (prefer.s.nsfw !== 'ignore'));
 let patternHide = ref(false);
 let playing = ref(false);
-//let displayCanvas = ref<HTMLCanvasElement>();
 let sliceDisplay = ref<HTMLDivElement>();
 let progress = ref<HTMLProgressElement>();
 let position = ref(0);
@@ -120,6 +119,7 @@ const player = ref(new ChiptuneJsPlayer(new ChiptuneJsConfig()));
 const maxRowNumbers = 0xFF;
 const overdraw = 0;
 const rowBuffer = 26 + overdraw;
+// Currently it's usued but it would be a great option for users to set themselves.
 const maxChannelLimit = 9;
 let buffer = null;
 let isSeeking = false;
@@ -309,45 +309,53 @@ function drawSlices(skipOptimizationChecks = false) {
 	const minRow = row - halfbuf;
 	const maxRow = row + halfbuf;
 
-	let rowDif = 0;
+	if (rowBuffer <= 0) {
+		lastDrawnRow = row;
+		lastPattern = pattern;
+		return;
+	}
 
 	let nbChannels = 0;
 	if (player.value.currentPlayingNode) nbChannels = player.value.currentPlayingNode.nbChannels;
 
-	if (pattern === lastPattern && !skipOptimizationChecks) {
-		rowDif = row - lastDrawnRow;
+	if (pattern === lastPattern && !skipOptimizationChecks && row !== lastDrawnRow) {
+		let rowDif = row - lastDrawnRow;
 
 		// Debug
-		if (rowDif > 1 || rowDif < -1) console.log(rowDif);
+		if (rowDif > 1 || rowDif < 0) debug_w('Row diff', rowDif);
 		let curtime = performance.now();
 
 		const isRowDirPos = rowDif > 0;
+		const rowDir = !isRowDirPos as unknown as number;
+		const norm = 1 - 2 * rowDir;
+		const inorm = norm * -1;
 		let drawnSlices = 0;
 
+		debug_w('begin drawing.\n', 'isRowDirPos', isRowDirPos, 'rowDir', rowDir, 'norm', norm);
+
 		for (let i = 0; i < canvasSlice.length; i++) {
-			//if (buf === 0) break; // I don't want it to do random things.
-			//if (canvasSlice[i].data.pattern === pattern) {
-			let offest = 0;
-			if (rowDif > 1 || rowDif < -1) offest = isRowDirPos ? drawnSlices - rowDif + 1 : drawnSlices + rowDif - 2; // Don't question magic numbers.
+			const last_slicepos = canvasSlice[i].data.slicePos;
 
 			canvasSlice[i].data.slicePos = canvasSlice[i].data.slicePos - rowDif;
-			if (canvasSlice[i].data.slicePos > -1 && canvasSlice[i].data.slicePos < rowBuffer + 1) continue;
+			debug('i: ', i, 'slicepos:', canvasSlice[i].data.slicePos, 'slicepos last:', last_slicepos, 'row:', row, canvasSlice[i].ctx.canvas);
+			if (canvasSlice[i].data.slicePos > -1 && canvasSlice[i].data.slicePos < rowBuffer) continue;
 
-			canvasSlice[i].data.slicePos = isRowDirPos ? rowBuffer - 1 : drawnSlices;
-			canvasSlice[i].data.position = isRowDirPos ? canvasSlice[i].data.position + rowBuffer : canvasSlice[i].data.position - rowBuffer;
+			canvasSlice[i].data.slicePos = isRowDirPos ? (rowBuffer - rowDif) + drawnSlices : drawnSlices;
+			//canvasSlice[i].data.slicePos = canvasSlice[i].data.slicePos - rowDif;
+			canvasSlice[i].data.position = canvasSlice[i].data.position + rowBuffer * norm;
 
-			let curRow = row + (isRowDirPos ? halfbuf : -halfbuf) - 1 + offest;
+			const curRow = (row + (drawnSlices - rowDif)) + halfbuf * norm;
 
-			canvasSlice[i].ctx.fillStyle = colours.background;
-			canvasSlice[i].ctx.fillRect(0, 0, canvasSlice[i].ref.width, canvasSlice[i].ref.height);
-			canvasSlice[i].ref.style.top = (canvasSlice[i].data.offest + (canvasSlice[i].data.position) * CHAR_HEIGHT) + 'px';
+			canvasSlice[i].ctx.clearRect(0, 0, canvasSlice[i].ref.width, canvasSlice[i].ref.height);
+			canvasSlice[i].ref.style.transform = 'translateY(' + (canvasSlice[i].data.offest + (canvasSlice[i].data.position) * CHAR_HEIGHT + CHAR_HEIGHT) + 'px)';
+			debug('i: ', i, canvasSlice[i].ref.style.transform, '\ncurRow', curRow, '\nhalfbuf * norm', halfbuf * norm, '\nrow', row, 'halfbuf', halfbuf, 'norm', norm, 'drawnSlices', drawnSlices);
 			drawRow(canvasSlice[i].ctx, curRow, nbChannels, pattern);
-
-			//alreadyDrawn[curRow] = true;
 
 			canvasSlice[i].ctx.fillStyle = isRowDirPos ? colours.foreground.fx : colours.foreground.operant; // Debug
 			canvasSlice[i].ctx.fillStyle = (isRowDirPos && rowDif > 1) ? colours.foreground.instr : canvasSlice[i].ctx.fillStyle;
+
 			// Debug text
+			/*
 			canvasSlice[i].ctx.fillText(
 				'   ' +
 				i.toString() + ' ' +
@@ -356,16 +364,17 @@ function drawSlices(skipOptimizationChecks = false) {
 				canvasSlice[i].data.position + ' ' +
 				Math.trunc(curtime) + 'ms ' +
 				canvasSlice[i].data.offest + 'px ' +
-				canvasSlice[i].ref.style.top
+				canvasSlice[i].ref.style.transform
 				, 0, ROW_OFFSET_Y);
-
-			if (!isRowDirPos || rowDif > 1) playPause(); // Debug pause
-
-			//canvasSlice[i].data.position = buf > 0 ? canvasSlice[i].data.position + rowBuffer + buf : canvasSlice[i].data.position - rowBuffer + buf;
-			//canvasSlice[i].ref.style.top = buf > 0 ? (canvasSlice[i].data.slicePos * CHAR_HEIGHT) + 'px' : (buf + row) * CHAR_HEIGHT + 'px';
-			//buf = (buf > 0) ? buf - 1 : buf + 1;
+			*/
 			drawnSlices++;
 		}
+
+		if (drawnSlices === 0) {
+			debug_w('No changed Slices, is this intentional?');
+		}
+
+		//if (!isRowDirPos || rowDif > 1) debug_playpause(); // Debug pause
 	} else {
 		if (patternTime.initial !== 0 && !alreadyHiddenOnce) {
 			//const arrLen = patternTime.length - 1;
@@ -373,9 +382,9 @@ function drawSlices(skipOptimizationChecks = false) {
 			//const initialDraw = patternTime.initial;
 			const trackerTime = player.value.currentPlayingNode.getProcessTime();
 
-			//console.log( initialDraw, averageDraw, player.value.getCurrentTempo(), player.value.getCurrentSpeed() );
-			console.log( trackerTime, patternTime );
-			console.log( patternTime.initial + trackerTime.max, trackerTime.max + patternTime.max );
+			//debug( initialDraw, averageDraw, player.value.getCurrentTempo(), player.value.getCurrentSpeed() );
+			debug( trackerTime, patternTime );
+			debug( patternTime.initial + trackerTime.max, trackerTime.max + patternTime.max );
 			if (patternTime.initial + trackerTime.max > MAX_TIME_SPENT && trackerTime.max + patternTime.max > MAX_TIME_PER_ROW) {
 				alreadyHiddenOnce = true;
 				togglePattern();
@@ -390,8 +399,9 @@ function drawSlices(skipOptimizationChecks = false) {
 		for (let i = 0; i < canvasSlice.length; i++) {
 			let curRow = row - halfbuf + i;
 			// just paint which slice, row and pushed row it is.
-			canvasSlice[i].ctx.fillStyle = colours.background;
-			canvasSlice[i].ctx.fillRect(0, 0, canvasSlice[i].ref.width, canvasSlice[i].ref.height);
+			//canvasSlice[i].ctx.fillStyle = colours.background;
+			//canvasSlice[i].ctx.fillRect(0, 0, canvasSlice[i].ref.width, canvasSlice[i].ref.height);
+			canvasSlice[i].ctx.clearRect(0, 0, canvasSlice[i].ref.width, canvasSlice[i].ref.height);
 			drawRow(canvasSlice[i].ctx, curRow, nbChannels, pattern);
 			//alreadyDrawn[curRow] = true;
 			canvasSlice[i].data.slicePos = i;
@@ -399,11 +409,11 @@ function drawSlices(skipOptimizationChecks = false) {
 			canvasSlice[i].data.offest = row * CHAR_HEIGHT;
 			canvasSlice[i].data.row = row - halfbuf + i;
 			canvasSlice[i].data.pattern = pattern;
-			canvasSlice[i].ref.style.top = canvasSlice[i].data.offest - CHAR_HEIGHT + 'px';
+			canvasSlice[i].ref.style.transform = 'translateY(' + (canvasSlice[i].data.offest) + 'px)';
 			canvasSlice[i].data.offest = canvasSlice[i].data.offest - CHAR_HEIGHT;
 
-			/*
 			// Debug Text
+			/*
 			canvasSlice[i].ctx.fillStyle = colours.foreground.default;
 			canvasSlice[i].ctx.fillText(
 				'   ' +
@@ -419,32 +429,16 @@ function drawSlices(skipOptimizationChecks = false) {
 		}
 	}
 
-	if (sliceDisplay.value) sliceDisplay.value.style.top = -(row * CHAR_HEIGHT - ((rowDif > 0 || pattern !== lastPattern) ? CHAR_HEIGHT : 0)) + 'px';
+	if (sliceDisplay.value) sliceDisplay.value.style.transform = 'translateY(' + ( -(row * CHAR_HEIGHT ) ) + 'px)';
 
-	/*
-	canvasSlice.forEach((slice, i) => {
-		if (lastPattern === pattern) {
-
-		} else {
-		// just paint which slice, row and pushed row it is.
-			let curRow = row - halfbuf + i;
-			slice.ctx.fillStyle = '#000000';
-			slice.ctx.fillRect(0, 0, slice.ref.width, slice.ref.height);
-			//drawRow(slice.ctx, curRow, nbChannels, pattern);
-			alreadyDrawn[curRow] = true;
-			slice.ctx.fillStyle = colours.foreground.default;
-			slice.ctx.fillText(i.toString() + ' ' + curRow.toString() + ' ' + curtime, 0, ROW_OFFSET_Y);
-		}
-	});
-*/
 	lastDrawnRow = row;
 	lastPattern = pattern;
+	//debug_playpause();
 }
 
 function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, pattern: number, drawX = (2 * CHAR_WIDTH), drawY = ROW_OFFSET_Y) {
 	if (!player.value.currentPlayingNode) return false;
-	//if (row < 0 || row > player.value.getPatternNumRows(pattern) - 1) return false;
-	//if (alreadyDrawn[row]) return true;
+	if (row < 0 || row > player.value.getPatternNumRows(pattern) - 1) return false;
 	const spacer = 11;
 	const space = ' ';
 	let seperators = '';
@@ -465,7 +459,9 @@ function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, p
 		op += part.substring(11, 13) + space.repeat( spacer + 1 );
 	}
 
-	//console.log( 'seperators: ' + seperators + '\nnote: ' + note + '\ninstr: ' + instr + '\nvolume: ' + volume + '\nfx: ' + fx + '\nop: ' + op);
+	//debug( 'seperators: ' + seperators + '\nnote: ' + note + '\ninstr: ' + instr + '\nvolume: ' + volume + '\nfx: ' + fx + '\nop: ' + op);
+
+	ctx.drawImage( numberRowCanvas, 0, -(CHAR_HEIGHT * row) );
 
 	ctx.fillStyle = colours.foreground.default;
 	ctx.fillText(seperators, drawX, drawY);
@@ -484,8 +480,6 @@ function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, p
 
 	ctx.fillStyle = colours.foreground.operant;
 	ctx.fillText(op, drawX + CHAR_WIDTH * 12, drawY);
-
-	ctx.drawImage( numberRowCanvas, 0, -(CHAR_HEIGHT * row) );
 
 	return true;
 }
@@ -512,7 +506,7 @@ function display(skipOptimizationChecks = false) {
 
 	/*
 	canvasRefs.value..forEach((canvas) => {
-		console.log(canvas);
+		debug(canvas);
 	});*/
 
 	// Size vs speed
