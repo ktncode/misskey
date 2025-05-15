@@ -110,6 +110,7 @@ function prepend(note: Misskey.entities.Note) {
 		note._shouldInsertAd_ = true;
 	}
 
+    console.log('DAKKAR-timeline-prepend',note);
 	pagingComponent.value.prepend(note);
 
 	emit('note');

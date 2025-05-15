@@ -197,6 +197,15 @@ watch(error, (n, o) => {
 	emit('status', n);
 });
 
+function DAKKAR(name,prevKeysAr) {
+    console.log(`DAKKAR-pagination-${name}`,prevKeysAr);
+    const prevKeys = new Set(prevKeysAr);
+    console.log(`DAKKAR-pagination-${name}-after`,Array.from(items.value.keys()));
+    const currKeys = new Set(items.value.keys());
+    console.log(`DAKKAR-pagination-${name} keys added: ${Array.from(currKeys.difference(prevKeys))}`);
+    console.log(`DAKKAR-pagination-${name} keys removed: ${Array.from(prevKeys.difference(currKeys))}`);
+}
+
 function getActualValue<T>(input: T | Ref<T> | undefined, defaultValue: T) : T {
 	if (!input) return defaultValue;
 	if (isRef(input)) return input.value;
@@ -217,7 +226,7 @@ async function init(): Promise<void> {
 			const item = res[i];
 			if (i === 3) item._shouldInsertAd_ = true;
 		}
-
+const prevKeys = Array.from(items.value.keys());
 		if (res.length === 0 || props.pagination.noPaging) {
 			concatItems(res);
 			more.value = false;
@@ -226,7 +235,7 @@ async function init(): Promise<void> {
 			concatItems(res);
 			more.value = true;
 		}
-
+DAKKAR('init',prevKeys);
 		error.value = false;
 		fetching.value = false;
 
@@ -266,7 +275,6 @@ const fetchMore = async (): Promise<void> => {
 			const oldScroll = scrollableElement.value ? scrollableElement.value.scrollTop : window.scrollY;
 
 			items.value = concatMapWithArray(items.value, _res);
-
 			return nextTick(() => {
 				if (scrollableElement.value) {
 					scrollInContainer(scrollableElement.value, { top: oldScroll + (scrollableElement.value.scrollHeight - oldHeight), behavior: 'instant' });
@@ -278,25 +286,27 @@ const fetchMore = async (): Promise<void> => {
 			});
 		};
 
+            const prevKeys=Array.from(items.value.keys());
+
 		if (res.length === 0) {
 			if (props.pagination.reversed) {
-				reverseConcat(res).then(() => {
-					more.value = false;
-				});
+			    await reverseConcat(res);
+			    more.value = false;
 			} else {
-				items.value = concatMapWithArray(items.value, res);
+			    items.value = concatMapWithArray(items.value, res);
 				more.value = false;
 			}
 		} else {
 			if (props.pagination.reversed) {
-				reverseConcat(res).then(() => {
-					more.value = true;
-				});
+			    await reverseConcat(res);
+			    more.value = true;
 			} else {
+                            const prevKeys=Array.from(items.value.keys());
 				items.value = concatMapWithArray(items.value, res);
 				more.value = true;
 			}
 		}
+            DAKKAR('fetchMore',prevKeys);
 	} finally {
 		moreFetching.value = false;
 	}
@@ -316,14 +326,16 @@ const fetchMoreAhead = async (): Promise<void> => {
 			sinceId: Array.from(items.value.keys()).at(-1),
 		}),
 	}).then(res => {
-		if (res.length === 0) {
+            const prevKeys = Array.from(items.value.keys());
+	    if (res.length === 0) {
 			items.value = concatMapWithArray(items.value, res);
 			more.value = false;
 		} else {
 			items.value = concatMapWithArray(items.value, res);
 			more.value = true;
 		}
-		moreFetching.value = false;
+	    moreFetching.value = false;
+            DAKKAR('fetchMoreAhead',prevKeys);
 	}, err => {
 		moreFetching.value = false;
 	});
@@ -382,6 +394,7 @@ watch(visibility, () => {
  * @param item アイテム
  */
 function prepend(item: MisskeyEntity): void {
+    const prevKeys = Array.from(items.value.keys());
 	if (items.value.size === 0) {
 		items.value.set(item.id, item);
 		fetching.value = false;
@@ -391,7 +404,8 @@ function prepend(item: MisskeyEntity): void {
 	if (_DEV_) console.log(isHead(), isPausingUpdate);
 
 	if (isHead() && !isPausingUpdate) unshiftItems([item]);
-	else prependQueue(item);
+    else prependQueue(item);
+    DAKKAR('prepend', prevKeys);
 }
 
 /**
@@ -402,7 +416,7 @@ function unshiftItems(newItems: MisskeyEntity[]) {
 	const prevLength = items.value.size;
 	items.value = new Map([...arrayToEntries(newItems), ...items.value].slice(0, newItems.length + props.displayLimit));
 	// if we truncated, mark that there are more values to fetch
-	if (items.value.size < prevLength) more.value = true;
+    if (items.value.size < prevLength) more.value = true;
 }
 
 /**
