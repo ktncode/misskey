@@ -73,12 +73,12 @@ const ok = async () => {
 		const croppedCanvas = await croppedSection?.$toCanvas({ width: widthToRender });
 		croppedCanvas?.toBlob(blob => {
 			if (!blob) return;
+			if (!$i) return;
 			const formData = new FormData();
 			formData.append('file', blob);
 			formData.append('name', `cropped_${props.file.name}`);
 			formData.append('isSensitive', props.file.isSensitive ? 'true' : 'false');
 			if (props.file.comment) { formData.append('comment', props.file.comment);}
-			formData.append('i', $i!.token);
 			if (props.uploadFolder) {
 				formData.append('folderId', props.uploadFolder);
 			} else if (props.uploadFolder !== null && prefer.s.uploadFolder) {
@@ -88,6 +88,9 @@ const ok = async () => {
 			window.fetch(apiUrl + '/drive/files/create', {
 				method: 'POST',
 				body: formData,
+				headers: {
+					'Authorization': `Bearer ${$i.token}`,
+				},
 			})
 				.then(response => response.json())
 				.then(f => {

@@ -73,7 +73,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</footer>
 		</div>
 	</div>
-	<template v-if="depth < store.s.numberOfReplies">
+	<template v-if="depth < prefer.s.numberOfReplies">
 		<SkNoteSub v-for="reply in replies" :key="reply.id" :note="reply" :class="[$style.reply, { [$style.single]: replies.length === 1 }]" :detail="true" :depth="depth + 1" :expandAllCws="props.expandAllCws" :onDeleteCallback="removeReply" :isReply="props.isReply"/>
 	</template>
 	<div v-else :class="$style.more">
@@ -81,18 +81,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 </div>
 <div v-else :class="$style.muted" @click="muted = false">
-	<I18n :src="i18n.ts.userSaysSomething" tag="small">
-		<template #name>
-			<MkA v-user-preview="note.userId" :to="userPage(note.user)">
-				<MkUserName :user="note.user"/>
-			</MkA>
-		</template>
-	</I18n>
+	<SkMutedNote :muted="muted" :note="appearNote"></SkMutedNote>
 </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, shallowRef, watch } from 'vue';
+import { computed, inject, ref, shallowRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { computeMergedCw } from '@@/js/compute-merged-cw.js';
 import { host } from '@@/js/config.js';
@@ -109,7 +103,7 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import { userPage } from '@/filters/user.js';
-import { checkWordMute } from '@/utility/check-word-mute.js';
+import { checkMutes } from '@/utility/check-word-mute.js';
 import { pleaseLogin } from '@/utility/please-login.js';
 import { showMovedDialog } from '@/utility/show-moved-dialog.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
@@ -119,7 +113,7 @@ import { getNoteMenu } from '@/utility/get-note-menu.js';
 import { boostMenuItems, computeRenoteTooltip } from '@/utility/boost-quote.js';
 import { prefer } from '@/preferences.js';
 import { useNoteCapture } from '@/use/use-note-capture.js';
-import { store } from '@/store.js';
+import SkMutedNote from '@/components/SkMutedNote.vue';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -143,7 +137,6 @@ const canRenote = computed(() => ['public', 'home'].includes(props.note.visibili
 const hideLine = computed(() => props.detail);
 
 const el = shallowRef<HTMLElement>();
-const muted = ref($i ? checkWordMute(props.note, $i, $i.mutedWords) : false);
 const translation = ref<any>(null);
 const translating = ref(false);
 const isDeleted = ref(false);
@@ -187,13 +180,15 @@ async function removeReply(id: Misskey.entities.Note['id']) {
 	}
 }
 
+const { muted } = checkMutes(appearNote.value);
+
 useNoteCapture({
 	rootEl: el,
 	note: appearNote,
 	isDeletedRef: isDeleted,
 	// only update replies if we are, in fact, showing replies
-	onReplyCallback: props.detail && props.depth < store.s.numberOfReplies ? addReplyTo : undefined,
-	onDeleteCallback: props.detail && props.depth < store.s.numberOfReplies ? props.onDeleteCallback : undefined,
+	onReplyCallback: props.detail && props.depth < prefer.s.numberOfReplies ? addReplyTo : undefined,
+	onDeleteCallback: props.detail && props.depth < prefer.s.numberOfReplies ? props.onDeleteCallback : undefined,
 });
 
 if ($i) {
@@ -398,7 +393,7 @@ function menu(): void {
 if (props.detail) {
 	misskeyApi('notes/children', {
 		noteId: props.note.id,
-		limit: store.s.numberOfReplies,
+		limit: prefer.s.numberOfReplies,
 		showQuotes: false,
 	}).then(res => {
 		replies.value = res;
@@ -607,6 +602,11 @@ if (props.detail) {
 	border: 1px solid var(--MI_THEME-divider);
 	margin: 8px 8px 0 8px;
 	border-radius: var(--MI-radius-sm);
+	cursor: pointer;
+}
+
+.muted:hover {
+	background: var(--MI_THEME-buttonBg);
 }
 
 // avatar container with line

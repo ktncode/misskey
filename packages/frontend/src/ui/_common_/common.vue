@@ -97,7 +97,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <div v-if="$i && $i.isBot" id="botWarn"><span>{{ i18n.ts.loggedInAsBot }}</span></div>
 
-<SkOneko v-if="store.r.oneko.value"/>
+<SkOneko v-if="prefer.r.oneko.value"/>
 </template>
 
 <script lang="ts" setup>
@@ -115,7 +115,6 @@ import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
 import { globalEvents } from '@/events.js';
 import XDrawerMenu from '@/ui/_common_/navbar-for-mobile.vue';
-import { store } from '@/store.js';
 
 const XStreamIndicator = defineAsyncComponent(() => import('./stream-indicator.vue'));
 const XUpload = defineAsyncComponent(() => import('./upload.vue'));

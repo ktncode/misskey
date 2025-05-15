@@ -814,6 +814,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 										<template #label><SearchLabel>{{ i18n.ts.withRepliesByDefaultForNewlyFollowed }}</SearchLabel></template>
 									</MkSwitch>
 								</MkPreferenceContainer>
+								<div class="_buttons">
+									<MkButton danger @click="updateRepliesAll(true)"><i class="ph-chats ph-bold ph-lg"></i> {{ i18n.ts.showRepliesToOthersInTimelineAll }}</MkButton>
+									<MkButton danger @click="updateRepliesAll(false)"><i class="ph-chat ph-bold ph-lg"></i> {{ i18n.ts.hideRepliesToOthersInTimelineAll }}</MkButton>
+								</div>
 							</SearchMarker>
 						</div>
 
@@ -824,6 +828,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 									<option value="reload">{{ i18n.ts._serverDisconnectedBehavior.reload }}</option>
 									<option value="dialog">{{ i18n.ts._serverDisconnectedBehavior.dialog }}</option>
 									<option value="quiet">{{ i18n.ts._serverDisconnectedBehavior.quiet }}</option>
+									<option value="disabled">{{ i18n.ts._serverDisconnectedBehavior.disabled }}</option>
 								</MkSelect>
 							</MkPreferenceContainer>
 						</SearchMarker>
@@ -1215,6 +1220,16 @@ async function testNotificationDot() {
 	} else {
 		os.toast(i18n.ts.notificationDotNotWorking);
 	}
+}
+
+async function updateRepliesAll(withReplies: boolean) {
+	const { canceled } = await os.confirm({
+		type: 'warning',
+		text: withReplies ? i18n.ts.confirmShowRepliesAll : i18n.ts.confirmHideRepliesAll,
+	});
+	if (canceled) return;
+
+	misskeyApi('following/update-all', { withReplies });
 }
 
 function save() {

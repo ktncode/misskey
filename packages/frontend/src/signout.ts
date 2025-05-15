@@ -56,11 +56,11 @@ export async function signout() {
 				await window.fetch(`${apiUrl}/sw/unregister`, {
 					method: 'POST',
 					body: JSON.stringify({
-						i: $i.token,
 						endpoint: push.endpoint,
 					}),
 					headers: {
 						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${$i.token}`,
 					},
 				});
 			}

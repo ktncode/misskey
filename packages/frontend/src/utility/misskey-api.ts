@@ -29,7 +29,7 @@ export function misskeyApi<
 	_ResT = ResT extends void ? Response<E, P> : ResT,
 >(
 	endpoint: E,
-	data: P & { i?: string | null; } = {} as any,
+	data: P & { i?: string | null; } = {} as P & {},
 	token?: string | null | undefined,
 	signal?: AbortSignal,
 ): Promise<_ResT> {
@@ -41,9 +41,23 @@ export function misskeyApi<
 	};
 
 	const promise = new Promise<_ResT>((resolve, reject) => {
+		const headers: Record<string, string> = {
+			'Content-Type': 'application/json',
+		};
+
 		// Append a credential
-		if ($i) data.i = $i.token;
-		if (token !== undefined) data.i = token;
+		const auth = token !== undefined
+			? token
+			: data.i !== undefined
+				? data.i
+				: $i?.token;
+
+		if (auth) {
+			headers['Authorization'] = `Bearer ${auth}`;
+		}
+
+		// Don't let the body value leak through
+		delete data.i;
 
 		// Send request
 		window.fetch(`${apiUrl}/${endpoint}`, {
@@ -51,9 +65,7 @@ export function misskeyApi<
 			body: JSON.stringify(data),
 			credentials: 'omit',
 			cache: 'no-cache',
-			headers: {
-				'Content-Type': 'application/json',
-			},
+			headers,
 			signal,
 		}).then(async (res) => {
 			const body = res.status === 204 ? null : await res.json();
@@ -81,7 +93,9 @@ export function misskeyApiGet<
 	_ResT = ResT extends void ? Misskey.api.SwitchCaseResponseType<E, P> : ResT,
 >(
 	endpoint: E,
-	data: P = {} as any,
+	data: P & { i?: string | null; } = {} as P & {},
+	token?: string | null | undefined,
+	signal?: AbortSignal,
 ): Promise<_ResT> {
 	pendingApiRequestsCount.value++;
 
@@ -92,11 +106,27 @@ export function misskeyApiGet<
 	const query = new URLSearchParams(data as any);
 
 	const promise = new Promise<_ResT>((resolve, reject) => {
+		// Append a credential
+		const auth = token !== undefined
+			? token
+			: data.i !== undefined
+				? data.i
+				: $i?.token;
+
+		const headers = auth
+			? { 'Authorization': `Bearer ${auth}` }
+			: undefined;
+
+		// Don't let the body value leak through
+		query.delete('i');
+
 		// Send request
 		window.fetch(`${apiUrl}/${endpoint}?${query}`, {
 			method: 'GET',
 			credentials: 'omit',
 			cache: 'default',
+			headers,
+			signal,
 		}).then(async (res) => {
 			const body = res.status === 204 ? null : await res.json();
 

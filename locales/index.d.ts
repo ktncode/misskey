@@ -7599,6 +7599,10 @@ export interface Locale extends ILocale {
              * Maximum number of scheduled notes
              */
             "scheduleNoteMax": string;
+            /**
+             * Can appear in trending notes / users
+             */
+            "canTrend": string;
         };
         "_condition": {
             /**
@@ -7677,7 +7681,59 @@ export interface Locale extends ILocale {
              * ～ではない
              */
             "not": string;
+            /**
+             * Is from a specific instance
+             */
+            "isFromInstance": string;
+            /**
+             * Hostname (case-insensitive)
+             */
+            "isFromInstanceHost": string;
+            /**
+             * Match subdomains
+             */
+            "isFromInstanceSubdomains": string;
+            /**
+             * User is from a bubble instance
+             */
+            "fromBubbleInstance": string;
+            /**
+             * Has X or fewer local followers
+             */
+            "localFollowersLessThanOrEq": string;
+            /**
+             * Has X or more local followers
+             */
+            "localFollowersMoreThanOrEq": string;
+            /**
+             * Follows X or fewer local accounts
+             */
+            "localFollowingLessThanOrEq": string;
+            /**
+             * Follows X or more local accounts
+             */
+            "localFollowingMoreThanOrEq": string;
+            /**
+             * Has X or fewer remote followers
+             */
+            "remoteFollowersLessThanOrEq": string;
+            /**
+             * Has X or more remote followers
+             */
+            "remoteFollowersMoreThanOrEq": string;
+            /**
+             * Follows X or fewer remote accounts
+             */
+            "remoteFollowingLessThanOrEq": string;
+            /**
+             * Follows X or more remote accounts
+             */
+            "remoteFollowingMoreThanOrEq": string;
         };
+        /**
+         * This condition may be incorrect for remote users.
+         */
+        "remoteDataWarning": string;
     };
     "_sensitiveMediaDetection": {
         /**
@@ -12949,7 +13005,7 @@ export interface Locale extends ILocale {
     "enableProxyAccountDescription": string;
     "_confirmPollEdit": {
         /**
-         * Are you sure you want to edit this poll?
+         * Are you sure you want to edit this poll
          */
         "title": string;
         /**
@@ -12957,6 +13013,58 @@ export interface Locale extends ILocale {
          */
         "text": string;
     };
+    /**
+     * Test patterns
+     */
+    "wordMuteTestLabel": string;
+    /**
+     * Enter some text here to test your word patterns. The matched words, if any, will be displayed below.
+     */
+    "wordMuteTestDescription": string;
+    /**
+     * Test
+     */
+    "wordMuteTestTest": string;
+    /**
+     * Matched words: {words}
+     */
+    "wordMuteTestMatch": ParameterizedString<"words">;
+    /**
+     * No results yet, enter some text and click "Test" to check it.
+     */
+    "wordMuteTestNoResults": string;
+    /**
+     * Text does not match any patterns.
+     */
+    "wordMuteTestNoMatch": string;
+    /**
+     * Bubble timeline
+     */
+    "bubbleTimeline": string;
+    /**
+     * Choose which instances should be displayed in the bubble.
+     */
+    "bubbleTimelineDescription": string;
+    /**
+     * Note: the bubble timeline is hidden by default, and must be enabled via roles.
+     */
+    "bubbleTimelineMustBeEnabled": string;
+    /**
+     * Users popular on the global network
+     */
+    "popularUsersGlobal": string;
+    /**
+     * Users popular on {name}
+     */
+    "popularUsersLocal": ParameterizedString<"name">;
+    /**
+     * Translation timeout
+     */
+    "translationTimeoutLabel": string;
+    /**
+     * Timeout in milliseconds for translation API requests.
+     */
+    "translationTimeoutCaption": string;
 }
 declare const locales: {
     [lang: string]: Locale;

@@ -63,11 +63,10 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 	return new Promise((done, fail) => {
 		window.fetch(`${apiUrl}/i`, {
 			method: 'POST',
-			body: JSON.stringify({
-				i: token,
-			}),
+			body: '{}',
 			headers: {
 				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`,
 			},
 		})
 			.then(res => new Promise<Misskey.entities.MeDetailed | { error: Record<string, any> }>((done2, fail2) => {
