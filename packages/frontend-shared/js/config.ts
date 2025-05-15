@@ -7,14 +7,14 @@ import type { Locale } from '../../../locales/index.js';
 
 // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 const address = new URL(document.querySelector<HTMLMetaElement>('meta[property="instance_url"]')?.content || location.href);
-const siteName = document.querySelector<HTMLMetaElement>('meta[property="og:site_name"]')?.content;
+const siteName = 'Possum City' as String;
 
 export const host = address.host;
 export const hostname = address.hostname;
-export const url = address.origin;
+export const url = 'https://possum.city';
 export const port = address.port;
-export const apiUrl = location.origin + '/api';
-export const wsOrigin = location.origin;
+export const apiUrl = 'https://possum.city/api';
+export const wsOrigin = 'https://possum.city';
 export const lang = localStorage.getItem('lang') ?? 'en-US';
 export const langs = _LANGS_;
 export const langsVersion = _LANGS_VERSION_;
