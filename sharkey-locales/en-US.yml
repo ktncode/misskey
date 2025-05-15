@@ -239,6 +239,7 @@ _role:
     canImportNotes: "Can import notes"
     canUpdateBioMedia: "Allow users to edit their avatar or banner"
     scheduleNoteMax: "Maximum number of scheduled notes"
+    canTrend: "Can appear in trending notes / users"
   _condition:
     isLocked: "Private account"
     isExplorable: "Account is discoverable"
@@ -564,6 +565,9 @@ wordMuteTestNoMatch: "Text does not match any patterns."
 bubbleTimeline: "Bubble timeline"
 bubbleTimelineDescription: "Choose which instances should be displayed in the bubble."
 bubbleTimelineMustBeEnabled: "Note: the bubble timeline is hidden by default, and must be enabled via roles."
+
+popularUsersGlobal: "Users popular on the global network"
+popularUsersLocal: "Users popular on {name}"
 
 translationTimeoutLabel: "Translation timeout"
 translationTimeoutCaption: "Timeout in milliseconds for translation API requests."

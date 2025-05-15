@@ -5520,6 +5520,7 @@ export type components = {
       scheduleNoteMax: number;
       /** @enum {string} */
       chatAvailability: 'available' | 'readonly' | 'unavailable';
+      canTrend: boolean;
     };
     ReversiGameLite: {
       /** Format: id */
@@ -21749,6 +21750,8 @@ export type operations = {
            * @enum {string}
            */
           origin?: 'combined' | 'local' | 'remote';
+          /** @default false */
+          trending?: boolean;
         };
       };
     };
@@ -31522,7 +31525,7 @@ export type operations = {
           /** @default 0 */
           offset?: number;
           /** @enum {string} */
-          sort?: '+follower' | '-follower' | '+createdAt' | '-createdAt' | '+updatedAt' | '-updatedAt';
+          sort?: '+follower' | '-follower' | '+localFollower' | '-localFollower' | '+createdAt' | '-createdAt' | '+updatedAt' | '-updatedAt';
           /**
            * @default all
            * @enum {string}

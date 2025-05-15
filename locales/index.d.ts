@@ -7599,6 +7599,10 @@ export interface Locale extends ILocale {
              * Maximum number of scheduled notes
              */
             "scheduleNoteMax": string;
+            /**
+             * Can appear in trending notes / users
+             */
+            "canTrend": string;
         };
         "_condition": {
             /**
@@ -13045,6 +13049,14 @@ export interface Locale extends ILocale {
      * Note: the bubble timeline is hidden by default, and must be enabled via roles.
      */
     "bubbleTimelineMustBeEnabled": string;
+    /**
+     * Users popular on the global network
+     */
+    "popularUsersGlobal": string;
+    /**
+     * Users popular on {name}
+     */
+    "popularUsersLocal": ParameterizedString<"name">;
     /**
      * Translation timeout
      */
