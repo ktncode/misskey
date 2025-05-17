@@ -137,7 +137,7 @@ const canRenote = computed(() => ['public', 'home'].includes(props.note.visibili
 const hideLine = computed(() => props.detail);
 
 const el = shallowRef<HTMLElement>();
-const translation = ref<any>(null);
+const translation = ref<Misskey.entities.NotesTranslateResponse | false | null>(null);
 const translating = ref(false);
 const isDeleted = ref(false);
 const renoted = ref(false);

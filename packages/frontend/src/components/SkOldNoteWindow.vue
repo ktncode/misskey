@@ -42,12 +42,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkA v-if="appearNote.replyId" :class="$style.noteReplyTarget" :to="`/notes/${appearNote.replyId}`"><i class="ph-arrow-bend-left-up ph-bold ph-lg"></i></MkA>
 					<Mfm v-if="appearNote.text" :text="appearNote.text" :isBlock="true" :author="appearNote.user" :nyaize="'respect'" :emojiUrls="appearNote.emojis"/>
 					<a v-if="appearNote.renote != null" :class="$style.rn">RN:</a>
-					<div v-if="translating || translation" :class="$style.translation">
+					<div v-if="translating || translation != null" :class="$style.translation">
 						<MkLoading v-if="translating" mini/>
-						<div v-else>
-							<b>{{ i18n.t('translatedFrom', { x: translation.sourceLang }) }}: </b>
+						<div v-else-if="translation && translation.text != null">
+							<b>{{ i18n.tsx.translatedFrom({ x: translation.sourceLang }) }}: </b>
 							<Mfm :text="translation.text" :isBlock="true" :author="appearNote.user" :nyaize="'respect'" :emojiUrls="appearNote.emojis"/>
 						</div>
+						<div v-else>{{ i18n.ts.translationFailed }}</div>
 					</div>
 					<div v-if="appearNote.files && appearNote.files.length > 0">
 						<MkMediaList :mediaList="appearNote.files"/>
@@ -151,7 +152,7 @@ const renoteUrl = appearNote.value.renote ? appearNote.value.renote.url : null;
 const renoteUri = appearNote.value.renote ? appearNote.value.renote.uri : null;
 
 const showContent = ref(false);
-const translation = ref(null);
+const translation = ref<Misskey.entities.NotesTranslateResponse | false | null>(null);
 const translating = ref(false);
 const urls = appearNote.value.text ? extractUrlFromMfm(mfm.parse(appearNote.value.text)).filter(u => u !== renoteUrl && u !== renoteUri) : null;
 const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && appearNote.value.user.instance);
