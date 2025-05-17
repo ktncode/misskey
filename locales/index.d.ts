@@ -12933,6 +12933,14 @@ export interface Locale extends ILocale {
      * Fetch linked note
      */
     "fetchLinkedNote": string;
+    /**
+     * Add "Translate" to note action menu
+     */
+    "showTranslationButtonInNoteFooter": string;
+    /**
+     * Failed to translate note. Please try again later or contact an administrator for assistance.
+     */
+    "translationFailed": string;
     "_processErrors": {
         /**
          * Unable to process quote. This post may be missing context.

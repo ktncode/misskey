@@ -523,6 +523,8 @@ id: "ID"
 mandatoryCW: "Force content warning"
 mandatoryCWDescription: "Applies a content warning to all posts created by this user. If the post already has a CW, then this is appended to the end."
 fetchLinkedNote: "Fetch linked note"
+showTranslationButtonInNoteFooter: "Add \"Translate\" to note action menu"
+translationFailed: "Failed to translate note. Please try again later or contact an administrator for assistance."
 
 _processErrors:
   quoteUnavailable: "Unable to process quote. This post may be missing context."

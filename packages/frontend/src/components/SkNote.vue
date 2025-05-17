@@ -88,12 +88,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 							:isAnim="allowAnim"
 							:isBlock="true"
 						/>
-						<div v-if="translating || translation" :class="$style.translation">
+						<div v-if="translating || translation != null" :class="$style.translation">
 							<MkLoading v-if="translating" mini/>
-							<div v-else-if="translation">
+							<div v-else-if="translation && translation.text != null">
 								<b>{{ i18n.tsx.translatedFrom({ x: translation.sourceLang }) }}: </b>
 								<Mfm :text="translation.text" :isBlock="true" :author="appearNote.user" :nyaize="'respect'" :emojiUrls="appearNote.emojis" class="_selectable"/>
 							</div>
+							<div v-else>{{ i18n.ts.translationFailed }}</div>
 						</div>
 						<MkButton v-if="!allowAnim && animated" :class="$style.playMFMButton" :small="true" @click="animatedMFM()" @click.stop><i class="ph-play ph-bold ph-lg "></i> {{ i18n.ts._animatedMFM.play }}</MkButton>
 						<MkButton v-else-if="!prefer.s.animatedMfm && allowAnim && animated" :class="$style.playMFMButton" :small="true" @click="animatedMFM()" @click.stop><i class="ph-stop ph-bold ph-lg "></i> {{ i18n.ts._animatedMFM.stop }}</MkButton>
@@ -164,6 +165,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<button v-if="prefer.s.showClipButtonInNoteFooter" ref="clipButton" :class="$style.footerButton" class="_button" @mousedown.prevent="clip()">
 					<i class="ti ti-paperclip"></i>
 				</button>
+				<button v-if="prefer.s.showTranslationButtonInNoteFooter && $i?.policies.canUseTranslator && instance.translatorAvailable" ref="translationButton" class="_button" :class="$style.footerButton" @mousedown.prevent="translate()">
+					<i class="ti ti-language-hiragana"></i>
+				</button>
 				<button ref="menuButton" :class="$style.footerButton" class="_button" @mousedown.prevent="showMenu()">
 					<i class="ti ti-dots"></i>
 				</button>
@@ -219,7 +223,7 @@ import { extractUrlFromMfm } from '@/utility/extract-url-from-mfm.js';
 import { checkAnimationFromMfm } from '@/utility/check-animated-mfm.js';
 import { $i } from '@/i.js';
 import { i18n } from '@/i18n.js';
-import { getAbuseNoteMenu, getCopyNoteLinkMenu, getNoteClipMenu, getNoteMenu } from '@/utility/get-note-menu.js';
+import { getAbuseNoteMenu, getCopyNoteLinkMenu, getNoteClipMenu, getNoteMenu, translateNote } from '@/utility/get-note-menu.js';
 import { getNoteVersionsMenu } from '@/utility/get-note-versions-menu.js';
 import { useNoteCapture } from '@/use/use-note-capture.js';
 import { deepClone } from '@/utility/clone.js';
@@ -229,7 +233,7 @@ import { getNoteSummary } from '@/utility/get-note-summary.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { showMovedDialog } from '@/utility/show-moved-dialog.js';
 import { boostMenuItems, computeRenoteTooltip } from '@/utility/boost-quote.js';
-import { isEnabledUrlPreview } from '@/instance.js';
+import { instance, isEnabledUrlPreview } from '@/instance.js';
 import { focusPrev, focusNext } from '@/utility/focus.js';
 import { getAppearNote } from '@/utility/get-appear-note.js';
 import { prefer } from '@/preferences.js';
@@ -310,7 +314,7 @@ const collapsed = ref(prefer.s.expandLongNote && appearNote.value.cw == null && 
 const isDeleted = ref(false);
 const renoted = ref(false);
 const { muted, hardMuted } = checkMutes(appearNote.value, props.withHardMute);
-const translation = ref<Misskey.entities.NotesTranslateResponse | null>(null);
+const translation = ref<Misskey.entities.NotesTranslateResponse | false | null>(null);
 const translating = ref(false);
 const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && appearNote.value.user.instance);
 const canRenote = computed(() => ['public', 'home'].includes(appearNote.value.visibility) || (appearNote.value.visibility === 'followers' && appearNote.value.userId === $i?.id));
@@ -357,6 +361,11 @@ const keymap = {
 		if (renoteCollapsed.value) return;
 		if (!prefer.s.showClipButtonInNoteFooter) return;
 		clip();
+	},
+	't': () => {
+		if (prefer.s.showTranslationButtonInNoteFooter && $i?.policies.canUseTranslator && instance.translatorAvailable) {
+			translate();
+		}
 	},
 	'o': () => {
 		if (renoteCollapsed.value) return;
@@ -778,6 +787,12 @@ async function clip(): Promise<void> {
 	}
 
 	os.popupMenu(await getNoteClipMenu({ note: note.value, isDeleted, currentClip: currentClip?.value }), clipButton.value).then(focus);
+}
+
+async function translate() {
+	if (props.mock) return;
+
+	await translateNote(appearNote.value.id, translation, translating);
 }
 
 function showRenoteMenu(): void {
