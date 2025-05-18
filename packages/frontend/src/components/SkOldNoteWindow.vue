@@ -42,14 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkA v-if="appearNote.replyId" :class="$style.noteReplyTarget" :to="`/notes/${appearNote.replyId}`"><i class="ph-arrow-bend-left-up ph-bold ph-lg"></i></MkA>
 					<Mfm v-if="appearNote.text" :text="appearNote.text" :isBlock="true" :author="appearNote.user" :nyaize="'respect'" :emojiUrls="appearNote.emojis"/>
 					<a v-if="appearNote.renote != null" :class="$style.rn">RN:</a>
-					<div v-if="translating || translation != null" :class="$style.translation">
-						<MkLoading v-if="translating" mini/>
-						<div v-else-if="translation && translation.text != null">
-							<b v-if="translation.sourceLang">{{ i18n.tsx.translatedFrom({ x: translation.sourceLang }) }}: </b>
-							<Mfm :text="translation.text" :isBlock="true" :author="appearNote.user" :nyaize="'respect'" :emojiUrls="appearNote.emojis"/>
-						</div>
-						<div v-else>{{ i18n.ts.translationFailed }}</div>
-					</div>
+					<SkNoteTranslation :note="note" :translation="translation" :translating="translating"></SkNoteTranslation>
 					<div v-if="appearNote.files && appearNote.files.length > 0">
 						<MkMediaList :mediaList="appearNote.files"/>
 					</div>
@@ -99,6 +92,7 @@ import { deepClone } from '@/utility/clone.js';
 import { dateTimeFormat } from '@/utility/intl-const.js';
 import { prefer } from '@/preferences';
 import { getPluginHandlers } from '@/plugin.js';
+import SkNoteTranslation from '@/components/SkNoteTranslation.vue';
 
 const props = defineProps<{
 	note: Misskey.entities.Note;
@@ -258,13 +252,6 @@ const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceT
 	margin-left: 4px;
 	font-style: oblique;
 	color: var(--MI_THEME-renote);
-}
-
-.translation {
-	border: solid 0.5px var(--MI_THEME-divider);
-	border-radius: var(--MI-radius);
-	padding: 12px;
-	margin-top: 8px;
 }
 
 .poll {

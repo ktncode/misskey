@@ -88,14 +88,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							:isAnim="allowAnim"
 							:isBlock="true"
 						/>
-						<div v-if="translating || translation != null" :class="$style.translation">
-							<MkLoading v-if="translating" mini/>
-							<div v-else-if="translation && translation.text != null">
-								<b v-if="translation.sourceLang">{{ i18n.tsx.translatedFrom({ x: translation.sourceLang }) }}: </b>
-								<Mfm :text="translation.text" :isBlock="true" :author="appearNote.user" :nyaize="'respect'" :emojiUrls="appearNote.emojis" class="_selectable"/>
-							</div>
-							<div v-else>{{ i18n.ts.translationFailed }}</div>
-						</div>
+						<SkNoteTranslation :note="note" :translation="translation" :translating="translating"></SkNoteTranslation>
 						<MkButton v-if="!allowAnim && animated" :class="$style.playMFMButton" :small="true" @click="animatedMFM()" @click.stop><i class="ph-play ph-bold ph-lg "></i> {{ i18n.ts._animatedMFM.play }}</MkButton>
 						<MkButton v-else-if="!prefer.s.animatedMfm && allowAnim && animated" :class="$style.playMFMButton" :small="true" @click="animatedMFM()" @click.stop><i class="ph-stop ph-bold ph-lg "></i> {{ i18n.ts._animatedMFM.stop }}</MkButton>
 					</div>
@@ -241,6 +234,7 @@ import { getPluginHandlers } from '@/plugin.js';
 import { DI } from '@/di.js';
 import { useRouter } from '@/router.js';
 import SkMutedNote from '@/components/SkMutedNote.vue';
+import SkNoteTranslation from '@/components/SkNoteTranslation.vue';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -1201,13 +1195,6 @@ function emitUpdReaction(emoji: string, delta: number) {
 .replyIcon {
 	color: var(--MI_THEME-accent);
 	margin-right: 0.5em;
-}
-
-.translation {
-	border: solid 0.5px var(--MI_THEME-divider);
-	border-radius: var(--MI-radius);
-	padding: 12px;
-	margin-top: 8px;
 }
 
 .urlPreview {
