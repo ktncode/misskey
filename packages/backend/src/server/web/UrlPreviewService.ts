@@ -161,32 +161,8 @@ export class UrlPreviewService {
 		}
 
 		const cacheKey = `${url}@${lang}@${cacheFormatVersion}`;
-		const cached = await this.previewCache.get(cacheKey);
-		if (cached !== undefined) {
-			if (cached.activityPub && !cached.haveNoteLocally) {
-				// Avoid duplicate checks in case inferActivityPubLink already set this.
-				const exists = await this.noteExists(cached.activityPub, fetch);
-
-				// Remove the AP flag if we encounter a permanent error fetching the note.
-				if (exists === false) {
-					cached.activityPub = null;
-					cached.haveNoteLocally = undefined;
-				} else {
-					cached.haveNoteLocally = exists ?? false;
-				}
-
-				// Persist the result once we finalize the result
-				if (!cached.activityPub || cached.haveNoteLocally) {
-					await this.previewCache.set(cacheKey, cached);
-				}
-			}
-
-			// Cache 1 day (matching redis), but not if the note could be fetched later
-			if (!cached.activityPub || cached.haveNoteLocally) {
-				reply.header('Cache-Control', 'public, max-age=86400');
-			}
-
-			return reply.code(200).send(cached);
+		if (await this.sendCachedPreview(cacheKey, reply, fetch)) {
+			return;
 		}
 
 		try {
@@ -233,7 +209,7 @@ export class UrlPreviewService {
 			// Await this to avoid hammering redis when a bunch of URLs are fetched at once
 			await this.previewCache.set(cacheKey, summary);
 
-			// Cache 1 day (matching redis), but not if the note could be fetched later
+			// Cache 1 day (matching redis), but only once we finalize the result
 			if (!summary.activityPub || summary.haveNoteLocally) {
 				reply.header('Cache-Control', 'public, max-age=86400');
 			}
@@ -251,6 +227,40 @@ export class UrlPreviewService {
 				},
 			});
 		}
+	}
+
+	private async sendCachedPreview(cacheKey: string, reply: FastifyReply, fetch: boolean): Promise<boolean> {
+		const summary = await this.previewCache.get(cacheKey);
+		if (summary === undefined) {
+			return false;
+		}
+
+		// Check if note has loaded since we last cached the preview
+		if (summary.activityPub && !summary.haveNoteLocally) {
+			// Avoid duplicate checks in case inferActivityPubLink already set this.
+			const exists = await this.noteExists(summary.activityPub, fetch);
+
+			// Remove the AP flag if we encounter a permanent error fetching the note.
+			if (exists === false) {
+				summary.activityPub = null;
+				summary.haveNoteLocally = undefined;
+			} else {
+				summary.haveNoteLocally = exists ?? false;
+			}
+
+			// Persist the result once we finalize the result
+			if (!summary.activityPub || summary.haveNoteLocally) {
+				await this.previewCache.set(cacheKey, summary);
+			}
+		}
+
+		// Cache 1 day (matching redis), but only once we finalize the result
+		if (!summary.activityPub || summary.haveNoteLocally) {
+			reply.header('Cache-Control', 'public, max-age=86400');
+		}
+
+		reply.code(200).send(summary);
+		return true;
 	}
 
 	private fetchSummary(url: string, meta: MiMeta, lang?: string): Promise<SummalyResult> {
