@@ -29,6 +29,7 @@ import { SkRateLimiterService } from '@/server/SkRateLimiterService.js';
 import { BucketRateLimit, Keyed, sendRateLimitHeaders } from '@/misc/rate-limit-utils.js';
 import type { MiLocalUser } from '@/models/User.js';
 import { getIpHash } from '@/misc/get-ip-hash.js';
+import { isRetryableError } from '@/misc/is-retryable-error.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 
 export type LocalSummalyResult = SummalyResult & {
@@ -36,7 +37,7 @@ export type LocalSummalyResult = SummalyResult & {
 };
 
 // Increment this to invalidate cached previews after a major change.
-const cacheFormatVersion = 2;
+const cacheFormatVersion = 3;
 
 type PreviewRoute = {
 	Querystring: {
@@ -163,10 +164,19 @@ export class UrlPreviewService {
 		const cached = await this.previewCache.get(cacheKey);
 		if (cached !== undefined) {
 			if (cached.activityPub && !cached.haveNoteLocally) {
-				cached.haveNoteLocally = await this.hasNoteLocally(cached.activityPub, fetch);
+				// Avoid duplicate checks in case inferActivityPubLink already set this.
+				const exists = await this.noteExists(cached.activityPub, fetch);
 
-				// Persist the result once we manage to fetch the note
-				if (cached.haveNoteLocally) {
+				// Remove the AP flag if we encounter a permanent error fetching the note.
+				if (exists === false) {
+					cached.activityPub = null;
+					cached.haveNoteLocally = undefined;
+				} else {
+					cached.haveNoteLocally = exists ?? false;
+				}
+
+				// Persist the result once we finalize the result
+				if (!cached.activityPub || cached.haveNoteLocally) {
 					await this.previewCache.set(cacheKey, cached);
 				}
 			}
@@ -207,9 +217,17 @@ export class UrlPreviewService {
 				await this.inferActivityPubLink(summary);
 			}
 
-			if (summary.activityPub) {
+			if (summary.activityPub && !summary.haveNoteLocally) {
 				// Avoid duplicate checks in case inferActivityPubLink already set this.
-				summary.haveNoteLocally ||= await this.hasNoteLocally(summary.activityPub, fetch);
+				const exists = await this.noteExists(summary.activityPub, fetch);
+
+				// Remove the AP flag if we encounter a permanent error fetching the note.
+				if (exists === false) {
+					summary.activityPub = null;
+					summary.haveNoteLocally = undefined;
+				} else {
+					summary.haveNoteLocally = exists ?? false;
+				}
 			}
 
 			// Await this to avoid hammering redis when a bunch of URLs are fetched at once
@@ -348,23 +366,29 @@ export class UrlPreviewService {
 		}
 	}
 
-	private async hasNoteLocally(uri: string, fetch = false): Promise<boolean> {
+	// true = exists, false = does not exist (permanently), null = does not exist (temporarily)
+	private async noteExists(uri: string, fetch = false): Promise<boolean | null> {
 		try {
-			// Local or cached remote notes
+			// Local note or cached remote note
 			if (await this.apDbResolverService.getNoteFromApId(uri)) {
 				return true;
 			}
 
-			// Un-cached remote notes
-			if (fetch && await this.apNoteService.resolveNote(uri)) {
+			// Un-cached remote note
+			if (!fetch) {
+				return null;
+			}
+
+			// Newly cached remote note
+			if (await this.apNoteService.resolveNote(uri)) {
 				return true;
 			}
 
-			// Everything else
+			// Non-existent or deleted note
 			return false;
-		} catch {
+		} catch (err) {
 			// Errors, including invalid notes and network errors
-			return false;
+			return isRetryableError(err) ? null : false;
 		}
 	}
 
