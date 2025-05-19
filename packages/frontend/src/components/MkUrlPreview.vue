@@ -222,7 +222,7 @@ function refresh(withFetch = false) {
 			return res.json();
 		})
 		.then(async (info: SummalyResult & { haveNoteLocally?: boolean } | null) => {
-			unknownUrl.value = info != null;
+			unknownUrl.value = info == null;
 			title.value = info?.title ?? null;
 			description.value = info?.description ?? null;
 			thumbnail.value = info?.thumbnail ?? null;
