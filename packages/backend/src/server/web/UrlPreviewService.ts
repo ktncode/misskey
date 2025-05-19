@@ -19,12 +19,16 @@ import { MiMeta } from '@/models/Meta.js';
 import { RedisKVCache } from '@/misc/cache.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { ApDbResolverService } from '@/core/activitypub/ApDbResolverService.js';
-import type { NotesRepository } from '@/models/_.js';
+import type { MiAccessToken, NotesRepository } from '@/models/_.js';
 import { ApUtilityService } from '@/core/activitypub/ApUtilityService.js';
 import { ApRequestService } from '@/core/activitypub/ApRequestService.js';
 import { SystemAccountService } from '@/core/SystemAccountService.js';
 import { ApNoteService } from '@/core/activitypub/models/ApNoteService.js';
 import { AuthenticateService, AuthenticationError } from '@/server/api/AuthenticateService.js';
+import { SkRateLimiterService } from '@/server/SkRateLimiterService.js';
+import { BucketRateLimit, Keyed, sendRateLimitHeaders } from '@/misc/rate-limit-utils.js';
+import type { MiLocalUser } from '@/models/User.js';
+import { getIpHash } from '@/misc/get-ip-hash.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 
 export type LocalSummalyResult = SummalyResult & {
@@ -41,6 +45,17 @@ type PreviewRoute = {
 		fetch?: string,
 		i?: string,
 	},
+};
+
+type AuthArray = [user: MiLocalUser | null | undefined, app: MiAccessToken | null | undefined, actor: MiLocalUser | string];
+
+// Up to 50 requests, then 10 / second (at 2 / 200ms rate)
+const previewLimit: Keyed<BucketRateLimit> = {
+	key: '/url',
+	type: 'bucket',
+	size: 50,
+	dripSize: 2,
+	dripRate: 200,
 };
 
 @Injectable()
@@ -70,6 +85,7 @@ export class UrlPreviewService {
 		private readonly systemAccountService: SystemAccountService,
 		private readonly apNoteService: ApNoteService,
 		private readonly authenticateService: AuthenticateService,
+		private readonly rateLimiterService: SkRateLimiterService,
 	) {
 		this.logger = this.loggerService.getLogger('url-preview');
 		this.previewCache = new RedisKVCache<LocalSummalyResult>(this.redisClient, 'summaly', {
@@ -122,6 +138,12 @@ export class UrlPreviewService {
 			});
 		}
 
+		// Check rate limit
+		const auth = await this.authenticate(request);
+		if (!await this.checkRateLimit(auth, reply)) {
+			return;
+		}
+
 		if (this.utilityService.isBlockedHost(this.meta.blockedHosts, new URL(url).host)) {
 			return reply.code(403).send({
 				error: {
@@ -133,7 +155,7 @@ export class UrlPreviewService {
 		}
 
 		const fetch = !!request.query.fetch;
-		if (fetch && !await this.hasFetchPermissions(request, reply)) {
+		if (fetch && !await this.checkFetchPermissions(auth, reply)) {
 			return;
 		}
 
@@ -347,7 +369,7 @@ export class UrlPreviewService {
 	}
 
 	// Adapted from ApiCallService
-	private async hasFetchPermissions(request: FastifyRequest<{ Querystring?: { i?: string | string[] }, Body?: { i?: string | string[] } }>, reply: FastifyReply): Promise<boolean> {
+	private async authenticate(request: FastifyRequest<{ Querystring?: { i?: string | string[] }, Body?: { i?: string | string[] } }>): Promise<AuthArray> {
 		const body = request.method === 'GET' ? request.query : request.body;
 
 		// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
@@ -355,20 +377,27 @@ export class UrlPreviewService {
 			? request.headers.authorization.slice(7)
 			: body?.['i'];
 		if (token != null && typeof token !== 'string') {
-			reply.code(400);
-			return false;
+			return [undefined, undefined, getIpHash(request.ip)];
 		}
 
-		const auth = await this.authenticateService.authenticate(token).catch(async (err) => {
+		try {
+			const auth = await this.authenticateService.authenticate(token);
+			return [auth[0], auth[1], auth[0] ?? getIpHash(request.ip)];
+		} catch (err) {
 			if (err instanceof AuthenticationError) {
-				return null;
+				return [undefined, undefined, getIpHash(request.ip)];
 			} else {
 				throw err;
 			}
-		});
+		}
+	}
+
+	// Adapted from ApiCallService
+	private async checkFetchPermissions(auth: AuthArray, reply: FastifyReply): Promise<boolean> {
+		const [user, app] = auth;
 
 		// Authentication
-		if (!auth) {
+		if (user === undefined) {
 			reply.code(401).send({
 				error: {
 					message: 'Authentication failed. Please ensure your token is correct.',
@@ -378,8 +407,7 @@ export class UrlPreviewService {
 			});
 			return false;
 		}
-		const [user, app] = auth;
-		if (user == null) {
+		if (user === null) {
 			reply.code(401).send({
 				error: {
 					message: 'Credential required.',
@@ -397,6 +425,7 @@ export class UrlPreviewService {
 					message: 'Your account has been suspended.',
 					code: 'YOUR_ACCOUNT_SUSPENDED',
 					kind: 'permission',
+
 					id: 'a8c724b3-6e9c-4b46-b1a8-bc3ed6258370',
 				},
 			});
@@ -411,6 +440,27 @@ export class UrlPreviewService {
 					id: '1370e5b7-d4eb-4566-bb1d-7748ee6a1838',
 				},
 			});
+			return false;
+		}
+
+		return true;
+	}
+
+	private async checkRateLimit(auth: AuthArray, reply: FastifyReply): Promise<boolean> {
+		const info = await this.rateLimiterService.limit(previewLimit, auth[2]);
+
+		// Always send headers, even if not blocked
+		sendRateLimitHeaders(reply, info);
+
+		if (info.blocked) {
+			reply.code(429).send({
+				error: {
+					message: 'Rate limit exceeded. Please try again later.',
+					code: 'RATE_LIMIT_EXCEEDED',
+					id: 'd5826d14-3982-4d2e-8011-b9e9f02499ef',
+				},
+			});
+
 			return false;
 		}
 
