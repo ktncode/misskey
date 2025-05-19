@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import * as Misskey from 'misskey-js';
 import { watch } from 'vue';
-import { i18n } from '@/i18n';
+import { i18n } from '@/i18n.js';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
