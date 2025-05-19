@@ -15,7 +15,6 @@ import type Logger from '@/logger.js';
 import { query } from '@/misc/prelude/url.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { bindThis } from '@/decorators.js';
-import { ApiError } from '@/server/api/error.js';
 import { MiMeta } from '@/models/Meta.js';
 import { RedisKVCache } from '@/misc/cache.js';
 import { UtilityService } from '@/core/UtilityService.js';
@@ -24,6 +23,8 @@ import type { NotesRepository } from '@/models/_.js';
 import { ApUtilityService } from '@/core/activitypub/ApUtilityService.js';
 import { ApRequestService } from '@/core/activitypub/ApRequestService.js';
 import { SystemAccountService } from '@/core/SystemAccountService.js';
+import { ApNoteService } from '@/core/activitypub/models/ApNoteService.js';
+import { AuthenticateService, AuthenticationError } from '@/server/api/AuthenticateService.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 
 export type LocalSummalyResult = SummalyResult & {
@@ -32,6 +33,15 @@ export type LocalSummalyResult = SummalyResult & {
 
 // Increment this to invalidate cached previews after a major change.
 const cacheFormatVersion = 2;
+
+type PreviewRoute = {
+	Querystring: {
+		url?: string
+		lang?: string,
+		fetch?: string,
+		i?: string,
+	},
+};
 
 @Injectable()
 export class UrlPreviewService {
@@ -58,6 +68,8 @@ export class UrlPreviewService {
 		private readonly apDbResolverService: ApDbResolverService,
 		private readonly apRequestService: ApRequestService,
 		private readonly systemAccountService: SystemAccountService,
+		private readonly apNoteService: ApNoteService,
+		private readonly authenticateService: AuthenticateService,
 	) {
 		this.logger = this.loggerService.getLogger('url-preview');
 		this.previewCache = new RedisKVCache<LocalSummalyResult>(this.redisClient, 'summaly', {
@@ -85,9 +97,9 @@ export class UrlPreviewService {
 
 	@bindThis
 	public async handle(
-		request: FastifyRequest<{ Querystring: { url?: string; lang?: string; } }>,
+		request: FastifyRequest<PreviewRoute>,
 		reply: FastifyReply,
-	): Promise<object | undefined> {
+	): Promise<void> {
 		const url = request.query.url;
 		if (typeof url !== 'string' || !URL.canParse(url)) {
 			reply.code(400);
@@ -101,38 +113,48 @@ export class UrlPreviewService {
 		}
 
 		if (!this.meta.urlPreviewEnabled) {
-			reply.code(403);
-			return {
-				error: new ApiError({
+			return reply.code(403).send({
+				error: {
 					message: 'URL preview is disabled',
 					code: 'URL_PREVIEW_DISABLED',
 					id: '58b36e13-d2f5-0323-b0c6-76aa9dabefb8',
-				}),
-			};
+				},
+			});
 		}
 
 		if (this.utilityService.isBlockedHost(this.meta.blockedHosts, new URL(url).host)) {
-			reply.code(403);
-			return {
-				error: new ApiError({
+			return reply.code(403).send({
+				error: {
 					message: 'URL is blocked',
 					code: 'URL_PREVIEW_BLOCKED',
 					id: '50294652-857b-4b13-9700-8e5c7a8deae8',
-				}),
-			};
+				},
+			});
+		}
+
+		const fetch = !!request.query.fetch;
+		if (fetch && !await this.hasFetchPermissions(request, reply)) {
+			return;
 		}
 
 		const cacheKey = `${url}@${lang}@${cacheFormatVersion}`;
 		const cached = await this.previewCache.get(cacheKey);
 		if (cached !== undefined) {
-			// Cache 1 day (matching redis)
-			reply.header('Cache-Control', 'public, max-age=86400');
+			if (cached.activityPub && !cached.haveNoteLocally) {
+				cached.haveNoteLocally = await this.hasNoteLocally(cached.activityPub, fetch);
 
-			if (cached.activityPub) {
-				cached.haveNoteLocally = !! await this.apDbResolverService.getNoteFromApId(cached.activityPub);
+				// Persist the result once we manage to fetch the note
+				if (cached.haveNoteLocally) {
+					await this.previewCache.set(cacheKey, cached);
+				}
 			}
 
-			return cached;
+			// Cache 1 day (matching redis), but not if the note could be fetched later
+			if (!cached.activityPub || cached.haveNoteLocally) {
+				reply.header('Cache-Control', 'public, max-age=86400');
+			}
+
+			return reply.code(200).send(cached);
 		}
 
 		try {
@@ -144,14 +166,13 @@ export class UrlPreviewService {
 
 			// Repeat check, since redirects are allowed.
 			if (this.utilityService.isBlockedHost(this.meta.blockedHosts, new URL(summary.url).host)) {
-				reply.code(403);
-				return {
-					error: new ApiError({
+				return reply.code(403).send({
+					error: {
 						message: 'URL is blocked',
 						code: 'URL_PREVIEW_BLOCKED',
 						id: '50294652-857b-4b13-9700-8e5c7a8deae8',
-					}),
-				};
+					},
+				});
 			}
 
 			this.logger.info(`Got preview of ${url} in ${lang}: ${summary.title}`);
@@ -166,28 +187,29 @@ export class UrlPreviewService {
 
 			if (summary.activityPub) {
 				// Avoid duplicate checks in case inferActivityPubLink already set this.
-				summary.haveNoteLocally ||= !!await this.apDbResolverService.getNoteFromApId(summary.activityPub);
+				summary.haveNoteLocally ||= await this.hasNoteLocally(summary.activityPub, fetch);
 			}
 
 			// Await this to avoid hammering redis when a bunch of URLs are fetched at once
 			await this.previewCache.set(cacheKey, summary);
 
-			// Cache 1 day (matching redis)
-			reply.header('Cache-Control', 'public, max-age=86400');
+			// Cache 1 day (matching redis), but not if the note could be fetched later
+			if (!summary.activityPub || summary.haveNoteLocally) {
+				reply.header('Cache-Control', 'public, max-age=86400');
+			}
 
-			return summary;
+			return reply.code(200).send(summary);
 		} catch (err) {
 			this.logger.warn(`Failed to get preview of ${url} for ${lang}: ${err}`);
 
-			reply.code(422);
 			reply.header('Cache-Control', 'max-age=3600');
-			return {
-				error: new ApiError({
+			return reply.code(422).send({
+				error: {
 					message: 'Failed to get preview',
 					code: 'URL_PREVIEW_FAILED',
 					id: '09d01cb5-53b9-4856-82e5-38a50c290a3b',
-				}),
-			};
+				},
+			});
 		}
 	}
 
@@ -211,6 +233,7 @@ export class UrlPreviewService {
 	}
 
 	private fetchSummaryFromProxy(url: string, meta: MiMeta, lang?: string): Promise<SummalyResult> {
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const proxy = meta.urlPreviewSummaryProxyUrl!;
 		const queryStr = query({
 			followRedirects: true,
@@ -301,5 +324,96 @@ export class UrlPreviewService {
 			summary.activityPub = remoteObject.id;
 			return;
 		}
+	}
+
+	private async hasNoteLocally(uri: string, fetch = false): Promise<boolean> {
+		try {
+			// Local or cached remote notes
+			if (await this.apDbResolverService.getNoteFromApId(uri)) {
+				return true;
+			}
+
+			// Un-cached remote notes
+			if (fetch && await this.apNoteService.resolveNote(uri)) {
+				return true;
+			}
+
+			// Everything else
+			return false;
+		} catch {
+			// Errors, including invalid notes and network errors
+			return false;
+		}
+	}
+
+	// Adapted from ApiCallService
+	private async hasFetchPermissions(request: FastifyRequest<{ Querystring?: { i?: string | string[] }, Body?: { i?: string | string[] } }>, reply: FastifyReply): Promise<boolean> {
+		const body = request.method === 'GET' ? request.query : request.body;
+
+		// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
+		const token = request.headers.authorization?.startsWith('Bearer ')
+			? request.headers.authorization.slice(7)
+			: body?.['i'];
+		if (token != null && typeof token !== 'string') {
+			reply.code(400);
+			return false;
+		}
+
+		const auth = await this.authenticateService.authenticate(token).catch(async (err) => {
+			if (err instanceof AuthenticationError) {
+				return null;
+			} else {
+				throw err;
+			}
+		});
+
+		// Authentication
+		if (!auth) {
+			reply.code(401).send({
+				error: {
+					message: 'Authentication failed. Please ensure your token is correct.',
+					code: 'AUTHENTICATION_FAILED',
+					id: 'b0a7f5f8-dc2f-4171-b91f-de88ad238e14',
+				},
+			});
+			return false;
+		}
+		const [user, app] = auth;
+		if (user == null) {
+			reply.code(401).send({
+				error: {
+					message: 'Credential required.',
+					code: 'CREDENTIAL_REQUIRED',
+					id: '1384574d-a912-4b81-8601-c7b1c4085df1',
+				},
+			});
+			return false;
+		}
+
+		// Authorization
+		if (user.isSuspended || user.isDeleted) {
+			reply.code(403).send({
+				error: {
+					message: 'Your account has been suspended.',
+					code: 'YOUR_ACCOUNT_SUSPENDED',
+					kind: 'permission',
+					id: 'a8c724b3-6e9c-4b46-b1a8-bc3ed6258370',
+				},
+			});
+			return false;
+		}
+		if (app && !app.permission.includes('read:account')) {
+			reply.code(403).send({
+				error: {
+					message: 'Your app does not have the necessary permissions to use this endpoint.',
+					code: 'PERMISSION_DENIED',
+					kind: 'permission',
+					id: '1370e5b7-d4eb-4566-bb1d-7748ee6a1838',
+				},
+			});
+			return false;
+		}
+
+		return true;
 	}
 }
