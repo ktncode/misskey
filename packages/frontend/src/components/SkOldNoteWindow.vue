@@ -29,7 +29,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 					</div>
 					<div :class="$style.noteHeaderUsername"><MkAcct :user="appearNote.user"/></div>
-					<MkInstanceTicker v-if="showTicker" :instance="appearNote.user.instance"/>
+					<MkInstanceTicker v-if="showTicker" :host="appearNote.user.host" :instance="appearNote.user.instance"/>
 				</div>
 			</header>
 			<div :class="$style.noteContent">
@@ -47,7 +47,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkMediaList :mediaList="appearNote.files"/>
 					</div>
 					<MkPoll v-if="appearNote.poll" :noteId="appearNote.id" :poll="appearNote.poll" :local="!appearNote.user.host" :author="appearNote.user" :emojiUrls="appearNote.emojis" :class="$style.poll"/>
-					<MkUrlPreview v-for="url in urls" :key="url" :url="url" :compact="true" :detail="true" style="margin-top: 6px;"/>
+					<MkUrlPreview v-for="url in urls" :key="url" :url="url" :compact="true" :detail="true" :showAsQuote="!appearNote.user.rejectQuotes" :skipNoteIds="selfNoteIds" style="margin-top: 6px;"/>
 					<div v-if="appearNote.renote" :class="$style.quote"><MkNoteSimple :note="appearNote.renote" :class="$style.quoteNote"/></div>
 				</div>
 				<MkA v-if="appearNote.channel && !inChannel" :class="$style.channel" :to="`/channels/${appearNote.channel.id}`"><i class="ph-television ph-bold ph-lg"></i> {{ appearNote.channel.name }}</MkA>
@@ -93,6 +93,7 @@ import { dateTimeFormat } from '@/utility/intl-const.js';
 import { prefer } from '@/preferences';
 import { getPluginHandlers } from '@/plugin.js';
 import SkNoteTranslation from '@/components/SkNoteTranslation.vue';
+import { getSelfNoteIds } from '@/utility/get-self-note-ids';
 
 const props = defineProps<{
 	note: Misskey.entities.Note;
@@ -149,6 +150,7 @@ const showContent = ref(false);
 const translation = ref<Misskey.entities.NotesTranslateResponse | false | null>(null);
 const translating = ref(false);
 const urls = appearNote.value.text ? extractUrlFromMfm(mfm.parse(appearNote.value.text)).filter(u => u !== renoteUrl && u !== renoteUri) : null;
+const selfNoteIds = computed(() => getSelfNoteIds(props.note));
 const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && appearNote.value.user.instance);
 
 </script>
