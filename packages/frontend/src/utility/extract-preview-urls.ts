@@ -19,6 +19,11 @@ export function extractPreviewUrls(note: Misskey.entities.Note, contents: mfm.Mf
 		url !== note.uri &&
 		// Local note
 		url !== `${config.url}/notes/${note.id}` &&
+		// Remote reply
+		url !== note.reply?.url &&
+		url !== note.reply?.uri &&
+		// Local reply
+		url !== `${config.url}/notes/${note.reply?.id}` &&
 		// Remote renote or quote
 		url !== note.renote?.url &&
 		url !== note.renote?.uri &&
