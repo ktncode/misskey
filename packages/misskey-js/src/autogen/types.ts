@@ -19581,18 +19581,10 @@ export type operations = {
       200: {
         content: {
           'application/json': {
-            image?: {
-              link?: string;
-              url: string;
-              title?: string;
-            };
-            paginationLinks?: {
-              self?: string;
-              first?: string;
-              next?: string;
-              last?: string;
-              prev?: string;
-            };
+            type: string;
+            id?: string;
+            updated?: string;
+            author?: string;
             link?: string;
             title?: string;
             items: {
@@ -19600,33 +19592,15 @@ export type operations = {
                 guid?: string;
                 title?: string;
                 pubDate?: string;
-                creator?: string;
-                summary?: string;
-                content?: string;
-                isoDate?: string;
-                categories?: string[];
-                contentSnippet?: string;
-                enclosure?: {
-                  url: string;
-                  length?: number;
-                  type?: string;
-                };
+                description?: string;
+                media: {
+                    medium?: string;
+                    url?: string;
+                    type?: string;
+                    lang?: string;
+                  }[];
               }[];
-            feedUrl?: string;
             description?: string;
-            itunes?: {
-              image?: string;
-              owner?: {
-                name?: string;
-                email?: string;
-              };
-              author?: string;
-              summary?: string;
-              explicit?: string;
-              categories?: string[];
-              keywords?: string[];
-              [key: string]: unknown;
-            };
           };
         };
       };

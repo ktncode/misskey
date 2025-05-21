@@ -86,7 +86,7 @@ describe('MfmService', () => {
 
 		test('ruby', async () => {
 			const input = '$[ruby $[group *some* text] ignore me]';
-			const output = '<p><ruby><span><span>*some*</span><span> text</span></span><rp>(</rp><rt>ignore me</rt><rp>)</rp></ruby></p>';
+			const output = '<p><ruby><span><span>*some*</span> text</span><rp>(</rp><rt>ignore me</rt><rp>)</rp></ruby></p>';
 			assert.equal(await mfmService.toMastoApiHtml(mfm.parse(input)), output);
 		});
 	});
