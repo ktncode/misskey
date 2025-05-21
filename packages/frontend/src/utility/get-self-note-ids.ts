@@ -12,7 +12,10 @@ import type * as Misskey from 'misskey-js';
 export function getSelfNoteIds(note: Misskey.entities.Note): string[] {
 	const ids = [note.id]; // Regular note
 	if (note.reply) ids.push(note.reply.id); // Reply
+	else if (note.replyId) ids.push(note.replyId); // Reply (not packed)
 	if (note.renote) ids.push(note.renote.id); // Renote or quote
+	else if (note.renoteId) ids.push(note.renoteId); // Renote or quote (not packed)
 	if (note.renote?.renote) ids.push(note.renote.renote.id); // Renote *of* a quote
+	else if (note.renote?.renoteId) ids.push(note.renote.renoteId); // Renote *of* a quote (not packed)
 	return ids;
 }
