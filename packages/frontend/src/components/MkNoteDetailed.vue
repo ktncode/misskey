@@ -286,6 +286,7 @@ import { DI } from '@/di.js';
 import SkMutedNote from '@/components/SkMutedNote.vue';
 import SkNoteTranslation from '@/components/SkNoteTranslation.vue';
 import { getSelfNoteIds } from '@/utility/get-self-note-ids.js';
+import { extractPreviewUrls } from '@/utility/extract-preview-urls.js';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -338,10 +339,10 @@ const isDeleted = ref(false);
 const renoted = ref(false);
 const translation = ref<Misskey.entities.NotesTranslateResponse | false | null>(null);
 const translating = ref(false);
-const parsed = appearNote.value.text ? mfm.parse(appearNote.value.text) : null;
-const urls = parsed ? extractUrlFromMfm(parsed).filter((url) => appearNote.value.renote?.url !== url && appearNote.value.renote?.uri !== url) : null;
+const parsed = computed(() => appearNote.value.text ? mfm.parse(appearNote.value.text) : null);
+const urls = computed(() => parsed.value ? extractPreviewUrls(props.note, parsed.value) : null);
 const selfNoteIds = computed(() => getSelfNoteIds(props.note));
-const animated = computed(() => parsed ? checkAnimationFromMfm(parsed) : null);
+const animated = computed(() => parsed.value ? checkAnimationFromMfm(parsed.value) : null);
 const allowAnim = ref(prefer.s.advancedMfm && prefer.s.animatedMfm);
 const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && appearNote.value.user.instance);
 const conversation = ref<Misskey.entities.Note[]>([]);

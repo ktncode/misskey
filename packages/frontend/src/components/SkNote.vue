@@ -236,6 +236,7 @@ import { useRouter } from '@/router.js';
 import SkMutedNote from '@/components/SkMutedNote.vue';
 import SkNoteTranslation from '@/components/SkNoteTranslation.vue';
 import { getSelfNoteIds } from '@/utility/get-self-note-ids.js';
+import { extractPreviewUrls } from '@/utility/extract-preview-urls.js';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -303,7 +304,7 @@ const galleryEl = useTemplateRef('galleryEl');
 const isMyRenote = $i && ($i.id === note.value.userId);
 const showContent = ref(prefer.s.uncollapseCW);
 const parsed = computed(() => appearNote.value.text ? mfm.parse(appearNote.value.text) : null);
-const urls = computed(() => parsed.value ? extractUrlFromMfm(parsed.value).filter((url) => appearNote.value.renote?.url !== url && appearNote.value.renote?.uri !== url) : null);
+const urls = computed(() => parsed.value ? extractPreviewUrls(props.note, parsed.value) : null);
 const selfNoteIds = computed(() => getSelfNoteIds(props.note));
 const isLong = shouldCollapsed(appearNote.value, urls.value ?? []);
 const collapsed = ref(prefer.s.expandLongNote && appearNote.value.cw == null && isLong ? false : appearNote.value.cw == null && isLong);

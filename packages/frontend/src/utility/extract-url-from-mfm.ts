@@ -10,6 +10,7 @@ import { unique } from '@/utility/array.js';
 // [ http://a/#1, http://a/#2, http://b/#3 ] => [ http://a/#1, http://b/#3 ]
 const removeHash = (x: string) => x.replace(/#[^#]*$/, '');
 
+// TODO this is O(n^2) which could introduce a frontend DoS with a large enough character limit
 export function extractUrlFromMfm(nodes: mfm.MfmNode[], respectSilentFlag = true): string[] {
 	const urlNodes = mfm.extract(nodes, (node) => {
 		return (node.type === 'url') || (node.type === 'link' && (!respectSilentFlag || !node.props.silent));

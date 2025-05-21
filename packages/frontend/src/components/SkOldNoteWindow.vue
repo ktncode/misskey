@@ -86,7 +86,6 @@ import MkPoll from '@/components/MkPoll.vue';
 import MkUrlPreview from '@/components/MkUrlPreview.vue';
 import MkInstanceTicker from '@/components/MkInstanceTicker.vue';
 import { userPage } from '@/filters/user.js';
-import { extractUrlFromMfm } from '@/utility/extract-url-from-mfm.js';
 import { i18n } from '@/i18n.js';
 import { deepClone } from '@/utility/clone.js';
 import { dateTimeFormat } from '@/utility/intl-const.js';
@@ -94,6 +93,7 @@ import { prefer } from '@/preferences';
 import { getPluginHandlers } from '@/plugin.js';
 import SkNoteTranslation from '@/components/SkNoteTranslation.vue';
 import { getSelfNoteIds } from '@/utility/get-self-note-ids';
+import { extractPreviewUrls } from '@/utility/extract-preview-urls.js';
 
 const props = defineProps<{
 	note: Misskey.entities.Note;
@@ -142,14 +142,13 @@ const isRenote = (
 );
 
 const el = shallowRef<HTMLElement>();
-let appearNote = computed(() => isRenote ? note.value.renote as Misskey.entities.Note : note.value);
-const renoteUrl = appearNote.value.renote ? appearNote.value.renote.url : null;
-const renoteUri = appearNote.value.renote ? appearNote.value.renote.uri : null;
+const appearNote = computed(() => isRenote ? note.value.renote as Misskey.entities.Note : note.value);
+const parsed = computed(() => appearNote.value.text ? mfm.parse(appearNote.value.text) : null);
 
 const showContent = ref(false);
 const translation = ref<Misskey.entities.NotesTranslateResponse | false | null>(null);
 const translating = ref(false);
-const urls = appearNote.value.text ? extractUrlFromMfm(mfm.parse(appearNote.value.text)).filter(u => u !== renoteUrl && u !== renoteUri) : null;
+const urls = computed(() => parsed.value ? extractPreviewUrls(props.note, parsed.value) : null);
 const selfNoteIds = computed(() => getSelfNoteIds(props.note));
 const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && appearNote.value.user.instance);
 
