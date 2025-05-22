@@ -897,10 +897,7 @@ export class DriveService {
 			this.downloaderLogger.debug(`Upload succeeded: created file ${driveFile.id}`);
 			return driveFile!;
 		} catch (err) {
-			this.downloaderLogger.error(`Failed to create drive file: ${renderInlineError(err)}`, {
-				url: url,
-				e: err,
-			});
+			this.downloaderLogger.error(`Failed to create drive file from ${url}: ${renderInlineError(err)}`);
 			throw err;
 		} finally {
 			cleanup();
