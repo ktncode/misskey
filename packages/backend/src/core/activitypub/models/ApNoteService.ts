@@ -101,29 +101,29 @@ export class ApNoteService {
 		const apType = getApType(object);
 
 		if (apType == null || !validPost.includes(apType)) {
-			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: invalid object type ${apType ?? 'undefined'}`);
+			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note from ${uri}: invalid object type ${apType ?? 'undefined'}`);
 		}
 
 		if (object.id && this.utilityService.extractDbHost(object.id) !== expectHost) {
-			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: id has different host. expected: ${expectHost}, actual: ${this.utilityService.extractDbHost(object.id)}`);
+			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note from ${uri}: id has different host. expected: ${expectHost}, actual: ${this.utilityService.extractDbHost(object.id)}`);
 		}
 
 		const actualHost = object.attributedTo && this.utilityService.extractDbHost(getOneApId(object.attributedTo));
 		if (object.attributedTo && actualHost !== expectHost) {
-			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: attributedTo has different host. expected: ${expectHost}, actual: ${actualHost}`);
+			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note from ${uri}: attributedTo has different host. expected: ${expectHost}, actual: ${actualHost}`);
 		}
 
 		if (object.published && !this.idService.isSafeT(new Date(object.published).valueOf())) {
-			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', 'invalid Note: published timestamp is malformed');
+			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', 'invalid Note from ${uri}: published timestamp is malformed');
 		}
 
 		if (actor) {
 			const attribution = (object.attributedTo) ? getOneApId(object.attributedTo) : actor.uri;
 			if (attribution !== actor.uri) {
-				return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: attribution does not match the actor that send it. attribution: ${attribution}, actor: ${actor.uri}`);
+				return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note from ${uri}: attribution does not match the actor that send it. attribution: ${attribution}, actor: ${actor.uri}`);
 			}
 			if (user && attribution !== user.uri) {
-				return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: updated attribution does not match original attribution. updated attribution: ${user.uri}, original attribution: ${attribution}`);
+				return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note from ${uri}: updated attribution does not match original attribution. updated attribution: ${user.uri}, original attribution: ${attribution}`);
 			}
 		}
 
@@ -197,7 +197,7 @@ export class ApNoteService {
 		// eslint-disable-next-line no-param-reassign
 		actor ??= await this.apPersonService.fetchPerson(uri) as MiRemoteUser | undefined;
 		if (actor && actor.isSuspended) {
-			throw new IdentifiableError('85ab9bd7-3a41-4530-959d-f07073900109', `actor ${uri} has been suspended: ${entryUri}`);
+			throw new IdentifiableError('85ab9bd7-3a41-4530-959d-f07073900109', `failed to create note ${entryUri}: actor ${uri} has been suspended`);
 		}
 
 		const apMentions = await this.apMentionService.extractApMentions(note.tag, resolver);
@@ -224,7 +224,7 @@ export class ApNoteService {
 		 */
 		const hasProhibitedWords = this.noteCreateService.checkProhibitedWordsContain({ cw, text, pollChoices: poll?.choices });
 		if (hasProhibitedWords) {
-			throw new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140af99', `Note contains prohibited words: ${entryUri}`);
+			throw new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140af99', `failed to create note ${entryUri}: contains prohibited words`);
 		}
 		//#endregion
 
@@ -233,7 +233,7 @@ export class ApNoteService {
 
 		// 解決した投稿者が凍結されていたらスキップ
 		if (actor.isSuspended) {
-			throw new IdentifiableError('85ab9bd7-3a41-4530-959d-f07073900109', `actor has been suspended: ${entryUri}`);
+			throw new IdentifiableError('85ab9bd7-3a41-4530-959d-f07073900109', `failed to create note ${entryUri}: actor ${actor.id} has been suspended`);
 		}
 
 		const noteAudience = await this.apAudienceService.parseAudience(actor, note.to, note.cc, resolver);
@@ -409,7 +409,7 @@ export class ApNoteService {
 		this.logger.info(`Creating the Note: ${note.id}`);
 
 		if (actor.isSuspended) {
-			throw new IdentifiableError('85ab9bd7-3a41-4530-959d-f07073900109', `actor ${actor.id} has been suspended: ${noteUri}`);
+			throw new IdentifiableError('85ab9bd7-3a41-4530-959d-f07073900109', `failed to update note ${entryUri}: actor ${actor.id} has been suspended`);
 		}
 
 		const apMentions = await this.apMentionService.extractApMentions(note.tag, resolver);
@@ -436,7 +436,7 @@ export class ApNoteService {
 		 */
 		const hasProhibitedWords = this.noteCreateService.checkProhibitedWordsContain({ cw, text, pollChoices: poll?.choices });
 		if (hasProhibitedWords) {
-			throw new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140af99', `Note contains prohibited words: ${noteUri}`);
+			throw new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140af99', `failed to update note ${noteUri}: contains prohibited words`);
 		}
 		//#endregion
 
