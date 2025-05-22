@@ -353,12 +353,12 @@ export class GlobalEventService {
 	}
 
 	@bindThis
-	private publish(channel: StreamChannels, type: string | null, value?: any): void {
+	private async publish(channel: StreamChannels, type: string | null, value?: any): Promise<void> {
 		const message = type == null ? value : value == null ?
 			{ type: type, body: null } :
 			{ type: type, body: value };
 
-		this.redisForPub.publish(this.config.host, JSON.stringify({
+		await this.redisForPub.publish(this.config.host, JSON.stringify({
 			channel: channel,
 			message: message,
 		}));
@@ -367,6 +367,11 @@ export class GlobalEventService {
 	@bindThis
 	public publishInternalEvent<K extends keyof InternalEventTypes>(type: K, value?: InternalEventTypes[K]): void {
 		this.publish('internal', type, typeof value === 'undefined' ? null : value);
+	}
+
+	@bindThis
+	public async publishInternalEventAsync<K extends keyof InternalEventTypes>(type: K, value?: InternalEventTypes[K]): Promise<void> {
+		await this.publish('internal', type, typeof value === 'undefined' ? null : value);
 	}
 
 	@bindThis
