@@ -49,10 +49,9 @@ export class ImportUserListsProcessorService {
 
 	@bindThis
 	public async process(job: Bull.Job<DbUserImportJobData>): Promise<void> {
-		this.logger.info(`Importing user lists of ${job.data.user.id} ...`);
-
 		const user = await this.usersRepository.findOneBy({ id: job.data.user.id });
 		if (user == null) {
+			this.logger.debug(`Skip: user ${job.data.user.id} does not exist`);
 			return;
 		}
 
@@ -60,8 +59,11 @@ export class ImportUserListsProcessorService {
 			id: job.data.fileId,
 		});
 		if (file == null) {
+			this.logger.debug(`Skip: file ${job.data.fileId} does not exist`);
 			return;
 		}
+
+		this.logger.info(`Importing user lists of ${job.data.user.id} ...`);
 
 		const csv = await this.downloadService.downloadTextFile(file.url);
 
@@ -107,6 +109,6 @@ export class ImportUserListsProcessorService {
 			}
 		}
 
-		this.logger.succ('Imported');
+		this.logger.debug('Imported');
 	}
 }

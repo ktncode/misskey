@@ -86,21 +86,23 @@ export class ExportAccountDataProcessorService {
 
 	@bindThis
 	public async process(job: Bull.Job): Promise<void> {
-		this.logger.info('Exporting Account Data...');
-
 		const user = await this.usersRepository.findOneBy({ id: job.data.user.id });
 		if (user == null) {
+			this.logger.debug(`Skip: user ${job.data.user.id} does not exist`);
 			return;
 		}
 
 		const profile = await this.userProfilesRepository.findOneBy({ userId: job.data.user.id });
 		if (profile == null) {
+			this.logger.debug(`Skip: user ${job.data.user.id} has no profile`);
 			return;
 		}
 
+		this.logger.info(`Exporting account data for ${job.data.user.id} ...`);
+
 		const [path, cleanup] = await createTempDir();
 
-		this.logger.info(`Temp dir is ${path}`);
+		this.logger.debug(`Temp dir is ${path}`);
 
 		// User Export
 
@@ -745,12 +747,12 @@ export class ExportAccountDataProcessorService {
 				zlib: { level: 0 },
 			});
 			archiveStream.on('close', async () => {
-				this.logger.succ(`Exported to: ${archivePath}`);
+				this.logger.debug(`Exported to path: ${archivePath}`);
 
 				const fileName = 'data-request-' + dateFormat(new Date(), 'yyyy-MM-dd-HH-mm-ss') + '.zip';
 				const driveFile = await this.driveService.addFile({ user, path: archivePath, name: fileName, force: true });
 
-				this.logger.succ(`Exported to: ${driveFile.id}`);
+				this.logger.debug(`Exported to drive: ${driveFile.id}`);
 				cleanup();
 				archiveCleanup();
 				if (profile.email) {

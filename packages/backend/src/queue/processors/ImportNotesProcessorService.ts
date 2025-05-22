@@ -159,10 +159,9 @@ export class ImportNotesProcessorService {
 
 	@bindThis
 	public async process(job: Bull.Job<DbNoteImportJobData>): Promise<void> {
-		this.logger.info(`Starting note import of ${job.data.user.id} ...`);
-
 		const user = await this.usersRepository.findOneBy({ id: job.data.user.id });
 		if (user == null) {
+			this.logger.debug(`Skip: user ${job.data.user.id} does not exist`);
 			return;
 		}
 
@@ -170,8 +169,11 @@ export class ImportNotesProcessorService {
 			id: job.data.fileId,
 		});
 		if (file == null) {
+			this.logger.debug(`Skip: file ${job.data.fileId} does not exist`);
 			return;
 		}
+
+		this.logger.info(`Starting note import of ${job.data.user.id} ...`);
 
 		let folder = await this.driveFoldersRepository.findOneBy({ name: 'Imports', userId: job.data.user.id });
 		if (folder == null) {
@@ -184,7 +186,7 @@ export class ImportNotesProcessorService {
 		if (type === 'Twitter' || file.name.startsWith('twitter') && file.name.endsWith('.zip')) {
 			const [path, cleanup] = await createTempDir();
 
-			this.logger.info(`Temp dir is ${path}`);
+			this.logger.debug(`Temp dir is ${path}`);
 
 			const destPath = path + '/twitter.zip';
 
@@ -198,7 +200,7 @@ export class ImportNotesProcessorService {
 
 			const outputPath = path + '/twitter';
 			try {
-				this.logger.succ(`Unzipping to ${outputPath}`);
+				this.logger.debug(`Unzipping to ${outputPath}`);
 				ZipReader.withDestinationPath(outputPath).viaBuffer(await fsp.readFile(destPath));
 
 				const unprocessedTweets = this.parseTwitterFile(await fsp.readFile(outputPath + '/data/tweets.js', 'utf-8'));
@@ -212,7 +214,7 @@ export class ImportNotesProcessorService {
 		} else if (type === 'Facebook' || file.name.startsWith('facebook-') && file.name.endsWith('.zip')) {
 			const [path, cleanup] = await createTempDir();
 
-			this.logger.info(`Temp dir is ${path}`);
+			this.logger.debug(`Temp dir is ${path}`);
 
 			const destPath = path + '/facebook.zip';
 
@@ -226,7 +228,7 @@ export class ImportNotesProcessorService {
 
 			const outputPath = path + '/facebook';
 			try {
-				this.logger.succ(`Unzipping to ${outputPath}`);
+				this.logger.debug(`Unzipping to ${outputPath}`);
 				ZipReader.withDestinationPath(outputPath).viaBuffer(await fsp.readFile(destPath));
 				const postsJson = await fsp.readFile(outputPath + '/your_activity_across_facebook/posts/your_posts__check_ins__photos_and_videos_1.json', 'utf-8');
 				const posts = JSON.parse(postsJson);
@@ -243,7 +245,7 @@ export class ImportNotesProcessorService {
 		} else if (file.name.endsWith('.zip')) {
 			const [path, cleanup] = await createTempDir();
 
-			this.logger.info(`Temp dir is ${path}`);
+			this.logger.debug(`Temp dir is ${path}`);
 
 			const destPath = path + '/unknown.zip';
 
@@ -257,7 +259,7 @@ export class ImportNotesProcessorService {
 
 			const outputPath = path + '/unknown';
 			try {
-				this.logger.succ(`Unzipping to ${outputPath}`);
+				this.logger.debug(`Unzipping to ${outputPath}`);
 				ZipReader.withDestinationPath(outputPath).viaBuffer(await fsp.readFile(destPath));
 				const isInstagram = type === 'Instagram' || fs.existsSync(outputPath + '/instagram_live') || fs.existsSync(outputPath + '/instagram_ads_and_businesses');
 				const isOutbox = type === 'Mastodon' || fs.existsSync(outputPath + '/outbox.json');
@@ -301,7 +303,7 @@ export class ImportNotesProcessorService {
 		} else if (job.data.type === 'Misskey' || file.name.startsWith('notes-') && file.name.endsWith('.json')) {
 			const [path, cleanup] = await createTemp();
 
-			this.logger.info(`Temp dir is ${path}`);
+			this.logger.debug(`Temp dir is ${path}`);
 
 			try {
 				await fsp.writeFile(path, '', 'utf-8');
@@ -318,7 +320,7 @@ export class ImportNotesProcessorService {
 			cleanup();
 		}
 
-		this.logger.succ('Import jobs created');
+		this.logger.debug('Import jobs created');
 	}
 
 	@bindThis

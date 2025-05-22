@@ -46,18 +46,19 @@ export class ImportCustomEmojisProcessorService {
 
 	@bindThis
 	public async process(job: Bull.Job<DbUserImportJobData>): Promise<void> {
-		this.logger.info('Importing custom emojis ...');
-
 		const file = await this.driveFilesRepository.findOneBy({
 			id: job.data.fileId,
 		});
 		if (file == null) {
+			this.logger.debug(`Skip: file ${job.data.fileId} does not exist`);
 			return;
 		}
 
+		this.logger.info(`Importing custom emojis from ${file.id} (${file.name}) ...`);
+
 		const [path, cleanup] = await createTempDir();
 
-		this.logger.info(`Temp dir is ${path}`);
+		this.logger.debug(`Temp dir is ${path}`);
 
 		const destPath = path + '/emojis.zip';
 
@@ -73,7 +74,7 @@ export class ImportCustomEmojisProcessorService {
 
 		const outputPath = path + '/emojis';
 		try {
-			this.logger.succ(`Unzipping to ${outputPath}`);
+			this.logger.debug(`Unzipping to ${outputPath}`);
 			ZipReader.withDestinationPath(outputPath).viaBuffer(await fs.promises.readFile(destPath));
 			const metaRaw = fs.readFileSync(outputPath + '/meta.json', 'utf-8');
 			const meta = JSON.parse(metaRaw);
@@ -126,7 +127,7 @@ export class ImportCustomEmojisProcessorService {
 
 			cleanup();
 
-			this.logger.succ('Imported');
+			this.logger.debug('Imported');
 		} catch (e) {
 			this.logger.error('Error importing custom emojis:', e as Error);
 			cleanup();
