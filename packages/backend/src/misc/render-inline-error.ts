@@ -7,6 +7,21 @@ import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { StatusError } from '@/misc/status-error.js';
 
 export function renderInlineError(err: unknown): string {
+	if (err instanceof Error) {
+		const text = printError(err);
+
+		if (err.cause) {
+			const cause = renderInlineError(err.cause);
+			return `${text} [caused by]: ${cause}`;
+		} else {
+			return text;
+		}
+	}
+
+	return String(err);
+}
+
+function printError(err: Error): string {
 	if (err instanceof IdentifiableError) {
 		if (err.message) {
 			return `${err.name} ${err.id}: ${err.message}`;
@@ -25,13 +40,9 @@ export function renderInlineError(err: unknown): string {
 		}
 	}
 
-	if (err instanceof Error) {
-		if (err.message) {
-			return `${err.name}: ${err.message}`;
-		} else {
-			return err.name;
-		}
+	if (err.message) {
+		return `${err.name}: ${err.message}`;
+	} else {
+		return err.name;
 	}
-
-	return String(err);
 }
