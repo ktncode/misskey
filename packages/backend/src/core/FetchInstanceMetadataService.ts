@@ -129,7 +129,7 @@ export class FetchInstanceMetadataService {
 
 			await this.federatedInstanceService.update(instance.id, updates);
 
-			this.logger.succ(`Successfully updated metadata of ${instance.host}`);
+			this.logger.info(`Successfully updated metadata of ${instance.host}`);
 		} catch (e) {
 			this.logger.error(`Failed to update metadata of ${instance.host}: ${renderInlineError(e)}`);
 		} finally {

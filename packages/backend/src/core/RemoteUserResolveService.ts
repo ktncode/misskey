@@ -106,7 +106,7 @@ export class RemoteUserResolveService {
 				});
 			}
 
-			this.logger.succ(`Corrected URI for ${acctLower} from ${user.uri} to ${self.href}`);
+			this.logger.info(`Corrected URI for ${acctLower} from ${user.uri} to ${self.href}`);
 
 			await this.apPersonService.updatePerson(self.href);
 

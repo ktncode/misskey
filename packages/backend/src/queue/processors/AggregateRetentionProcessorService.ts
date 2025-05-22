@@ -87,6 +87,6 @@ export class AggregateRetentionProcessorService {
 			});
 		}
 
-		this.logger.succ('Retention aggregated.');
+		this.logger.info('Retention aggregated.');
 	}
 }
