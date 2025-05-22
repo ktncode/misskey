@@ -695,9 +695,9 @@ export class MiMeta {
 
 	@Column('varchar', {
 		length: 500,
-		nullable: true,
+		default: '❤️',
 	})
-	public defaultLike: string | null;
+	public defaultLike: string;
 
 	@Column('varchar', {
 		length: 256, array: true, default: '{}',
