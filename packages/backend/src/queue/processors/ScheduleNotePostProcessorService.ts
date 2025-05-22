@@ -133,7 +133,7 @@ export class ScheduleNotePostProcessorService {
 						reason: renderInlineError(err),
 					});
 					await this.noteScheduleRepository.remove(data);
-					this.logger.error(`Scheduled note failed:`, err);
+					this.logger.error(`Scheduled note failed: ${renderInlineError(err)}`);
 					throw err;
 				});
 				await this.noteScheduleRepository.remove(data);

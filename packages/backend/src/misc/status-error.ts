@@ -9,8 +9,8 @@ export class StatusError extends Error {
 	public isClientError: boolean;
 	public isRetryable: boolean;
 
-	constructor(message: string, statusCode: number, statusMessage?: string, options?: ErrorOptions) {
-		super(message, options);
+	constructor(message: string, statusCode: number, statusMessage?: string, cause?: unknown) {
+		super(message, cause ? { cause } : undefined);
 		this.name = 'StatusError';
 		this.statusCode = statusCode;
 		this.statusMessage = statusMessage;

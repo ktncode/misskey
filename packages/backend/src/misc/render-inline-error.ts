@@ -5,23 +5,35 @@
 
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { StatusError } from '@/misc/status-error.js';
+import { CaptchaError } from '@/core/CaptchaService.js';
 
 export function renderInlineError(err: unknown): string {
-	if (err instanceof Error) {
-		const text = printError(err);
+	const parts: string[] = [];
+	renderTo(err, parts);
+	return parts.join('');
+}
 
-		if (err.cause) {
-			const cause = renderInlineError(err.cause);
-			return `${text} [caused by]: ${cause}`;
-		} else {
-			return text;
+function renderTo(err: unknown, parts: string[]): void {
+	parts.push(printError(err));
+
+	if (err instanceof AggregateError) {
+		for (let i = 0; i < err.errors.length; i++) {
+			parts.push(` [${i + 1}/${err.errors.length}]: `);
+			renderTo(err.errors[i], parts);
 		}
 	}
 
-	return String(err);
+	if (err instanceof Error) {
+		if (err.cause) {
+			parts.push(' [caused by]: ');
+			renderTo(err.cause, parts);
+			// const cause = renderInlineError(err.cause);
+			// parts.push(' [caused by]: ', cause);
+		}
+	}
 }
 
-function printError(err: Error): string {
+function printError(err: unknown): string {
 	if (err instanceof IdentifiableError) {
 		if (err.message) {
 			return `${err.name} ${err.id}: ${err.message}`;
@@ -40,9 +52,21 @@ function printError(err: Error): string {
 		}
 	}
 
-	if (err.message) {
-		return `${err.name}: ${err.message}`;
-	} else {
-		return err.name;
+	if (err instanceof CaptchaError) {
+		if (err.code.description) {
+			return `${err.name} ${err.code.description}: ${err.message}`;
+		} else {
+			return `${err.name}: ${err.message}`;
+		}
 	}
+
+	if (err instanceof Error) {
+		if (err.message) {
+			return `${err.name}: ${err.message}`;
+		} else {
+			return err.name;
+		}
+	}
+
+	return String(err);
 }

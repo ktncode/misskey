@@ -17,6 +17,7 @@ import { RemoteLoggerService } from '@/core/RemoteLoggerService.js';
 import { ApDbResolverService } from '@/core/activitypub/ApDbResolverService.js';
 import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
 import { bindThis } from '@/decorators.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 
 @Injectable()
 export class RemoteUserResolveService {
@@ -119,8 +120,8 @@ export class RemoteUserResolveService {
 	@bindThis
 	private async resolveSelf(acctLower: string): Promise<ILink> {
 		const finger = await this.webfingerService.webfinger(acctLower).catch(err => {
-			this.logger.error(`Failed to WebFinger for ${chalk.yellow(acctLower)}: ${ err.statusCode ?? err.message }`);
-			throw new Error(`Failed to WebFinger for ${acctLower}: ${ err.statusCode ?? err.message }`);
+			this.logger.error(`Failed to WebFinger for ${chalk.yellow(acctLower)}: ${renderInlineError(err)}`);
+			throw new Error(`Failed to WebFinger for ${acctLower}: error thrown`, { cause: err });
 		});
 		const self = finger.links.find(link => link.rel != null && link.rel.toLowerCase() === 'self');
 		if (!self) {

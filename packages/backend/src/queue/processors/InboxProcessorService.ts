@@ -228,7 +228,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 
 				const ldHost = this.utilityService.extractDbHost(authUser.user.uri);
 				if (!this.utilityService.isFederationAllowedHost(ldHost)) {
-					throw new Bull.UnrecoverableError(`Blocked request: ${ldHost}`);
+					throw new Bull.UnrecoverableError(`skip: request host is blocked: ${ldHost}`);
 				}
 			} else {
 				throw new Bull.UnrecoverableError(`skip: http-signature verification failed and no LD-Signature. keyId=${signature.keyId}`);

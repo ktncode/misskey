@@ -175,11 +175,11 @@ export class ApNoteService {
 		this.logger.debug(`Note fetched: ${JSON.stringify(note, null, 2)}`);
 
 		if (note.id == null) {
-			throw new UnrecoverableError(`Refusing to create note without id: ${entryUri}`);
+			throw new UnrecoverableError(`failed to create note ${entryUri}: missing ID`);
 		}
 
 		if (!checkHttps(note.id)) {
-			throw new UnrecoverableError(`unexpected schema of note.id ${note.id} in ${entryUri}`);
+			throw new UnrecoverableError(`failed to create note ${entryUri}: unexpected schema`);
 		}
 
 		const url = this.apUtilityService.findBestObjectUrl(note);
@@ -188,7 +188,7 @@ export class ApNoteService {
 
 		// 投稿者をフェッチ
 		if (note.attributedTo == null) {
-			throw new UnrecoverableError(`invalid note.attributedTo ${note.attributedTo} in ${entryUri}`);
+			throw new UnrecoverableError(`failed to create note: ${entryUri}: missing attributedTo`);
 		}
 
 		const uri = getOneApId(note.attributedTo);
@@ -271,14 +271,14 @@ export class ApNoteService {
 				.then(x => {
 					if (x == null) {
 						this.logger.warn(`Specified inReplyTo "${note.inReplyTo}", but not found`);
-						throw new Error(`could not fetch inReplyTo ${note.inReplyTo} for note ${entryUri}`);
+						throw new IdentifiableError('1ebf0a96-2769-4973-a6c2-3dcbad409dff', `failed to create note ${entryUri}: could not fetch inReplyTo ${note.inReplyTo}`, true);
 					}
 
 					return x;
 				})
 				.catch(async err => {
 					this.logger.warn(`error ${renderInlineError(err)} fetching inReplyTo ${note.inReplyTo} for note ${entryUri}`);
-					throw err;
+					throw new IdentifiableError('1ebf0a96-2769-4973-a6c2-3dcbad409dff', `failed to create note ${entryUri}: could not fetch inReplyTo ${note.inReplyTo}`, true, err);
 				})
 			: null;
 
@@ -349,7 +349,7 @@ export class ApNoteService {
 			this.logger.info('The note is already inserted while creating itself, reading again');
 			const duplicate = await this.fetchNote(value);
 			if (!duplicate) {
-				throw new Error(`The note creation failed with duplication error even when there is no duplication: ${entryUri}`);
+				throw new IdentifiableError('39c328e1-e829-458b-bfc9-65dcd513d1f8', `failed to create note ${entryUri}: the note creation failed with duplication error even when there is no duplication. This is likely a bug.`);
 			}
 			return duplicate;
 		}
@@ -363,45 +363,39 @@ export class ApNoteService {
 		const noteUri = getApId(value);
 
 		// URIがこのサーバーを指しているならスキップ
-		if (noteUri.startsWith(this.config.url + '/')) throw new UnrecoverableError(`uri points local: ${noteUri}`);
+		if (this.utilityService.isUriLocal(noteUri)) {
+			throw new UnrecoverableError(`failed to update note ${noteUri}: uri is local`);
+		}
 
 		//#region このサーバーに既に登録されているか
 		const updatedNote = await this.notesRepository.findOneBy({ uri: noteUri });
-		if (updatedNote == null) throw new Error(`Note is not registered (no note): ${noteUri}`);
+		if (updatedNote == null) throw new UnrecoverableError(`failed to update note ${noteUri}: note does not exist`);
 
 		const user = await this.usersRepository.findOneBy({ id: updatedNote.userId }) as MiRemoteUser | null;
-		if (user == null) throw new Error(`Note is not registered (no user): ${noteUri}`);
+		if (user == null) throw new UnrecoverableError(`failed to update note ${noteUri}: user does not exist`);
 
-		// eslint-disable-next-line no-param-reassign
-		if (resolver == null) resolver = this.apResolverService.createResolver();
+		resolver ??= this.apResolverService.createResolver();
 
 		const object = await resolver.resolve(value);
 
 		const entryUri = getApId(value);
 		const err = this.validateNote(object, entryUri, actor, user);
 		if (err) {
-			this.logger.error(`Error updating note: ${renderInlineError(err)}`, {
-				resolver: { history: resolver.getHistory() },
-				value,
-				object,
-			});
+			this.logger.error(`Failed to update note ${noteUri}: ${renderInlineError(err)}`);
 			throw err;
 		}
 
 		// `validateNote` checks that the actor and user are one and the same
-		// eslint-disable-next-line no-param-reassign
 		actor ??= user;
 
 		const note = object as IPost;
 
-		this.logger.debug(`Note fetched: ${JSON.stringify(note, null, 2)}`);
-
 		if (note.id == null) {
-			throw new UnrecoverableError(`Refusing to update note without id: ${noteUri}`);
+			throw new UnrecoverableError(`failed to update note ${entryUri}: missing ID`);
 		}
 
 		if (!checkHttps(note.id)) {
-			throw new UnrecoverableError(`unexpected schema of note.id ${note.id} in ${noteUri}`);
+			throw new UnrecoverableError(`failed to update note ${entryUri}: unexpected schema`);
 		}
 
 		const url = this.apUtilityService.findBestObjectUrl(note);
@@ -475,14 +469,14 @@ export class ApNoteService {
 				.then(x => {
 					if (x == null) {
 						this.logger.warn(`Specified inReplyTo "${note.inReplyTo}", but not found`);
-						throw new Error(`could not fetch inReplyTo ${note.inReplyTo} for note ${entryUri}`);
+						throw new IdentifiableError('1ebf0a96-2769-4973-a6c2-3dcbad409dff', `failed to update note ${entryUri}: could not fetch inReplyTo ${note.inReplyTo}`, true);
 					}
 
 					return x;
 				})
 				.catch(async err => {
 					this.logger.warn(`error ${renderInlineError(err)} fetching inReplyTo ${note.inReplyTo} for note ${entryUri}`);
-					throw err;
+					throw new IdentifiableError('1ebf0a96-2769-4973-a6c2-3dcbad409dff', `failed to update note ${entryUri}: could not fetch inReplyTo ${note.inReplyTo}`, true, err);
 				})
 			: null;
 
@@ -550,7 +544,7 @@ export class ApNoteService {
 			this.logger.info('The note is already inserted while creating itself, reading again');
 			const duplicate = await this.fetchNote(value);
 			if (!duplicate) {
-				throw new Error(`The note creation failed with duplication error even when there is no duplication: ${noteUri}`);
+				throw new IdentifiableError('39c328e1-e829-458b-bfc9-65dcd513d1f8', `failed to update note ${entryUri}: the note update failed with duplication error even when there is no duplication. This is likely a bug.`);
 			}
 			return duplicate;
 		}
@@ -567,8 +561,7 @@ export class ApNoteService {
 		const uri = getApId(value);
 
 		if (!this.utilityService.isFederationAllowedUri(uri)) {
-			// TODO convert to identifiable error
-			throw new StatusError(`blocked host: ${uri}`, 451, 'blocked host');
+			throw new IdentifiableError('04620a7e-044e-45ce-b72c-10e1bdc22e69', `failed to resolve note ${uri}: host is blocked`);
 		}
 
 		//#region このサーバーに既に登録されていたらそれを返す
@@ -578,8 +571,7 @@ export class ApNoteService {
 
 		// Bail if local URI doesn't exist
 		if (this.utilityService.isUriLocal(uri)) {
-			// TODO convert to identifiable error
-			throw new StatusError(`cannot resolve local note: ${uri}`, 400, 'cannot resolve local note');
+			throw new IdentifiableError('cbac7358-23f2-4c70-833e-cffb4bf77913', `failed to resolve note ${uri}: URL is local and does not exist`);
 		}
 
 		const unlock = await this.appLockService.getApLock(uri);

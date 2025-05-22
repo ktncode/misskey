@@ -55,6 +55,7 @@ import type { ApLoggerService } from '../ApLoggerService.js';
 
 import type { ApImageService } from './ApImageService.js';
 import type { IActor, ICollection, IObject, IOrderedCollection } from '../type.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 
 const nameLength = 128;
 const summaryLength = 2048;
@@ -158,21 +159,21 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		const expectHost = this.utilityService.punyHostPSLDomain(uri);
 
 		if (!isActor(x)) {
-			throw new UnrecoverableError(`invalid Actor type '${x.type}' in ${uri}`);
+			throw new UnrecoverableError(`invalid Actor ${uri}: unknown type '${x.type}'`);
 		}
 
 		if (!(typeof x.id === 'string' && x.id.length > 0)) {
-			throw new UnrecoverableError(`invalid Actor ${uri} - wrong id type`);
+			throw new UnrecoverableError(`invalid Actor ${uri}: wrong id type`);
 		}
 
 		if (!(typeof x.inbox === 'string' && x.inbox.length > 0)) {
-			throw new UnrecoverableError(`invalid Actor ${uri} - wrong inbox type`);
+			throw new UnrecoverableError(`invalid Actor ${uri}: wrong inbox type`);
 		}
 
 		this.apUtilityService.assertApUrl(x.inbox);
 		const inboxHost = this.utilityService.punyHostPSLDomain(x.inbox);
 		if (inboxHost !== expectHost) {
-			throw new UnrecoverableError(`invalid Actor ${uri} - wrong inbox ${inboxHost}`);
+			throw new UnrecoverableError(`invalid Actor ${uri}: wrong inbox host ${inboxHost}`);
 		}
 
 		const sharedInboxObject = x.sharedInbox ?? (x.endpoints ? x.endpoints.sharedInbox : undefined);
@@ -180,7 +181,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 			const sharedInbox = getApId(sharedInboxObject);
 			this.apUtilityService.assertApUrl(sharedInbox);
 			if (!(typeof sharedInbox === 'string' && sharedInbox.length > 0 && this.utilityService.punyHostPSLDomain(sharedInbox) === expectHost)) {
-				throw new UnrecoverableError(`invalid Actor ${uri} - wrong shared inbox ${sharedInbox}`);
+				throw new UnrecoverableError(`invalid Actor ${uri}: wrong shared inbox ${sharedInbox}`);
 			}
 		}
 
@@ -191,7 +192,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 				if (typeof collectionUri === 'string' && collectionUri.length > 0) {
 					this.apUtilityService.assertApUrl(collectionUri);
 					if (this.utilityService.punyHostPSLDomain(collectionUri) !== expectHost) {
-						throw new UnrecoverableError(`invalid Actor ${uri} - wrong ${collection} ${collectionUri}`);
+						throw new UnrecoverableError(`invalid Actor ${uri}: wrong ${collection} host ${collectionUri}`);
 					}
 				} else if (collectionUri != null) {
 					throw new UnrecoverableError(`invalid Actor ${uri}: wrong ${collection} type`);
@@ -200,7 +201,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		}
 
 		if (!(typeof x.preferredUsername === 'string' && x.preferredUsername.length > 0 && x.preferredUsername.length <= 128 && /^\w([\w-.]*\w)?$/.test(x.preferredUsername))) {
-			throw new UnrecoverableError(`invalid Actor ${uri} - wrong username`);
+			throw new UnrecoverableError(`invalid Actor ${uri}: wrong username`);
 		}
 
 		// These fields are only informational, and some AP software allows these
@@ -208,7 +209,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		// we can at least see these users and their activities.
 		if (x.name) {
 			if (!(typeof x.name === 'string' && x.name.length > 0)) {
-				throw new UnrecoverableError(`invalid Actor ${uri} - wrong name`);
+				throw new UnrecoverableError(`invalid Actor ${uri}: wrong name`);
 			}
 			x.name = truncate(x.name, nameLength);
 		} else if (x.name === '') {
@@ -217,24 +218,24 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		}
 		if (x.summary) {
 			if (!(typeof x.summary === 'string' && x.summary.length > 0)) {
-				throw new UnrecoverableError(`invalid Actor ${uri} - wrong summary`);
+				throw new UnrecoverableError(`invalid Actor ${uri}: wrong summary`);
 			}
 			x.summary = truncate(x.summary, summaryLength);
 		}
 
 		const idHost = this.utilityService.punyHostPSLDomain(x.id);
 		if (idHost !== expectHost) {
-			throw new UnrecoverableError(`invalid Actor ${uri} - wrong id ${x.id}`);
+			throw new UnrecoverableError(`invalid Actor ${uri}: wrong id ${x.id}`);
 		}
 
 		if (x.publicKey) {
 			if (typeof x.publicKey.id !== 'string') {
-				throw new UnrecoverableError(`invalid Actor ${uri} - wrong publicKey.id type`);
+				throw new UnrecoverableError(`invalid Actor ${uri}: wrong publicKey.id type`);
 			}
 
 			const publicKeyIdHost = this.utilityService.punyHostPSLDomain(x.publicKey.id);
 			if (publicKeyIdHost !== expectHost) {
-				throw new UnrecoverableError(`invalid Actor ${uri} - wrong publicKey.id ${x.publicKey.id}`);
+				throw new UnrecoverableError(`invalid Actor ${uri}: wrong publicKey.id ${x.publicKey.id}`);
 			}
 		}
 
@@ -272,8 +273,6 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 	}
 
 	private async resolveAvatarAndBanner(user: MiRemoteUser, icon: any, image: any, bgimg: any): Promise<Partial<Pick<MiRemoteUser, 'avatarId' | 'bannerId' | 'backgroundId' | 'avatarUrl' | 'bannerUrl' | 'backgroundUrl' | 'avatarBlurhash' | 'bannerBlurhash' | 'backgroundBlurhash'>>> {
-		if (user == null) throw new Error('failed to create user: user is null');
-
 		const [avatar, banner, background] = await Promise.all([icon, image, bgimg].map(img => {
 			// icon and image may be arrays
 			// see https://www.w3.org/TR/activitystreams-vocabulary/#dfn-icon
@@ -326,12 +325,11 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 	 */
 	@bindThis
 	public async createPerson(uri: string, resolver?: Resolver): Promise<MiRemoteUser> {
-		if (typeof uri !== 'string') throw new UnrecoverableError(`uri is not string: ${uri}`);
+		if (typeof uri !== 'string') throw new UnrecoverableError(`failed to create user ${uri}: input is not string`);
 
 		const host = this.utilityService.punyHost(uri);
 		if (host === this.utilityService.toPuny(this.config.host)) {
-			// TODO convert to unrecoverable error
-			throw new StatusError(`cannot resolve local user: ${uri}`, 400, 'cannot resolve local user');
+			throw new UnrecoverableError(`failed to create user ${uri}: URI is local`);
 		}
 
 		return await this._createPerson(uri, resolver);
@@ -341,8 +339,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		const uri = getApId(value);
 		const host = this.utilityService.punyHost(uri);
 
-		// eslint-disable-next-line no-param-reassign
-		if (resolver == null) resolver = this.apResolverService.createResolver();
+		resolver ??= this.apResolverService.createResolver();
 
 		const object = await resolver.resolve(value);
 		const person = this.validateActor(object, uri);
@@ -375,7 +372,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		const bday = person['vcard:bday']?.match(/^\d{4}-\d{2}-\d{2}/);
 
 		if (person.id == null) {
-			throw new UnrecoverableError(`Refusing to create person without id: ${uri}`);
+			throw new UnrecoverableError(`failed to create user ${uri}: missing ID`);
 		}
 
 		const url = this.apUtilityService.findBestObjectUrl(person);
@@ -568,7 +565,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 	 */
 	@bindThis
 	public async updatePerson(uri: string, resolver?: Resolver | null, hint?: IObject, movePreventUris: string[] = []): Promise<string | void> {
-		if (typeof uri !== 'string') throw new UnrecoverableError('uri is not string');
+		if (typeof uri !== 'string') throw new UnrecoverableError(`failed to update user ${uri}: input is not string`);
 
 		// URIがこのサーバーを指しているならスキップ
 		if (this.utilityService.isUriLocal(uri)) return;
@@ -624,7 +621,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		const bday = person['vcard:bday']?.match(/^\d{4}-\d{2}-\d{2}/);
 
 		if (person.id == null) {
-			throw new UnrecoverableError(`Refusing to update person without id: ${uri}`);
+			throw new UnrecoverableError(`failed to update user ${uri}: missing ID`);
 		}
 
 		const url = this.apUtilityService.findBestObjectUrl(person);
@@ -793,8 +790,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		const uri = getApId(value);
 
 		if (!this.utilityService.isFederationAllowedUri(uri)) {
-			// TODO convert to identifiable error
-			throw new StatusError(`blocked host: ${uri}`, 451, 'blocked host');
+			throw new IdentifiableError('590719b3-f51f-48a9-8e7d-6f559ad00e5d', `failed to resolve person ${uri}: host is blocked`);
 		}
 
 		//#region このサーバーに既に登録されていたらそれを返す
@@ -804,8 +800,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 
 		// Bail if local URI doesn't exist
 		if (this.utilityService.isUriLocal(uri)) {
-			// TODO convert to identifiable error
-			throw new StatusError(`cannot resolve local person: ${uri}`, 400, 'cannot resolve local person');
+			throw new IdentifiableError('efb573fd-6b9e-4912-9348-a02f5603df4f', `failed to resolve person ${uri}: URL is local and does not exist`);
 		}
 
 		const unlock = await this.appLockService.getApLock(uri);
@@ -859,7 +854,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		}) : null;
 		if (!collection) return;
 
-		if (!isCollectionOrOrderedCollection(collection)) throw new UnrecoverableError(`featured ${user.featured} is not Collection or OrderedCollection in ${user.uri}`);
+		if (!isCollectionOrOrderedCollection(collection)) throw new UnrecoverableError(`failed to update user ${user.uri}: featured ${user.featured} is not Collection or OrderedCollection`);
 
 		// Resolve to Object(may be Note) arrays
 		const unresolvedItems = isCollection(collection) ? collection.items : collection.orderedItems;

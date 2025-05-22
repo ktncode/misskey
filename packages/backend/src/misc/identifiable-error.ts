@@ -15,8 +15,8 @@ export class IdentifiableError extends Error {
 	 */
 	public readonly isRetryable: boolean;
 
-	constructor(id: string, message?: string, isRetryable = false, options?: ErrorOptions) {
-		super(message, options);
+	constructor(id: string, message?: string, isRetryable = false, cause?: unknown) {
+		super(message, cause ? { cause } : undefined);
 		this.message = message ?? '';
 		this.id = id;
 		this.isRetryable = isRetryable;
