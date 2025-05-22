@@ -45,8 +45,8 @@ import { isMimeImage } from '@/misc/is-mime-image.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { BunnyService } from '@/core/BunnyService.js';
-import { LoggerService } from './LoggerService.js';
 import { renderInlineError } from '@/misc/render-inline-error.js';
+import { LoggerService } from './LoggerService.js';
 
 type AddFileArgs = {
 	/** User who wish to add file */
@@ -203,7 +203,7 @@ export class DriveService {
 			//#endregion
 
 			//#region Uploads
-			this.registerLogger.info(`uploading original: ${key}`);
+			this.registerLogger.debug(`uploading original: ${key}`);
 			const uploads = [
 				this.upload(key, fs.createReadStream(path), type, null, name),
 			];
@@ -212,7 +212,7 @@ export class DriveService {
 				webpublicKey = `${prefix}webpublic-${randomUUID()}.${alts.webpublic.ext}`;
 				webpublicUrl = `${ baseUrl }/${ webpublicKey }`;
 
-				this.registerLogger.info(`uploading webpublic: ${webpublicKey}`);
+				this.registerLogger.debug(`uploading webpublic: ${webpublicKey}`);
 				uploads.push(this.upload(webpublicKey, alts.webpublic.data, alts.webpublic.type, alts.webpublic.ext, name));
 			}
 
@@ -220,7 +220,7 @@ export class DriveService {
 				thumbnailKey = `${prefix}thumbnail-${randomUUID()}.${alts.thumbnail.ext}`;
 				thumbnailUrl = `${ baseUrl }/${ thumbnailKey }`;
 
-				this.registerLogger.info(`uploading thumbnail: ${thumbnailKey}`);
+				this.registerLogger.debug(`uploading thumbnail: ${thumbnailKey}`);
 				uploads.push(this.upload(thumbnailKey, alts.thumbnail.data, alts.thumbnail.type, alts.thumbnail.ext, `${name}.thumbnail`));
 			}
 
@@ -264,11 +264,11 @@ export class DriveService {
 			const [url, thumbnailUrl, webpublicUrl] = await Promise.all(promises);
 
 			if (thumbnailUrl) {
-				this.registerLogger.info(`thumbnail stored: ${thumbnailAccessKey}`);
+				this.registerLogger.debug(`thumbnail stored: ${thumbnailAccessKey}`);
 			}
 
 			if (webpublicUrl) {
-				this.registerLogger.info(`web stored: ${webpublicAccessKey}`);
+				this.registerLogger.debug(`web stored: ${webpublicAccessKey}`);
 			}
 
 			file.storedInternal = true;
@@ -356,7 +356,7 @@ export class DriveService {
 		let webpublic: IImage | null = null;
 
 		if (generateWeb && !satisfyWebpublic && !isAnimated) {
-			this.registerLogger.info('creating web image');
+			this.registerLogger.debug('creating web image');
 
 			try {
 				if (['image/jpeg', 'image/webp', 'image/avif'].includes(type)) {
@@ -370,9 +370,9 @@ export class DriveService {
 				this.registerLogger.warn('web image not created (an error occurred)', err as Error);
 			}
 		} else {
-			if (satisfyWebpublic) this.registerLogger.info('web image not created (original satisfies webpublic)');
-			else if (isAnimated) this.registerLogger.info('web image not created (animated image)');
-			else this.registerLogger.info('web image not created (from remote)');
+			if (satisfyWebpublic) this.registerLogger.debug('web image not created (original satisfies webpublic)');
+			else if (isAnimated) this.registerLogger.debug('web image not created (animated image)');
+			else this.registerLogger.debug('web image not created (from remote)');
 		}
 		// #endregion webpublic
 
@@ -499,7 +499,6 @@ export class DriveService {
 	}: AddFileArgs): Promise<MiDriveFile> {
 		const userRoleNSFW = user && (await this.roleService.getUserPolicies(user.id)).alwaysMarkNsfw;
 		const info = await this.fileInfoService.getFileInfo(path);
-		this.registerLogger.info(`${JSON.stringify(info)}`);
 
 		// detect name
 		const detectedName = correctFilename(
@@ -509,6 +508,8 @@ export class DriveService {
 			ext ?? info.type.ext,
 		);
 
+		this.registerLogger.debug(`Detected file info: ${JSON.stringify(info)}`);
+
 		if (user && !force) {
 		// Check if there is a file with the same hash
 			const matched = await this.driveFilesRepository.findOneBy({
@@ -517,7 +518,7 @@ export class DriveService {
 			});
 
 			if (matched) {
-				this.registerLogger.info(`file with same hash is found: ${matched.id}`);
+				this.registerLogger.debug(`file with same hash is found: ${matched.id}`);
 				if (sensitive && !matched.isSensitive) {
 					// The file is federated as sensitive for this time, but was federated as non-sensitive before.
 					// Therefore, update the file to sensitive.
@@ -645,7 +646,7 @@ export class DriveService {
 			} catch (err) {
 			// duplicate key error (when already registered)
 				if (isDuplicateKeyValueError(err)) {
-					this.registerLogger.info(`already registered ${file.uri}`);
+					this.registerLogger.debug(`already registered ${file.uri}`);
 
 					file = await this.driveFilesRepository.findOneBy({
 						uri: file.uri!,
@@ -660,7 +661,7 @@ export class DriveService {
 			file = await (this.save(file, path, detectedName, info));
 		}
 
-		this.registerLogger.succ(`drive file has been created ${file.id}`);
+		this.registerLogger.info(`Created file ${file.id} (${detectedName}) of type ${info.type.mime} for user ${user?.id ?? '<none>'}`);
 
 		if (user) {
 			this.driveFileEntityService.pack(file, { self: true }).then(packedFile => {
@@ -893,7 +894,7 @@ export class DriveService {
 			}
 
 			const driveFile = await this.addFile({ user, path, name, comment, folderId, force, isLink, url, uri, sensitive, requestIp, requestHeaders });
-			this.downloaderLogger.succ(`Got: ${driveFile.id}`);
+			this.downloaderLogger.debug(`Upload succeeded: created file ${driveFile.id}`);
 			return driveFile!;
 		} catch (err) {
 			this.downloaderLogger.error(`Failed to create drive file: ${renderInlineError(err)}`, {
