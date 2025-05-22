@@ -101,7 +101,7 @@ export class DownloadService {
 			await stream.pipeline(req, fs.createWriteStream(path));
 		} catch (e) {
 			if (e instanceof Got.HTTPError) {
-				throw new StatusError(`${e.response.statusCode} ${e.response.statusMessage}`, e.response.statusCode, e.response.statusMessage, e);
+				throw new StatusError(`download error from ${url}`, e.response.statusCode, e.response.statusMessage, e);
 			} else if (e instanceof Got.RequestError || e instanceof Got.AbortError) {
 				throw new Error(String(e), { cause: e });
 			} else if (e instanceof Error) {

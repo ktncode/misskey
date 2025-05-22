@@ -384,7 +384,7 @@ export class FileServerService {
 			) {
 				if (!isConvertibleImage) {
 					// 画像でないなら404でお茶を濁す
-					throw new StatusError('Unexpected mime', 404);
+					throw new StatusError(`Unexpected non-convertible mime: ${file.mime}`, 404, 'Unexpected mime');
 				}
 			}
 
@@ -448,7 +448,7 @@ export class FileServerService {
 			} else if (file.mime === 'image/svg+xml') {
 				image = this.imageProcessingService.convertToWebpStream(file.path, 2048, 2048);
 			} else if (!file.mime.startsWith('image/') || !FILE_TYPE_BROWSERSAFE.includes(file.mime)) {
-				throw new StatusError('Rejected type', 403, 'Rejected type');
+				throw new StatusError(`Blocked mime type: ${file.mime}`, 403, 'Blocked mime type');
 			}
 
 			if (!image) {
@@ -522,7 +522,7 @@ export class FileServerService {
 	> {
 		if (url.startsWith(`${this.config.url}/files/`)) {
 			const key = url.replace(`${this.config.url}/files/`, '').split('/').shift();
-			if (!key) throw new StatusError('Invalid File Key', 400, 'Invalid File Key');
+			if (!key) throw new StatusError(`Invalid file URL ${url}`, 400, 'Invalid file url');
 
 			return await this.getFileFromKey(key);
 		}

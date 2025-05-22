@@ -18,6 +18,8 @@ export function renderInlineError(err: unknown): string {
 	if (err instanceof StatusError) {
 		if (err.message) {
 			return `${err.name} ${err.statusCode}: ${err.message}`;
+		} else if (err.statusMessage) {
+			return `${err.name} ${err.statusCode}: ${err.statusMessage}`;
 		} else {
 			return `${err.name} ${err.statusCode}`;
 		}
