@@ -62,7 +62,7 @@ export class AggregateRetentionProcessorService {
 			});
 		} catch (err) {
 			if (isDuplicateKeyValueError(err)) {
-				this.logger.succ('Skip because it has already been processed by another worker.');
+				this.logger.debug('Skip because it has already been processed by another worker.');
 				return;
 			}
 			throw err;
