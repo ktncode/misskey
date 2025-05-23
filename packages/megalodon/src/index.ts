@@ -12,17 +12,17 @@ import MastodonEntity from './mastodon/entity';
 import MisskeyEntity from './misskey/entity';
 
 export {
-  Response,
+  type Response,
   OAuth,
   RequestCanceledError,
   isCancel,
   detector,
-  MegalodonInterface,
+	type MegalodonInterface,
   NotificationType,
   FilterContext,
   Misskey,
-  Entity,
+	type Entity,
   Converter,
-	MastodonEntity,
-	MisskeyEntity,
+	type MastodonEntity,
+	type MisskeyEntity,
 }
