@@ -11,8 +11,8 @@
 	},
 	"dependencies": {
 		"@discordapp/twemoji": "15.1.0",
-		"@phosphor-icons/web": "^2.0.3",
-		"@transfem-org/sfm-js": "0.24.5",
+		"@phosphor-icons/web": "2.1.2",
+		"mfm-js": "npm:@transfem-org/sfm-js@0.24.6",
 		"buraha": "0.0.1",
 		"frontend-shared": "workspace:*",
 		"json5": "2.2.3",

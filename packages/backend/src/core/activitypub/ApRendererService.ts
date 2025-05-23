@@ -6,7 +6,7 @@
 import { createPublicKey, randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
-import * as mfm from '@transfem-org/sfm-js';
+import * as mfm from 'mfm-js';
 import { UnrecoverableError } from 'bullmq';
 import { Element, Text } from 'domhandler';
 import { DI } from '@/di-symbols.js';
