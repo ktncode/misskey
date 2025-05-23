@@ -13046,6 +13046,10 @@ export interface Locale extends ILocale {
      */
     "wordMuteTestNoMatch": string;
     /**
+     * All word mutes are *case-sensitive* and match on any substring, including part of a longer word or name. You can use regular expressions for more precise control.
+     */
+    "wordMuteWarning": string;
+    /**
      * Bubble timeline
      */
     "bubbleTimeline": string;
