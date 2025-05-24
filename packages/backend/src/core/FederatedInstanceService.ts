@@ -5,9 +5,9 @@
 
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import { QueryFailedError } from 'typeorm';
+import { DataSource, QueryFailedError } from 'typeorm';
 import type { InstancesRepository } from '@/models/_.js';
-import type { MiInstance } from '@/models/Instance.js';
+import { MiInstance } from '@/models/Instance.js';
 import { MemoryKVCache, RedisKVCache } from '@/misc/cache.js';
 import { IdService } from '@/core/IdService.js';
 import { DI } from '@/di-symbols.js';
@@ -25,6 +25,9 @@ export class FederatedInstanceService implements OnApplicationShutdown {
 
 		@Inject(DI.instancesRepository)
 		private instancesRepository: InstancesRepository,
+
+		@Inject(DI.db)
+		private readonly db: DataSource,
 
 		private utilityService: UtilityService,
 		private idService: IdService,
@@ -55,34 +58,27 @@ export class FederatedInstanceService implements OnApplicationShutdown {
 		const cached = await this.federatedInstanceCache.get(host);
 		if (cached) return cached;
 
-		const index = await this.instancesRepository.findOneBy({ host });
+		return await this.db.transaction(async tem => {
+			let index = await tem.findOneBy(MiInstance, { host });
 
-		if (index == null) {
-			let i;
-			try {
-				i = await this.instancesRepository.insertOne({
+			if (index == null) {
+				await tem.insert(MiInstance, {
 					id: this.idService.gen(),
 					host,
 					firstRetrievedAt: new Date(),
+					isBlocked: this.utilityService.isBlockedHost(host),
+					isSilenced: this.utilityService.isSilencedHost(host),
+					isMediaSilenced: this.utilityService.isMediaSilencedHost(host),
+					isAllowListed: this.utilityService.isAllowListedHost(host),
+					isBubbled: this.utilityService.isBubbledHost(host),
 				});
-			} catch (e: unknown) {
-				if (e instanceof QueryFailedError) {
-					if (isDuplicateKeyValueError(e)) {
-						i = await this.instancesRepository.findOneBy({ host });
-					}
-				}
 
-				if (i == null) {
-					throw e;
-				}
+				index = await tem.findOneByOrFail(MiInstance, { host });
 			}
 
-			this.federatedInstanceCache.set(host, i);
-			return i;
-		} else {
-			this.federatedInstanceCache.set(host, index);
+			await this.federatedInstanceCache.set(host, index);
 			return index;
-		}
+		});
 	}
 
 	@bindThis
