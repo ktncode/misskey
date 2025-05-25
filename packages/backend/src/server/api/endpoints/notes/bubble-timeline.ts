@@ -85,7 +85,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('note.visibility = \'public\'')
 				.andWhere('note.channelId IS NULL')
-				.andWhere('note.userHost IN (:...hosts)', { hosts: this.serverSettings.bubbleInstances })
+				.andWhere('(note.userHost IS NULL OR userInstance.isBubbled = true)') // This comes from generateVisibilityQuery below
 				.innerJoinAndSelect('note.user', 'user')
 				.leftJoinAndSelect('note.reply', 'reply')
 				.leftJoinAndSelect('note.renote', 'renote')
