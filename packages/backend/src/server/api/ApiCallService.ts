@@ -103,6 +103,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			const errId = randomUUID();
 			this.logger.error(`Internal error occurred in ${ep.name}: ${renderInlineError(err)}`, {
 				ep: ep.name,
+				user: userId ?? '<unauthenticated>',
 				e: {
 					message: err.message,
 					code: err.name,
