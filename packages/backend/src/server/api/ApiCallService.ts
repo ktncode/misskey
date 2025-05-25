@@ -27,6 +27,7 @@ import { AuthenticateService, AuthenticationError } from './AuthenticateService.
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { OnApplicationShutdown } from '@nestjs/common';
 import type { IEndpointMeta, IEndpoint } from './endpoints.js';
+import { renderFullError } from '@/misc/render-full-error.js';
 
 const accessDenied = {
 	message: 'Access denied.',
@@ -101,15 +102,16 @@ export class ApiCallService implements OnApplicationShutdown {
 			throw err;
 		} else {
 			const errId = randomUUID();
-			this.logger.error(`Internal error occurred in ${ep.name}: ${renderInlineError(err)}`, {
-				ep: ep.name,
+			const fullError = renderFullError(err);
+			const message = typeof(fullError) === 'string'
+				? `Internal error id=${errId} occurred in ${ep.name}: ${fullError}`
+				: `Internal error id=${errId} occurred in ${ep.name}:`;
+			const data = typeof(fullError) === 'object'
+				? { e: fullError }
+				: {};
+			this.logger.error(message, {
 				user: userId ?? '<unauthenticated>',
-				e: {
-					message: err.message,
-					code: err.name,
-					stack: err.stack,
-					id: errId,
-				},
+				...data,
 			});
 
 			if (this.config.sentryForBackend) {
