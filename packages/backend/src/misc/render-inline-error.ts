@@ -34,6 +34,9 @@ function renderTo(err: unknown, parts: string[]): void {
 }
 
 function printError(err: unknown): string {
+	if (err === undefined) return 'undefined';
+	if (err === null) return 'null';
+
 	if (err instanceof IdentifiableError) {
 		if (err.message) {
 			return `${err.name} ${err.id}: ${err.message}`;
