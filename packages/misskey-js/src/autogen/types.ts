@@ -12919,6 +12919,7 @@ export type operations = {
         'application/json': {
           uri: string;
           expandCollectionItems?: boolean;
+          expandCollectionLimit?: number | null;
           allowAnonymous?: boolean;
         };
       };

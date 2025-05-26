@@ -35,6 +35,7 @@ export const paramDef = {
 	properties: {
 		uri: { type: 'string' },
 		expandCollectionItems: { type: 'boolean' },
+		expandCollectionLimit: { type: 'integer', nullable: true },
 		allowAnonymous: { type: 'boolean' },
 	},
 	required: ['uri'],
@@ -50,7 +51,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const object = await resolver.resolve(ps.uri, ps.allowAnonymous ?? false);
 
 			if (ps.expandCollectionItems && isCollectionOrOrderedCollection(object)) {
-				const items = await resolver.resolveCollectionItems(object, undefined, ps.allowAnonymous ?? false);
+				const items = await resolver.resolveCollectionItems(object, ps.expandCollectionLimit, ps.allowAnonymous ?? false);
 
 				if (isOrderedCollection(object) || isOrderedCollectionPage(object)) {
 					object.orderedItems = items;
