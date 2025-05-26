@@ -79,12 +79,21 @@ export class Resolver {
 		}
 	}
 
+	/**
+	 * Recursively resolves items from a collection.
+	 * Stops when reaching the resolution limit or an optional item limit - whichever is lower.
+	 * This method supports Collection, OrderedCollection, and individual pages of either type.
+	 * Malformed collections (mixing Ordered and un-Ordered types) are also supported.
+	 * @param collection Collection to resolve from - can be a URL or object of any supported collection type.
+	 * @param limit Maximum number of items to resolve. If null or undefined (default), then items will be resolved until reaching the recursion limit.
+	 * @param allowAnonymousItems If true, collection items can be anonymous (lack an ID). If false (default), then an error is thrown when reaching an item without ID.
+	 */
 	@bindThis
-	public async resolveCollectionItems(value: string | IObject, limit?: number, allowAnonymousItems?: boolean): Promise<IObjectWithId[]> {
+	public async resolveCollectionItems(collection: string | IObject, limit?: number | null, allowAnonymousItems?: boolean): Promise<IObjectWithId[]> {
 		const items: IObjectWithId[] = [];
 
-		const collection = await this.resolveCollection(value);
-		await this.resolveCollectionItemsTo(collection, limit, allowAnonymousItems, collection.id, items);
+		const collectionObj = await this.resolveCollection(collection);
+		await this.resolveCollectionItemsTo(collectionObj, limit ?? undefined, allowAnonymousItems, collectionObj.id, items);
 
 		return items;
 	}
