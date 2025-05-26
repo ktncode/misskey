@@ -12918,6 +12918,8 @@ export type operations = {
       content: {
         'application/json': {
           uri: string;
+          expandCollectionItems?: boolean;
+          allowAnonymous?: boolean;
         };
       };
     };

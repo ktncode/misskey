@@ -19,11 +19,12 @@ import { ApLogService, calculateDurationSince, extractObjectContext } from '@/co
 import { ApUtilityService } from '@/core/activitypub/ApUtilityService.js';
 import { SystemAccountService } from '@/core/SystemAccountService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { getApId, getNullableApId, IObjectWithId, isCollectionOrOrderedCollection } from './type.js';
+import { toArray } from '@/misc/prelude/array.js';
+import { AnyCollection, getApId, getNullableApId, IObjectWithId, isCollection, isCollectionOrOrderedCollection, isCollectionPage, isOrderedCollection, isOrderedCollectionPage } from './type.js';
 import { ApDbResolverService } from './ApDbResolverService.js';
 import { ApRendererService } from './ApRendererService.js';
 import { ApRequestService } from './ApRequestService.js';
-import type { IObject, ICollection, IOrderedCollection, ApObject } from './type.js';
+import type { IObject, ApObject } from './type.js';
 
 export class Resolver {
 	private history: Set<string>;
@@ -75,6 +76,65 @@ export class Resolver {
 			return collection;
 		} else {
 			throw new IdentifiableError('f100eccf-f347-43fb-9b45-96a0831fb635', `unrecognized collection type: ${collection.type}`);
+		}
+	}
+
+	@bindThis
+	public async resolveCollectionItems(value: string | IObject, limit?: number, allowAnonymousItems?: boolean): Promise<IObjectWithId[]> {
+		const items: IObjectWithId[] = [];
+
+		const collection = await this.resolveCollection(value);
+		await this.resolveCollectionItemsTo(collection, limit, allowAnonymousItems, collection.id, items);
+
+		return items;
+	}
+
+	private async resolveCollectionItemsTo(current: AnyCollection | null, limit: number | undefined, allowAnonymousItems: boolean | undefined, sourceUri: string | undefined, destination: IObjectWithId[]): Promise<void> {
+		// This is pulled up to avoid code duplication below
+		const iterate = async(items: ApObject): Promise<void> => {
+			for (const item of toArray(items)) {
+				// Stop when we reach the fetch limit
+				if (this.history.size > this.recursionLimit) break;
+
+				// Stop when we reach the item limit
+				if (limit != null && limit < 1) break;
+
+				// Use secureResolve whenever possible, to avoid re-fetching items that were included inline.
+				const resolved = (sourceUri && !allowAnonymousItems)
+					? await this.secureResolve(item, sourceUri)
+					: await this.resolve(getApId(item), allowAnonymousItems);
+				destination.push(resolved);
+
+				// Decrement the outer variable directly, because the code below checks it too
+				if (limit != null) limit--;
+			}
+		};
+
+		while (current != null) {
+			// Iterate all items in the current page
+			if (current.items) {
+				await iterate(current.items);
+			}
+			if (current.orderedItems) {
+				await iterate(current.orderedItems);
+			}
+
+			if (this.history.size >= this.recursionLimit) {
+				// Stop when we reach the fetch limit
+				current = null;
+			} else if (limit != null && limit < 1) {
+				// Stop when we reach the item limit
+				current = null;
+			} else if (isCollection(current) || isOrderedCollection(current)) {
+				// Continue to first page
+				current = current.first ? await this.resolveCollection(current.first, true) : null;
+			} else if (isCollectionPage(current) || isOrderedCollectionPage(current)) {
+				// Continue to next page
+				current = current.next ? await this.resolveCollection(current.next, true) : null;
+			} else {
+				// Stop in all other conditions
+				current = null;
+			}
 		}
 	}
 
