@@ -24,7 +24,7 @@
 		"vue": "3.5.14"
 	},
 	"devDependencies": {
-		"@misskey-dev/summaly": "npm:@transfem-org/summaly@5.2.1",
+		"@misskey-dev/summaly": "npm:@transfem-org/summaly@5.2.2",
 		"@rollup/plugin-json": "6.1.0",
 		"@rollup/plugin-replace": "6.0.2",
 		"@rollup/pluginutils": "5.1.4",
