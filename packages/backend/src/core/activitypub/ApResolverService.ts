@@ -93,12 +93,12 @@ export class Resolver {
 		const items: IObjectWithId[] = [];
 
 		const collectionObj = await this.resolveCollection(collection);
-		await this.resolveCollectionItemsTo(collectionObj, limit ?? undefined, allowAnonymousItems, collectionObj.id, items);
+		await this.resolveCollectionItemsTo(collectionObj, limit ?? undefined, allowAnonymousItems, items);
 
 		return items;
 	}
 
-	private async resolveCollectionItemsTo(current: AnyCollection | null, limit: number | undefined, allowAnonymousItems: boolean | undefined, sourceUri: string | undefined, destination: IObjectWithId[]): Promise<void> {
+	private async resolveCollectionItemsTo(current: AnyCollection | null, limit: number | undefined, allowAnonymousItems: boolean | undefined, destination: IObjectWithId[]): Promise<void> {
 		// This is pulled up to avoid code duplication below
 		const iterate = async(items: ApObject): Promise<void> => {
 			for (const item of toArray(items)) {
@@ -109,8 +109,8 @@ export class Resolver {
 				if (limit != null && limit < 1) break;
 
 				// Use secureResolve whenever possible, to avoid re-fetching items that were included inline.
-				const resolved = (sourceUri && !allowAnonymousItems)
-					? await this.secureResolve(item, sourceUri)
+				const resolved = current?.id
+					? await this.secureResolve(item, current.id, allowAnonymousItems)
 					: await this.resolve(getApId(item), allowAnonymousItems);
 				destination.push(resolved);
 
