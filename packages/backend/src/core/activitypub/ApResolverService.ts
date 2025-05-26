@@ -63,10 +63,12 @@ export class Resolver {
 		return this.recursionLimit;
 	}
 
+	public async resolveCollection(value: string, allowAnonymous?: boolean): Promise<AnyCollection & IObjectWithId>;
+	public async resolveCollection(value: string | IObject, allowAnonymous?: boolean): Promise<AnyCollection>;
 	@bindThis
-	public async resolveCollection(value: string | IObject): Promise<ICollection | IOrderedCollection> {
+	public async resolveCollection(value: string | IObject, allowAnonymous?: boolean): Promise<AnyCollection> {
 		const collection = typeof value === 'string'
-			? await this.resolve(value)
+			? await this.resolve(value, allowAnonymous)
 			: value;
 
 		if (isCollectionOrOrderedCollection(collection)) {
@@ -103,25 +105,33 @@ export class Resolver {
 		return await this.resolve(id);
 	}
 
-	public async resolve(value: string | [string]): Promise<IObjectWithId>;
-	public async resolve(value: string | IObject | [string | IObject]): Promise<IObject>;
+	public async resolve(value: string | [string], allowAnonymous?: boolean): Promise<IObjectWithId>;
+	public async resolve(value: string | IObject | [string | IObject], allowAnonymous?: boolean): Promise<IObject>;
+	/**
+	 * Resolves a URL or object to an AP object.
+	 * Tuples are expanded to their first element before anything else, and non-string inputs are returned as-is.
+	 * Otherwise, the string URL is fetched and validated to represent a valid ActivityPub object.
+	 * @param value The input value to resolve
+	 * @param allowAnonymous Determines what to do if a response object lacks an ID field. If false (default), then an exception is thrown. If true, then the ID is populated from the final response URL.
+	 */
 	@bindThis
-	public async resolve(value: string | IObject | [string | IObject]): Promise<IObject> {
+	public async resolve(value: string | IObject | [string | IObject], allowAnonymous = false): Promise<IObject> {
 		value = fromTuple(value);
 
+		// TODO try and remove this eventually, as it's a major security foot-gun
 		if (typeof value !== 'string') {
 			return value;
 		}
 
 		const host = this.utilityService.extractDbHost(value);
 		if (this.config.activityLogging.enabled && !this.utilityService.isSelfHost(host)) {
-			return await this._resolveLogged(value, host);
+			return await this._resolveLogged(value, host, allowAnonymous);
 		} else {
-			return await this._resolve(value, host);
+			return await this._resolve(value, host, allowAnonymous);
 		}
 	}
 
-	private async _resolveLogged(requestUri: string, host: string): Promise<IObjectWithId> {
+	private async _resolveLogged(requestUri: string, host: string, allowAnonymous: boolean): Promise<IObjectWithId> {
 		const startTime = process.hrtime.bigint();
 
 		const log = await this.apLogService.createFetchLog({
@@ -130,7 +140,7 @@ export class Resolver {
 		});
 
 		try {
-			const result = await this._resolve(requestUri, host, log);
+			const result = await this._resolve(requestUri, host, allowAnonymous, log);
 
 			log.accepted = true;
 			log.result = 'ok';
@@ -150,7 +160,7 @@ export class Resolver {
 		}
 	}
 
-	private async _resolve(value: string, host: string, log?: SkApFetchLog): Promise<IObjectWithId> {
+	private async _resolve(value: string, host: string, allowAnonymous: boolean, log?: SkApFetchLog): Promise<IObjectWithId> {
 		if (value.includes('#')) {
 			// URLs with fragment parts cannot be resolved correctly because
 			// the fragment part does not get transmitted over HTTP(S).
@@ -181,8 +191,8 @@ export class Resolver {
 		}
 
 		const object = (this.user
-			? await this.apRequestService.signedGet(value, this.user)
-			: await this.httpRequestService.getActivityJson(value));
+			? await this.apRequestService.signedGet(value, this.user, allowAnonymous)
+			: await this.httpRequestService.getActivityJson(value, false, allowAnonymous));
 
 		if (log) {
 			const { object: objectOnly, context, contextHash } = extractObjectContext(object);
