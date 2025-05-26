@@ -151,16 +151,26 @@ export class Resolver {
 	 * Securely resolves an AP object or URL that has been sent from another instance.
 	 * An input object is trusted if and only if its ID matches the authority of sentFromUri.
 	 * In all other cases, the object is re-fetched from remote by input string or object ID.
+	 * @param input The input object or URL to resolve
+	 * @param sentFromUri The URL where this object originated. This MUST be accurate - all security checks depend on this value!
+	 * @param allowAnonymous If true, anonymous objects are allowed and will have their ID set to sentFromUri. If false (default) then anonymous objects will be rejected with an error.
 	 */
 	@bindThis
-	public async secureResolve(input: ApObject, sentFromUri: string): Promise<IObjectWithId> {
+	public async secureResolve(input: ApObject, sentFromUri: string, allowAnonymous?: boolean): Promise<IObjectWithId> {
 		// Unpack arrays to get the value element.
 		const value = fromTuple(input);
 		if (value == null) {
 			throw new IdentifiableError('20058164-9de1-4573-8715-425753a21c1d', 'Cannot resolve null input');
 		}
 
-		// This will throw if the input has no ID, which is good because we can't verify an anonymous object anyway.
+		// If anonymous input is allowed, then any object is automatically valid if we set the ID.
+		// We can short-circuit here and avoid un-necessary checks.
+		if (allowAnonymous && typeof(value) === 'object' && value.id == null) {
+			value.id = sentFromUri;
+			return value as IObjectWithId;
+		}
+
+		// This ensures the input has a string ID, protecting against type confusion and rejecting anonymous objects.
 		const id = getApId(value);
 
 		// Check if we can use the provided object as-is.
@@ -171,7 +181,7 @@ export class Resolver {
 		}
 
 		// If the checks didn't pass, then we must fetch the object and use that.
-		return await this.resolve(id);
+		return await this.resolve(id, allowAnonymous);
 	}
 
 	public async resolve(value: string | [string], allowAnonymous?: boolean): Promise<IObjectWithId>;
