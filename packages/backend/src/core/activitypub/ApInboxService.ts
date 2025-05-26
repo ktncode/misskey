@@ -36,7 +36,7 @@ import InstanceChart from '@/core/chart/charts/instance.js';
 import FederationChart from '@/core/chart/charts/federation.js';
 import { FetchInstanceMetadataService } from '@/core/FetchInstanceMetadataService.js';
 import { UpdateInstanceQueue } from '@/core/UpdateInstanceQueue.js';
-import { getApHrefNullable, getApId, getApIds, getApType, getNullableApId, isAccept, isActor, isAdd, isAnnounce, isApObject, isBlock, isCollection, isCollectionOrOrderedCollection, isCreate, isDelete, isFlag, isFollow, isLike, isDislike, isMove, isPost, isReject, isRemove, isTombstone, isUndo, isUpdate, validActor, validPost, isActivity, IObjectWithId } from './type.js';
+import { getApHrefNullable, getApId, getApIds, getApType, getNullableApId, isAccept, isActor, isAdd, isAnnounce, isApObject, isBlock, isCollectionOrOrderedCollection, isCreate, isDelete, isFlag, isFollow, isLike, isDislike, isMove, isPost, isReject, isRemove, isTombstone, isUndo, isUpdate, validActor, validPost, isActivity, IObjectWithId } from './type.js';
 import { ApNoteService } from './models/ApNoteService.js';
 import { ApLoggerService } from './ApLoggerService.js';
 import { ApDbResolverService } from './ApDbResolverService.js';
@@ -106,22 +106,16 @@ export class ApInboxService {
 		let result = undefined as string | void;
 		if (isCollectionOrOrderedCollection(activity)) {
 			const results = [] as [string, string | void][];
-			// eslint-disable-next-line no-param-reassign
 			resolver ??= this.apResolverService.createResolver();
 
-			const items = toArray(isCollection(activity) ? activity.items : activity.orderedItems);
-			if (items.length >= resolver.getRecursionLimit()) {
-				throw new Error(`skipping activity: collection would surpass recursion limit: ${this.utilityService.extractDbHost(actor.uri)}`);
-			}
-
-			for (const item of items) {
-				const act = await resolver.resolve(item);
-				if (act.id == null || this.utilityService.extractDbHost(act.id) !== this.utilityService.extractDbHost(actor.uri)) {
+			const items = await resolver.resolveCollectionItems(activity);
+			for (const act of items) {
+				if (this.utilityService.extractDbHost(act.id) !== this.utilityService.extractDbHost(actor.uri)) {
 					this.logger.debug('skipping activity: activity id is null or mismatching');
 					continue;
 				}
 				try {
-					results.push([getApId(item), await this.performOneActivity(actor, act, resolver)]);
+					results.push([getApId(act), await this.performOneActivity(actor, act, resolver)]);
 				} catch (err) {
 					if (err instanceof Error || typeof err === 'string') {
 						this.logger.error(err);
