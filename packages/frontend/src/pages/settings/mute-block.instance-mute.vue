@@ -32,7 +32,7 @@ const autochange = ref(false);
 async function save() {
 	let mutes = instanceMutes.value
 		.trim().split('\n')
-		.map(el => el.toLowercase().trim())
+		.map(el => el.toLowerCase().trim())
 		.filter(el => el);
 
 	await misskeyApi('i/update', {
