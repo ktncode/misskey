@@ -454,7 +454,7 @@ export class UrlPreviewService {
 			host = null;
 		}
 		try {
-			const user = await this.remoteUserResolveService.resolveUser(username, host)
+			const user = await this.remoteUserResolveService.resolveUser(username, host);
 
 			const attributionDomains = user.attributionDomains;
 			if (attributionDomains.some(x => `.${url.host.toLowerCase()}`.endsWith(`.${x}`))) {
@@ -463,10 +463,10 @@ export class UrlPreviewService {
 					username: fediverseCreator,
 					avatarUrl: user.avatarUrl ?? '',
 					avatarBlurhash: user.avatarBlurhash ?? '',
-				}
+				};
 			}
 		} catch {
-			console.warn('user not found: ' + fediverseCreator)
+			console.warn('user not found: ' + fediverseCreator);
 		}
 	}
 
