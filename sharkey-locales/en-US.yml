@@ -589,3 +589,9 @@ roleAutomatic: "automatic"
 
 translationTimeoutLabel: "Translation timeout"
 translationTimeoutCaption: "Timeout in milliseconds for translation API requests."
+
+attributionDomains: "Attribution Domains"
+attributionDomainsDescription: "A list of domains whose content can be attributed to you on link previews, separated by new-line. Any subdomain will also be valid."
+attributionDomainsTutorial: "Webpages with `<meta name=\"fediverse:creator\" content=\"@{user}@{host}\" />` can then be attributed to you."
+
+writtenBy: "Written by"

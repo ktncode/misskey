@@ -161,6 +161,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #caption>{{ i18n.ts.flagAsBotDescription }}</template>
 						</MkSwitch>
 					</SearchMarker>
+
+					<AttributionDomainsSettings/>
 				</div>
 			</MkFolder>
 		</SearchMarker>
@@ -170,6 +172,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, reactive, ref, watch, defineAsyncComponent } from 'vue';
+import AttributionDomainsSettings from './attribution-domains-setting.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
@@ -217,6 +220,7 @@ const profile = reactive({
 	isBot: $i.isBot ?? false,
 	isCat: $i.isCat ?? false,
 	speakAsCat: $i.speakAsCat ?? false,
+	attributionDomains: $i.attributionDomains,
 });
 
 watch(() => profile, () => {
@@ -276,6 +280,7 @@ function save() {
 		isBot: !!profile.isBot,
 		isCat: !!profile.isCat,
 		speakAsCat: !!profile.speakAsCat,
+		attributionDomains: !!profile.attributionDomains,
 	}, undefined, {
 		'0b3f9f6a-2f4d-4b1f-9fb4-49d3a2fd7191': {
 			title: i18n.ts.yourNameContainsProhibitedWords,

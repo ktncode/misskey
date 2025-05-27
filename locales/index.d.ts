@@ -13129,6 +13129,22 @@ export interface Locale extends ILocale {
      * Timeout in milliseconds for translation API requests.
      */
     "translationTimeoutCaption": string;
+    /**
+     * Attribution Domains
+     */
+    "attributionDomains": string;
+    /**
+     * A list of domains whose content can be attributed to you on link previews, separated by new-line. Any subdomain will also be valid.
+     */
+    "attributionDomainsDescription": string;
+    /**
+     * Webpages with `<meta name="fediverse:creator" content="@{user}@{host}" />` can then be attributed to you.
+     */
+    "attributionDomainsTutorial": ParameterizedString<"user" | "host">;
+    /**
+     * Written by
+     */
+    "writtenBy": string;
 }
 declare const locales: {
     [lang: string]: Locale;

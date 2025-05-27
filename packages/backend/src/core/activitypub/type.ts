@@ -255,6 +255,7 @@ export interface IActor extends IObject {
 	enableRss?: boolean;
 	listenbrainz?: string;
 	backgroundUrl?: string;
+	attributionDomains?: string[];
 }
 
 export const isCollection = (object: IObject): object is ICollection =>

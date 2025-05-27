@@ -433,6 +433,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 					makeNotesFollowersOnlyBefore: (person as any).makeNotesFollowersOnlyBefore ?? null,
 					makeNotesHiddenBefore: (person as any).makeNotesHiddenBefore ?? null,
 					emojis,
+					attributionDomains: (person as any).attributionDomains,
 				})) as MiRemoteUser;
 
 				let _description: string | null = null;
@@ -616,6 +617,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 			// We use "!== false" to handle incorrect types, missing / null values, and "default to true" logic.
 			hideOnlineStatus: person.hideOnlineStatus !== false,
 			isExplorable: person.discoverable !== false,
+			attributionDomains: person.attributionDomains,
 			...(await this.resolveAvatarAndBanner(exist, person.icon, person.image, person.backgroundUrl).catch(() => ({}))),
 		} as Partial<MiRemoteUser> & Pick<MiRemoteUser, 'isBot' | 'isCat' | 'speakAsCat' | 'isLocked' | 'movedToUri' | 'alsoKnownAs' | 'isExplorable'>;
 

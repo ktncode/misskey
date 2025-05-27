@@ -19,7 +19,8 @@ import { MiMeta } from '@/models/Meta.js';
 import { RedisKVCache } from '@/misc/cache.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { ApDbResolverService } from '@/core/activitypub/ApDbResolverService.js';
-import type { MiAccessToken, NotesRepository } from '@/models/_.js';
+import type { MiAccessToken, NotesRepository, UsersRepository } from '@/models/_.js';
+import { RemoteUserResolveService } from '@/core/RemoteUserResolveService.js';
 import { ApUtilityService } from '@/core/activitypub/ApUtilityService.js';
 import { ApRequestService } from '@/core/activitypub/ApRequestService.js';
 import { SystemAccountService } from '@/core/SystemAccountService.js';
@@ -34,6 +35,12 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 
 export type LocalSummalyResult = SummalyResult & {
 	haveNoteLocally?: boolean;
+	linkAttribution?: {
+		name: string,
+		username: string,
+		avatarUrl: string,
+		avatarBlurhash: string,
+	}
 };
 
 // Increment this to invalidate cached previews after a major change.
@@ -77,11 +84,15 @@ export class UrlPreviewService {
 		@Inject(DI.notesRepository)
 		private readonly notesRepository: NotesRepository,
 
+		@Inject(DI.usersRepository)
+		private readonly usersRepository: UsersRepository,
+
 		private httpRequestService: HttpRequestService,
 		private loggerService: LoggerService,
 		private readonly utilityService: UtilityService,
 		private readonly apUtilityService: ApUtilityService,
 		private readonly apDbResolverService: ApDbResolverService,
+		private readonly remoteUserResolveService: RemoteUserResolveService,
 		private readonly apRequestService: ApRequestService,
 		private readonly systemAccountService: SystemAccountService,
 		private readonly apNoteService: ApNoteService,
@@ -205,6 +216,8 @@ export class UrlPreviewService {
 					summary.haveNoteLocally = exists ?? false;
 				}
 			}
+
+			await this.validateLinkAttribution(summary);
 
 			// Await this to avoid hammering redis when a bunch of URLs are fetched at once
 			await this.previewCache.set(cacheKey, summary);
@@ -423,6 +436,41 @@ export class UrlPreviewService {
 			} else {
 				throw err;
 			}
+		}
+	}
+
+	private async validateLinkAttribution(summary: LocalSummalyResult) {
+		if (!summary.fediverseCreator) return;
+
+		const url = URL.parse(summary.url);
+		if (!url) return;
+		let fediverseCreator = summary.fediverseCreator;
+		// expecting either '@username@host' or 'username@host'
+		if (fediverseCreator.startsWith('@')) {
+			fediverseCreator = fediverseCreator.substring(1);
+		}
+
+		//
+		const array = fediverseCreator.split('@');
+		const username = array[0].toLowerCase();
+		let host: string | null = array[1];
+		if (host.toLowerCase() === this.config.host) {
+			host = null;
+		}
+		try {
+			const user = await this.remoteUserResolveService.resolveUser(username, host)
+
+			const attributionDomains = user.attributionDomains;
+			if (attributionDomains.some(x => `.${url.host.toLowerCase()}`.endsWith(`.${x}`))) {
+				summary.linkAttribution = {
+					name: user.name ?? user.username,
+					username: fediverseCreator,
+					avatarUrl: user.avatarUrl ?? '',
+					avatarBlurhash: user.avatarBlurhash ?? '',
+				}
+			}
+		} catch {
+			console.warn('user not found: ' + fediverseCreator)
 		}
 	}
 

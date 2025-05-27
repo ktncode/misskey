@@ -378,6 +378,12 @@ export class MiUser {
 	})
 	public allowUnsignedFetch: UserUnsignedFetchOption;
 
+	@Column('varchar', {
+		name: 'attributionDomains',
+		length: 128, array: true, default: '{}',
+	})
+	public attributionDomains: string[];
+
 	constructor(data: Partial<MiUser>) {
 		if (data == null) return;
 

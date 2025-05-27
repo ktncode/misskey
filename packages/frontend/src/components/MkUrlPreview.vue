@@ -65,6 +65,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</footer>
 		</article>
 	</component>
+	<footer v-if="linkAttribution" :class="$style.footer" style="float: right">
+		<a :href="'/@' + linkAttribution.username">
+			<p :class="$style.linkAttribution">{{i18n.ts.writtenBy}}</p>
+			<MkImgWithBlurhash :class="$style.linkAttributionIcon" :src="linkAttribution.avatarUrl" :hash="linkAttribution.avatarBlurhash" :cover="true" :onlyAvgColor="true"/>
+			<b :class="$style.linkAttribution" style="color: var(--MI_THEME-accent)">{{ linkAttribution.name }}</b>
+		</a>
+	</footer>
 	<template v-if="showActions">
 		<div v-if="tweetId" :class="$style.action">
 			<MkButton :small="true" inline @click="tweetExpanded = true">
@@ -99,6 +106,7 @@ import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { deviceKind } from '@/utility/device-kind.js';
 import MkButton from '@/components/MkButton.vue';
+import MkImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
 import { transformPlayerUrl } from '@/utility/player-url-transform.js';
 import { store } from '@/store.js';
 import { prefer } from '@/preferences.js';
@@ -146,6 +154,12 @@ const player = ref<SummalyResult['player']>({
 	height: null,
 	allow: [],
 });
+const linkAttribution = ref<{
+	name: string,
+	username: string,
+	avatarUrl: string,
+	avatarBlurhash: string,
+} | null>(null);
 const playerEnabled = ref(false);
 const tweetId = ref<string | null>(null);
 const tweetExpanded = ref(props.detail);
@@ -221,7 +235,15 @@ function refresh(withFetch = false) {
 
 			return res.json();
 		})
-		.then(async (info: SummalyResult & { haveNoteLocally?: boolean } | null) => {
+		.then(async (info: SummalyResult & {
+			haveNoteLocally?: boolean,
+			linkAttribution?: {
+				name: string,
+				username: string,
+				avatarUrl: string,
+				avatarBlurhash: string,
+			}
+		} | null) => {
 			unknownUrl.value = info == null;
 			title.value = info?.title ?? null;
 			description.value = info?.description ?? null;
@@ -236,6 +258,7 @@ function refresh(withFetch = false) {
 			};
 			sensitive.value = info?.sensitive ?? false;
 			activityPub.value = info?.activityPub ?? null;
+			linkAttribution.value = info?.linkAttribution ?? null;
 
 			theNote.value = null;
 			if (info?.haveNoteLocally) {
@@ -391,6 +414,27 @@ refresh();
 	display: inline-block;
 	margin: 0;
 	font-size: 0.8em;
+	line-height: 16px;
+	vertical-align: top;
+}
+
+.linkAttributionIcon {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	margin-left: 0.5em;
+	margin-right: 0.25em;
+	vertical-align: top;
+	border-radius: 50%;
+	* {
+		border-radius: 4px;
+	}
+}
+
+.linkAttribution {
+	font-size: 0.8em;
+	display: inline-block;
+	margin: 0;
 	line-height: 16px;
 	vertical-align: top;
 }

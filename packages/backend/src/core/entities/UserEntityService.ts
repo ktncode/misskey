@@ -603,6 +603,7 @@ export class UserEntityService implements OnModuleInit {
 			enableRss: user.enableRss,
 			mandatoryCW: user.mandatoryCW,
 			rejectQuotes: user.rejectQuotes,
+			attributionDomains: user.attributionDomains,
 			isSilenced: user.isSilenced || this.roleService.getUserPolicies(user.id).then(r => !r.canPublicNote),
 			speakAsCat: user.speakAsCat ?? false,
 			approved: user.approved,
