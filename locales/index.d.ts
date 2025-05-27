@@ -13134,13 +13134,9 @@ export interface Locale extends ILocale {
      */
     "attributionDomains": string;
     /**
-     * A list of domains whose content can be attributed to you on link previews, separated by new-line. Any subdomain will also be valid.
+     * A list of domains whose content can be attributed to you on link previews, separated by new-line. Any subdomain will also be valid. The following needs to be on the webpage:
      */
     "attributionDomainsDescription": string;
-    /**
-     * Webpages with `<meta name="fediverse:creator" content="@{user}@{host}" />` can then be attributed to you.
-     */
-    "attributionDomainsTutorial": ParameterizedString<"user" | "host">;
     /**
      * Written by
      */

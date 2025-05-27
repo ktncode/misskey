@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #label>{{ i18n.ts.attributionDomains }}</template>
 			<template #caption>{{ i18n.ts.attributionDomainsDescription }}
 				<br/>
-				<Mfm :text="i18n.tsx.attributionDomainsTutorial({ user: $i.username, host: host})"/>
+				<Mfm :text="tutorialTag"/>
 			</template>
 		</MkTextarea>
 	</SearchMarker>
@@ -33,7 +33,7 @@ const $i = ensureSignin();
 
 const attributionDomains = ref($i.attributionDomains.join('\n'));
 const changed = ref(false);
-const host = toUnicode(hostRaw);
+const tutorialTag = '`<meta name="fediverse:creator" content="' + $i.username + '@' + toUnicode(hostRaw) + '" />`';
 
 async function save() {
 	let domains = attributionDomains.value
