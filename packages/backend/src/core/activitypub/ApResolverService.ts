@@ -25,7 +25,7 @@ import { AnyCollection, getApId, getNullableApId, IObjectWithId, isCollection, i
 import { ApDbResolverService } from './ApDbResolverService.js';
 import { ApRendererService } from './ApRendererService.js';
 import { ApRequestService } from './ApRequestService.js';
-import type { IObject, ApObject } from './type.js';
+import type { IObject, ApObject, IAnonymousObject } from './type.js';
 
 export class Resolver {
 	private history: Set<string>;
@@ -83,6 +83,9 @@ export class Resolver {
 		}
 	}
 
+	public async resolveCollectionItems(collection: IAnonymousObject, limit?: number | null, allowAnonymousItems?: true, concurrency?: number): Promise<IAnonymousObject[]>;
+	public async resolveCollectionItems(collection: string | IObjectWithId, limit?: number | null, allowAnonymousItems?: boolean, concurrency?: number): Promise<IObjectWithId[]>;
+	public async resolveCollectionItems(collection: string | IObject, limit?: number | null, allowAnonymousItems?: boolean, concurrency?: number): Promise<IObject[]>;
 	/**
 	 * Recursively resolves items from a collection.
 	 * Stops when reaching the resolution limit or an optional item limit - whichever is lower.
@@ -94,11 +97,11 @@ export class Resolver {
 	 * @param concurrency Maximum number of items to resolve at once. (default: 4)
 	 */
 	@bindThis
-	public async resolveCollectionItems(collection: string | IObjectWithId, limit?: number | null, allowAnonymousItems?: boolean, concurrency = 4): Promise<IObjectWithId[]> {
-		const resolvedItems: IObjectWithId[] = [];
+	public async resolveCollectionItems(collection: string | IObject, limit?: number | null, allowAnonymousItems?: boolean, concurrency = 4): Promise<IObject[]> {
+		const resolvedItems: IObject[] = [];
 
 		// This is pulled up to avoid code duplication below
-		const iterate = async(items: ApObject, current: AnyCollection & IObjectWithId) => {
+		const iterate = async(items: ApObject, current: AnyCollection) => {
 			const sentFrom = current.id;
 			const itemArr = toArray(items);
 			const itemLimit = limit ?? Number.MAX_SAFE_INTEGER;
@@ -106,7 +109,7 @@ export class Resolver {
 			await this.resolveItemArray(itemArr, sentFrom, itemLimit, concurrency, allowAnonymous, resolvedItems);
 		};
 
-		let current: (AnyCollection & IObjectWithId) | null = await this.resolveCollection(collection);
+		let current: AnyCollection | null = await this.resolveCollection(collection);
 		do {
 			// Iterate all items in the current page
 			if (current.items) {
@@ -137,16 +140,27 @@ export class Resolver {
 		return resolvedItems;
 	}
 
-	private async resolveItemArray(source: (string | IObject)[], sentFrom: string, itemLimit: number, concurrency: number, allowAnonymousItems: boolean, destination: IObjectWithId[]): Promise<void> {
+	private async resolveItemArray(source: (string | IObject)[], sentFrom: undefined, itemLimit: number, concurrency: number, allowAnonymousItems: true, destination: IAnonymousObject[]): Promise<void>;
+	private async resolveItemArray(source: (string | IObject)[], sentFrom: string, itemLimit: number, concurrency: number, allowAnonymousItems: boolean, destination: IObjectWithId[]): Promise<void>;
+	private async resolveItemArray(source: (string | IObject)[], sentFrom: string | undefined, itemLimit: number, concurrency: number, allowAnonymousItems: boolean, destination: IObject[]): Promise<void>;
+	private async resolveItemArray(source: (string | IObject)[], sentFrom: string | undefined, itemLimit: number, concurrency: number, allowAnonymousItems: boolean, destination: IObject[]): Promise<void> {
 		const recursionLimit = this.recursionLimit - this.history.size;
 		const batchLimit = Math.min(source.length, recursionLimit, itemLimit);
 
-		const limiter = promiseLimit<IObjectWithId>(concurrency);
+		const limiter = promiseLimit<IObject>(concurrency);
 		const batch = await Promise.all(source
 			.slice(0, batchLimit)
 			.map(item => limiter(async () => {
-				// Use secureResolve to avoid re-fetching items that were included inline.
-				return await this.secureResolve(item, sentFrom, allowAnonymousItems);
+				if (sentFrom) {
+					// Use secureResolve to avoid re-fetching items that were included inline.
+					return await this.secureResolve(item, sentFrom, allowAnonymousItems);
+				} else if (allowAnonymousItems) {
+					return await this.resolveAnonymous(item);
+				} else {
+					// ID is required if we have neither sentFrom not allowAnonymousItems
+					const id = getApId(item);
+					return await this.resolve(id);
+				}
 			})));
 
 		destination.push(...batch);
@@ -161,12 +175,9 @@ export class Resolver {
 	 * @param allowAnonymous If true, anonymous objects are allowed and will have their ID set to sentFromUri. If false (default) then anonymous objects will be rejected with an error.
 	 */
 	@bindThis
-	public async secureResolve(input: ApObject, sentFromUri: string, allowAnonymous?: boolean): Promise<IObjectWithId> {
+	public async secureResolve(input: string | IObject | [string | IObject], sentFromUri: string, allowAnonymous?: boolean): Promise<IObjectWithId> {
 		// Unpack arrays to get the value element.
 		const value = fromTuple(input);
-		if (value == null) {
-			throw new IdentifiableError('20058164-9de1-4573-8715-425753a21c1d', 'Cannot resolve null input');
-		}
 
 		// If anonymous input is allowed, then any object is automatically valid if we set the ID.
 		// We can short-circuit here and avoid un-necessary checks.
@@ -187,6 +198,21 @@ export class Resolver {
 
 		// If the checks didn't pass, then we must fetch the object and use that.
 		return await this.resolve(id, allowAnonymous);
+	}
+
+	/**
+	 * Resolves an anonymous object.
+	 * The returned value will not have any ID present.
+	 * If one is provided in the response, it will be removed automatically.
+	 */
+	@bindThis
+	public async resolveAnonymous(value: string | IObject | [string | IObject]): Promise<IAnonymousObject> {
+		value = fromTuple(value);
+
+		const object = await this.resolve(value);
+		object.id = undefined;
+
+		return object as IAnonymousObject;
 	}
 
 	public async resolve(value: string | [string], allowAnonymous?: boolean): Promise<IObjectWithId>;

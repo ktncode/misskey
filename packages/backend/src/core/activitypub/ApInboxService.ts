@@ -109,13 +109,22 @@ export class ApInboxService {
 			resolver ??= this.apResolverService.createResolver();
 
 			const items = await resolver.resolveCollectionItems(activity);
-			for (const act of items) {
-				if (this.utilityService.extractDbHost(act.id) !== this.utilityService.extractDbHost(actor.uri)) {
-					this.logger.debug('skipping activity: activity id is null or mismatching');
-					continue;
+			for (let i = 0; i < items.length; i++) {
+				const act = items[i];
+				if (act.id != null) {
+					if (this.utilityService.extractDbHost(act.id) !== this.utilityService.extractDbHost(actor.uri)) {
+						this.logger.warn('skipping activity: activity id mismatch');
+						continue;
+					}
+				} else {
+					// Activity ID should only be string or undefined.
+					act.id = undefined;
 				}
+
 				try {
-					results.push([getApId(act), await this.performOneActivity(actor, act, resolver)]);
+					const id = getNullableApId(act) ?? `${getNullableApId(activity)}#${i}`;
+					const result = await this.performOneActivity(actor, act, resolver);
+					results.push([id, result]);
 				} catch (err) {
 					if (err instanceof Error || typeof err === 'string') {
 						this.logger.error(err);

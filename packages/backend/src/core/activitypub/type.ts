@@ -43,6 +43,18 @@ export interface IObjectWithId extends IObject {
 	id: string;
 }
 
+export function isObjectWithId(object: IObject): object is IObjectWithId {
+	return typeof(object.id) === 'string';
+}
+
+export interface IAnonymousObject extends IObject {
+	id: undefined;
+}
+
+export function isAnonymousObject(object: IObject): object is IAnonymousObject {
+	return object.id === undefined;
+}
+
 /**
  * Get array of ActivityStreams Objects id
  */
