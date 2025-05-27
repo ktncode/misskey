@@ -67,7 +67,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</component>
 	<footer v-if="linkAttribution" :class="$style.footer" style="float: right">
 		<a :href="'/@' + linkAttribution.username">
-			<p :class="$style.linkAttribution">{{i18n.ts.writtenBy}}</p>
+			<p :class="$style.linkAttribution">{{ i18n.ts.writtenBy }}</p>
 			<MkImgWithBlurhash :class="$style.linkAttributionIcon" :src="linkAttribution.avatarUrl" :hash="linkAttribution.avatarBlurhash" :cover="true" :onlyAvgColor="true"/>
 			<b :class="$style.linkAttribution" style="color: var(--MI_THEME-accent)">{{ linkAttribution.name }}</b>
 		</a>

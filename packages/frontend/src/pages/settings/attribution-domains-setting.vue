@@ -8,7 +8,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<SearchMarker :keywords="['attribution', 'domains', 'preview', 'url']">
 		<MkTextarea v-model="attributionDomains">
 			<template #label>{{ i18n.ts.attributionDomains }}</template>
-			<template #caption>{{ i18n.ts.attributionDomainsDescription }}
+			<template #caption>
+				{{ i18n.ts.attributionDomainsDescription }}
 				<br/>
 				<Mfm :text="tutorialTag"/>
 			</template>
