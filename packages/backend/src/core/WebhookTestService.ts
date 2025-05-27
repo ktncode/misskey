@@ -76,6 +76,7 @@ function generateDummyUser(override?: Partial<MiUser>): MiUser {
 		mandatoryCW: null,
 		rejectQuotes: false,
 		allowUnsignedFetch: 'staff',
+		attributionDomains: [],
 		...override,
 	};
 }

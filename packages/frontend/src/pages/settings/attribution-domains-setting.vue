@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import { host as hostRaw } from '@@/js/config.js'
+import { host as hostRaw } from '@@/js/config.js';
 import { toUnicode } from 'punycode.js';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkInfo from '@/components/MkInfo.vue';
