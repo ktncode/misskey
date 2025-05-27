@@ -28,7 +28,7 @@ import { ApNoteService } from '@/core/activitypub/models/ApNoteService.js';
 import { AuthenticateService, AuthenticationError } from '@/server/api/AuthenticateService.js';
 import { SkRateLimiterService } from '@/server/SkRateLimiterService.js';
 import { BucketRateLimit, Keyed, sendRateLimitHeaders } from '@/misc/rate-limit-utils.js';
-import type { MiLocalUser } from '@/models/User.js';
+import type { MiLocalUser, MiUser } from '@/models/User.js';
 import { getIpHash } from '@/misc/get-ip-hash.js';
 import { isRetryableError } from '@/misc/is-retryable-error.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
@@ -36,10 +36,7 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 export type LocalSummalyResult = SummalyResult & {
 	haveNoteLocally?: boolean;
 	linkAttribution?: {
-		name: string,
-		username: string,
-		avatarUrl: string,
-		avatarBlurhash: string,
+		user: MiUser,
 	}
 };
 
@@ -448,6 +445,10 @@ export class UrlPreviewService {
 		}
 
 		const array = fediverseCreator.split('@');
+
+		// make sure we only have username@host.
+		if (array.length !== 2) return;
+
 		const username = array[0].toLowerCase();
 		let host: string | null = array[1];
 		if (host.toLowerCase() === this.config.host) {
@@ -459,14 +460,11 @@ export class UrlPreviewService {
 			const attributionDomains = user.attributionDomains;
 			if (attributionDomains.some(x => `.${url.host.toLowerCase()}`.endsWith(`.${x}`))) {
 				summary.linkAttribution = {
-					name: user.name ?? user.username,
-					username: fediverseCreator,
-					avatarUrl: user.avatarUrl ?? '',
-					avatarBlurhash: user.avatarBlurhash ?? '',
+					user: user,
 				};
 			}
 		} catch {
-			console.warn('user not found: ' + fediverseCreator);
+			this.logger.warn('user not found: ' + fediverseCreator);
 		}
 	}
 

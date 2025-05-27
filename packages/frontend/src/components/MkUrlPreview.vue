@@ -65,13 +65,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</footer>
 		</article>
 	</component>
-	<footer v-if="linkAttribution" :class="$style.footer" style="text-align: right">
-		<a :href="'/@' + linkAttribution.username">
-			<p :class="$style.linkAttribution">{{ i18n.ts.writtenBy }}</p>
-			<MkImgWithBlurhash :class="$style.linkAttributionIcon" :src="linkAttribution.avatarUrl" :hash="linkAttribution.avatarBlurhash" :cover="true" :onlyAvgColor="true"/>
-			<b :class="$style.linkAttribution" style="color: var(--MI_THEME-accent)">{{ linkAttribution.name }}</b>
-		</a>
-	</footer>
+	<I18n v-if="linkAttribution" :src="i18n.ts.writtenBy" :class="$style.linkAttribution" tag="p">
+		<template #user>
+			<MkA v-user-preview="linkAttribution.user.id" :to="userPage(linkAttribution.user)">
+				<MkAvatar :class="$style.linkAttributionIcon" :user="linkAttribution.user"/>
+				<MkUserName :user="linkAttribution.user" style="color: var(--MI_THEME-accent)"/>
+			</MkA>
+		</template>
+	</I18n>
 	<template v-if="showActions">
 		<div v-if="tweetId" :class="$style.action">
 			<MkButton :small="true" inline @click="tweetExpanded = true">
@@ -114,6 +115,7 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { warningExternalWebsite } from '@/utility/warning-external-website.js';
 import DynamicNoteSimple from '@/components/DynamicNoteSimple.vue';
 import { $i } from '@/i';
+import { userPage } from '@/filters/user.js';
 
 type SummalyResult = Awaited<ReturnType<typeof summaly>>;
 
@@ -155,10 +157,7 @@ const player = ref<SummalyResult['player']>({
 	allow: [],
 });
 const linkAttribution = ref<{
-	name: string,
-	username: string,
-	avatarUrl: string,
-	avatarBlurhash: string,
+	user: Misskey.entities.User,
 } | null>(null);
 const playerEnabled = ref(false);
 const tweetId = ref<string | null>(null);
@@ -238,10 +237,7 @@ function refresh(withFetch = false) {
 		.then(async (info: SummalyResult & {
 			haveNoteLocally?: boolean,
 			linkAttribution?: {
-				name: string,
-				username: string,
-				avatarUrl: string,
-				avatarBlurhash: string,
+				user: Misskey.entities.User
 			}
 		} | null) => {
 			unknownUrl.value = info == null;
@@ -420,11 +416,11 @@ refresh();
 
 .linkAttributionIcon {
 	display: inline-block;
-	width: 1em;
-	height: 1em;
-	margin-left: 0.5em;
+	width: 16px;
+	height: 16px;
+	margin-left: 0.25em;
 	margin-right: 0.25em;
-	vertical-align: top;
+	vertical-align: middle;
 	border-radius: 50%;
 	* {
 		border-radius: 4px;
@@ -432,11 +428,12 @@ refresh();
 }
 
 .linkAttribution {
+	width: 100%;
 	font-size: 0.8em;
 	display: inline-block;
-	margin: 0;
-	line-height: 16px;
-	vertical-align: top;
+	margin: auto;
+	padding-top: 0.5em;
+	text-align: right;
 }
 
 .action {

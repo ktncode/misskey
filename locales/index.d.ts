@@ -13138,9 +13138,9 @@ export interface Locale extends ILocale {
      */
     "attributionDomainsDescription": string;
     /**
-     * Written by
+     * Written by {user}
      */
-    "writtenBy": string;
+    "writtenBy": ParameterizedString<"user">;
 }
 declare const locales: {
     [lang: string]: Locale;
