@@ -27,11 +27,12 @@ const $i = ensureSignin();
 
 const instanceMutes = ref($i.mutedInstances.join('\n'));
 const changed = ref(false);
+const autochange = ref(false);
 
 async function save() {
 	let mutes = instanceMutes.value
 		.trim().split('\n')
-		.map(el => el.trim())
+		.map(el => el.toLowercase().trim())
 		.filter(el => el);
 
 	await misskeyApi('i/update', {
@@ -41,10 +42,15 @@ async function save() {
 	changed.value = false;
 
 	// Refresh filtered list to signal to the user how they've been saved
-	instanceMutes.value = mutes.join('\n');
+	if (instanceMutes.value !== mutes.join('\n')) {
+		instanceMutes.value = mutes.join('\n');
+		autochange.value = true;
+	} else { autochange.value = false; }
 }
 
 watch(instanceMutes, () => {
-	changed.value = true;
+	if (!autochange.value) {
+		changed.value = true;
+	}
 });
 </script>
