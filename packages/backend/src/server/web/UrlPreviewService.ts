@@ -28,15 +28,16 @@ import { ApNoteService } from '@/core/activitypub/models/ApNoteService.js';
 import { AuthenticateService, AuthenticationError } from '@/server/api/AuthenticateService.js';
 import { SkRateLimiterService } from '@/server/SkRateLimiterService.js';
 import { BucketRateLimit, Keyed, sendRateLimitHeaders } from '@/misc/rate-limit-utils.js';
-import type { MiLocalUser, MiUser } from '@/models/User.js';
+import type { MiLocalUser } from '@/models/User.js';
 import { getIpHash } from '@/misc/get-ip-hash.js';
 import { isRetryableError } from '@/misc/is-retryable-error.js';
+import * as Acct from '@/misc/acct.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 
 export type LocalSummalyResult = SummalyResult & {
 	haveNoteLocally?: boolean;
 	linkAttribution?: {
-		user: MiUser,
+		userId: string,
 	}
 };
 
@@ -435,36 +436,25 @@ export class UrlPreviewService {
 
 	private async validateLinkAttribution(summary: LocalSummalyResult) {
 		if (!summary.fediverseCreator) return;
+		if (!URL.canParse(summary.url)) return;
 
 		const url = URL.parse(summary.url);
-		if (!url) return;
-		let fediverseCreator = summary.fediverseCreator;
-		// expecting either '@username@host' or 'username@host'
-		if (fediverseCreator.startsWith('@')) {
-			fediverseCreator = fediverseCreator.substring(1);
-		}
 
-		const array = fediverseCreator.split('@');
-
-		// make sure we only have username@host.
-		if (array.length !== 2) return;
-
-		const username = array[0].toLowerCase();
-		let host: string | null = array[1];
-		if (host.toLowerCase() === this.config.host) {
-			host = null;
+		const acct = Acct.parse(summary.fediverseCreator);
+		if (acct.host?.toLowerCase() === this.config.host) {
+			acct.host = null;
 		}
 		try {
-			const user = await this.remoteUserResolveService.resolveUser(username, host);
+			const user = await this.remoteUserResolveService.resolveUser(acct.username, acct.host);
 
 			const attributionDomains = user.attributionDomains;
-			if (attributionDomains.some(x => `.${url.host.toLowerCase()}`.endsWith(`.${x}`))) {
+			if (attributionDomains.some(x => `.${url?.host.toLowerCase()}`.endsWith(`.${x}`))) {
 				summary.linkAttribution = {
-					user: user,
+					userId: user.id,
 				};
 			}
 		} catch {
-			this.logger.warn('user not found: ' + fediverseCreator);
+			this.logger.debug('User not found: ' + summary.fediverseCreator);
 		}
 	}
 

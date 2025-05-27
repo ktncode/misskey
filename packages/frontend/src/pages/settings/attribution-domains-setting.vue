@@ -38,7 +38,7 @@ const autochange = ref(false);
 const tutorialTag = '`<meta name="fediverse:creator" content="' + $i.username + '@' + toUnicode(hostRaw) + '" />`';
 
 async function save() {
-	let domains = attributionDomains.value
+	const domains = attributionDomains.value
 		.trim().split('\n')
 		.map(el => el.trim().toLowerCase())
 		.filter(el => el);

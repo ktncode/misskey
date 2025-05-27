@@ -65,14 +65,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</footer>
 		</article>
 	</component>
-	<I18n v-if="linkAttribution" :src="i18n.ts.writtenBy" :class="$style.linkAttribution" tag="p">
+
+	<I18n v-if="attributionUser" :src="i18n.ts.writtenBy" :class="$style.linkAttribution" tag="p">
 		<template #user>
-			<MkA v-user-preview="linkAttribution.user.id" :to="userPage(linkAttribution.user)">
-				<MkAvatar :class="$style.linkAttributionIcon" :user="linkAttribution.user"/>
-				<MkUserName :user="linkAttribution.user" style="color: var(--MI_THEME-accent)"/>
+			<MkA v-user-preview="attributionUser.id" :to="userPage(attributionUser)">
+				<MkAvatar :class="$style.linkAttributionIcon" :user="attributionUser"/>
+				<MkUserName :user="attributionUser" style="color: var(--MI_THEME-accent)"/>
 			</MkA>
 		</template>
 	</I18n>
+	<p v-else-if="linkAttribution" :class="$style.linkAttributionIcon"><MkEllipsis/></p>
+
 	<template v-if="showActions">
 		<div v-if="tweetId" :class="$style.action">
 			<MkButton :small="true" inline @click="tweetExpanded = true">
@@ -107,7 +110,6 @@ import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { deviceKind } from '@/utility/device-kind.js';
 import MkButton from '@/components/MkButton.vue';
-import MkImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
 import { transformPlayerUrl } from '@/utility/player-url-transform.js';
 import { store } from '@/store.js';
 import { prefer } from '@/preferences.js';
@@ -157,8 +159,9 @@ const player = ref<SummalyResult['player']>({
 	allow: [],
 });
 const linkAttribution = ref<{
-	user: Misskey.entities.User,
+	userId: string,
 } | null>(null);
+const attributionUser = ref<Misskey.entities.User | null>(null);
 const playerEnabled = ref(false);
 const tweetId = ref<string | null>(null);
 const tweetExpanded = ref(props.detail);
@@ -237,7 +240,7 @@ function refresh(withFetch = false) {
 		.then(async (info: SummalyResult & {
 			haveNoteLocally?: boolean,
 			linkAttribution?: {
-				user: Misskey.entities.User
+				userId: string,
 			}
 		} | null) => {
 			unknownUrl.value = info == null;
@@ -255,6 +258,10 @@ function refresh(withFetch = false) {
 			sensitive.value = info?.sensitive ?? false;
 			activityPub.value = info?.activityPub ?? null;
 			linkAttribution.value = info?.linkAttribution ?? null;
+			if (linkAttribution.value) {
+				misskeyApi('users/show', { userId: linkAttribution.value.userId })
+					.then(u => attributionUser.value = u);
+			}
 
 			theNote.value = null;
 			if (info?.haveNoteLocally) {
