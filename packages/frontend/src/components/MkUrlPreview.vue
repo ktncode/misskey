@@ -74,7 +74,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkA>
 		</template>
 	</I18n>
-	<p v-else-if="linkAttribution" :class="$style.linkAttributionIcon"><MkEllipsis/></p>
+	<p v-else-if="linkAttribution" :class="$style.linkAttribution"><MkEllipsis/></p>
 
 	<template v-if="showActions">
 		<div v-if="tweetId" :class="$style.action">
