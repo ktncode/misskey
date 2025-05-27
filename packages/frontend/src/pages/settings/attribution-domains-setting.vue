@@ -34,12 +34,13 @@ const $i = ensureSignin();
 
 const attributionDomains = ref($i.attributionDomains.join('\n'));
 const changed = ref(false);
+const autochange = ref(false);
 const tutorialTag = '`<meta name="fediverse:creator" content="' + $i.username + '@' + toUnicode(hostRaw) + '" />`';
 
 async function save() {
 	let domains = attributionDomains.value
 		.trim().split('\n')
-		.map(el => el.trim())
+		.map(el => el.trim().toLowerCase())
 		.filter(el => el);
 
 	await misskeyApi('i/update', {
@@ -49,10 +50,15 @@ async function save() {
 	changed.value = false;
 
 	// Refresh filtered list to signal to the user how they've been saved
-	attributionDomains.value = domains.join('\n');
+	if (attributionDomains.value !== domains.join('\n')) {
+		attributionDomains.value = domains.join('\n');
+		autochange.value = true;
+	} else { autochange.value = false; }
 }
 
 watch(attributionDomains, () => {
-	changed.value = true;
+	if (!autochange.value) {
+		changed.value = true;
+	}
 });
 </script>
