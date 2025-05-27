@@ -19,7 +19,7 @@ import { MiMeta } from '@/models/Meta.js';
 import { RedisKVCache } from '@/misc/cache.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { ApDbResolverService } from '@/core/activitypub/ApDbResolverService.js';
-import type { MiAccessToken, NotesRepository, UsersRepository } from '@/models/_.js';
+import type { MiAccessToken, NotesRepository } from '@/models/_.js';
 import { RemoteUserResolveService } from '@/core/RemoteUserResolveService.js';
 import { ApUtilityService } from '@/core/activitypub/ApUtilityService.js';
 import { ApRequestService } from '@/core/activitypub/ApRequestService.js';
@@ -83,9 +83,6 @@ export class UrlPreviewService {
 
 		@Inject(DI.notesRepository)
 		private readonly notesRepository: NotesRepository,
-
-		@Inject(DI.usersRepository)
-		private readonly usersRepository: UsersRepository,
 
 		private httpRequestService: HttpRequestService,
 		private loggerService: LoggerService,
@@ -450,7 +447,6 @@ export class UrlPreviewService {
 			fediverseCreator = fediverseCreator.substring(1);
 		}
 
-		//
 		const array = fediverseCreator.split('@');
 		const username = array[0].toLowerCase();
 		let host: string | null = array[1];
