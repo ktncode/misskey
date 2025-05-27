@@ -1,12 +1,9 @@
-/**
- * @typedef {import('typeorm').MigrationInterface} MigrationInterface
+/*
+ * SPDX-FileCopyrightText: piuvas and other Sharkey contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-/**
- * @class
- * @implements {MigrationInterface}
- */
-module.exports = class AddAttributionDomains1748096357260 {
+export class AddAttributionDomains1748096357260 {
     name = 'AddAttributionDomains1748096357260'
 
     async up(queryRunner) {
