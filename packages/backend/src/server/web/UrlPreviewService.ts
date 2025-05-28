@@ -152,13 +152,25 @@ export class UrlPreviewService {
 			return;
 		}
 
+		// Strip out hash (anchor)
+		const urlObj = new URL(url);
+		if (urlObj.hash) {
+			urlObj.hash = '';
+			const params = new URLSearchParams({ url: urlObj.href });
+			if (lang) params.set('lang', lang);
+			const newUrl = `/url?${params.toString()}`;
+
+			reply.redirect(newUrl, 301);
+			return;
+		}
+
 		// Check rate limit
 		const auth = await this.authenticate(request);
 		if (!await this.checkRateLimit(auth, reply)) {
 			return;
 		}
 
-		if (this.utilityService.isBlockedHost(this.meta.blockedHosts, new URL(url).host)) {
+		if (this.utilityService.isBlockedHost(this.meta.blockedHosts, urlObj.host)) {
 			return reply.code(403).send({
 				error: {
 					message: 'URL is blocked',
