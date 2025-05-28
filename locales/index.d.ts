@@ -13158,6 +13158,14 @@ export interface Locale extends ILocale {
      */
     "translationTimeoutCaption": string;
     /**
+     * Staff notes
+     */
+    "staffNotes": string;
+    /**
+     * Icon of {name}
+     */
+    "instanceIconAlt": ParameterizedString<"name">;
+    /**
      * Attribution Domains
      */
     "attributionDomains": string;

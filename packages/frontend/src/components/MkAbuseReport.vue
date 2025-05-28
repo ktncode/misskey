@@ -30,13 +30,31 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</template>
 
 	<div class="_gaps_s">
-		<MkFolder :withSpacer="false">
+		<MkFolder :withSpacer="true">
 			<template #icon><MkAvatar :user="report.targetUser" style="width: 18px; height: 18px;"/></template>
 			<template #label>{{ i18n.ts.target }}: <MkAcct :user="report.targetUser"/></template>
-			<template #suffix>#{{ report.targetUserId.toUpperCase() }}</template>
+			<template #suffix>{{ i18n.ts.id }}# {{ report.targetUserId }}</template>
 
 			<div style="height: 300px; --MI-stickyTop: 0; --MI-stickyBottom: 0;">
-				<RouterView :router="targetRouter"/>
+				<admin-user :userId="report.targetUserId" :userHint="report.targetUser"></admin-user>
+			</div>
+		</MkFolder>
+
+		<MkFolder v-if="report.targetInstance" :withSpacer="true">
+			<template #icon>
+				<img
+					v-if="targetInstanceIcon"
+					:src="targetInstanceIcon"
+					:alt="i18n.tsx.instanceIconAlt({ name: report.targetInstance.name || report.targetInstance.host })"
+					:class="$style.instanceIcon"
+					class="icon"
+				/>
+			</template>
+			<template #label>{{ i18n.ts.instance }}: {{ report.targetInstance.name || report.targetInstance.host }}</template>
+			<template #suffix>{{ i18n.ts.id }}# {{ report.targetInstance.id }}</template>
+
+			<div style="height: 300px; --MI-stickyTop: 0; --MI-stickyBottom: 0;">
+				<instance-info :host="report.targetInstance.host" :instanceHint="report.targetInstance" :metaHint="metaHint"></instance-info>
 			</div>
 		</MkFolder>
 
@@ -45,22 +63,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #label>{{ i18n.ts.details }}</template>
 			<div class="_gaps_s">
 				<Mfm :text="report.comment" :isBlock="true" :linkNavigationBehavior="'window'"/>
+				<MkUrlPreview v-for="url in urls" :key="url" :group="previewGroup" :url="url" :compact="false" :detail="false" :showAsQuote="true"/>
 			</div>
 		</MkFolder>
 
-		<MkFolder :withSpacer="false">
+		<MkFolder :withSpacer="true">
 			<template #icon><MkAvatar :user="report.reporter" style="width: 18px; height: 18px;"/></template>
 			<template #label>{{ i18n.ts.reporter }}: <MkAcct :user="report.reporter"/></template>
-			<template #suffix>#{{ report.reporterId.toUpperCase() }}</template>
+			<template #suffix>{{ i18n.ts.id }}# {{ report.reporterId }}</template>
 
 			<div style="height: 300px; --MI-stickyTop: 0; --MI-stickyBottom: 0;">
-				<RouterView :router="reporterRouter"/>
+				<admin-user :userId="report.reporterId" :userHint="report.reporter"></admin-user>
 			</div>
 		</MkFolder>
 
 		<MkFolder :defaultOpen="false">
 			<template #icon><i class="ti ti-message-2"></i></template>
-			<template #label>{{ i18n.ts.moderationNote }}</template>
+			<template #label>{{ i18n.ts.staffNotes }}</template>
 			<template #suffix>{{ moderationNote.length > 0 ? '...' : i18n.ts.none }}</template>
 			<div class="_gaps_s">
 				<MkTextarea v-model="moderationNote" manualSave>
@@ -78,8 +97,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { provide, ref, watch } from 'vue';
+import { computed, provide, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
+import * as mfm from '@transfem-org/sfm-js';
 import MkButton from '@/components/MkButton.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkKeyValue from '@/components/MkKeyValue.vue';
@@ -91,6 +111,13 @@ import RouterView from '@/components/global/RouterView.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
 import { createRouter } from '@/router.js';
+import MkUrlPreview, { PreviewGroup } from '@/components/MkUrlPreview.vue';
+import { extractUrlFromMfm } from '@/utility/extract-url-from-mfm';
+import { getProxiedImageUrlNullable } from '@/utility/media-proxy';
+import InstanceInfo from '@/pages/instance-info.vue';
+import { iAmAdmin } from '@/i';
+import { misskeyApi } from '@/utility/misskey-api';
+import AdminUser from '@/pages/admin-user.vue';
 
 const props = defineProps<{
 	report: Misskey.entities.AdminAbuseUserReportsResponse[number];
@@ -100,10 +127,29 @@ const emit = defineEmits<{
 	(ev: 'resolved', reportId: string): void;
 }>();
 
+/*
 const targetRouter = createRouter(`/admin/user/${props.report.targetUserId}`);
 targetRouter.init();
 const reporterRouter = createRouter(`/admin/user/${props.report.reporterId}`);
 reporterRouter.init();
+*/
+
+const parsed = computed(() => props.report.comment ? mfm.parse(props.report.comment) : null);
+const urls = computed(() => parsed.value ? extractUrlFromMfm(parsed.value) : null);
+const previewGroup = computed(() => new PreviewGroup()); // Lazy-load
+const metaHint = ref<Misskey.entities.AdminMetaResponse | undefined>(undefined);
+
+const targetInstanceIcon = computed(() => props.report.targetInstance?.faviconUrl
+	? getProxiedImageUrlNullable(props.report.targetInstance.faviconUrl, 'preview')
+	: props.report.targetInstance?.iconUrl
+		? getProxiedImageUrlNullable(props.report.targetInstance.iconUrl, 'preview')
+		: null);
+
+if (iAmAdmin) {
+	misskeyApi('admin/meta')
+		.then(meta => metaHint.value = meta)
+		.catch(err => console.error('[MkAbuseReport] Error fetching meta:', err));
+}
 
 const moderationNote = ref(props.report.moderationNote ?? '');
 
@@ -150,4 +196,8 @@ function showMenu(ev: MouseEvent) {
 </script>
 
 <style lang="scss" module>
+.instanceIcon {
+	width: 18px;
+	height: 18px;
+}
 </style>
