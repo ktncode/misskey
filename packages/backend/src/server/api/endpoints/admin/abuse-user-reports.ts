@@ -122,12 +122,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me) => {
 			const query = this.queryService.makePaginationQuery(this.abuseUserReportsRepository.createQueryBuilder('report'), ps.sinceId, ps.untilId)
 				.leftJoinAndSelect('report.targetUser', 'targetUser')
-				.leftJoinAndSelect('report.targetUserProfile', 'targetUserProfile')
+				.leftJoinAndSelect('targetUser.userProfile', 'targetUserProfile')
 				.leftJoinAndSelect('report.targetUserInstance', 'targetUserInstance')
 				.leftJoinAndSelect('report.reporter', 'reporter')
-				.leftJoinAndSelect('report.reporterProfile', 'reporterProfile')
+				.leftJoinAndSelect('reporter.userProfile', 'reporterProfile')
 				.leftJoinAndSelect('report.assignee', 'assignee')
-				.leftJoinAndSelect('report.assigneeProfile', 'assigneeProfile')
+				.leftJoinAndSelect('assignee.userProfile', 'assigneeProfile')
 			;
 
 			switch (ps.state) {
