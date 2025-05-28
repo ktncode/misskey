@@ -125,9 +125,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.leftJoinAndSelect('report.targetUserProfile', 'targetUserProfile')
 				.leftJoinAndSelect('report.targetUserInstance', 'targetUserInstance')
 				.leftJoinAndSelect('report.reporter', 'reporter')
-				.leftJoinAndSelect('report.reporterUserProfile', 'reporterUserProfile')
+				.leftJoinAndSelect('report.reporterProfile', 'reporterProfile')
 				.leftJoinAndSelect('report.assignee', 'assignee')
-				.leftJoinAndSelect('report.assigneeUserProfile', 'assigneeUserProfile')
+				.leftJoinAndSelect('report.assigneeProfile', 'assigneeProfile')
 			;
 
 			switch (ps.state) {
