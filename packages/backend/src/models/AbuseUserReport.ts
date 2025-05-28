@@ -5,6 +5,7 @@
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { MiInstance } from '@/models/Instance.js';
+import { MiUserProfile } from '@/models/UserProfile.js';
 import { id } from './util/id.js';
 import { MiUser } from './User.js';
 
@@ -25,6 +26,13 @@ export class MiAbuseUserReport {
 	@JoinColumn()
 	public targetUser: MiUser | null;
 
+	@ManyToOne(() => MiUserProfile, {
+		onDelete: 'CASCADE',
+		createForeignKeyConstraints: false,
+	})
+	@JoinColumn({ name: 'targetUserId', referencedColumnName: 'userId' })
+	public targetUserProfile: MiUserProfile | null;
+
 	@Index()
 	@Column(id())
 	public reporterId: MiUser['id'];
@@ -34,6 +42,13 @@ export class MiAbuseUserReport {
 	})
 	@JoinColumn()
 	public reporter: MiUser | null;
+
+	@ManyToOne(() => MiUserProfile, {
+		onDelete: 'CASCADE',
+		createForeignKeyConstraints: false,
+	})
+	@JoinColumn({ name: 'reporterId', referencedColumnName: 'userId' })
+	public reporterProfile: MiUserProfile | null;
 
 	@Column({
 		...id(),
@@ -46,6 +61,13 @@ export class MiAbuseUserReport {
 	})
 	@JoinColumn()
 	public assignee: MiUser | null;
+
+	@ManyToOne(() => MiUserProfile, {
+		onDelete: 'CASCADE',
+		createForeignKeyConstraints: false,
+	})
+	@JoinColumn({ name: 'assigneeId', referencedColumnName: 'userId' })
+	public assigneeProfile: MiUserProfile | null;
 
 	@Index()
 	@Column('boolean', {

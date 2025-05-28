@@ -120,7 +120,15 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private queryService: QueryService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.abuseUserReportsRepository.createQueryBuilder('report'), ps.sinceId, ps.untilId);
+			const query = this.queryService.makePaginationQuery(this.abuseUserReportsRepository.createQueryBuilder('report'), ps.sinceId, ps.untilId)
+				.leftJoinAndSelect('report.targetUser', 'targetUser')
+				.leftJoinAndSelect('report.targetUserProfile', 'targetUserProfile')
+				.leftJoinAndSelect('report.targetUserInstance', 'targetUserInstance')
+				.leftJoinAndSelect('report.reporter', 'reporter')
+				.leftJoinAndSelect('report.reporterUserProfile', 'reporterUserProfile')
+				.leftJoinAndSelect('report.assignee', 'assignee')
+				.leftJoinAndSelect('report.assigneeUserProfile', 'assigneeUserProfile')
+			;
 
 			switch (ps.state) {
 				case 'resolved': query.andWhere('report.resolved = TRUE'); break;
