@@ -48,9 +48,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 			-->
 
 			<MkPagination v-slot="{items}" ref="reports" :pagination="pagination" :displayLimit="50">
-				<div class="_gaps">
-					<XAbuseReport v-for="report in items" :key="report.id" :report="report" @resolved="resolved"/>
-				</div>
+				<SkDateSeparatedList v-slot="{ item: report }" :items="items">
+					<XAbuseReport :report="report" @resolved="resolved"/>
+				</SkDateSeparatedList>
 			</MkPagination>
 		</div>
 	</div>
@@ -67,6 +67,7 @@ import { definePage } from '@/page.js';
 import MkButton from '@/components/MkButton.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import { store } from '@/store.js';
+import SkDateSeparatedList from '@/components/SkDateSeparatedList.vue';
 
 const reports = useTemplateRef('reports');
 
