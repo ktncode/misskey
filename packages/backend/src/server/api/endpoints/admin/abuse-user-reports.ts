@@ -69,6 +69,11 @@ export const meta = {
 					nullable: false, optional: false,
 					ref: 'UserDetailedNotMe',
 				},
+				targetInstance: {
+					type: 'object',
+					nullable: true, optional: false,
+					ref: 'FederationInstance',
+				},
 				assignee: {
 					type: 'object',
 					nullable: true, optional: false,

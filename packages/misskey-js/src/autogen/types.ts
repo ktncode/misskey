@@ -6198,6 +6198,7 @@ export type operations = {
               assigneeId: string | null;
               reporter: components['schemas']['UserDetailedNotMe'];
               targetUser: components['schemas']['UserDetailedNotMe'];
+              targetInstance: components['schemas']['FederationInstance'] | null;
               assignee: components['schemas']['UserDetailedNotMe'] | null;
               forwarded: boolean;
               /** @enum {string|null} */
