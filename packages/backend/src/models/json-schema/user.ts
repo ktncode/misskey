@@ -239,8 +239,9 @@ export const packedUserLiteSchema = {
 		attributionDomains: {
 			type: 'array',
 			nullable: false, optional: false,
-			additionalProperties: {
+			items: {
 				type: 'string',
+				nullable: false, optional: false,
 			},
 		},
 	},

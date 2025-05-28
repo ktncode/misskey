@@ -259,8 +259,13 @@ function refresh(withFetch = false) {
 			activityPub.value = info?.activityPub ?? null;
 			linkAttribution.value = info?.linkAttribution ?? null;
 			if (linkAttribution.value) {
-				misskeyApi('users/show', { userId: linkAttribution.value.userId })
-					.then(u => attributionUser.value = u);
+				try {
+					const response = await misskeyApi('users/show', { userId: linkAttribution.value.userId });
+					attributionUser.value = response;
+				} catch {
+					// makes the loading ellipsis vanish.
+					linkAttribution.value = null;
+				}
 			}
 
 			theNote.value = null;
