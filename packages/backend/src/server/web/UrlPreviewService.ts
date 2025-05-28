@@ -123,6 +123,16 @@ export class UrlPreviewService {
 		request: FastifyRequest<PreviewRoute>,
 		reply: FastifyReply,
 	): Promise<void> {
+		if (!this.meta.urlPreviewEnabled) {
+			return reply.code(403).send({
+				error: {
+					message: 'URL preview is disabled',
+					code: 'URL_PREVIEW_DISABLED',
+					id: '58b36e13-d2f5-0323-b0c6-76aa9dabefb8',
+				},
+			});
+		}
+
 		const url = request.query.url;
 		if (typeof url !== 'string' || !URL.canParse(url)) {
 			reply.code(400);
@@ -133,16 +143,6 @@ export class UrlPreviewService {
 		if (Array.isArray(lang)) {
 			reply.code(400);
 			return;
-		}
-
-		if (!this.meta.urlPreviewEnabled) {
-			return reply.code(403).send({
-				error: {
-					message: 'URL preview is disabled',
-					code: 'URL_PREVIEW_DISABLED',
-					id: '58b36e13-d2f5-0323-b0c6-76aa9dabefb8',
-				},
-			});
 		}
 
 		// Check rate limit
