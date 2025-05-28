@@ -139,6 +139,13 @@ export class UrlPreviewService {
 			return;
 		}
 
+		// Enforce HTTP(S) for input URLs
+		const urlScheme = this.utilityService.getUrlScheme(url);
+		if (urlScheme !== 'http:' && urlScheme !== 'https:') {
+			reply.code(400);
+			return;
+		}
+
 		const lang = request.query.lang;
 		if (Array.isArray(lang)) {
 			reply.code(400);
