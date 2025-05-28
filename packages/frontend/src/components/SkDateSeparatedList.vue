@@ -5,9 +5,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div class="_gaps">
-	<template v-for="item in timeline" :key="item.id">
-		<slot v-if="item.type === 'item'" :id="item.id" :item="item.data"></slot>
-		<slot v-else-if="item.type === 'date'" :id="item.id" :prev="item.prev" :prevText="item.prevText" :next="item.next" :nextText="item.nextText" name="date">
+	<template v-for="(item, index) in timeline" :key="item.id">
+		<slot v-if="item.type === 'item'" :id="item.id" :index="index" :item="item.data"></slot>
+		<slot v-else-if="item.type === 'date'" :id="item.id" :index="index" :prev="item.prev" :prevText="item.prevText" :next="item.next" :nextText="item.nextText" name="date">
 			<div :class="$style.dateDivider">
 				<span><i class="ti ti-chevron-up"></i> {{ item.nextText }}</span>
 				<span :class="$style.dateSeparator"></span>
