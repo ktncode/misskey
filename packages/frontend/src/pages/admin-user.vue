@@ -273,8 +273,14 @@ import SkBadgeStrip from '@/components/SkBadgeStrip.vue';
 const props = withDefaults(defineProps<{
 	userId: string;
 	initialTab?: string;
+	userHint?: Misskey.entities.UserDetailed;
+	infoHint?: Misskey.entities.AdminShowUserResponse;
+	ipsHint?: Misskey.entities.AdminGetUserIpsResponse;
 }>(), {
 	initialTab: 'overview',
+	userHint: undefined,
+	infoHint: undefined,
+	ipsHint: undefined,
 });
 
 const tab = ref(props.initialTab);
@@ -405,16 +411,23 @@ const announcementsPagination = {
 };
 const expandedRoles = ref([]);
 
-function createFetcher() {
-	return () => Promise.all([misskeyApi('users/show', {
-		userId: props.userId,
-	}), misskeyApi('admin/show-user', {
-		userId: props.userId,
-	}), iAmAdmin ? misskeyApi('admin/get-user-ips', {
-		userId: props.userId,
-	}) : Promise.resolve(null), iAmAdmin ? misskeyApi('ap/get', {
-		uri: `${url}/users/${props.userId}`,
-	}).catch(() => null) : null]).then(([_user, _info, _ips, _ap]) => {
+function createFetcher(withHint = true) {
+	return () => Promise.all([
+		(withHint && props.userHint) ? props.userHint : misskeyApi('users/show', {
+			userId: props.userId,
+		}),
+		(withHint && props.infoHint) ? props.infoHint : misskeyApi('admin/show-user', {
+			userId: props.userId,
+		}),
+		iAmAdmin
+			? (withHint && props.ipsHint) ? props.ipsHint : misskeyApi('admin/get-user-ips', {
+				userId: props.userId,
+			})
+			: null,
+		iAmAdmin ? misskeyApi('ap/get', {
+			uri: `${url}/users/${props.userId}`,
+		}).catch(() => null) : null],
+	).then(([_user, _info, _ips, _ap]) => {
 		user.value = _user;
 		info.value = _info;
 		ips.value = _ips;
@@ -432,7 +445,7 @@ function createFetcher() {
 
 async function refreshUser() {
 	// Not a typo - createFetcher() returns a function()
-	await createFetcher()();
+	await createFetcher(false)();
 }
 
 async function onMandatoryCWChanged(value: string) {

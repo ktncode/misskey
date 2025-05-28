@@ -238,9 +238,14 @@ import SkBadgeStrip from '@/components/SkBadgeStrip.vue';
 
 const $style = useCssModule();
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
 	host: string;
-}>();
+	metaHint?: Misskey.entities.AdminMetaResponse;
+	instanceHint?: Misskey.entities.FederationInstance;
+}>(), {
+	metaHint: undefined,
+	instanceHint: undefined,
+});
 
 const tab = ref('overview');
 
@@ -365,8 +370,8 @@ async function saveModerationNote() {
 
 async function fetch(): Promise<void> {
 	const [m, i] = await Promise.all([
-		iAmAdmin ? misskeyApi('admin/meta') : null,
-		misskeyApi('federation/show-instance', {
+		props.metaHint ?? (iAmAdmin ? misskeyApi('admin/meta') : null),
+		props.instanceHint ?? misskeyApi('federation/show-instance', {
 			host: props.host,
 		}),
 	]);
