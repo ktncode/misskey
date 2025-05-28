@@ -4,8 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div v-if="groupLockout" style="display: none"></div>
-<template v-else-if="player.url && playerEnabled">
+<template v-if="player.url && playerEnabled">
 	<div
 		:class="$style.player"
 		:style="player.width ? `padding: ${(player.height || 0) / player.width * 100}% 0 0` : `padding: ${(player.height || 0)}px 0 0`"
@@ -77,7 +76,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</I18n>
 	<p v-else-if="linkAttribution" :class="$style.linkAttribution"><MkEllipsis/></p>
 
-	<template v-if="showActions && !groupLockout">
+	<template v-if="showActions">
 		<div v-if="tweetId" :class="$style.action">
 			<MkButton :small="true" inline @click="tweetExpanded = true">
 				<i class="ti ti-brand-x"></i> {{ i18n.ts.expandTweet }}
@@ -100,53 +99,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </div>
 </template>
 
-<script lang="ts">
-/**
- * Links a group of previews to de-duplicate the results.
- * Between all MkUrlPreview instances that share a group, each URL and Note are guaranteed to appear only once.
- */
-export class PreviewGroup {
-	private readonly urls = new Map<string, number>();
-	private readonly noteIds = new Map<string, number>();
-
-	public claimUrl(url: string, componentUid: number): boolean {
-		return this.claim(this.urls, url, componentUid);
-	}
-
-	public claimNoteId(noteId: string, componentUid: number): boolean {
-		return this.claim(this.noteIds, noteId, componentUid);
-	}
-
-	private claim(group: Map<string, number>, key: string, uid: number): boolean {
-		const claim = group.get(key);
-
-		// Already claimed
-		if (claim != null && claim !== uid) {
-			return false;
-		}
-
-		group.set(key, uid);
-		return true;
-	}
-
-	public releaseUrl(url: string, componentUid: number): void {
-		this.release(this.urls, url, componentUid);
-	}
-
-	public releaseNoteId(noteId: string, componentUid: number): void {
-		this.release(this.noteIds, noteId, componentUid);
-	}
-
-	private release(group: Map<string, number>, key: string, uid: number): void {
-		if (group.get(key) === uid) {
-			group.delete(key);
-		}
-	}
-}
-</script>
-
 <script lang="ts" setup>
-import { defineAsyncComponent, onDeactivated, onUnmounted, ref, getCurrentInstance } from 'vue';
+import { defineAsyncComponent, onDeactivated, onUnmounted, ref } from 'vue';
 import { url as local } from '@@/js/config.js';
 import { versatileLang } from '@@/js/intl-const.js';
 import * as Misskey from 'misskey-js';
@@ -165,12 +119,12 @@ import DynamicNoteSimple from '@/components/DynamicNoteSimple.vue';
 import { $i } from '@/i';
 import { userPage } from '@/filters/user.js';
 
-const uid = getCurrentInstance()?.uid ?? -1;
-if (uid === -1) {
-	console.warn('[MkUrlPreview] Component has null instance??');
-}
-
-type SummalyResult = Awaited<ReturnType<typeof summaly>>;
+type SummalyResult = Awaited<ReturnType<typeof summaly>> & {
+	haveNoteLocally?: boolean,
+	linkAttribution?: {
+		userId: string,
+	}
+};
 
 const props = withDefaults(defineProps<{
 	url: string;
@@ -179,24 +133,21 @@ const props = withDefaults(defineProps<{
 	showAsQuote?: boolean;
 	showActions?: boolean;
 	skipNoteIds?: (string | undefined)[];
-	group?: PreviewGroup;
+	previewHint?: SummalyResult;
+	noteHint?: Misskey.entities.Note | null;
 }>(), {
 	detail: false,
 	compact: false,
 	showAsQuote: false,
 	showActions: true,
 	skipNoteIds: undefined,
-	group: undefined,
+	previewHint: undefined,
+	noteHint: undefined,
 });
-
-const emit = defineEmits<{
-	(event: 'loaded', preview: SummalyResult & { haveNoteLocally?: boolean } | null, note: Misskey.entities.Note | null): void;
-}>();
 
 const MOBILE_THRESHOLD = 500;
 const isMobile = ref(deviceKind === 'smartphone' || window.innerWidth <= MOBILE_THRESHOLD);
 
-const groupLockout = ref<boolean>(false);
 const hidePreview = ref<boolean>(false);
 const maybeRelativeUrl = maybeMakeRelative(props.url, local);
 const self = maybeRelativeUrl !== props.url;
@@ -228,13 +179,12 @@ const tweetHeight = ref(150);
 const unknownUrl = ref(false);
 const theNote = ref<Misskey.entities.Note | null>(null);
 const fetchingTheNote = ref(false);
-const preview = ref<SummalyResult & { haveNoteLocally?: boolean } | null>(null);
 
 onDeactivated(() => {
 	playerEnabled.value = false;
 });
 
-async function fetchNote() {
+async function fetchNote(initial: boolean) {
 	if (!props.showAsQuote) return;
 	if (!activityPub.value) return;
 	if (theNote.value) return;
@@ -242,15 +192,19 @@ async function fetchNote() {
 
 	fetchingTheNote.value = true;
 	try {
-		const response = await misskeyApi('ap/show', { uri: activityPub.value });
+		const response = (initial && props.noteHint !== undefined)
+			? { type: 'Note', object: props.noteHint }
+			: await misskeyApi('ap/show', { uri: activityPub.value });
 		if (response.type !== 'Note') return;
+		if (!response.object) {
+			activityPub.value = null;
+			theNote.value = null;
+			return;
+		}
 		const theNoteId = response['object'].id;
 		if (theNoteId && props.skipNoteIds && props.skipNoteIds.includes(theNoteId)) {
 			hidePreview.value = true;
 			return;
-		}
-		if (props.group && !props.group.claimNoteId(response['object'].id, uid)) {
-			groupLockout.value = true;
 		}
 		theNote.value = response['object'];
 	} catch (err) {
@@ -272,22 +226,16 @@ if (requestUrl.hostname === 'twitter.com' || requestUrl.hostname === 'mobile.twi
 	if (m) tweetId.value = m[1];
 }
 
+// This is now handled on the backend
+/*
 if (requestUrl.hostname === 'music.youtube.com' && requestUrl.pathname.match('^/(?:watch|channel)')) {
 	requestUrl.hostname = 'www.youtube.com';
 }
 
 requestUrl.hash = '';
+*/
 
-const refresh = (withFetch = false) => {
-	// Release URL/noteID when refreshing, in case it changes.
-	// (Could happen since redirects are allowed.)
-	if (preview.value && props.group) {
-		props.group.releaseUrl(preview.value.url, uid);
-	}
-	if (theNote.value && props.group) {
-		props.group.releaseNoteId(theNote.value.id, uid);
-	}
-
+function refresh(withFetch = false, initial = false) {
 	const params = new URLSearchParams({
 		url: requestUrl.href,
 		lang: versatileLang,
@@ -297,24 +245,21 @@ const refresh = (withFetch = false) => {
 	}
 
 	const headers = $i ? { Authorization: `Bearer ${$i.token}` } : undefined;
-	return fetching.value ??= window.fetch(`/url?${params.toString()}`, { headers })
-		.then(res => {
-			if (!res.ok) {
-				if (_DEV_) {
-					console.warn(`[HTTP${res.status}] Failed to fetch url preview`);
+	const fetchPromise: Promise<SummalyResult | null> = (initial && props.previewHint)
+		? Promise.resolve(props.previewHint)
+		: window.fetch(`/url?${params.toString()}`, { headers })
+			.then(res => {
+				if (!res.ok) {
+					if (_DEV_) {
+						console.warn(`[HTTP${res.status}] Failed to fetch url preview`);
+					}
+					return null;
 				}
-				return null;
-			}
 
-			return res.json();
-		})
-		.then(async (info: SummalyResult & {
-			haveNoteLocally?: boolean,
-			linkAttribution?: {
-				userId: string,
-			}
-		} | null) => {
-			preview.value = info;
+				return res.json();
+			});
+	return fetching.value ??= fetchPromise
+		.then(async (info: SummalyResult | null) => {
 			unknownUrl.value = info == null;
 			title.value = info?.title ?? null;
 			description.value = info?.description ?? null;
@@ -329,7 +274,6 @@ const refresh = (withFetch = false) => {
 			};
 			sensitive.value = info?.sensitive ?? false;
 			activityPub.value = info?.activityPub ?? null;
-			groupLockout.value = info != null && props.group != null && !props.group.claimUrl(info.url, uid);
 			linkAttribution.value = info?.linkAttribution ?? null;
 			if (linkAttribution.value) {
 				try {
@@ -343,14 +287,13 @@ const refresh = (withFetch = false) => {
 
 			theNote.value = null;
 			if (info?.haveNoteLocally) {
-				await fetchNote();
+				await fetchNote(initial);
 			}
 		})
 		.finally(() => {
 			fetching.value = null;
-			emit('loaded', preview.value, theNote.value);
 		});
-};
+}
 
 function adjustTweetHeight(message: MessageEvent) {
 	if (message.origin !== 'https://platform.twitter.com') return;
@@ -375,17 +318,10 @@ window.addEventListener('message', adjustTweetHeight);
 
 onUnmounted(() => {
 	window.removeEventListener('message', adjustTweetHeight);
-
-	if (preview.value && props.group) {
-		props.group.releaseUrl(preview.value.url, uid);
-	}
-	if (theNote.value && props.group) {
-		props.group.releaseNoteId(theNote.value.id, uid);
-	}
 });
 
 // Load initial data
-refresh();
+refresh(false, true);
 </script>
 
 <style lang="scss" module>

@@ -62,8 +62,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #icon><i class="ti ti-message-2"></i></template>
 			<template #label>{{ i18n.ts.details }}</template>
 			<div class="_gaps_s">
-				<Mfm :text="report.comment" :isBlock="true" :linkNavigationBehavior="'window'"/>
-				<MkUrlPreview v-for="url in urls" :key="url" :group="previewGroup" :url="url" :compact="false" :detail="false" :showAsQuote="true"/>
+				<Mfm :text="report.comment" :parsedNodes="parsedComment" :isBlock="true" :linkNavigationBehavior="'window'" :author="report.reporter" :nyaize="false" :isAnim="false"/>
+				<SkUrlPreviewGroup :sourceNodes="parsedComment" :compact="false" :detail="false" :showAsQuote="true"/>
 			</div>
 		</MkFolder>
 
@@ -111,13 +111,12 @@ import RouterView from '@/components/global/RouterView.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
 import { createRouter } from '@/router.js';
-import MkUrlPreview, { PreviewGroup } from '@/components/MkUrlPreview.vue';
-import { extractUrlFromMfm } from '@/utility/extract-url-from-mfm';
 import { getProxiedImageUrlNullable } from '@/utility/media-proxy';
 import InstanceInfo from '@/pages/instance-info.vue';
 import { iAmAdmin } from '@/i';
 import { misskeyApi } from '@/utility/misskey-api';
 import AdminUser from '@/pages/admin-user.vue';
+import SkUrlPreviewGroup from '@/components/SkUrlPreviewGroup.vue';
 
 const props = defineProps<{
 	report: Misskey.entities.AdminAbuseUserReportsResponse[number];
@@ -134,9 +133,7 @@ const reporterRouter = createRouter(`/admin/user/${props.report.reporterId}`);
 reporterRouter.init();
 */
 
-const parsed = computed(() => props.report.comment ? mfm.parse(props.report.comment) : null);
-const urls = computed(() => parsed.value ? extractUrlFromMfm(parsed.value) : null);
-const previewGroup = computed(() => new PreviewGroup()); // Lazy-load
+const parsedComment = computed(() => mfm.parse(props.report.comment));
 const metaHint = ref<Misskey.entities.AdminMetaResponse | undefined>(undefined);
 
 const targetInstanceIcon = computed(() => props.report.targetInstance?.faviconUrl
