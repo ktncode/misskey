@@ -185,7 +185,7 @@ export class UrlPreviewService {
 			return;
 		}
 
-		const cacheKey = `${url}@${lang}@${cacheFormatVersion}`;
+		const cacheKey = getCacheKey(url, lang);
 		if (await this.sendCachedPreview(cacheKey, reply, fetch)) {
 			return;
 		}
@@ -235,6 +235,18 @@ export class UrlPreviewService {
 
 			// Await this to avoid hammering redis when a bunch of URLs are fetched at once
 			await this.previewCache.set(cacheKey, summary);
+
+			// Also cache the response URL in case of redirects
+			if (summary.url !== url) {
+				const responseCacheKey = getCacheKey(summary.url, lang);
+				await this.previewCache.set(responseCacheKey, summary);
+			}
+
+			// Also cache the ActivityPub URL, if different from the others
+			if (summary.activityPub && summary.activityPub !== summary.url) {
+				const apCacheKey = getCacheKey(summary.activityPub, lang);
+				await this.previewCache.set(apCacheKey, summary);
+			}
 
 			// Cache 1 day (matching redis), but only once we finalize the result
 			if (!summary.activityPub || summary.haveNoteLocally) {
@@ -551,4 +563,8 @@ export class UrlPreviewService {
 
 		return true;
 	}
+}
+
+function getCacheKey(url: string, lang = 'none') {
+	return `${url}@${lang}@${cacheFormatVersion}`;
 }
