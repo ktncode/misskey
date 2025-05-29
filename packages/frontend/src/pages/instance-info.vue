@@ -12,22 +12,72 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div class="fnfelxur">
 					<!-- TODO copy the alt text stuff from reports UI PR -->
 					<img v-if="faviconUrl" :src="faviconUrl" alt="" class="icon"/>
-					<span class="name">{{ instance.name || instance.host }}</span>
+					<div :class="$style.headerData">
+						<span class="name">{{ instance.name || instance.host }}</span>
+						<span>
+							<span class="_monospace">{{ instance.host }}</span>
+							<button v-tooltip="i18n.ts.copy" class="_textButton" style="margin-left: 0.5em;" @click="copyToClipboard(instance.host)"><i class="ti ti-copy"></i></button>
+						</span>
+						<span>
+							<span class="_monospace">{{ instance.id }}</span>
+							<button v-tooltip="i18n.ts.copy" class="_textButton" style="margin-left: 0.5em;" @click="copyToClipboard(instance.id)"><i class="ti ti-copy"></i></button>
+						</span>
+					</div>
 				</div>
-				<div style="display: flex; flex-direction: column; gap: 1em;">
-					<MkKeyValue :copy="host" oneline>
-						<template #key>{{ i18n.ts.name }}</template>
-						<template #value><span class="_monospace"><MkLink :url="`https://${host}`">{{ host }}</MkLink></span></template>
-					</MkKeyValue>
-					<MkKeyValue oneline>
-						<template #key>{{ i18n.ts.software }}</template>
-						<template #value><span class="_monospace">{{ instance.softwareName || `(${i18n.ts.unknown})` }} / {{ instance.softwareVersion || `(${i18n.ts.unknown})` }}</span></template>
-					</MkKeyValue>
-					<MkKeyValue oneline>
-						<template #key>{{ i18n.ts.administrator }}</template>
-						<template #value>{{ instance.maintainerName || `(${i18n.ts.unknown})` }} ({{ instance.maintainerEmail || `(${i18n.ts.unknown})` }})</template>
-					</MkKeyValue>
-				</div>
+				<MkFolder>
+					<template #icon><i class="ph-list-bullets ph-bold ph-lg"></i></template>
+					<template #label>{{ i18n.ts.details }}</template>
+					<div style="display: flex; flex-direction: column; gap: 1em;">
+						<MkKeyValue :copy="instance.id" oneline>
+							<template #key>{{ i18n.ts.id }}</template>
+							<template #value><span class="_monospace">{{ instance.id }}</span></template>
+						</MkKeyValue>
+						<MkKeyValue :copy="instance.name" oneline>
+							<template #key>{{ i18n.ts.name }}</template>
+							<template #value><span class="_monospace">{{ instance.name || `(${i18n.ts.unknown})` }}</span></template>
+						</MkKeyValue>
+						<MkKeyValue :copy="host" oneline>
+							<template #key>{{ i18n.ts.host }}</template>
+							<template #value><span class="_monospace"><MkLink :url="`https://${host}`">{{ host }}</MkLink></span></template>
+						</MkKeyValue>
+						<MkKeyValue :copy="instance.firstRetrievedAt" oneline>
+							<template #key>{{ i18n.ts.createdAt }}</template>
+							<template #value><span class="_monospace"><MkTime :time="instance.firstRetrievedAt" :mode="'detail'"/></span></template>
+						</MkKeyValue>
+						<MkKeyValue :copy="instance.infoUpdatedAt" oneline>
+							<template #key>{{ i18n.ts.updatedAt }}</template>
+							<template #value><span class="_monospace"><MkTime :time="instance.infoUpdatedAt" :mode="'detail'"/></span></template>
+						</MkKeyValue>
+						<MkKeyValue :copy="instance.latestRequestReceivedAt" oneline>
+							<template #key>{{ i18n.ts.lastActiveDate }}</template>
+							<template #value><span class="_monospace"><MkTime :time="instance.latestRequestReceivedAt" :mode="'detail'"/></span></template>
+						</MkKeyValue>
+						<MkKeyValue :copy="instance.softwareName" oneline>
+							<template #key>{{ i18n.ts.software }}</template>
+							<template #value><span class="_monospace">{{ instance.softwareName || `(${i18n.ts.unknown})` }} / {{ instance.softwareVersion || `(${i18n.ts.unknown})` }}</span></template>
+						</MkKeyValue>
+						<MkKeyValue :copy="instance.maintainerName" oneline>
+							<template #key>{{ i18n.ts.administrator }}</template>
+							<template #value><span class="_monospace">{{ instance.maintainerName || `(${i18n.ts.unknown})` }}</span></template>
+						</MkKeyValue>
+						<MkKeyValue :copy="instance.maintainerEmail" oneline>
+							<template #key>{{ i18n.ts.email }}</template>
+							<template #value><span class="_monospace">{{ instance.maintainerEmail || `(${i18n.ts.unknown})` }}</span></template>
+						</MkKeyValue>
+						<MkKeyValue oneline>
+							<template #key>{{ i18n.ts.followingPub }}</template>
+							<template #value><span class="_monospace"><MkNumber :value="instance.followingCount"/></span></template>
+						</MkKeyValue>
+						<MkKeyValue oneline>
+							<template #key>{{ i18n.ts.followersSub }}</template>
+							<template #value><span class="_monospace"><MkNumber :value="instance.followersCount"/></span></template>
+						</MkKeyValue>
+						<MkKeyValue>
+							<template #key>{{ i18n.ts._delivery.status }}</template>
+							<template #value><span class="_monospace">{{ i18n.ts._delivery._type[suspensionState] }}</span></template>
+						</MkKeyValue>
+					</div>
+				</MkFolder>
 				<MkKeyValue>
 					<template #key>{{ i18n.ts.description }}</template>
 					<template #value>{{ instance.description }}</template>
@@ -36,14 +86,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<FormSection v-if="iAmModerator">
 					<template #label>{{ i18n.ts.moderation }}</template>
 					<div class="_gaps_s">
-						<MkKeyValue>
-							<template #key>
-								{{ i18n.ts._delivery.status }}
-							</template>
-							<template #value>
-								{{ i18n.ts._delivery._type[suspensionState] }}
-							</template>
-						</MkKeyValue>
 						<div class="_buttons">
 							<MkButton inline :disabled="!instance" danger @click="deleteAllFiles">{{ i18n.ts.deleteAllFiles }}</MkButton>
 							<MkButton inline :disabled="!instance" danger @click="severAllFollowRelations">{{ i18n.ts.severAllFollowRelations }}</MkButton>
@@ -64,32 +106,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #caption>{{ i18n.ts.moderationNoteDescription }}</template>
 						</MkTextarea>
 					</div>
-				</FormSection>
-
-				<FormSection>
-					<MkKeyValue oneline style="margin: 1em 0;">
-						<template #key>{{ i18n.ts.registeredAt }}</template>
-						<template #value><MkTime mode="detail" :time="instance.firstRetrievedAt"/></template>
-					</MkKeyValue>
-					<MkKeyValue oneline style="margin: 1em 0;">
-						<template #key>{{ i18n.ts.updatedAt }}</template>
-						<template #value><MkTime mode="detail" :time="instance.infoUpdatedAt"/></template>
-					</MkKeyValue>
-					<MkKeyValue oneline style="margin: 1em 0;">
-						<template #key>{{ i18n.ts.latestRequestReceivedAt }}</template>
-						<template #value><MkTime v-if="instance.latestRequestReceivedAt" :time="instance.latestRequestReceivedAt"/><span v-else>N/A</span></template>
-					</MkKeyValue>
-				</FormSection>
-
-				<FormSection>
-					<MkKeyValue oneline style="margin: 1em 0;">
-						<template #key>{{ i18n.ts.followingPub }}</template>
-						<template #value>{{ number(instance.followingCount) }}</template>
-					</MkKeyValue>
-					<MkKeyValue oneline style="margin: 1em 0;">
-						<template #key>{{ i18n.ts.followersSub }}</template>
-						<template #value>{{ number(instance.followersCount) }}</template>
-					</MkKeyValue>
 				</FormSection>
 
 				<FormSection>
@@ -199,6 +215,10 @@ import { dateString } from '@/filters/date.js';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import { $i } from '@/i.js';
+import { copyToClipboard } from '@/utility/copy-to-clipboard';
+import { acct } from '@/filters/user';
+import MkFolder from '@/components/MkFolder.vue';
+import MkNumber from '@/components/MkNumber.vue';
 
 const props = defineProps<{
 	host: string;
@@ -522,5 +542,26 @@ definePage(() => ({
       flex-shrink: 0;
     }
   }
+}
+</style>
+
+<style lang="scss" module>
+.headerData {
+	display: flex;
+	flex-direction: column;
+
+	> * {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-size: 85%;
+		opacity: 0.7;
+	}
+
+	> :first-child {
+		text-overflow: initial;
+		word-break: break-all;
+		font-size: 100%;
+		opacity: 1.0;
+	}
 }
 </style>
