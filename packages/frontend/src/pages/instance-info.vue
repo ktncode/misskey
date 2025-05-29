@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div class="fnfelxur">
 					<!-- TODO copy the alt text stuff from reports UI PR -->
 					<img v-if="faviconUrl" :src="faviconUrl" alt="" class="icon"/>
-					<span class="name">{{ instance.name || `(${i18n.ts.unknown})` }}</span>
+					<span class="name">{{ instance.name || instance.host }}</span>
 				</div>
 				<div style="display: flex; flex-direction: column; gap: 1em;">
 					<MkKeyValue :copy="host" oneline>
