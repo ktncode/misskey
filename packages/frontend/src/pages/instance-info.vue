@@ -110,7 +110,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkSwitch v-model="rejectReports" :disabled="!instance" @update:modelValue="toggleRejectReports">{{ i18n.ts.rejectReports }}</MkSwitch>
 						<MkInfo v-if="isBaseMediaSilenced" warn>{{ i18n.ts.mediaSilencedByBase }}</MkInfo>
 						<MkSwitch v-model="isMediaSilenced" :disabled="!meta || !instance || isBaseMediaSilenced" @update:modelValue="toggleMediaSilenced">{{ i18n.ts.mediaSilenceThisInstance }}</MkSwitch>
-						<MkButton @click="refreshMetadata"><i class="ti ti-refresh"></i> Refresh metadata</MkButton>
+						<MkButton @click="refreshMetadata"><i class="ph-cloud-arrow-down ph-bold ph-lg"></i> {{ i18n.ts.updateRemoteUser }}</MkButton>
 					</div>
 				</FormSection>
 
