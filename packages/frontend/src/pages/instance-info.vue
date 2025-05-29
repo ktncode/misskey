@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<div style="display: flex; flex-direction: column; gap: 1em;">
 					<MkKeyValue :copy="host" oneline>
-						<template #key>Host</template>
+						<template #key>{{ i18n.ts.name }}</template>
 						<template #value><span class="_monospace"><MkLink :url="`https://${host}`">{{ host }}</MkLink></span></template>
 					</MkKeyValue>
 					<MkKeyValue oneline>
@@ -34,7 +34,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkKeyValue>
 
 				<FormSection v-if="iAmModerator">
-					<template #label>Moderation</template>
+					<template #label>{{ i18n.ts.moderation }}</template>
 					<div class="_gaps_s">
 						<MkKeyValue>
 							<template #key>
@@ -83,17 +83,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<FormSection>
 					<MkKeyValue oneline style="margin: 1em 0;">
-						<template #key>Following (Pub)</template>
+						<template #key>{{ i18n.ts.followingPub }}</template>
 						<template #value>{{ number(instance.followingCount) }}</template>
 					</MkKeyValue>
 					<MkKeyValue oneline style="margin: 1em 0;">
-						<template #key>Followers (Sub)</template>
+						<template #key>{{ i18n.ts.followersSub }}</template>
 						<template #value>{{ number(instance.followersCount) }}</template>
 					</MkKeyValue>
 				</FormSection>
 
 				<FormSection>
-					<template #label>Well-known resources</template>
+					<template #label>{{ i18n.ts.wellKnownResources }}</template>
 					<FormLink :to="`https://${host}/.well-known/host-meta`" external style="margin-bottom: 8px;">host-meta</FormLink>
 					<FormLink :to="`https://${host}/.well-known/host-meta.json`" external style="margin-bottom: 8px;">host-meta.json</FormLink>
 					<FormLink :to="`https://${host}/.well-known/nodeinfo`" external style="margin-bottom: 8px;">nodeinfo</FormLink>
@@ -128,7 +128,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<div v-else-if="tab === 'users'" class="_gaps_m">
 				<MkPagination v-slot="{items}" :pagination="usersPagination" style="display: grid; grid-template-columns: repeat(auto-fill,minmax(270px,1fr)); grid-gap: 12px;">
-					<MkA v-for="user in items" :key="user.id" v-tooltip.mfm="`Last posted: ${dateString(user.updatedAt)}`" class="user" :to="`/admin/user/${user.id}`">
+					<MkA v-for="user in items" :key="user.id" v-tooltip.mfm="i18n.tsx.lastPosted({ at: dateString(user.updatedAt) })" class="user" :to="`/admin/user/${user.id}`">
 						<MkUserCardMini :user="user"/>
 					</MkA>
 				</MkPagination>
@@ -137,11 +137,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkPagination v-slot="{items}" :pagination="followingPagination">
 					<div class="follow-relations-list">
 						<div v-for="followRelationship in items" :key="followRelationship.id" class="follow-relation">
-							<MkA v-tooltip.mfm="`Last posted: ${dateString(followRelationship.followee.updatedAt)}`" :to="`/admin/user/${followRelationship.followee.id}`" class="user">
+							<MkA v-tooltip.mfm="i18n.tsx.lastPosted({ at: dateString(followRelationship.followee.updatedAt) })" :to="`/admin/user/${followRelationship.followee.id}`" class="user">
 								<MkUserCardMini :user="followRelationship.followee" :withChart="false"/>
 							</MkA>
 							<span class="arrow">→</span>
-							<MkA v-tooltip.mfm="`Last posted: ${dateString(followRelationship.follower.updatedAt)}`" :to="`/admin/user/${followRelationship.follower.id}`" class="user">
+							<MkA v-tooltip.mfm="i18n.tsx.lastPosted({ at: dateString(followRelationship.follower.updatedAt) })" :to="`/admin/user/${followRelationship.follower.id}`" class="user">
 								<MkUserCardMini :user="followRelationship.follower" :withChart="false"/>
 							</MkA>
 						</div>
@@ -152,11 +152,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkPagination v-slot="{items}" :pagination="followersPagination">
 					<div class="follow-relations-list">
 						<div v-for="followRelationship in items" :key="followRelationship.id" class="follow-relation">
-							<MkA v-tooltip.mfm="`Last posted: ${dateString(followRelationship.followee.updatedAt)}`" :to="`/admin/user/${followRelationship.followee.id}`" class="user">
+							<MkA v-tooltip.mfm="i18n.tsx.lastPosted({ at: dateString(followRelationship.followee.updatedAt) })" :to="`/admin/user/${followRelationship.followee.id}`" class="user">
 								<MkUserCardMini :user="followRelationship.followee" :withChart="false"/>
 							</MkA>
 							<span class="arrow">←</span>
-							<MkA v-tooltip.mfm="`Last posted: ${dateString(followRelationship.follower.updatedAt)}`" :to="`/admin/user/${followRelationship.follower.id}`" class="user">
+							<MkA v-tooltip.mfm="i18n.tsx.lastPosted({ at: dateString(followRelationship.follower.updatedAt) })" :to="`/admin/user/${followRelationship.follower.id}`" class="user">
 								<MkUserCardMini :user="followRelationship.follower" :withChart="false"/>
 							</MkA>
 						</div>
@@ -440,7 +440,7 @@ const headerTabs = computed(() => [{
 	icon: 'ti ti-users',
 }, ...getFollowingTabs(), {
 	key: 'raw',
-	title: 'Raw',
+	title: i18n.ts.raw,
 	icon: 'ti ti-code',
 }]);
 

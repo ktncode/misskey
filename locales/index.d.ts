@@ -13129,6 +13129,26 @@ export interface Locale extends ILocale {
      * Timeout in milliseconds for translation API requests.
      */
     "translationTimeoutCaption": string;
+    /**
+     * Following (Pub)
+     */
+    "followingPub": string;
+    /**
+     * Followers (Sub)
+     */
+    "followersSub": string;
+    /**
+     * Well-known resources
+     */
+    "wellKnownResources": string;
+    /**
+     * Last posted: {at}
+     */
+    "lastPosted": ParameterizedString<"at">;
+    /**
+     * Raw
+     */
+    "raw": string;
 }
 declare const locales: {
     [lang: string]: Locale;

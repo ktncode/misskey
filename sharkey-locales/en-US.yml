@@ -589,3 +589,9 @@ roleAutomatic: "automatic"
 
 translationTimeoutLabel: "Translation timeout"
 translationTimeoutCaption: "Timeout in milliseconds for translation API requests."
+
+followingPub: "Following (Pub)"
+followersSub: "Followers (Sub)"
+wellKnownResources: "Well-known resources"
+lastPosted: "Last posted: {at}"
+raw: 'Raw'
