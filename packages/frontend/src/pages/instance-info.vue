@@ -88,10 +88,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkTextarea>
 				</MkFolder>
 
-				<MkKeyValue>
-					<template #key>{{ i18n.ts.description }}</template>
-					<template #value>{{ instance.description }}</template>
-				</MkKeyValue>
+				<FormSection v-if="instance.description">
+					<MkKeyValue>
+						<template #key>{{ i18n.ts.description }}</template>
+						<template #value>{{ instance.description }}</template>
+					</MkKeyValue>
+				</FormSection>
 
 				<FormSection v-if="iAmModerator">
 					<template #label>{{ i18n.ts.moderation }}</template>
