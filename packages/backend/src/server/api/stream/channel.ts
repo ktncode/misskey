@@ -82,6 +82,11 @@ export default abstract class Channel {
 		return false;
 	}
 
+	/**
+	 * This function modifies {@link note}, please make sure it has been shallow cloned.
+	 * See Dakkar's comment of {@link assignMyReaction} for more
+	 * @param note The note to change
+	 */
 	protected async hideNote(note: Packed<'Note'>): Promise<void> {
 		if (note.renote) {
 			await this.hideNote(note.renote);
@@ -101,8 +106,8 @@ export default abstract class Channel {
 		this.noteEntityService = noteEntityService;
 	}
 
-	public send(payload: { type: string, body: JsonValue }): void
-	public send(type: string, payload: JsonValue): void
+	public send(payload: { type: string, body: JsonValue }): void;
+	public send(type: string, payload: JsonValue): void;
 	@bindThis
 	public send(typeOrPayload: { type: string, body: JsonValue } | string, payload?: JsonValue) {
 		const type = payload === undefined ? (typeOrPayload as { type: string, body: JsonValue }).type : (typeOrPayload as string);
@@ -122,7 +127,6 @@ export default abstract class Channel {
 	public onMessage?(type: string, body: JsonValue): void;
 
 	public async assignMyReaction(note: Packed<'Note'>): Promise<Packed<'Note'>> {
-		let changed = false;
 		// StreamingApiServerService creates a single EventEmitter per server process,
 		// so a new note arriving from redis gets de-serialised once per server process,
 		// and then that single object is passed to all active channels on each connection.
@@ -133,7 +137,6 @@ export default abstract class Channel {
 			if (note.renote && Object.keys(note.renote.reactions).length > 0) {
 				const myReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
 				if (myReaction) {
-					changed = true;
 					clonedNote.renote = { ...note.renote };
 					clonedNote.renote.myReaction = myReaction;
 				}
@@ -141,7 +144,6 @@ export default abstract class Channel {
 			if (note.renote?.reply && Object.keys(note.renote.reply.reactions).length > 0) {
 				const myReaction = await this.noteEntityService.populateMyReaction(note.renote.reply, this.user.id);
 				if (myReaction) {
-					changed = true;
 					clonedNote.renote = { ...note.renote };
 					clonedNote.renote.reply = { ...note.renote.reply };
 					clonedNote.renote.reply.myReaction = myReaction;
@@ -151,12 +153,11 @@ export default abstract class Channel {
 		if (this.user && note.reply && Object.keys(note.reply.reactions).length > 0) {
 			const myReaction = await this.noteEntityService.populateMyReaction(note.reply, this.user.id);
 			if (myReaction) {
-				changed = true;
 				clonedNote.reply = { ...note.reply };
 				clonedNote.reply.myReaction = myReaction;
 			}
 		}
-		return changed ? clonedNote : note;
+		return clonedNote;
 	}
 }
 
@@ -165,4 +166,4 @@ export type MiChannelService<T extends boolean> = {
 	requireCredential: T;
 	kind: T extends true ? string : string | null | undefined;
 	create: (id: string, connection: Connection) => Channel;
-}
+};
