@@ -14,8 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</template>
 
 		<template #default="{ items: notes }">
-			<component
-				:is="prefer.s.animation ? TransitionGroup : 'div'"
+			<SkTransitionGroup
 				:class="[$style.root, { [$style.noGap]: noGap, '_gaps': !noGap, [$style.reverse]: paginationQuery.reversed }]"
 				:enterActiveClass="$style.transition_x_enterActive"
 				:leaveActiveClass="$style.transition_x_leaveActive"
@@ -33,7 +32,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 					<DynamicNote v-else :class="$style.note" :note="note" :withHardMute="true" :data-scroll-anchor="note.id"/>
 				</div>
-			</component>
+			</SkTransitionGroup>
 		</template>
 	</MkPagination>
 </MkPullToRefresh>
@@ -54,6 +53,7 @@ import DynamicNote from '@/components/DynamicNote.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import { i18n } from '@/i18n.js';
 import { infoImageUrl } from '@/instance.js';
+import SkTransitionGroup from '@/components/SkTransitionGroup.vue';
 
 const props = withDefaults(defineProps<{
 	src: BasicTimelineType | 'mentions' | 'directs' | 'list' | 'antenna' | 'channel' | 'role';

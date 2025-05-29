@@ -4,8 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<component
-	:is="prefer.s.animation ? TransitionGroup : 'div'"
+<SkTransitionGroup
 	:enterActiveClass="$style.transition_x_enterActive"
 	:leaveActiveClass="$style.transition_x_leaveActive"
 	:enterFromClass="$style.transition_x_enterFrom"
@@ -15,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 >
 	<XReaction v-for="[reaction, count] in reactions" :key="reaction" :reaction="reaction" :count="count" :isInitial="initialReactions.has(reaction)" :note="note" @reactionToggled="onMockToggleReaction"/>
 	<slot v-if="hasMoreReactions" :key="'$more'" name="more"/>
-</component>
+</SkTransitionGroup>
 </template>
 
 <script lang="ts" setup>
@@ -25,6 +24,7 @@ import { TransitionGroup } from 'vue';
 import XReaction from '@/components/MkReactionsViewer.reaction.vue';
 import { prefer } from '@/preferences.js';
 import { DI } from '@/di.js';
+import SkTransitionGroup from '@/components/SkTransitionGroup.vue';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
