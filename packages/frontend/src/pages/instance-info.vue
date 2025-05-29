@@ -10,7 +10,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div>
 			<div v-if="tab === 'overview'" class="_gaps_m">
 				<div class="fnfelxur">
-					<img :src="faviconUrl" alt="" class="icon"/>
+					<!-- TODO copy the alt text stuff from reports UI PR -->
+					<img v-if="faviconUrl" :src="faviconUrl" alt="" class="icon"/>
 					<span class="name">{{ instance.name || `(${i18n.ts.unknown})` }}</span>
 				</div>
 				<div style="display: flex; flex-direction: column; gap: 1em;">
