@@ -9,10 +9,10 @@ import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { ImageProcessingService } from '@/core/ImageProcessingService.js';
 import type { IImage } from '@/core/ImageProcessingService.js';
-import {createTemp, createTempDir } from '@/misc/create-temp.js';
+import { createTemp, createTempDir } from '@/misc/create-temp.js';
 import { bindThis } from '@/decorators.js';
 import { appendQuery, query } from '@/misc/prelude/url.js';
-import {LoggerService} from "@/core/LoggerService.js";
+import { LoggerService } from "@/core/LoggerService.js";
 import type Logger from "@/logger.js";
 
 @Injectable()
