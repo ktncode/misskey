@@ -15,6 +15,15 @@ import { appendQuery, query } from '@/misc/prelude/url.js';
 import { LoggerService } from "@/core/LoggerService.js";
 import type Logger from "@/logger.js";
 
+// faststart is only supported for MP4, M4A, M4W and MOV files (the MOV family).
+// WebM (and Matroska) files always support faststart-like behavior.
+const supportedMimeTypes = new Map([
+	['video/mp4', 'mp4'],
+	['video/m4a', 'mp4'],
+	['video/m4v', 'mp4'],
+	['video/quicktime', 'mov'],
+]);
+
 @Injectable()
 export class VideoProcessingService {
 	private logger: Logger;
@@ -78,15 +87,6 @@ export class VideoProcessingService {
 	 */
 	@bindThis
 	public async webOptimizeVideo(source: string, mimeType: string): Promise<void> {
-		// faststart is only supported for MP4, M4A, M4W and MOV files (the MOV family).
-		// WebM (and Matroska) files always support faststart-like behavior.
-		const supportedMimeTypes = new Map([
-			['video/mp4', 'mp4'],
-			['video/m4a', 'mp4'],
-			['video/m4v', 'mp4'],
-			['video/quicktime', 'mov']
-		]);
-
 		const outputFormat = supportedMimeTypes.get(mimeType);
 		if (!outputFormat) {
 			this.logger.debug(`Skipping web optimization for unsupported MIME type: ${mimeType}`);
