@@ -13,7 +13,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 	tag="div" :class="$style.root"
 >
 	<XReaction v-for="[reaction, count] in reactions" :key="reaction" :reaction="reaction" :count="count" :isInitial="initialReactions.has(reaction)" :note="note" @reactionToggled="onMockToggleReaction"/>
-	<slot v-if="hasMoreReactions" :key="'$more'" name="more"/>
+	<div v-if="hasMoreReactions" :key="'$more'" :class="$style.moreReactions">
+		<slot name="more"/>
+	</div>
 </SkTransitionGroup>
 </template>
 
@@ -102,7 +104,7 @@ watch([() => props.note.reactions, () => props.maxNumber], ([newSource, maxNumbe
 	position: absolute;
 }
 
-.root {
+.root, .moreReactions {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
