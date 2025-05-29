@@ -78,6 +78,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</MkKeyValue>
 					</div>
 				</MkFolder>
+
+				<MkFolder v-if="iAmModerator" :defaultOpen="moderationNote.length > 0">
+					<template #icon><i class="ph-stamp ph-bold ph-lg"></i></template>
+					<template #label>{{ i18n.ts.moderationNote }}</template>
+					<MkTextarea v-model="moderationNote" manualSave>
+						<template #label>{{ i18n.ts.moderationNote }}</template>
+						<template #caption>{{ i18n.ts.moderationNoteDescription }}</template>
+					</MkTextarea>
+				</MkFolder>
+
 				<MkKeyValue>
 					<template #key>{{ i18n.ts.description }}</template>
 					<template #value>{{ instance.description }}</template>
@@ -101,10 +111,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkInfo v-if="isBaseMediaSilenced" warn>{{ i18n.ts.mediaSilencedByBase }}</MkInfo>
 						<MkSwitch v-model="isMediaSilenced" :disabled="!meta || !instance || isBaseMediaSilenced" @update:modelValue="toggleMediaSilenced">{{ i18n.ts.mediaSilenceThisInstance }}</MkSwitch>
 						<MkButton @click="refreshMetadata"><i class="ti ti-refresh"></i> Refresh metadata</MkButton>
-						<MkTextarea v-model="moderationNote" manualSave>
-							<template #label>{{ i18n.ts.moderationNote }}</template>
-							<template #caption>{{ i18n.ts.moderationNoteDescription }}</template>
-						</MkTextarea>
 					</div>
 				</FormSection>
 
