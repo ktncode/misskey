@@ -101,6 +101,7 @@ const sqlLogger = dbLogger.createSubLogger('sql', 'gray');
 
 export type LoggerProps = {
 	disableQueryTruncation?: boolean;
+	enableQueryLogging?: boolean;
 	enableQueryParamLogging?: boolean;
 	printReplicationMode?: boolean,
 };
@@ -150,6 +151,8 @@ class MyCustomLogger implements Logger {
 
 	@bindThis
 	public logQuery(query: string, parameters?: any[], queryRunner?: QueryRunner) {
+		if (!this.props.enableQueryLogging) return;
+
 		const prefix = (this.props.printReplicationMode && queryRunner)
 			? `[${queryRunner.getReplicationMode()}] `
 			: undefined;
@@ -314,13 +317,12 @@ export function createPostgresDataSource(config: Config) {
 			},
 		} : false,
 		logging: log,
-		logger: log
-			? new MyCustomLogger({
-				disableQueryTruncation: config.logging?.sql?.disableQueryTruncation,
-				enableQueryParamLogging: config.logging?.sql?.enableQueryParamLogging,
-				printReplicationMode: !!config.dbReplications,
-			})
-			: undefined,
+		logger: new MyCustomLogger({
+			disableQueryTruncation: config.logging?.sql?.disableQueryTruncation,
+			enableQueryLogging: log,
+			enableQueryParamLogging: config.logging?.sql?.enableQueryParamLogging,
+			printReplicationMode: !!config.dbReplications,
+		}),
 		maxQueryExecutionTime: config.db.slowQueryThreshold,
 		entities: entities,
 		migrations: ['../../migration/*.js'],
