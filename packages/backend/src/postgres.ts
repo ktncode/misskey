@@ -98,6 +98,8 @@ pg.types.setTypeParser(20, Number);
 export const dbLogger = new MisskeyLogger('db');
 
 const sqlLogger = dbLogger.createSubLogger('sql', 'gray');
+const sqlMigrateLogger = sqlLogger.createSubLogger('migrate');
+const sqlSchemaLogger = sqlLogger.createSubLogger('schema');
 
 export type LoggerProps = {
 	disableQueryTruncation?: boolean;
@@ -179,7 +181,7 @@ class MyCustomLogger implements Logger {
 
 	@bindThis
 	public logSchemaBuild(message: string) {
-		sqlLogger.info(message);
+		sqlSchemaLogger.debug(message);
 	}
 
 	@bindThis
@@ -198,7 +200,7 @@ class MyCustomLogger implements Logger {
 
 	@bindThis
 	public logMigration(message: string) {
-		sqlLogger.info(message);
+		sqlMigrateLogger.debug(message);
 	}
 }
 
