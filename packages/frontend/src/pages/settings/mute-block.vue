@@ -223,12 +223,6 @@ const expandedBlockItems = ref([]);
 
 const showSoftWordMutedWord = prefer.model('showSoftWordMutedWord');
 
-watch([
-	showSoftWordMutedWord,
-], async () => {
-	await reloadAsk({ reason: i18n.ts.reloadToApplySetting, unison: true });
-});
-
 async function unrenoteMute(user, ev) {
 	os.popupMenu([{
 		text: i18n.ts.renoteUnmute,
