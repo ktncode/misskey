@@ -394,7 +394,7 @@ const keymap = {
 		clip();
 	},
 	't': () => {
-		if (prefer.s.showTranslationButtonInNoteFooter && policies.canUseTranslator && instance.translatorAvailable) {
+		if (prefer.s.showTranslationButtonInNoteFooter && policies.value.canUseTranslator && instance.translatorAvailable) {
 			translate();
 		}
 	},
