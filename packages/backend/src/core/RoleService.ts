@@ -86,7 +86,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canManageCustomEmojis: false,
 	canManageAvatarDecorations: false,
 	canSearchNotes: false,
-	canUseTranslator: true,
+	canUseTranslator: false,
 	canHideAds: false,
 	driveCapacityMb: 100,
 	maxFileSizeMb: 10,
