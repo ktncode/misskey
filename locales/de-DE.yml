@@ -1459,9 +1459,6 @@ _abuseUserReport:
   accept: "Akzeptieren"
   reject: "Ablehnen"
   resolveTutorial: "Wenn der Inhalt der Meldung rechtmäßig ist, wähle „Akzeptieren“, um sie als gelöst zu markieren.\nWenn der Inhalt der Meldung unzulässig ist, wähle „Ablehnen“, um sie zu ignorieren."
-  addContextToReport: "Kontext zur Meldung hinzufügen"
-  additionalContext: "Zusätzlicher Kontext (wird deutlich markiert und angehängt)"
-  additionalContextPlaceholder: "Füge zusätzliche Details oder Kontext hinzu, die an die ursprüngliche Meldung für die entfernten Administratoren angehängt werden (z.B. spezifische problematische Beiträge, Screenshots von DM-Belästigungen, etc.)"
 _delivery:
   status: "Auslieferungsstatus"
   stop: "Gesperrt"

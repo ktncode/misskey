@@ -390,3 +390,7 @@ schedulePostList: "予約投稿一覧"
 _permissions:
   "read:notes-schedule": "予約投稿を見る"
   "write:notes-schedule": "予約投稿を作成・削除する"
+_abuseUserReport:
+  addContextToReport: "通報にコンテキストを追加"
+  additionalContext: "追加情報（明確にマークされて追記されます）"
+  additionalContextPlaceholder: "リモート管理者向けに元の通報に明確にマークされて追記される追加の詳細や文脈を入力してください（例：特定の問題のある投稿、DMでの嫌がらせのスクリーンショットなど）"

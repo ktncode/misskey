@@ -1467,9 +1467,6 @@ _abuseUserReport:
   accept: "是認"
   reject: "否認"
   resolveTutorial: "内容が正当である通報に対応した場合は「是認」を選択し、肯定的にケースが解決されたことをマークします。\n内容が正当でない通報の場合は「否認」を選択し、否定的にケースが解決されたことをマークします。"
-  addContextToReport: "通報にコンテキストを追加"
-  additionalContext: "追加情報（明確にマークされて追記されます）"
-  additionalContextPlaceholder: "リモート管理者向けに元の通報に明確にマークされて追記される追加の詳細や文脈を入力してください（例：特定の問題のある投稿、DMでの嫌がらせのスクリーンショットなど）"
 
 _delivery:
   status: "配信状態"
