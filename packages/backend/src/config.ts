@@ -8,9 +8,11 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import * as yaml from 'js-yaml';
 import { globSync } from 'glob';
+import ipaddr from 'ipaddr.js';
 import type * as Sentry from '@sentry/node';
 import type * as SentryVue from '@sentry/vue';
 import type { RedisOptions } from 'ioredis';
+import type { IPv4, IPv6 } from 'ipaddr.js';
 
 type RedisOptionsSource = Partial<RedisOptions> & {
 	host?: string;
@@ -82,7 +84,7 @@ type Source = {
 	proxySmtp?: string;
 	proxyBypassHosts?: string[];
 
-	allowedPrivateNetworks?: string[];
+	allowedPrivateNetworks?: PrivateNetworkSource[];
 	disallowExternalApRedirect?: boolean;
 
 	maxFileSize?: number;
@@ -109,6 +111,7 @@ type Source = {
 	deliverJobMaxAttempts?: number;
 	inboxJobMaxAttempts?: number;
 
+	mediaDirectory?: string;
 	mediaProxy?: string;
 	proxyRemoteFiles?: boolean;
 	videoThumbnailGenerator?: string;
@@ -152,6 +155,60 @@ type Source = {
 	}
 };
 
+export type PrivateNetworkSource = string | { network?: string, ports?: number[] };
+
+export type PrivateNetwork = {
+	/**
+	 * CIDR IP/netmask definition of the IP range to match.
+	 */
+	cidr: CIDR;
+
+	/**
+	 * List of ports to match.
+	 * If undefined, then all ports match.
+	 * If empty, then NO ports match.
+	 */
+	ports?: number[];
+};
+
+export type CIDR = [ip: IPv4 | IPv6, prefixLength: number];
+
+export function parsePrivateNetworks(patterns: PrivateNetworkSource[]): PrivateNetwork[];
+export function parsePrivateNetworks(patterns: undefined): undefined;
+export function parsePrivateNetworks(patterns: PrivateNetworkSource[] | undefined): PrivateNetwork[] | undefined;
+export function parsePrivateNetworks(patterns: PrivateNetworkSource[] | undefined): PrivateNetwork[] | undefined {
+	if (!patterns) return undefined;
+	return patterns
+		.map(e => {
+			if (typeof(e) === 'string') {
+				const cidr = parseIpOrMask(e);
+				if (cidr) {
+					return { cidr } satisfies PrivateNetwork;
+				}
+			} else if (e.network) {
+				const cidr = parseIpOrMask(e.network);
+				if (cidr) {
+					return { cidr, ports: e.ports } satisfies PrivateNetwork;
+				}
+			}
+
+			console.warn('[config] Skipping invalid entry in allowedPrivateNetworks: ', e);
+			return null;
+		})
+		.filter(p => p != null);
+}
+
+function parseIpOrMask(ipOrMask: string): CIDR | null {
+	if (ipaddr.isValidCIDR(ipOrMask)) {
+		return ipaddr.parseCIDR(ipOrMask);
+	}
+	if (ipaddr.isValid(ipOrMask)) {
+		const ip = ipaddr.parse(ipOrMask);
+		return [ip, 32];
+	}
+	return null;
+}
+
 export type Config = {
 	url: string;
 	port: number;
@@ -190,7 +247,7 @@ export type Config = {
 	proxy: string | undefined;
 	proxySmtp: string | undefined;
 	proxyBypassHosts: string[] | undefined;
-	allowedPrivateNetworks: string[] | undefined;
+	allowedPrivateNetworks: PrivateNetwork[] | undefined;
 	disallowExternalApRedirect: boolean;
 	maxFileSize: number;
 	maxNoteLength: number;
@@ -241,6 +298,7 @@ export type Config = {
 	frontendManifestExists: boolean;
 	frontendEmbedEntry: string;
 	frontendEmbedManifestExists: boolean;
+	mediaDirectory: string;
 	mediaProxy: string;
 	externalMediaProxyEnabled: boolean;
 	videoThumbnailGenerator: string | null;
@@ -290,7 +348,7 @@ const _dirname = dirname(_filename);
 /**
  * Path of configuration directory
  */
-const dir = `${_dirname}/../../../.config`;
+const dir = process.env.MISSKEY_CONFIG_DIR ?? `${_dirname}/../../../.config`;
 
 /**
  * Path of configuration file
@@ -382,7 +440,7 @@ export function loadConfig(): Config {
 		proxy: config.proxy,
 		proxySmtp: config.proxySmtp,
 		proxyBypassHosts: config.proxyBypassHosts,
-		allowedPrivateNetworks: config.allowedPrivateNetworks,
+		allowedPrivateNetworks: parsePrivateNetworks(config.allowedPrivateNetworks),
 		disallowExternalApRedirect: config.disallowExternalApRedirect ?? false,
 		maxFileSize: config.maxFileSize ?? 262144000,
 		maxNoteLength: config.maxNoteLength ?? 3000,
@@ -407,6 +465,7 @@ export function loadConfig(): Config {
 		signToActivityPubGet: config.signToActivityPubGet ?? true,
 		attachLdSignatureForRelays: config.attachLdSignatureForRelays ?? true,
 		checkActivityPubGetSignature: config.checkActivityPubGetSignature,
+		mediaDirectory: config.mediaDirectory ?? resolve(_dirname, '../../../files'),
 		mediaProxy: externalMediaProxy ?? internalMediaProxy,
 		externalMediaProxyEnabled: externalMediaProxy !== null && externalMediaProxy !== internalMediaProxy,
 		videoThumbnailGenerator: config.videoThumbnailGenerator ?
@@ -575,14 +634,14 @@ function applyEnvOverrides(config: Source) {
 		['host', 'port', 'username', 'pass', 'db', 'prefix'],
 	]);
 	_apply_top(['fulltextSearch', 'provider']);
-	_apply_top(['meilisearch', ['host', 'port', 'apikey', 'ssl', 'index', 'scope']]);
+	_apply_top(['meilisearch', ['host', 'port', 'apiKey', 'ssl', 'index', 'scope']]);
 	_apply_top([['sentryForFrontend', 'sentryForBackend'], 'options', ['dsn', 'profileSampleRate', 'serverName', 'includeLocalVariables', 'proxy', 'keepAlive', 'caCerts']]);
 	_apply_top(['sentryForBackend', 'enableNodeProfiling']);
 	_apply_top(['sentryForFrontend', 'vueIntegration', ['attachProps', 'attachErrorHandler']]);
 	_apply_top(['sentryForFrontend', 'vueIntegration', 'tracingOptions', 'timeout']);
 	_apply_top(['sentryForFrontend', 'browserTracingIntegration', 'routeLabel']);
 	_apply_top([['clusterLimit', 'deliverJobConcurrency', 'inboxJobConcurrency', 'relashionshipJobConcurrency', 'deliverJobPerSec', 'inboxJobPerSec', 'relashionshipJobPerSec', 'deliverJobMaxAttempts', 'inboxJobMaxAttempts']]);
-	_apply_top([['outgoingAddress', 'outgoingAddressFamily', 'proxy', 'proxySmtp', 'mediaProxy', 'proxyRemoteFiles', 'videoThumbnailGenerator']]);
+	_apply_top([['outgoingAddress', 'outgoingAddressFamily', 'proxy', 'proxySmtp', 'mediaDirectory', 'mediaProxy', 'proxyRemoteFiles', 'videoThumbnailGenerator']]);
 	_apply_top([['maxFileSize', 'maxNoteLength', 'maxRemoteNoteLength', 'maxAltTextLength', 'maxRemoteAltTextLength', 'pidFile', 'filePermissionBits']]);
 	_apply_top(['import', ['downloadTimeout', 'maxFileSize']]);
 	_apply_top([['signToActivityPubGet', 'checkActivityPubGetSignature', 'setupPassword', 'disallowExternalApRedirect']]);

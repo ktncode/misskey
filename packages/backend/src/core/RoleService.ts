@@ -69,6 +69,7 @@ export type RolePolicies = {
 	canImportMuting: boolean;
 	canImportUserLists: boolean;
 	chatAvailability: 'available' | 'readonly' | 'unavailable';
+	canTrend: boolean;
 };
 
 export const DEFAULT_POLICIES: RolePolicies = {
@@ -108,6 +109,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canImportMuting: true,
 	canImportUserLists: true,
 	chatAvailability: 'available',
+	canTrend: true,
 };
 
 @Injectable()
@@ -149,6 +151,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	) {
 		this.rolesCache = new MemorySingleCache<MiRole[]>(1000 * 60 * 60); // 1h
 		this.roleAssignmentByUserIdCache = new MemoryKVCache<MiRoleAssignment[]>(1000 * 60 * 5); // 5m
+		// TODO additional cache for final calculation?
 
 		this.redisForSub.on('message', this.onMessage);
 	}
@@ -358,8 +361,9 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async getUserAssigns(userId: MiUser['id']) {
+	public async getUserAssigns(userOrId: MiUser | MiUser['id']) {
 		const now = Date.now();
+		const userId = typeof(userOrId) === 'object' ? userOrId.id : userOrId;
 		let assigns = await this.roleAssignmentByUserIdCache.fetch(userId, () => this.roleAssignmentsRepository.findBy({ userId }));
 		// 期限切れのロールを除外
 		assigns = assigns.filter(a => a.expiresAt == null || (a.expiresAt.getTime() > now));
@@ -367,12 +371,13 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async getUserRoles(userId: MiUser['id']) {
+	public async getUserRoles(userOrId: MiUser | MiUser['id']) {
 		const roles = await this.rolesCache.fetch(() => this.rolesRepository.findBy({}));
+		const userId = typeof(userOrId) === 'object' ? userOrId.id : userOrId;
 		const followStats = await this.cacheService.getFollowStats(userId);
-		const assigns = await this.getUserAssigns(userId);
+		const assigns = await this.getUserAssigns(userOrId);
 		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
-		const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
+		const user = typeof(userOrId) === 'object' ? userOrId : roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userOrId) : null;
 		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, assignedRoles, r.condFormula, followStats));
 		return [...assignedRoles, ...matchedCondRoles];
 	}
@@ -381,8 +386,9 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	 * 指定ユーザーのバッジロール一覧取得
 	 */
 	@bindThis
-	public async getUserBadgeRoles(userId: MiUser['id']) {
+	public async getUserBadgeRoles(userOrId: MiUser | MiUser['id']) {
 		const now = Date.now();
+		const userId = typeof(userOrId) === 'object' ? userOrId.id : userOrId;
 		let assigns = await this.roleAssignmentByUserIdCache.fetch(userId, () => this.roleAssignmentsRepository.findBy({ userId }));
 		// 期限切れのロールを除外
 		assigns = assigns.filter(a => a.expiresAt == null || (a.expiresAt.getTime() > now));
@@ -392,7 +398,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const assignedBadgeRoles = assignedRoles.filter(r => r.asBadge);
 		const badgeCondRoles = roles.filter(r => r.asBadge && (r.target === 'conditional'));
 		if (badgeCondRoles.length > 0) {
-			const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
+			const user = typeof(userOrId) === 'object' ? userOrId : roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userOrId) : null;
 			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user!, assignedRoles, r.condFormula, followStats));
 			return [...assignedBadgeRoles, ...matchedBadgeCondRoles];
 		} else {
@@ -401,12 +407,12 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async getUserPolicies(userId: MiUser['id'] | null): Promise<RolePolicies> {
+	public async getUserPolicies(userOrId: MiUser | MiUser['id'] | null): Promise<RolePolicies> {
 		const basePolicies = { ...DEFAULT_POLICIES, ...this.meta.policies };
 
-		if (userId == null) return basePolicies;
+		if (userOrId == null) return basePolicies;
 
-		const roles = await this.getUserRoles(userId);
+		const roles = await this.getUserRoles(userOrId);
 
 		function calc<T extends keyof RolePolicies>(name: T, aggregate: (values: RolePolicies[T][]) => RolePolicies[T]) {
 			if (roles.length === 0) return basePolicies[name];
@@ -465,6 +471,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canImportMuting: calc('canImportMuting', vs => vs.some(v => v === true)),
 			canImportUserLists: calc('canImportUserLists', vs => vs.some(v => v === true)),
 			chatAvailability: calc('chatAvailability', aggregateChatAvailability),
+			canTrend: calc('canTrend', vs => vs.some(v => v === true)),
 		};
 	}
 

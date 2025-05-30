@@ -248,6 +248,9 @@ export const PREF_DEF = {
 	showClipButtonInNoteFooter: {
 		default: false,
 	},
+	showTranslationButtonInNoteFooter: {
+		default: false,
+	},
 	reactionsDisplaySize: {
 		default: 'medium' as 'small' | 'medium' | 'large',
 	},

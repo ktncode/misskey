@@ -20,7 +20,7 @@ import type { MiDriveFile } from './DriveFile.js';
 // You should not use `@Index({ concurrent: true })` decorator because database initialization for test will fail
 // because it will always run CREATE INDEX in transaction based on decorators.
 // Not appending `{ concurrent: true }` to `@Index` will not cause any problem in production,
-@Index(['userId', 'id'])
+@Index('IDX_724b311e6f883751f261ebe378', ['userId', 'id'])
 @Entity('note')
 export class MiNote {
 	@PrimaryColumn(id())
@@ -273,3 +273,7 @@ export type IMentionedRemoteUsers = {
 	username: string;
 	host: string;
 }[];
+
+export function hasText(note: MiNote): note is MiNote & { text: string } {
+	return note.text != null;
+}

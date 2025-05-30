@@ -5524,6 +5524,7 @@ export type components = {
       scheduleNoteMax: number;
       /** @enum {string} */
       chatAvailability: 'available' | 'readonly' | 'unavailable';
+      canTrend: boolean;
     };
     ReversiGameLite: {
       /** Format: id */
@@ -9253,6 +9254,7 @@ export type operations = {
             enableReactionsBuffering: boolean;
             notesPerOneAd: number;
             backgroundImageUrl: string | null;
+            translationTimeout: number;
             deeplAuthKey: string | null;
             deeplIsPro: boolean;
             deeplFreeMode: boolean;
@@ -9261,6 +9263,7 @@ export type operations = {
             libreTranslateKey: string | null;
             defaultDarkTheme: string | null;
             defaultLightTheme: string | null;
+            defaultLike: string;
             description: string | null;
             disableRegistration: boolean;
             impressumUrl: string | null;
@@ -11228,6 +11231,14 @@ export type operations = {
                 expiresAt: string | null;
                 roleId: string;
               })[];
+            followStats: {
+              totalFollowing: number;
+              totalFollowers: number;
+              localFollowing: number;
+              localFollowers: number;
+              remoteFollowing: number;
+              remoteFollowers: number;
+            };
           };
         };
       };
@@ -12135,7 +12146,7 @@ export type operations = {
           description?: string | null;
           defaultLightTheme?: string | null;
           defaultDarkTheme?: string | null;
-          defaultLike?: string | null;
+          defaultLike?: string;
           cacheRemoteFiles?: boolean;
           cacheRemoteSensitiveFiles?: boolean;
           emailRequiredForSignup?: boolean;
@@ -12167,6 +12178,7 @@ export type operations = {
           maintainerName?: string | null;
           maintainerEmail?: string | null;
           langs?: string[];
+          translationTimeout?: number;
           deeplAuthKey?: string | null;
           deeplIsPro?: boolean;
           deeplFreeMode?: boolean;
@@ -21759,6 +21771,8 @@ export type operations = {
            * @enum {string}
            */
           origin?: 'combined' | 'local' | 'remote';
+          /** @default false */
+          trending?: boolean;
         };
       };
     };
@@ -28721,14 +28735,10 @@ export type operations = {
       200: {
         content: {
           'application/json': {
-            sourceLang: string;
-            text: string;
+            sourceLang?: string;
+            text?: string;
           };
         };
-      };
-      /** @description OK (without any results) */
-      204: {
-        content: never;
       };
       /** @description Client error */
       400: {
@@ -31536,7 +31546,7 @@ export type operations = {
           /** @default 0 */
           offset?: number;
           /** @enum {string} */
-          sort?: '+follower' | '-follower' | '+createdAt' | '-createdAt' | '+updatedAt' | '-updatedAt';
+          sort?: '+follower' | '-follower' | '+localFollower' | '-localFollower' | '+createdAt' | '-createdAt' | '+updatedAt' | '-updatedAt';
           /**
            * @default all
            * @enum {string}
