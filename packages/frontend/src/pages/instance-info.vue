@@ -98,7 +98,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkFolder v-if="iAmModerator" :defaultOpen="moderationNote.length > 0" :sticky="false">
 					<template #icon><i class="ph-stamp ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts.moderationNote }}</template>
-					<MkTextarea v-model="moderationNote" manualSave>
+					<MkTextarea v-model="moderationNote" manualSave @update:modelValue="saveModerationNote">
 						<template #label>{{ i18n.ts.moderationNote }}</template>
 						<template #caption>{{ i18n.ts.moderationNoteDescription }}</template>
 					</MkTextarea>
@@ -353,11 +353,14 @@ const followersPagination = {
 	offsetMode: false,
 };
 
-if (iAmModerator) {
-	watch(moderationNote, async () => {
-		if (instance.value == null) return;
-		await os.apiWithDialog('admin/federation/update-instance', { host: instance.value.host, moderationNote: moderationNote.value });
-	});
+async function saveModerationNote() {
+	if (iAmModerator) {
+		await os.promiseDialog(async () => {
+			if (instance.value == null) return;
+			await os.apiWithDialog('admin/federation/update-instance', { host: instance.value.host, moderationNote: moderationNote.value });
+			await fetch();
+		});
+	}
 }
 
 async function fetch(): Promise<void> {
