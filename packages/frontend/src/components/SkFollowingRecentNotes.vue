@@ -21,7 +21,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, shallowRef } from 'vue';
 import type { Paging } from '@/components/MkPagination.vue';
 import type { FollowingFeedTab } from '@/types/following-feed.js';
-import { infoImageUrl } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import MkDateSeparatedList from '@/components/MkDateSeparatedList.vue';
 import MkPagination from '@/components/MkPagination.vue';
