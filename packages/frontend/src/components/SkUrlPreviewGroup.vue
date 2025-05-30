@@ -207,9 +207,13 @@ function deduplicatePreviews(previews: Summary[]): Summary[] {
 			// Skip if we have AP and the other doesn't
 			if (preview.activityPub && !p.activityPub) return false;
 
+			// Skip if we have a note and the other doesn't
+			if (preview.note && !p.note) return false;
+
 			// Skip later previews (keep the earliest instance)...
-			// ...but only if we have AP or the later one doesn't.
-			if (i > index && (preview.activityPub || !p.activityPub)) return false;
+			// ...but only if we have AP or the later one doesn't...
+			// ...and only if we have note or the later one doesn't.
+			if (i > index && (preview.activityPub || !p.activityPub) && (preview.note || !p.note)) return false;
 
 			// If we get here, then "preview" is a duplicate of "p" and should be skipped.
 			return true;
