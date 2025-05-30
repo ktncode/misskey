@@ -321,7 +321,7 @@ export function createPostgresDataSource(config: Config) {
 				printReplicationMode: !!config.dbReplications,
 			})
 			: undefined,
-		maxQueryExecutionTime: 300,
+		maxQueryExecutionTime: config.db.slowQueryThreshold,
 		entities: entities,
 		migrations: ['../../migration/*.js'],
 	});
