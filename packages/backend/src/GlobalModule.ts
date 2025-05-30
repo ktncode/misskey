@@ -28,7 +28,7 @@ const $db: Provider = {
 			const db = createPostgresDataSource(config);
 			return await db.initialize();
 		} catch (e) {
-			console.log(e);
+			console.error('failed to initialize database connection', e);
 			throw e;
 		}
 	},
