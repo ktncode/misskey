@@ -79,6 +79,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 				</MkFolder>
 
+				<MkFolder>
+					<template #label>{{ i18n.ts.wellKnownResources }}</template>
+					<template #icon><i class="ph-network ph-bold ph-lg"></i></template>
+					<ul :class="$style.linksList" class="_gaps_s">
+						<!-- TODO more links here -->
+						<li><MkLink :url="`https://${host}/.well-known/host-meta`" class="_monospace">/.well-known/host-meta</MkLink></li>
+						<li><MkLink :url="`https://${host}/.well-known/host-meta.json`" class="_monospace">/.well-known/host-meta.json</MkLink></li>
+						<li><MkLink :url="`https://${host}/.well-known/nodeinfo`" class="_monospace">/.well-known/nodeinfo</MkLink></li>
+						<li><MkLink :url="`https://${host}/robots.txt`" class="_monospace">/robots.txt</MkLink></li>
+						<li><MkLink :url="`https://${host}/manifest.json`" class="_monospace">/manifest.json</MkLink></li>
+					</ul>
+				</MkFolder>
+
 				<MkFolder v-if="iAmModerator" :defaultOpen="moderationNote.length > 0">
 					<template #icon><i class="ph-stamp ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts.moderationNote }}</template>
@@ -114,15 +127,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkSwitch v-model="isMediaSilenced" :disabled="!meta || !instance || isBaseMediaSilenced" @update:modelValue="toggleMediaSilenced">{{ i18n.ts.mediaSilenceThisInstance }}</MkSwitch>
 						<MkButton @click="refreshMetadata"><i class="ph-cloud-arrow-down ph-bold ph-lg"></i> {{ i18n.ts.updateRemoteUser }}</MkButton>
 					</div>
-				</FormSection>
-
-				<FormSection>
-					<template #label>{{ i18n.ts.wellKnownResources }}</template>
-					<FormLink :to="`https://${host}/.well-known/host-meta`" external style="margin-bottom: 8px;">host-meta</FormLink>
-					<FormLink :to="`https://${host}/.well-known/host-meta.json`" external style="margin-bottom: 8px;">host-meta.json</FormLink>
-					<FormLink :to="`https://${host}/.well-known/nodeinfo`" external style="margin-bottom: 8px;">nodeinfo</FormLink>
-					<FormLink :to="`https://${host}/robots.txt`" external style="margin-bottom: 8px;">robots.txt</FormLink>
-					<FormLink :to="`https://${host}/manifest.json`" external style="margin-bottom: 8px;">manifest.json</FormLink>
 				</FormSection>
 			</div>
 			<div v-else-if="tab === 'chart'" class="_gaps_m">
@@ -571,5 +575,10 @@ definePage(() => ({
 		font-size: 100%;
 		opacity: 1.0;
 	}
+}
+
+.linksList {
+	margin: 0;
+	padding-left: 1.5em;
 }
 </style>
