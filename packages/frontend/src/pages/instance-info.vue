@@ -122,8 +122,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 						<div :class="$style.buttonStrip">
 							<MkButton inline :disabled="!instance" @click="refreshMetadata"><i class="ph-cloud-arrow-down ph-bold ph-lg"></i> {{ i18n.ts.updateRemoteUser }}</MkButton>
-							<MkButton inline :disabled="!instance" danger @click="deleteAllFiles">{{ i18n.ts.deleteAllFiles }}</MkButton>
-							<MkButton inline :disabled="!instance" danger @click="severAllFollowRelations">{{ i18n.ts.severAllFollowRelations }}</MkButton>
+							<MkButton inline :disabled="!instance" danger @click="deleteAllFiles"><i class="ph-trash ph-bold ph-lg"></i> {{ i18n.ts.deleteAllFiles }}</MkButton>
+							<MkButton inline :disabled="!instance" danger @click="severAllFollowRelations"><i class="ph-link-break ph-bold ph-lg"></i> {{ i18n.ts.severAllFollowRelations }}</MkButton>
 						</div>
 					</div>
 				</FormSection>
