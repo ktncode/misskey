@@ -1459,6 +1459,9 @@ _abuseUserReport:
   accept: "Accept"
   reject: "Reject"
   resolveTutorial: "If the report's content is legitimate, select \"Accept\" to mark it as resolved.\nIf the report's content is illegitimate, select \"Reject\" to ignore it."
+  addContextToReport: "Add context to report"
+  additionalContext: "Additional context (will be clearly marked and appended)"
+  additionalContextPlaceholder: "Add any additional details or context that will be appended to the original report for remote administrators (e.g., specific offending posts, screenshots of DM harassment, etc.)"
 _delivery:
   status: "Delivery status"
   stop: "Suspended"

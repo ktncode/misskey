@@ -49,7 +49,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			<MkPagination v-slot="{items}" ref="reports" :pagination="pagination" :displayLimit="50">
 				<div class="_gaps">
-					<XAbuseReport v-for="report in items" :key="report.id" :report="report" @resolved="resolved"/>
+					<XAbuseReport v-for="report in items" :key="report.id" :report="report" @resolved="resolved" @forwarded="forwarded"/>
 				</div>
 			</MkPagination>
 		</div>
@@ -88,6 +88,13 @@ const pagination = {
 
 function resolved(reportId) {
 	reports.value?.removeItem(reportId);
+}
+
+function forwarded(reportId) {
+	reports.value?.updateItem(reportId, (report) => ({
+		...report,
+		forwarded: true,
+	}));
 }
 
 function closeTutorial() {
