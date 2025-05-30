@@ -30,7 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</template>
 
 	<div class="_gaps_s">
-		<MkFolder :withSpacer="true">
+		<MkFolder :withSpacer="false">
 			<template #icon><MkAvatar :user="report.targetUser" style="width: 18px; height: 18px;"/></template>
 			<template #label>{{ i18n.ts.target }}: <MkAcct :user="report.targetUser"/></template>
 			<template #suffix>{{ i18n.ts.id }}# {{ report.targetUserId }}</template>
@@ -40,7 +40,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</MkFolder>
 
-		<MkFolder v-if="report.targetInstance" :withSpacer="true">
+		<MkFolder v-if="report.targetInstance" :withSpacer="false">
 			<template #icon>
 				<img
 					v-if="targetInstanceIcon"
@@ -67,7 +67,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</MkFolder>
 
-		<MkFolder :withSpacer="true">
+		<MkFolder :withSpacer="false">
 			<template #icon><MkAvatar :user="report.reporter" style="width: 18px; height: 18px;"/></template>
 			<template #label>{{ i18n.ts.reporter }}: <MkAcct :user="report.reporter"/></template>
 			<template #suffix>{{ i18n.ts.id }}# {{ report.reporterId }}</template>
