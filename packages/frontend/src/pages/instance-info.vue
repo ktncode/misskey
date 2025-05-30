@@ -72,7 +72,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #key>{{ i18n.ts.followersSub }}</template>
 							<template #value><span class="_monospace"><MkNumber :value="instance.followersCount"/></span></template>
 						</MkKeyValue>
-						<MkKeyValue>
+						<MkKeyValue oneline>
 							<template #key>{{ i18n.ts._delivery.status }}</template>
 							<template #value><span class="_monospace">{{ i18n.ts._delivery._type[suspensionState] }}</span></template>
 						</MkKeyValue>
