@@ -164,7 +164,8 @@ class MyCustomLogger implements Logger {
 		const prefix = (this.props.printReplicationMode && queryRunner)
 			? `[${queryRunner.getReplicationMode()}] `
 			: undefined;
-		sqlLogger.error(this.transformQueryLog(query, { prefix }), this.transformParameters(parameters));
+		const transformed = this.transformQueryLog(query, { prefix });
+		sqlLogger.error(`Query error (${error}): ${transformed}`, this.transformParameters(parameters));
 	}
 
 	@bindThis
@@ -172,7 +173,8 @@ class MyCustomLogger implements Logger {
 		const prefix = (this.props.printReplicationMode && queryRunner)
 			? `[${queryRunner.getReplicationMode()}] `
 			: undefined;
-		sqlLogger.warn(this.transformQueryLog(query, { prefix }), this.transformParameters(parameters));
+		const transformed = this.transformQueryLog(query, { prefix });
+		sqlLogger.warn(`Query is slow (${time}ms): ${transformed}`, this.transformParameters(parameters));
 	}
 
 	@bindThis
@@ -181,8 +183,17 @@ class MyCustomLogger implements Logger {
 	}
 
 	@bindThis
-	public log(message: string) {
-		sqlLogger.info(message);
+	public log(level: 'log' | 'info' | 'warn', message: string) {
+		switch (level) {
+			case 'log':
+			case 'info': {
+				sqlLogger.info(message);
+				break;
+			}
+			case 'warn': {
+				sqlLogger.warn(message);
+			}
+		}
 	}
 
 	@bindThis
