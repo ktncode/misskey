@@ -499,6 +499,10 @@ export function loadConfig(): Config {
 }
 
 function tryCreateUrl(url: string) {
+	if (!url) {
+		throw new Error('Failed to load: no "url" property found in config. Please check the value of "MISSKEY_CONFIG_DIR" and "MISSKEY_CONFIG_YML", and verify that all configuration files are correct.');
+	}
+
 	try {
 		return new URL(url);
 	} catch (e) {
