@@ -4292,6 +4292,7 @@ export type components = {
           iconUrl: string | null;
           displayOrder: number;
         })[];
+      attributionDomains: string[];
     };
     UserDetailedNotMeOnly: {
       /** Format: url */
@@ -25180,6 +25181,7 @@ export type operations = {
           defaultCWPriority?: 'default' | 'parent' | 'defaultParent' | 'parentDefault';
           /** @enum {string} */
           allowUnsignedFetch?: 'never' | 'always' | 'essential' | 'staff';
+          attributionDomains?: string[];
         };
       };
     };
