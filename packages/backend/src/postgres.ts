@@ -137,7 +137,7 @@ class MyCustomLogger implements Logger {
 			modded = truncateSql(modded);
 		}
 
-		return highlightSql(modded);
+		return this.props.enableQueryLogging ? highlightSql(modded) : modded;
 	}
 
 	@bindThis
