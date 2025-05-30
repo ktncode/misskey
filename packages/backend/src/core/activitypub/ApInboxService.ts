@@ -217,6 +217,10 @@ export class ApInboxService {
 		const note = await this.apNoteService.resolveNote(object, { resolver });
 		if (!note) return `skip: target note not found ${targetUri}`;
 
+		if (note.userHost == null && note.localOnly) {
+			throw new IdentifiableError('12e23cec-edd9-442b-aa48-9c21f0c3b215', 'Cannot react to local-only note');
+		}
+
 		await this.apNoteService.extractEmojis(activity.tag ?? [], actor.host).catch(() => null);
 
 		try {
@@ -369,6 +373,10 @@ export class ApInboxService {
 
 			if (!await this.noteEntityService.isVisibleForMe(renote, actor.id)) {
 				return 'skip: invalid actor for this activity';
+			}
+
+			if (renote.userHost == null && renote.localOnly) {
+				throw new IdentifiableError('12e23cec-edd9-442b-aa48-9c21f0c3b215', 'Cannot renote a local-only note');
 			}
 
 			this.logger.info(`Creating the (Re)Note: ${uri}`);
