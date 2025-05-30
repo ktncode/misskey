@@ -72,8 +72,8 @@ export default class Logger {
 			null;
 
 		let log = envOption.hideWorkerId
-			? `${l}\t[${contexts.join(' ')}]\t${m}`
-			: `${l} ${worker}\t[${contexts.join(' ')}]\t${m}`;
+			? `${l}\t[${contexts.join(' ')}]\t\t${m}`
+			: `${l} ${worker}\t[${contexts.join(' ')}]\t\t${m}`;
 		if (envOption.withLogTime) log = chalk.gray(time) + ' ' + log;
 
 		const args: unknown[] = [important ? chalk.bold(log) : log];
