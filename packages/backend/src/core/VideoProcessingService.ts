@@ -23,6 +23,7 @@ const supportedMimeTypes = new Map([
 	['video/m4v', 'mp4'],
 	['video/quicktime', 'mov'],
 ]);
+const fs = await import('node:fs/promises');
 
 @Injectable()
 export class VideoProcessingService {
@@ -105,7 +106,6 @@ export class VideoProcessingService {
 					.on('end', async () => {
 						try {
 							// Replace original file with optimized version
-							const fs = await import('node:fs/promises');
 							await fs.copyFile(tempPath, source);
 							this.logger.info(`Web-optimized video: ${source}`);
 							resolve();
