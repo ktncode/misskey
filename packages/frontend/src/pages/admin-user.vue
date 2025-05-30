@@ -27,7 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<MkInfo v-if="isSystem">{{ i18n.ts.isSystemAccount }}</MkInfo>
 
-				<MkFolder v-if="!isSystem">
+				<MkFolder v-if="!isSystem" :sticky="false">
 					<template #icon><i class="ph-list-bullets ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts.details }}</template>
 					<div style="display: flex; flex-direction: column; gap: 1em;">
@@ -84,7 +84,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 				</MkFolder>
 
-				<MkFolder v-if="info">
+				<MkFolder v-if="info" :sticky="false">
 					<template #icon><i class="ph-scroll ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts._role.policies }}</template>
 					<div class="_gaps">
@@ -94,7 +94,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 				</MkFolder>
 
-				<MkFolder v-if="iAmAdmin && ips && ips.length > 0">
+				<MkFolder v-if="iAmAdmin && ips && ips.length > 0" :sticky="false">
 					<template #icon><i class="ph-network ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts.ip }}</template>
 					<MkInfo>{{ i18n.ts.ipTip }}</MkInfo>
@@ -104,7 +104,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 				</MkFolder>
 
-				<MkFolder v-if="iAmModerator" :defaultOpen="moderationNote.length > 0">
+				<MkFolder v-if="iAmModerator" :defaultOpen="moderationNote.length > 0" :sticky="false">
 					<template #icon><i class="ph-stamp ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts.moderationNote }}</template>
 					<MkTextarea v-model="moderationNote" manualSave @update:modelValue="onModerationNoteChanged">

@@ -27,7 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<SkBadgeStrip v-if="badges.length > 0" :badges="badges"></SkBadgeStrip>
 
-				<MkFolder>
+				<MkFolder :sticky="false">
 					<template #icon><i class="ph-list-bullets ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts.details }}</template>
 					<div style="display: flex; flex-direction: column; gap: 1em;">
@@ -82,7 +82,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 				</MkFolder>
 
-				<MkFolder>
+				<MkFolder :sticky="false">
 					<template #label>{{ i18n.ts.wellKnownResources }}</template>
 					<template #icon><i class="ph-network ph-bold ph-lg"></i></template>
 					<ul :class="$style.linksList" class="_gaps_s">
@@ -95,7 +95,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</ul>
 				</MkFolder>
 
-				<MkFolder v-if="iAmModerator" :defaultOpen="moderationNote.length > 0">
+				<MkFolder v-if="iAmModerator" :defaultOpen="moderationNote.length > 0" :sticky="false">
 					<template #icon><i class="ph-stamp ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts.moderationNote }}</template>
 					<MkTextarea v-model="moderationNote" manualSave>
