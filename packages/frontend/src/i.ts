@@ -6,7 +6,6 @@
 import { computed, reactive } from 'vue';
 import * as Misskey from 'misskey-js';
 import { miLocalStorage } from '@/local-storage.js';
-import { fetchInstance } from '@/instance';
 
 // TODO: 他のタブと永続化されたstateを同期
 
@@ -29,10 +28,6 @@ export let notesCount = $i == null ? 0 : $i.notesCount;
 export function incNotesCount() {
 	notesCount++;
 }
-
-// instance export can be empty sometimes, which causes problems.
-const instance = await fetchInstance();
-export const policies = computed<Misskey.entities.RolePolicies>(() => $i?.policies ?? instance.policies);
 
 if (_DEV_) {
 	(window as any).$i = $i;

@@ -108,7 +108,7 @@ import * as os from '@/os.js';
 import * as sound from '@/utility/sound.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
-import { $i, policies } from '@/i.js';
+import { $i } from '@/i.js';
 import { userPage } from '@/filters/user.js';
 import { checkMutes } from '@/utility/check-word-mute.js';
 import { pleaseLogin } from '@/utility/please-login.js';
@@ -121,7 +121,7 @@ import { boostMenuItems, computeRenoteTooltip } from '@/utility/boost-quote.js';
 import { prefer } from '@/preferences.js';
 import { useNoteCapture } from '@/use/use-note-capture.js';
 import SkMutedNote from '@/components/SkMutedNote.vue';
-import { instance } from '@/instance';
+import { instance, policies } from '@/instance';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
