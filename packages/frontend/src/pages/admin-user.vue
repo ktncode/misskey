@@ -20,15 +20,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<span class="_monospace">{{ user.id }}</span>
 							<button v-tooltip="i18n.ts.copy" class="_textButton" style="margin-left: 0.5em;" @click="copyToClipboard(user.id)"><i class="ti ti-copy"></i></button>
 						</span>
-						<span class="state">
-							<span v-if="!approved" class="silenced">{{ i18n.ts.notApproved }}</span>
-							<span v-if="approved && !user.host" class="moderator">{{ i18n.ts.approved }}</span>
-							<span v-if="suspended" class="suspended">{{ i18n.ts.suspended }}</span>
-							<span v-if="silenced" class="silenced">{{ i18n.ts.silenced }}</span>
-							<span v-if="moderator" class="moderator">{{ i18n.ts.moderator }}</span>
-						</span>
 					</div>
 				</div>
+
+				<SkBadgeStrip v-if="badges.length > 0" :badges="badges"></SkBadgeStrip>
 
 				<MkInfo v-if="isSystem">{{ i18n.ts.isSystemAccount }}</MkInfo>
 
@@ -248,6 +243,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, defineAsyncComponent, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@@/js/config.js';
+import type { Badge } from '@/components/SkBadgeStrip.vue';
 import MkChart from '@/components/MkChart.vue';
 import MkObjectView from '@/components/MkObjectView.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
@@ -272,6 +268,7 @@ import MkPagination from '@/components/MkPagination.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkNumber from '@/components/MkNumber.vue';
 import { copyToClipboard } from '@/utility/copy-to-clipboard';
+import SkBadgeStrip from '@/components/SkBadgeStrip.vue';
 
 const props = withDefaults(defineProps<{
 	userId: string;
@@ -303,6 +300,98 @@ const filesPagination = {
 		userId: props.userId,
 	})),
 };
+
+const badges = computed(() => {
+	const arr: Badge[] = [];
+	if (info.value && user.value) {
+		if (info.value.isSuspended) {
+			arr.push({
+				key: 'suspended',
+				label: i18n.ts.suspended,
+				style: 'error',
+			});
+		}
+
+		if (info.value.isSilenced) {
+			arr.push({
+				key: 'silenced',
+				label: i18n.ts.silenced,
+				style: 'warning',
+			});
+		}
+
+		if (info.value.alwaysMarkNsfw) {
+			arr.push({
+				key: 'nsfw',
+				label: i18n.ts.nsfw,
+				style: 'warning',
+			});
+		}
+
+		if (user.value.mandatoryCW) {
+			arr.push({
+				key: 'cw',
+				label: i18n.ts.cw,
+				style: 'warning',
+			});
+		}
+
+		if (info.value.isHibernated) {
+			arr.push({
+				key: 'hibernated',
+				label: i18n.ts.hibernated,
+				style: 'neutral',
+			});
+		}
+
+		if (info.value.isAdministrator) {
+			arr.push({
+				key: 'admin',
+				label: i18n.ts.administrator,
+				style: 'success',
+			});
+		} else if (info.value.isModerator) {
+			arr.push({
+				key: 'mod',
+				label: i18n.ts.moderator,
+				style: 'success',
+			});
+		}
+
+		if (user.value.host == null) {
+			if (info.value.email) {
+				if (info.value.emailVerified) {
+					arr.push({
+						key: 'verified',
+						label: i18n.ts.verified,
+						style: 'success',
+					});
+				} else {
+					arr.push({
+						key: 'not_verified',
+						label: i18n.ts.notVerified,
+						style: 'success',
+					});
+				}
+			}
+
+			if (info.value.approved) {
+				arr.push({
+					key: 'approved',
+					label: i18n.ts.approved,
+					style: 'success',
+				});
+			} else {
+				arr.push({
+					key: 'not_approved',
+					label: i18n.ts.notApproved,
+					style: 'warning',
+				});
+			}
+		}
+	}
+	return arr;
+});
 
 const announcementsStatus = ref<'active' | 'archived'>('active');
 

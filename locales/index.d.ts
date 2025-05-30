@@ -13146,9 +13146,37 @@ export interface Locale extends ILocale {
      */
     "lastPosted": ParameterizedString<"at">;
     /**
+     * NSFW
+     */
+    "nsfw": string;
+    /**
      * Raw
      */
     "raw": string;
+    /**
+     * CW
+     */
+    "cw": string;
+    /**
+     * Media Silenced
+     */
+    "mediaSilenced": string;
+    /**
+     * Bubble
+     */
+    "bubble": string;
+    /**
+     * Verified
+     */
+    "verified": string;
+    /**
+     * Not Verified
+     */
+    "notVerified": string;
+    /**
+     * Hibernated
+     */
+    "hibernated": string;
 }
 declare const locales: {
     [lang: string]: Locale;

@@ -24,6 +24,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</span>
 					</div>
 				</div>
+
+				<SkBadgeStrip v-if="badges.length > 0" :badges="badges"></SkBadgeStrip>
+
 				<MkFolder>
 					<template #icon><i class="ph-list-bullets ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts.details }}</template>
@@ -200,10 +203,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, useCssModule } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { ChartSrc } from '@/components/MkChart.vue';
 import type { Paging } from '@/components/MkPagination.vue';
+import type { Badge } from '@/components/SkBadgeStrip.vue';
 import MkChart from '@/components/MkChart.vue';
 import MkObjectView from '@/components/MkObjectView.vue';
 import FormLink from '@/components/form/link.vue';
@@ -230,6 +234,9 @@ import { copyToClipboard } from '@/utility/copy-to-clipboard';
 import { acct } from '@/filters/user';
 import MkFolder from '@/components/MkFolder.vue';
 import MkNumber from '@/components/MkNumber.vue';
+import SkBadgeStrip from '@/components/SkBadgeStrip.vue';
+
+const $style = useCssModule();
 
 const props = defineProps<{
 	host: string;
@@ -265,6 +272,55 @@ const baseDomains = computed(() => {
 const isBaseBlocked = computed(() => meta.value && baseDomains.value.some(d => meta.value?.blockedHosts.includes(d)));
 const isBaseSilenced = computed(() => meta.value && baseDomains.value.some(d => meta.value?.silencedHosts.includes(d)));
 const isBaseMediaSilenced = computed(() => meta.value && baseDomains.value.some(d => meta.value?.mediaSilencedHosts.includes(d)));
+
+const badges = computed(() => {
+	const arr: Badge[] = [];
+	if (instance.value) {
+		if (instance.value.isBlocked) {
+			arr.push({
+				key: 'blocked',
+				label: i18n.ts.blocked,
+				style: 'error',
+			});
+		}
+		if (instance.value.isSuspended) {
+			arr.push({
+				key: 'suspended',
+				label: i18n.ts.suspended,
+				style: 'error',
+			});
+		}
+		if (instance.value.isSilenced) {
+			arr.push({
+				key: 'silenced',
+				label: i18n.ts.silenced,
+				style: 'warning',
+			});
+		}
+		if (instance.value.isMediaSilenced) {
+			arr.push({
+				key: 'media_silenced',
+				label: i18n.ts.mediaSilenced,
+				style: 'warning',
+			});
+		}
+		if (instance.value.isNSFW) {
+			arr.push({
+				key: 'nsfw',
+				label: i18n.ts.nsfw,
+				style: 'warning',
+			});
+		}
+		if (instance.value.isBubbled) {
+			arr.push({
+				key: 'bubbled',
+				label: i18n.ts.bubble,
+				style: 'success',
+			});
+		}
+	}
+	return arr;
+});
 
 const usersPagination = {
 	endpoint: iAmModerator ? 'admin/show-users' : 'users',

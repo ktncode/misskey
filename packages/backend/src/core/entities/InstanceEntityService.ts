@@ -62,6 +62,7 @@ export class InstanceEntityService {
 			rejectReports: instance.rejectReports,
 			rejectQuotes: instance.rejectQuotes,
 			moderationNote: iAmModerator ? instance.moderationNote : null,
+			isBubbled: this.utilityService.isBubbledHost(instance.host),
 		};
 	}
 
