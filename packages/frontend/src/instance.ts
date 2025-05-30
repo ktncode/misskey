@@ -65,4 +65,6 @@ export async function fetchInstance(force = false): Promise<Misskey.entities.Met
 }
 
 // instance export can be empty sometimes, which causes problems.
-nextTick(() => fetchInstance());
+await fetchInstance().catch(err => {
+	console.warn('Initial meta fetch failed:', err);
+});
