@@ -1,8 +1,3 @@
-<!--
-SPDX-FileCopyrightText: syuilo and misskey-project
-SPDX-License-Identifier: AGPL-3.0-only
--->
-
 <template>
 <MkModal ref="modal" :preferType="'dialog'" :zPriority="'high'" @click="cancel()" @closed="emit('closed')" @esc="cancel()">
 	<div :class="$style.root">
