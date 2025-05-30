@@ -35,7 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #label>{{ i18n.ts.target }}: <MkAcct :user="report.targetUser"/></template>
 			<template #suffix>{{ i18n.ts.id }}# {{ report.targetUserId }}</template>
 
-			<div style="height: 300px; --MI-stickyTop: 0; --MI-stickyBottom: 0;">
+			<div style="--MI-stickyTop: 0; --MI-stickyBottom: 0;">
 				<admin-user :userId="report.targetUserId" :userHint="report.targetUser"></admin-user>
 			</div>
 		</MkFolder>
@@ -53,7 +53,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #label>{{ i18n.ts.instance }}: {{ report.targetInstance.name || report.targetInstance.host }}</template>
 			<template #suffix>{{ i18n.ts.id }}# {{ report.targetInstance.id }}</template>
 
-			<div style="height: 300px; --MI-stickyTop: 0; --MI-stickyBottom: 0;">
+			<div style="--MI-stickyTop: 0; --MI-stickyBottom: 0;">
 				<instance-info :host="report.targetInstance.host" :instanceHint="report.targetInstance" :metaHint="metaHint"></instance-info>
 			</div>
 		</MkFolder>
@@ -72,7 +72,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #label>{{ i18n.ts.reporter }}: <MkAcct :user="report.reporter"/></template>
 			<template #suffix>{{ i18n.ts.id }}# {{ report.reporterId }}</template>
 
-			<div style="height: 300px; --MI-stickyTop: 0; --MI-stickyBottom: 0;">
+			<div style="--MI-stickyTop: 0; --MI-stickyBottom: 0;">
 				<admin-user :userId="report.reporterId" :userHint="report.reporter"></admin-user>
 			</div>
 		</MkFolder>
