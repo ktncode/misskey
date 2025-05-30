@@ -115,7 +115,7 @@ function highlightSql(sql: string) {
 }
 
 function truncateSql(sql: string) {
-	return sql.length > 100 ? `${sql.substring(0, 100)}...` : sql;
+	return sql.length > 100 ? `${sql.substring(0, 100)} [truncated]` : sql;
 }
 
 function stringifyParameter(param: any) {
