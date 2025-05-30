@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div v-if="instance" class="_spacer" style="--MI_SPACER-w: 600px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<!-- This empty div is preserved to avoid merge conflicts -->
 		<div>
-			<div v-if="tab === 'overview'" class="_gaps_m">
+			<div v-if="tab === 'overview'" class="_gaps">
 				<div class="fnfelxur">
 					<!-- TODO copy the alt text stuff from reports UI PR -->
 					<img v-if="faviconUrl" :src="faviconUrl" alt="" class="icon"/>
