@@ -782,6 +782,7 @@ definePage(() => ({
 	cursor: pointer;
 }
 
+// Sync with instance-info.vue
 .buttonStrip {
 	margin: calc(var(--MI-margin) / 2 * -1);
 

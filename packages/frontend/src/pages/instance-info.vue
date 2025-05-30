@@ -108,11 +108,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<FormSection v-if="iAmModerator">
 					<template #label>{{ i18n.ts.moderation }}</template>
-					<div class="_gaps_s">
-						<div class="_buttons">
-							<MkButton inline :disabled="!instance" danger @click="deleteAllFiles">{{ i18n.ts.deleteAllFiles }}</MkButton>
-							<MkButton inline :disabled="!instance" danger @click="severAllFollowRelations">{{ i18n.ts.severAllFollowRelations }}</MkButton>
-						</div>
+					<div class="_gaps">
 						<MkSwitch v-model="isSuspended" :disabled="!instance" @update:modelValue="toggleSuspended">{{ i18n.ts._delivery.stop }}</MkSwitch>
 						<MkInfo v-if="isBaseBlocked" warn>{{ i18n.ts.blockedByBase }}</MkInfo>
 						<MkSwitch v-model="isBlocked" :disabled="!meta || !instance || isBaseBlocked" @update:modelValue="toggleBlock">{{ i18n.ts.blockThisInstance }}</MkSwitch>
@@ -123,7 +119,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkSwitch v-model="rejectReports" :disabled="!instance" @update:modelValue="toggleRejectReports">{{ i18n.ts.rejectReports }}</MkSwitch>
 						<MkInfo v-if="isBaseMediaSilenced" warn>{{ i18n.ts.mediaSilencedByBase }}</MkInfo>
 						<MkSwitch v-model="isMediaSilenced" :disabled="!meta || !instance || isBaseMediaSilenced" @update:modelValue="toggleMediaSilenced">{{ i18n.ts.mediaSilenceThisInstance }}</MkSwitch>
-						<MkButton @click="refreshMetadata"><i class="ph-cloud-arrow-down ph-bold ph-lg"></i> {{ i18n.ts.updateRemoteUser }}</MkButton>
+
+						<div :class="$style.buttonStrip">
+							<MkButton inline :disabled="!instance" @click="refreshMetadata"><i class="ph-cloud-arrow-down ph-bold ph-lg"></i> {{ i18n.ts.updateRemoteUser }}</MkButton>
+							<MkButton inline :disabled="!instance" danger @click="deleteAllFiles">{{ i18n.ts.deleteAllFiles }}</MkButton>
+							<MkButton inline :disabled="!instance" danger @click="severAllFollowRelations">{{ i18n.ts.severAllFollowRelations }}</MkButton>
+						</div>
 					</div>
 				</FormSection>
 			</div>
@@ -578,5 +579,14 @@ definePage(() => ({
 .linksList {
 	margin: 0;
 	padding-left: 1.5em;
+}
+
+// Sync with admin-user.vue
+.buttonStrip {
+	margin: calc(var(--MI-margin) / 2 * -1);
+
+	>* {
+		margin: calc(var(--MI-margin) / 2);
+	}
 }
 </style>
