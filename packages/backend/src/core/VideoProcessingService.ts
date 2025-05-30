@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import fs from 'node:fs/promises';
 import { Inject, Injectable } from '@nestjs/common';
 import FFmpeg from 'fluent-ffmpeg';
 import { DI } from '@/di-symbols.js';
@@ -12,8 +13,8 @@ import type { IImage } from '@/core/ImageProcessingService.js';
 import { createTemp, createTempDir } from '@/misc/create-temp.js';
 import { bindThis } from '@/decorators.js';
 import { appendQuery, query } from '@/misc/prelude/url.js';
-import { LoggerService } from "@/core/LoggerService.js";
-import type Logger from "@/logger.js";
+import { LoggerService } from '@/core/LoggerService.js';
+import type Logger from '@/logger.js';
 
 // faststart is only supported for MP4, M4A, M4W and MOV files (the MOV family).
 // WebM (and Matroska) files always support faststart-like behavior.
@@ -23,7 +24,6 @@ const supportedMimeTypes = new Map([
 	['video/m4v', 'mp4'],
 	['video/quicktime', 'mov'],
 ]);
-const fs = await import('node:fs/promises');
 
 @Injectable()
 export class VideoProcessingService {
