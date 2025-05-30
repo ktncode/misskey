@@ -518,14 +518,14 @@ const headerTabs = computed(() => [{
 	title: i18n.ts.overview,
 	icon: 'ti ti-info-circle',
 }, {
-	key: 'chart',
-	title: i18n.ts.charts,
-	icon: 'ti ti-chart-line',
-}, {
 	key: 'users',
 	title: i18n.ts.users,
 	icon: 'ti ti-users',
 }, ...getFollowingTabs(), {
+	key: 'chart',
+	title: i18n.ts.charts,
+	icon: 'ti ti-chart-line',
+}, {
 	key: 'raw',
 	title: i18n.ts.raw,
 	icon: 'ti ti-code',
