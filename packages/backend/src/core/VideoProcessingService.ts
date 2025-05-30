@@ -27,7 +27,7 @@ const fs = await import('node:fs/promises');
 
 @Injectable()
 export class VideoProcessingService {
-	private logger: Logger;
+	private readonly logger: Logger;
 
 	constructor(
 		@Inject(DI.config)
@@ -37,7 +37,7 @@ export class VideoProcessingService {
 
 		private loggerService: LoggerService,
 	) {
-		this.logger = this.loggerService.getLogger("video-processing");
+		this.logger = this.loggerService.getLogger('video-processing');
 	}
 
 	@bindThis
