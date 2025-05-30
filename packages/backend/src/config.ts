@@ -379,7 +379,10 @@ export function loadConfig(): Config {
 		process.env['MK_WARNED_ABOUT_CONFIG'] = '1';
 	}
 
-	const config = configFiles.map(path => fs.readFileSync(path, 'utf-8'))
+	const config = configFiles.map(path => {
+		console.log(`Reading configuration from ${path}`);
+		return fs.readFileSync(path, 'utf-8');
+	})
 		.map(contents => yaml.load(contents) as Source)
 		.reduce(
 			(acc: Source, cur: Source) => Object.assign(acc, cur),
