@@ -412,10 +412,13 @@ function createFetcher() {
 		userId: props.userId,
 	}), iAmAdmin ? misskeyApi('admin/get-user-ips', {
 		userId: props.userId,
-	}) : Promise.resolve(null)]).then(([_user, _info, _ips]) => {
+	}) : Promise.resolve(null), iAmAdmin ? misskeyApi('ap/get', {
+		uri: `${url}/users/${props.userId}`,
+	}).catch(() => null) : null]).then(([_user, _info, _ips, _ap]) => {
 		user.value = _user;
 		info.value = _info;
 		ips.value = _ips;
+		ap.value = _ap;
 		moderator.value = info.value.isModerator;
 		silenced.value = info.value.isSilenced;
 		approved.value = info.value.approved;
@@ -427,23 +430,30 @@ function createFetcher() {
 	});
 }
 
-function refreshUser() {
-	init.value = createFetcher();
+async function refreshUser() {
+	// Not a typo - createFetcher() returns a function()
+	await createFetcher()();
 }
 
 async function onMandatoryCWChanged(value: string) {
-	await os.apiWithDialog('admin/cw-user', { userId: props.userId, cw: value });
-	refreshUser();
+	await os.promiseDialog(async () => {
+		await misskeyApi('admin/cw-user', { userId: props.userId, cw: value });
+		await refreshUser();
+	});
 }
 
 async function onModerationNoteChanged(value: string) {
-	await misskeyApi('admin/update-user-note', { userId: props.userId, text: value });
-	refreshUser();
+	await os.promiseDialog(async () => {
+		await misskeyApi('admin/update-user-note', { userId: props.userId, text: value });
+		refreshUser();
+	});
 }
 
 async function updateRemoteUser() {
-	await os.apiWithDialog('federation/update-remote-user', { userId: user.value.id });
-	refreshUser();
+	await os.promiseDialog(async () => {
+		await misskeyApi('federation/update-remote-user', { userId: props.userId });
+		refreshUser();
+	});
 }
 
 async function resetPassword() {
@@ -457,7 +467,7 @@ async function resetPassword() {
 		const { password } = await misskeyApi('admin/reset-password', {
 			userId: user.value.id,
 		});
-		os.alert({
+		await os.alert({
 			type: 'success',
 			text: i18n.tsx.newPasswordIs({ password }),
 		});
@@ -472,7 +482,7 @@ async function toggleNSFW(v) {
 	if (confirm.canceled) {
 		markedAsNSFW.value = !v;
 	} else {
-		await misskeyApi(v ? 'admin/nsfw-user' : 'admin/unnsfw-user', { userId: user.value.id });
+		await misskeyApi(v ? 'admin/nsfw-user' : 'admin/unnsfw-user', { userId: props.userId });
 		await refreshUser();
 	}
 }
@@ -485,8 +495,10 @@ async function toggleSilence(v) {
 	if (confirm.canceled) {
 		silenced.value = !v;
 	} else {
-		await misskeyApi(v ? 'admin/silence-user' : 'admin/unsilence-user', { userId: user.value.id });
-		await refreshUser();
+		await os.promiseDialog(async () => {
+			await misskeyApi(v ? 'admin/silence-user' : 'admin/unsilence-user', { userId: props.userId });
+			await refreshUser();
+		});
 	}
 }
 
@@ -498,8 +510,10 @@ async function toggleSuspend(v) {
 	if (confirm.canceled) {
 		suspended.value = !v;
 	} else {
-		await misskeyApi(v ? 'admin/suspend-user' : 'admin/unsuspend-user', { userId: user.value.id });
-		await refreshUser();
+		await os.promiseDialog(async () => {
+			await misskeyApi(v ? 'admin/suspend-user' : 'admin/unsuspend-user', { userId: props.userId });
+			await refreshUser();
+		});
 	}
 }
 
@@ -511,11 +525,13 @@ async function toggleRejectQuotes(v: boolean): Promise<void> {
 	if (confirm.canceled) {
 		rejectQuotes.value = !v;
 	} else {
-		await misskeyApi('admin/reject-quotes', {
-			userId: props.userId,
-			rejectQuotes: v,
+		await os.promiseDialog(async () => {
+			await misskeyApi('admin/reject-quotes', {
+				userId: props.userId,
+				rejectQuotes: v,
+			});
+			await refreshUser();
 		});
-		await refreshUser();
 	}
 }
 
@@ -525,17 +541,10 @@ async function unsetUserAvatar() {
 		text: i18n.ts.unsetUserAvatarConfirm,
 	});
 	if (confirm.canceled) return;
-	const process = async () => {
-		await misskeyApi('admin/unset-user-avatar', { userId: user.value.id });
-		os.success();
-	};
-	await process().catch(err => {
-		os.alert({
-			type: 'error',
-			text: err.toString(),
-		});
+	await os.promiseDialog(async () => {
+		await misskeyApi('admin/unset-user-avatar', { userId: props.userId });
+		await refreshUser();
 	});
-	refreshUser();
 }
 
 async function unsetUserBanner() {
@@ -544,17 +553,10 @@ async function unsetUserBanner() {
 		text: i18n.ts.unsetUserBannerConfirm,
 	});
 	if (confirm.canceled) return;
-	const process = async () => {
-		await misskeyApi('admin/unset-user-banner', { userId: user.value.id });
-		os.success();
-	};
-	await process().catch(err => {
-		os.alert({
-			type: 'error',
-			text: err.toString(),
-		});
+	await os.promiseDialog(async () => {
+		await misskeyApi('admin/unset-user-banner', { userId: props.userId });
+		await refreshUser();
 	});
-	refreshUser();
 }
 
 async function deleteAllFiles() {
@@ -563,17 +565,10 @@ async function deleteAllFiles() {
 		text: i18n.ts.deleteAllFilesConfirm,
 	});
 	if (confirm.canceled) return;
-	const process = async () => {
-		await misskeyApi('admin/delete-all-files-of-a-user', { userId: user.value.id });
-		os.success();
-	};
-	await process().catch(err => {
-		os.alert({
-			type: 'error',
-			text: err.toString(),
-		});
+	await os.promiseDialog(async () => {
+		await misskeyApi('admin/delete-all-files-of-a-user', { userId: props.userId });
+		await refreshUser();
 	});
-	await refreshUser();
 }
 
 async function deleteAccount() {
@@ -593,7 +588,7 @@ async function deleteAccount() {
 			userId: user.value.id,
 		});
 	} else {
-		os.alert({
+		await os.alert({
 			type: 'error',
 			text: 'input not match',
 		});
@@ -633,18 +628,22 @@ async function assignRole() {
 		: period === 'oneMonth' ? Date.now() + (1000 * 60 * 60 * 24 * 30)
 		: null;
 
-	await os.apiWithDialog('admin/roles/assign', { roleId, userId: user.value.id, expiresAt });
-	refreshUser();
+	await os.promiseDialog(async () => {
+		await misskeyApi('admin/roles/assign', { roleId, userId: props.userId, expiresAt });
+		await refreshUser();
+	});
 }
 
 async function unassignRole(role, ev) {
-	os.popupMenu([{
+	await os.popupMenu([{
 		text: i18n.ts.unassign,
 		icon: 'ti ti-x',
 		danger: true,
 		action: async () => {
-			await os.apiWithDialog('admin/roles/unassign', { roleId: role.id, userId: user.value.id });
-			refreshUser();
+			await os.promiseDialog(async () => {
+				await misskeyApi('admin/roles/unassign', { roleId: role.id, userId: props.userId});
+				await refreshUser();
+			});
 		},
 	}], ev.currentTarget ?? ev.target);
 }
@@ -678,14 +677,6 @@ watch(() => props.userId, () => {
 	init.value = createFetcher();
 }, {
 	immediate: true,
-});
-
-watch(user, () => {
-	misskeyApi('ap/get', {
-		uri: user.value.uri ?? `${url}/users/${user.value.id}`,
-	}).then(res => {
-		ap.value = res;
-	});
 });
 
 const headerActions = computed(() => []);
