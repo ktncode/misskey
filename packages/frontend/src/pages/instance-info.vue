@@ -356,17 +356,20 @@ const followersPagination = {
 if (iAmModerator) {
 	watch(moderationNote, async () => {
 		if (instance.value == null) return;
-		await misskeyApi('admin/federation/update-instance', { host: instance.value.host, moderationNote: moderationNote.value });
+		await os.apiWithDialog('admin/federation/update-instance', { host: instance.value.host, moderationNote: moderationNote.value });
 	});
 }
 
 async function fetch(): Promise<void> {
-	if (iAmAdmin) {
-		meta.value = await misskeyApi('admin/meta');
-	}
-	instance.value = await misskeyApi('federation/show-instance', {
-		host: props.host,
-	});
+	const [m, i] = await Promise.all([
+		iAmAdmin ? misskeyApi('admin/meta') : null,
+		misskeyApi('federation/show-instance', {
+			host: props.host,
+		}),
+	]);
+	meta.value = m;
+	instance.value = i;
+
 	suspensionState.value = instance.value?.suspensionState ?? 'none';
 	isSuspended.value = suspensionState.value !== 'none';
 	isBlocked.value = instance.value?.isBlocked ?? false;
@@ -381,80 +384,106 @@ async function fetch(): Promise<void> {
 
 async function toggleBlock(): Promise<void> {
 	if (!iAmAdmin) return;
-	if (!meta.value) throw new Error('No meta?');
-	if (!instance.value) throw new Error('No instance?');
-	const { host } = instance.value;
-	await misskeyApi('admin/update-meta', {
-		blockedHosts: isBlocked.value ? meta.value.blockedHosts.concat([host]) : meta.value.blockedHosts.filter(x => x !== host),
+	await os.promiseDialog(async () => {
+		if (!meta.value) throw new Error('No meta?');
+		if (!instance.value) throw new Error('No instance?');
+		const { host } = instance.value;
+		await os.apiWithDialog('admin/update-meta', {
+			blockedHosts: isBlocked.value ? meta.value.blockedHosts.concat([host]) : meta.value.blockedHosts.filter(x => x !== host),
+		});
+		await fetch();
 	});
 }
 
 async function toggleSilenced(): Promise<void> {
 	if (!iAmAdmin) return;
-	if (!meta.value) throw new Error('No meta?');
-	if (!instance.value) throw new Error('No instance?');
-	const { host } = instance.value;
-	const silencedHosts = meta.value.silencedHosts ?? [];
-	await misskeyApi('admin/update-meta', {
-		silencedHosts: isSilenced.value ? silencedHosts.concat([host]) : silencedHosts.filter(x => x !== host),
+	await os.promiseDialog(async () => {
+		if (!meta.value) throw new Error('No meta?');
+		if (!instance.value) throw new Error('No instance?');
+		const { host } = instance.value;
+		const silencedHosts = meta.value.silencedHosts ?? [];
+		await os.promiseDialog(async () => {
+			await misskeyApi('admin/update-meta', {
+				silencedHosts: isSilenced.value ? silencedHosts.concat([host]) : silencedHosts.filter(x => x !== host),
+			});
+			await fetch();
+		});
 	});
 }
 
 async function toggleMediaSilenced(): Promise<void> {
 	if (!iAmAdmin) return;
-	if (!meta.value) throw new Error('No meta?');
-	if (!instance.value) throw new Error('No instance?');
-	const { host } = instance.value;
-	const mediaSilencedHosts = meta.value.mediaSilencedHosts ?? [];
-	await misskeyApi('admin/update-meta', {
-		mediaSilencedHosts: isMediaSilenced.value ? mediaSilencedHosts.concat([host]) : mediaSilencedHosts.filter(x => x !== host),
+	await os.promiseDialog(async () => {
+		if (!meta.value) throw new Error('No meta?');
+		if (!instance.value) throw new Error('No instance?');
+		const { host } = instance.value;
+		const mediaSilencedHosts = meta.value.mediaSilencedHosts ?? [];
+		await misskeyApi('admin/update-meta', {
+			mediaSilencedHosts: isMediaSilenced.value ? mediaSilencedHosts.concat([host]) : mediaSilencedHosts.filter(x => x !== host),
+		});
+		await fetch();
 	});
 }
 
 async function toggleSuspended(): Promise<void> {
 	if (!iAmModerator) return;
-	if (!instance.value) throw new Error('No instance?');
-	suspensionState.value = isSuspended.value ? 'manuallySuspended' : 'none';
-	await misskeyApi('admin/federation/update-instance', {
-		host: instance.value.host,
-		isSuspended: isSuspended.value,
+	await os.promiseDialog(async () => {
+		if (!instance.value) throw new Error('No instance?');
+		suspensionState.value = isSuspended.value ? 'manuallySuspended' : 'none';
+		await misskeyApi('admin/federation/update-instance', {
+			host: instance.value.host,
+			isSuspended: isSuspended.value,
+		});
+		await fetch();
 	});
 }
 
 async function toggleNSFW(): Promise<void> {
 	if (!iAmModerator) return;
-	if (!instance.value) throw new Error('No instance?');
-	await misskeyApi('admin/federation/update-instance', {
-		host: instance.value.host,
-		isNSFW: isNSFW.value,
+	await os.promiseDialog(async () => {
+		if (!instance.value) throw new Error('No instance?');
+		await misskeyApi('admin/federation/update-instance', {
+			host: instance.value.host,
+			isNSFW: isNSFW.value,
+		});
+		await fetch();
 	});
 }
 
 async function toggleRejectReports(): Promise<void> {
 	if (!iAmModerator) return;
-	if (!instance.value) throw new Error('No instance?');
-	await misskeyApi('admin/federation/update-instance', {
-		host: instance.value.host,
-		rejectReports: rejectReports.value,
+	await os.promiseDialog(async () => {
+		if (!instance.value) throw new Error('No instance?');
+		await misskeyApi('admin/federation/update-instance', {
+			host: instance.value.host,
+			rejectReports: rejectReports.value,
+		});
+		await fetch();
 	});
 }
 
 async function toggleRejectQuotes(): Promise<void> {
 	if (!iAmModerator) return;
-	if (!instance.value) throw new Error('No instance?');
-	await misskeyApi('admin/federation/update-instance', {
-		host: instance.value.host,
-		rejectQuotes: rejectQuotes.value,
+	await os.promiseDialog(async () => {
+		if (!instance.value) throw new Error('No instance?');
+		await misskeyApi('admin/federation/update-instance', {
+			host: instance.value.host,
+			rejectQuotes: rejectQuotes.value,
+		});
+		await fetch();
 	});
 }
 
-function refreshMetadata(): void {
+async function refreshMetadata(): Promise<void> {
 	if (!iAmModerator) return;
-	if (!instance.value) throw new Error('No instance?');
-	misskeyApi('admin/federation/refresh-remote-instance-metadata', {
-		host: instance.value.host,
+	await os.promiseDialog(async () => {
+		if (!instance.value) throw new Error('No instance?');
+		await misskeyApi('admin/federation/refresh-remote-instance-metadata', {
+			host: instance.value.host,
+		});
+		await fetch();
 	});
-	os.alert({
+	await os.alert({
 		text: 'Refresh requested',
 	});
 }
@@ -469,14 +498,12 @@ async function deleteAllFiles(): Promise<void> {
 	});
 	if (confirm.canceled) return;
 
-	await Promise.all([
-		misskeyApi('admin/federation/delete-all-files', {
-			host: instance.value.host,
-		}),
-		os.alert({
-			text: i18n.ts.deleteAllFilesQueued,
-		}),
-	]);
+	await os.apiWithDialog('admin/federation/delete-all-files', {
+		host: instance.value.host,
+	});
+	await os.alert({
+		text: i18n.ts.deleteAllFilesQueued,
+	});
 }
 
 async function severAllFollowRelations(): Promise<void> {
@@ -493,14 +520,12 @@ async function severAllFollowRelations(): Promise<void> {
 	});
 	if (confirm.canceled) return;
 
-	await Promise.all([
-		misskeyApi('admin/federation/remove-all-following', {
-			host: instance.value.host,
-		}),
-		os.alert({
-			text: i18n.tsx.severAllFollowRelationsQueued({ host: instance.value.host }),
-		}),
-	]);
+	await os.apiWithDialog('admin/federation/remove-all-following', {
+		host: instance.value.host,
+	});
+	await os.alert({
+		text: i18n.tsx.severAllFollowRelationsQueued({ host: instance.value.host }),
+	});
 }
 
 fetch();
