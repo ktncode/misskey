@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkButton from '@/components/MkButton.vue';
@@ -26,8 +26,13 @@ import { i18n } from '@/i18n.js';
 const $i = ensureSignin();
 
 const instanceMutes = ref($i.mutedInstances.join('\n'));
+const domainArray = computed(() => {
+	return instanceMutes.value
+		.trim().split('\n')
+		.map(el => el.trim().toLowerCase())
+		.filter(el => el);
+});
 const changed = ref(false);
-const autochange = ref(false);
 
 async function save() {
 	const mutes = instanceMutes.value
@@ -39,17 +44,15 @@ async function save() {
 		mutedInstances: mutes,
 	});
 
-	changed.value = false;
-
 	// Refresh filtered list to signal to the user how they've been saved
-	if (instanceMutes.value !== mutes.join('\n')) {
-		instanceMutes.value = mutes.join('\n');
-		autochange.value = true;
-	} else { autochange.value = false; }
+	instanceMutes.value = domainArray.value.join('\n');
+
+	changed.value = false;
 }
 
-watch(instanceMutes, () => {
-	if (!autochange.value) {
+watch(domainArray, (newArray, oldArray) => {
+	// compare arrays
+	if (newArray.length !== oldArray.length || !newArray.every((a, i) => a === oldArray[i])) {
 		changed.value = true;
 	}
 });
