@@ -9,6 +9,7 @@ import { dirname, resolve } from 'node:path';
 import * as yaml from 'js-yaml';
 import { globSync } from 'glob';
 import ipaddr from 'ipaddr.js';
+import Logger from './logger.js';
 import type * as Sentry from '@sentry/node';
 import type * as SentryVue from '@sentry/vue';
 import type { RedisOptions } from 'ioredis';
@@ -155,6 +156,8 @@ type Source = {
 	}
 };
 
+const configLogger = new Logger('config');
+
 export type PrivateNetworkSource = string | { network?: string, ports?: number[] };
 
 export type PrivateNetwork = {
@@ -192,7 +195,7 @@ export function parsePrivateNetworks(patterns: PrivateNetworkSource[] | undefine
 				}
 			}
 
-			console.warn('[config] Skipping invalid entry in allowedPrivateNetworks: ', e);
+			configLogger.warn('Skipping invalid entry in allowedPrivateNetworks: ', e);
 			return null;
 		})
 		.filter(p => p != null);
@@ -375,11 +378,14 @@ export function loadConfig(): Config {
 
 	if (configFiles.length === 0
 			&& !process.env['MK_WARNED_ABOUT_CONFIG']) {
-		console.log('No config files loaded, check if this is intentional');
+		configLogger.warn('No config files loaded, check if this is intentional');
 		process.env['MK_WARNED_ABOUT_CONFIG'] = '1';
 	}
 
-	const config = configFiles.map(path => fs.readFileSync(path, 'utf-8'))
+	const config = configFiles.map(path => {
+		configLogger.info(`Reading configuration from ${path}`);
+		return fs.readFileSync(path, 'utf-8');
+	})
 		.map(contents => yaml.load(contents) as Source)
 		.reduce(
 			(acc: Source, cur: Source) => Object.assign(acc, cur),
@@ -496,6 +502,10 @@ export function loadConfig(): Config {
 }
 
 function tryCreateUrl(url: string) {
+	if (!url) {
+		throw new Error('Failed to load: no "url" property found in config. Please check the value of "MISSKEY_CONFIG_DIR" and "MISSKEY_CONFIG_YML", and verify that all configuration files are correct.');
+	}
+
 	try {
 		return new URL(url);
 	} catch (e) {
