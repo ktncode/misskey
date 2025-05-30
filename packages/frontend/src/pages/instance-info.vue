@@ -368,12 +368,16 @@ async function saveModerationNote() {
 	}
 }
 
-async function fetch(): Promise<void> {
+async function fetch(withHint = false): Promise<void> {
 	const [m, i] = await Promise.all([
-		props.metaHint ?? (iAmAdmin ? misskeyApi('admin/meta') : null),
-		props.instanceHint ?? misskeyApi('federation/show-instance', {
-			host: props.host,
-		}),
+		(withHint && props.metaHint)
+			? props.metaHint
+			: iAmAdmin ? misskeyApi('admin/meta') : null,
+		(withHint && props.instanceHint)
+			? props.instanceHint
+			: misskeyApi('federation/show-instance', {
+				host: props.host,
+			}),
 	]);
 	meta.value = m;
 	instance.value = i;
@@ -536,7 +540,7 @@ async function severAllFollowRelations(): Promise<void> {
 	});
 }
 
-fetch();
+fetch(true);
 
 const headerActions = computed(() => [{
 	text: `https://${props.host}`,
