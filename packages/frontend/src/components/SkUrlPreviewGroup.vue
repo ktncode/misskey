@@ -35,6 +35,7 @@ import { extractUrlFromMfm } from '@/utility/extract-url-from-mfm';
 import { $i } from '@/i';
 import { misskeyApi } from '@/utility/misskey-api';
 import MkUrlPreview from '@/components/MkUrlPreview.vue';
+import { getNoteUrls } from '@/utility/getNoteUrls';
 
 type Summary = Awaited<ReturnType<typeof summaly>> & {
 	haveNoteLocally?: boolean;
@@ -263,6 +264,31 @@ function deduplicatePreviews(previews: Summary[]): Summary[] {
 
 			// If we get here, then "preview" is a duplicate of "p" and should be skipped.
 			return true;
+		}));
+
+	// eslint-disable-next-line no-param-reassign
+	previews = previews
+		// Remove any previews where the note duplicates url
+		.filter((preview, index) => !previews.some((p, i) => {
+			// Skip the current preview (don't count self as duplicate).
+			if (p === preview) return false;
+
+			// Skip if we have a note
+			if (preview.note) return false;
+
+			// Skip if other does not have a note
+			if (!p.note) return false;
+
+			// Skip later previews (keep the earliest instance)
+			if (i > index) return false;
+
+			const noteUrls = getNoteUrls(p.note);
+
+			// Remove if other duplicates our AP URL
+			if (preview.activityPub && noteUrls.includes(preview.activityPub)) return true;
+
+			// Remove if other duplicates our main URL
+			return noteUrls.includes(preview.url);
 		}));
 
 	return previews;
