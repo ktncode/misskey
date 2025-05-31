@@ -300,7 +300,7 @@ function menuEdit() {
 		backdrop-filter: var(--MI-blur, blur(8px));
 	}
 
-	.banner {
+  .banner {
     position: absolute;
     top: 0;
     left: 0;
