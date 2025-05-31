@@ -25,52 +25,54 @@ const props = defineProps<{
 
 const note = ref<Misskey.entities.Note | null>(null);
 
-let timeoutId = null;
+// eslint-disable-next-line id-denylist
+let timeoutId: ReturnType<typeof window.setTimeout> | null = null;
 
 async function sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => {
-	    setTimeout(() => {
-		    resolve()
+	return new Promise((resolve) => {
+		window.setTimeout(() => {
+			resolve();
 		}, ms);
 	});
 }
 
-async function retryOnThrottle<T>(f: ()=>Promise<T>, retryCount: number = 5): Promise<T> {
-    let lastResult: T = undefined!;
-	const r = Math.random();
-	for(let i=0; i<retryCount; i++) {
+async function retryOnThrottle<T>(f: ()=>Promise<T>, retryCount = 5): Promise<T> {
+	let lastResult: T;
+	for (let i = 0; i < retryCount; i++) {
 		const [ok, resultOrError] = await f()
 			.then(result => [true, result])
 			.catch(err => [false, err]);
-        
-        lastResult = resultOrError;
+
+		lastResult = resultOrError;
 
 		if (ok) {
 			break;
 		}
 
 		// RATE_LIMIT_EXCEEDED
-		if (resultOrError?.id === "d5826d14-3982-4d2e-8011-b9e9f02499ef") {
+		if (resultOrError?.id === 'd5826d14-3982-4d2e-8011-b9e9f02499ef') {
 			await sleep(resultOrError?.info?.fullResetMs ?? 1000);
 			continue;
 		}
 
 		throw resultOrError;
 	}
-    return lastResult;
+	return lastResult;
 }
 
 onMounted(() => {
 	if (props.block.note == null) return;
-	timeoutId = setTimeout(() => {
+	timeoutId = window.setTimeout(() => {
 		retryOnThrottle(() => misskeyApi('notes/show', { noteId: props.block.note })).then(result => {
-		    note.value = result;
+			note.value = result;
 		});
 	}, 500 * props.index); // rate limit is 2 reqs per sec
 });
 
 onUnmounted(() => {
-    if (timeoutId !== null) clearTimeout(timeoutId);
+	if (timeoutId !== null) {
+		window.clearTimeout(timeoutId);
+	}
 });
 </script>
 
