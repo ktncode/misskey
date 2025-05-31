@@ -41,6 +41,7 @@ type Source = {
 		db?: string;
 		user?: string;
 		pass?: string;
+		slowQueryThreshold?: number;
 		disableCache?: boolean;
 		extra?: { [x: string]: string };
 	};
@@ -225,6 +226,7 @@ export type Config = {
 		db: string;
 		user: string;
 		pass: string;
+		slowQueryThreshold?: number;
 		disableCache?: boolean;
 		extra?: { [x: string]: string };
 	};
@@ -411,6 +413,10 @@ export function loadConfig(): Config {
 	const internalMediaProxy = `${scheme}://${host}/proxy`;
 	const redis = convertRedisOptions(config.redis, host);
 
+	// nullish => 300 (default)
+	// 0 => undefined (disabled)
+	const slowQueryThreshold = (config.db.slowQueryThreshold ?? 300) || undefined;
+
 	return {
 		version,
 		publishTarballInsteadOfProvideRepositoryUrl: !!config.publishTarballInsteadOfProvideRepositoryUrl,
@@ -429,7 +435,7 @@ export function loadConfig(): Config {
 		apiUrl: `${scheme}://${host}/api`,
 		authUrl: `${scheme}://${host}/auth`,
 		driveUrl: `${scheme}://${host}/files`,
-		db: { ...config.db, db: dbDb, user: dbUser, pass: dbPass },
+		db: { ...config.db, db: dbDb, user: dbUser, pass: dbPass, slowQueryThreshold },
 		dbReplications: config.dbReplications,
 		dbSlaves: config.dbSlaves,
 		fulltextSearch: config.fulltextSearch,
@@ -637,7 +643,7 @@ function applyEnvOverrides(config: Source) {
 	// these are all the settings that can be overridden
 
 	_apply_top([['url', 'port', 'address', 'socket', 'chmodSocket', 'disableHsts', 'id', 'dbReplications', 'websocketCompression']]);
-	_apply_top(['db', ['host', 'port', 'db', 'user', 'pass', 'disableCache']]);
+	_apply_top(['db', ['host', 'port', 'db', 'user', 'pass', 'slowQueryThreshold', 'disableCache']]);
 	_apply_top(['dbSlaves', Array.from((config.dbSlaves ?? []).keys()), ['host', 'port', 'db', 'user', 'pass']]);
 	_apply_top([
 		['redis', 'redisForPubsub', 'redisForJobQueue', 'redisForTimelines', 'redisForReactions', 'redisForRateLimit'],
