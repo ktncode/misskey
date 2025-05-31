@@ -37,13 +37,15 @@ async function sleep(ms: number): Promise<void> {
 }
 
 async function retryOnThrottle<T>(f: ()=>Promise<T>, retryCount = 5): Promise<T> {
-	let lastResult: T;
+	let lastOk: boolean;
+	let lastResultOrError: T;
 	for (let i = 0; i < retryCount; i++) {
 		const [ok, resultOrError] = await f()
 			.then(result => [true, result])
 			.catch(err => [false, err]);
 
-		lastResult = resultOrError;
+		lastOk = ok;
+		lastResultOrError = resultOrError;
 
 		if (ok) {
 			break;
@@ -55,9 +57,16 @@ async function retryOnThrottle<T>(f: ()=>Promise<T>, retryCount = 5): Promise<T>
 			continue;
 		}
 
+		// Throw for non-throttling errors
 		throw resultOrError;
 	}
-	return lastResult;
+
+	if (lastOk) {
+		return lastResultOrError;
+	} else {
+		// Give up after getting throttled too many times
+		throw lastResultOrError;
+	}
 }
 
 onMounted(() => {
