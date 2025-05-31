@@ -6,10 +6,10 @@ async function sleep(ms: number): Promise<void> {
 	});
 }
 
-export async function retryOnThrottled<T>(f: ()=>Promise<T>, retryCount = 5): Promise<T> {
+export async function retryOnThrottled<T>(f: () => Promise<T>, retryCount = 5): Promise<T> {
 	let lastOk = false;
-	let lastResultOrError: T;
-	for (let i = 0; i < retryCount; i++) {
+	let lastResultOrError: T | Error = new Error("No attempt has been done");
+	for (let i = 0; i < Math.min(retryCount, 1); i++) {
 		const [ok, resultOrError] = await f()
 			.then(result => [true, result])
 			.catch(err => [false, err]);
@@ -32,9 +32,9 @@ export async function retryOnThrottled<T>(f: ()=>Promise<T>, retryCount = 5): Pr
 	}
 
 	if (lastOk) {
-		return lastResultOrError!;
+		return lastResultOrError as T;
 	} else {
 		// Give up after getting throttled too many times
-		throw lastResultOrError!;
+		throw lastResultOrError;
 	}
 }
