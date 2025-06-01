@@ -260,8 +260,7 @@ export class QueryService {
 			q.leftJoin(`note.${key}Instance`, `${key}Instance`);
 			q.andWhere(new Brackets(qb => {
 				qb.orWhere(`note.${key}Id IS NULL`) // no corresponding user
-					.orWhere(`note.${key}Host IS NULL`) // local
-					.orWhere(`${key}Instance.isBlocked = false`); // not blocked
+					.orWhere(`note.${key}Host IS NULL`); // local
 
 				if (allowSilenced) {
 					qb.orWhere(`${key}Instance.isBlocked = false`); // not blocked
