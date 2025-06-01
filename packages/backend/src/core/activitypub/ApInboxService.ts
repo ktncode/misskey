@@ -122,13 +122,14 @@ export class ApInboxService {
 					act.id = undefined;
 				}
 
+				const id = getNullableApId(act) ?? `${getNullableApId(activity)}#${i}`;
+
 				try {
-					const id = getNullableApId(act) ?? `${getNullableApId(activity)}#${i}`;
 					const result = await this.performOneActivity(actor, act, resolver);
 					results.push([id, result]);
 				} catch (err) {
 					if (err instanceof Error || typeof err === 'string') {
-						this.logger.error(`Unhandled error in activity ${getNullableApId(item || 'undefined')}:`, err);
+						this.logger.error(`Unhandled error in activity ${id}:`, err);
 					} else {
 						throw err;
 					}
