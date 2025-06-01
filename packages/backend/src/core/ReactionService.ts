@@ -10,7 +10,7 @@ import { IdentifiableError } from '@/misc/identifiable-error.js';
 import type { MiRemoteUser, MiUser } from '@/models/User.js';
 import type { MiNote } from '@/models/Note.js';
 import { IdService } from '@/core/IdService.js';
-import type { MiNoteReaction } from '@/models/NoteReaction.js';
+import { MiNoteReaction } from '@/models/NoteReaction.js';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { NotificationService } from '@/core/NotificationService.js';
@@ -31,6 +31,7 @@ import { isQuote, isRenote } from '@/misc/is-renote.js';
 import { ReactionsBufferingService } from '@/core/ReactionsBufferingService.js';
 import { PER_NOTE_REACTION_USER_PAIR_CACHE_MAX } from '@/const.js';
 import { CacheService } from '@/core/CacheService.js';
+import type { DataSource } from 'typeorm';
 
 const FALLBACK = '\u2764';
 
@@ -88,6 +89,9 @@ export class ReactionService {
 
 		@Inject(DI.emojisRepository)
 		private emojisRepository: EmojisRepository,
+
+		@Inject(DI.db)
+		private readonly db: DataSource,
 
 		private utilityService: UtilityService,
 		private customEmojiService: CustomEmojiService,
@@ -176,10 +180,29 @@ export class ReactionService {
 			reaction,
 		};
 
-		await this.noteReactionsRepository.upsert(record, {
-			skipUpdateIfNoValuesChanged: true,
-			conflictPaths: ['noteId', 'userId'],
+		const result = await this.db.transaction(async tem => {
+			await tem.createQueryBuilder(MiNoteReaction, 'noteReaction')
+				.insert()
+				.values(record)
+				.orIgnore()
+				.execute();
+
+			return await tem.createQueryBuilder(MiNoteReaction, 'noteReaction')
+				.select()
+				.where({ noteId: note.id, userId: user.id })
+				.getOneOrFail();
 		});
+
+		if (result.id !== record.id) {
+			// Conflict with the same ID => nothing to do.
+			if (result.reaction === record.reaction) {
+				return;
+			}
+
+			// 別のリアクションがすでにされていたら置き換える
+			await this.delete(user, note);
+			await this.noteReactionsRepository.insert(record);
+		}
 
 		// Increment reactions count
 		if (this.meta.enableReactionsBuffering) {
