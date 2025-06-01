@@ -32,6 +32,7 @@ export const paramDef = {
 	type: 'object',
 	properties: {
 		reportId: { type: 'string', format: 'misskey:id' },
+		additionalContext: { type: 'string', nullable: true },
 	},
 	required: ['reportId'],
 } as const;
@@ -49,7 +50,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.noSuchAbuseReport);
 			}
 
-			await this.abuseReportService.forward(report.id, me);
+			await this.abuseReportService.forward(report.id, me, ps.additionalContext);
 		});
 	}
 }

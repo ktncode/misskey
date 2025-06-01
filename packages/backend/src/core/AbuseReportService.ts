@@ -121,6 +121,7 @@ export class AbuseReportService {
 	public async forward(
 		reportId: MiAbuseUserReport['id'],
 		moderator: MiUser,
+		additionalContext?: string | null,
 	) {
 		const report = await this.abuseUserReportsRepository.findOneByOrFail({ id: reportId });
 
@@ -132,6 +133,15 @@ export class AbuseReportService {
 			throw new Error('The report has already been forwarded.');
 		}
 
+		// Validate combined length of report + context + separator
+		const separator = '\n\n--- Additional context from moderator ---\n\n';
+		const combinedLength = report.comment.length + 
+			(additionalContext ? separator.length + additionalContext.trim().length : 0);
+		
+		if (combinedLength > 2048) {
+			throw new Error('Combined report and additional context is too long (maximum 2048 characters)');
+		}
+
 		await this.abuseUserReportsRepository.update(report.id, {
 			forwarded: true,
 		});
@@ -139,9 +149,18 @@ export class AbuseReportService {
 		const actor = await this.systemAccountService.fetch('actor');
 		const targetUser = await this.usersRepository.findOneByOrFail({ id: report.targetUserId });
 
-		const flag = this.apRendererService.renderFlag(actor, targetUser.uri!, report.comment);
-		const contextAssignedFlag = this.apRendererService.addContext(flag);
-		this.queueService.deliver(actor, contextAssignedFlag, targetUser.inbox, false);
+		if (!targetUser.uri) {
+			throw new Error('Target user URI is null.');
+		}
+
+		// Create the flag content, combining original comment with additional context
+		let flagContent = report.comment;
+		if (additionalContext && additionalContext.trim()) {
+			flagContent += separator + additionalContext.trim();
+		}
+
+		const flag = this.apRendererService.renderFlag(actor, targetUser.uri, flagContent);
+		this.queueService.deliver(moderator, flag, report.targetUserHost, false);
 
 		this.moderationLogService
 			.log(moderator, 'forwardAbuseReport', {

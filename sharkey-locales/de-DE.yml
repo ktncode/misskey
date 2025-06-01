@@ -416,3 +416,8 @@ _authorizedFetchValueDescription:
   essential: "Erlaubt einige begrenzte unsignierte Anfragen. Bietet eine Mischung aus \"Niemals\" und \"Immer\", indem nur die minimalen Profil-Metadaten offengelegt werden, die für die Föderation mit älterer Software erforderlich sind."
   staff: "Verwende den von den Administratoren der Instanz empfohlenen Standardwert von \"{value}\"."
 authorizedFetchLegacyWarning: "Die Konfigurationseigenschaft 'checkActivityPubGetSignature' ist veraltet und wurde durch die neue Einstellung „Authorized Fetch“ ersetzt. Bitte entferne sie aus deiner Konfigurationsdatei."
+
+_abuseUserReport:
+  addContextToReport: "Kontext zur Meldung hinzufügen"
+  additionalContext: "Zusätzlicher Kontext (wird deutlich markiert und angehängt)"
+  additionalContextPlaceholder: "Füge zusätzliche Details oder Kontext hinzu, die an die ursprüngliche Meldung für die entfernten Administratoren angehängt werden (z.B. spezifische problematische Beiträge, Screenshots von DM-Belästigungen, etc.)"

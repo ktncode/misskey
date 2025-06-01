@@ -5841,6 +5841,18 @@ export interface Locale extends ILocale {
          * 内容が正当でない通報の場合は「否認」を選択し、否定的にケースが解決されたことをマークします。
          */
         "resolveTutorial": string;
+        /**
+         * 通報にコンテキストを追加
+         */
+        "addContextToReport": string;
+        /**
+         * 追加情報（明確にマークされて追記されます）
+         */
+        "additionalContext": string;
+        /**
+         * リモート管理者向けに元の通報に明確にマークされて追記される追加の詳細や文脈を入力してください（例：特定の問題のある投稿、DMでの嫌がらせのスクリーンショットなど）
+         */
+        "additionalContextPlaceholder": string;
     };
     "_delivery": {
         /**

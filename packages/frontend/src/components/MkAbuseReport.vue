@@ -78,14 +78,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { provide, ref, watch } from 'vue';
+import { ref, watch, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@/components/MkButton.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkKeyValue from '@/components/MkKeyValue.vue';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
-import { dateString } from '@/filters/date.js';
 import MkFolder from '@/components/MkFolder.vue';
 import RouterView from '@/components/global/RouterView.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
@@ -98,6 +95,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	(ev: 'resolved', reportId: string): void;
+	(ev: 'forwarded', reportId: string): void;
 }>();
 
 const targetRouter = createRouter(`/admin/user/${props.report.targetUserId}`);
@@ -124,11 +122,25 @@ function resolve(resolvedAs) {
 	});
 }
 
-function forward() {
+async function forward() {
+	const { canceled, result } = await new Promise<{ canceled: boolean; result?: string }>(resolve => {
+		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportContextDialog.vue')), {
+			reportComment: props.report.comment,
+		}, {
+			done: (res) => {
+				resolve(res);
+			},
+			closed: () => dispose(),
+		});
+	});
+
+	if (canceled) return;
+
 	os.apiWithDialog('admin/forward-abuse-user-report', {
 		reportId: props.report.id,
+		additionalContext: result,
 	}).then(() => {
-
+		emit('forwarded', props.report.id);
 	});
 }
 
