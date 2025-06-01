@@ -5294,6 +5294,7 @@ export type components = {
       rejectReports: boolean;
       rejectQuotes: boolean;
       moderationNote?: string | null;
+      isBubbled: boolean;
     };
     GalleryPost: {
       /**
@@ -11209,6 +11210,7 @@ export type operations = {
               }]>;
             };
             isModerator: boolean;
+            isAdministrator: boolean;
             isSystem: boolean;
             isSilenced: boolean;
             isSuspended: boolean;

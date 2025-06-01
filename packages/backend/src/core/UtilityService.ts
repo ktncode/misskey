@@ -95,6 +95,15 @@ export class UtilityService {
 	}
 
 	@bindThis
+	public isBubbledHost(host: string | null): boolean {
+		if (host == null) return false;
+
+		// TODO remove null conditional after merging lab/persisted-instance-blocks
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		return this.meta.bubbleInstances?.includes(host);
+	}
+
+	@bindThis
 	public concatNoteContentsForKeyWordCheck(content: {
 		cw?: string | null;
 		text?: string | null;
