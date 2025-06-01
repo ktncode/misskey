@@ -263,8 +263,12 @@ export class QueryService {
 					.orWhere(`note.${key}Host IS NULL`) // local
 					.orWhere(`${key}Instance.isBlocked = false`); // not blocked
 
-				if (!allowSilenced) {
-					qb.orWhere(`${key}Instance.isSilenced = false`); // not silenced
+				if (allowSilenced) {
+					qb.orWhere(`${key}Instance.isBlocked = false`); // not blocked
+				} else {
+					qb.orWhere(new Brackets(qbb => qbb
+						.andWhere(`${key}Instance.isBlocked = false`) // not blocked
+						.andWhere(`${key}Instance.isSilenced = false`))); // not silenced
 				}
 
 				if (excludeAuthor) {
