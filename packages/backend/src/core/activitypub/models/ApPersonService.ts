@@ -398,6 +398,9 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 		const followerscollection = await _resolver.resolveCollection(person.followers!).catch(() => { return null; });
 		const followingcollection = await _resolver.resolveCollection(person.following!).catch(() => { return null; });
 
+		// Register the instance first, to avoid FK errors
+		await this.federatedInstanceService.fetchOrRegister(host);
+
 		try {
 			// Start transaction
 			await this.db.transaction(async transactionalEntityManager => {
