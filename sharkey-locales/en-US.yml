@@ -371,6 +371,8 @@ _mfm:
   smallDescription: "Displays content small and thin."
   center: "Center"
   centerDescription: "Displays content centered."
+  unixtime: "Unix Time"
+  unixtimeDescription: "Displays a timestamp in the viewer's current timezone."
   inlineCode: "Code (Inline)"
   inlineCodeDescription: "Displays inline syntax highlighting for (program) code."
   blockCode: "Code (Block)"
