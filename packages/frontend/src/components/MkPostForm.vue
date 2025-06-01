@@ -557,6 +557,7 @@ async function toggleLocalOnly() {
 		if (confirm.result === 'no') return;
 
 		if (confirm.result === 'neverShow') {
+			prefer.commit('neverShowLocalOnlyInfo', 'true');
 			miLocalStorage.setItem('neverShowLocalOnlyInfo', 'true');
 		}
 	}

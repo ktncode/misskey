@@ -683,7 +683,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<SearchMarker :keywords="['font', 'size']">
 							<MkRadios v-model="fontSize">
 								<template #label><SearchLabel>{{ i18n.ts.fontSize }}</SearchLabel></template>
-								<option :value="null"><span style="font-size: 14px;">Aa</span></option>
+								<option value="0"><span style="font-size: 14px;">Aa</span></option>
 								<option value="1"><span style="font-size: 15px;">Aa</span></option>
 								<option value="2"><span style="font-size: 16px;">Aa</span></option>
 								<option value="3"><span style="font-size: 17px;">Aa</span></option>
@@ -795,7 +795,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<SearchMarker :keywords="['corner', 'radius']">
 								<MkRadios v-model="cornerRadius">
 									<template #label><SearchLabel>{{ i18n.ts.cornerRadius }}</SearchLabel></template>
-									<option :value="null"><i class="sk-icons sk-shark sk-icons-lg" style="top: 2px;position: relative;"></i> Sharkey</option>
+									<option value="sharkey"><i class="sk-icons sk-shark sk-icons-lg" style="top: 2px;position: relative;"></i> Sharkey</option>
 									<option value="misskey"><i class="sk-icons sk-misskey sk-icons-lg" style="top: 2px;position: relative;"></i> Misskey</option>
 								</MkRadios>
 							</SearchMarker>
@@ -974,7 +974,6 @@ import { worksOnInstance } from '@/utility/favicon-dot.js';
 
 const $i = ensureSignin();
 
-const lang = ref(miLocalStorage.getItem('lang'));
 const dataSaver = ref(prefer.s.dataSaver);
 
 const overridedDeviceKind = prefer.model('overridedDeviceKind');
@@ -1034,9 +1033,6 @@ const contextMenu = prefer.model('contextMenu');
 const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
-const fontSize = ref(miLocalStorage.getItem('fontSize'));
-const useSystemFont = ref(miLocalStorage.getItem('useSystemFont') != null);
-
 // Sharkey options
 const collapseNotesRepliedTo = prefer.model('collapseNotesRepliedTo');
 const showTickerOnReplies = prefer.model('showTickerOnReplies');
@@ -1052,7 +1048,6 @@ const notificationClickable = prefer.model('notificationClickable');
 const warnExternalUrl = prefer.model('warnExternalUrl');
 const showVisibilitySelectorOnBoost = prefer.model('showVisibilitySelectorOnBoost');
 const visibilityOnBoost = prefer.model('visibilityOnBoost');
-const cornerRadius = ref(miLocalStorage.getItem('cornerRadius'));
 const oneko = prefer.model('oneko');
 const numberOfReplies = prefer.model('numberOfReplies');
 const autoloadConversation = prefer.model('autoloadConversation');
@@ -1061,34 +1056,62 @@ const useCustomSearchEngine = computed(() => !Object.keys(searchEngineMap).inclu
 const defaultCW = ref($i.defaultCW);
 const defaultCWPriority = ref($i.defaultCWPriority);
 
-watch(lang, () => {
-	miLocalStorage.setItem('lang', lang.value as string);
-	miLocalStorage.removeItem('locale');
-	miLocalStorage.removeItem('localeVersion');
+const langModel = prefer.model('lang');
+const lang = computed<string>({
+	get() {
+		return langModel.value ?? miLocalStorage.getItem('lang') ?? 'en-US';
+	},
+	set(newLang) {
+		langModel.value = newLang;
+		miLocalStorage.setItem('lang', newLang);
+		miLocalStorage.removeItem('locale');
+		miLocalStorage.removeItem('localeVersion');
+	},
 });
 
-watch(fontSize, () => {
-	if (fontSize.value == null) {
-		miLocalStorage.removeItem('fontSize');
-	} else {
-		miLocalStorage.setItem('fontSize', fontSize.value);
-	}
+const fontSizeModel = prefer.model('fontSize');
+const fontSize = computed<'0' | '1' | '2' | '3'>({
+	get() {
+		return fontSizeModel.value ?? miLocalStorage.getItem('fontSize') ?? '0';
+	},
+	set(newFontSize) {
+		fontSizeModel.value = newFontSize;
+		if (newFontSize !== '0') {
+			miLocalStorage.setItem('fontSize', newFontSize);
+		} else {
+			miLocalStorage.removeItem('fontSize');
+		}
+	},
 });
 
-watch(useSystemFont, () => {
-	if (useSystemFont.value) {
-		miLocalStorage.setItem('useSystemFont', 't');
-	} else {
-		miLocalStorage.removeItem('useSystemFont');
-	}
+const useSystemFontModel = prefer.model('useSystemFont');
+const useSystemFont = computed<boolean>({
+	get() {
+		return useSystemFontModel.value ?? (miLocalStorage.getItem('useSystemFont') != null);
+	},
+	set(newUseSystemFont) {
+		useSystemFontModel.value = newUseSystemFont;
+		if (newUseSystemFont) {
+			miLocalStorage.setItem('useSystemFont', 't');
+		} else {
+			miLocalStorage.removeItem('useSystemFont');
+		}
+	},
 });
 
-watch(cornerRadius, () => {
-	if (cornerRadius.value == null) {
-		miLocalStorage.removeItem('cornerRadius');
-	} else {
-		miLocalStorage.setItem('cornerRadius', cornerRadius.value);
-	}
+const cornerRadiusModel = prefer.model('cornerRadius');
+const cornerRadius = computed<'misskey' | 'sharkey'>({
+	get() {
+		return cornerRadiusModel.value ?? miLocalStorage.getItem('cornerRadius') ?? 'sharkey';
+	},
+	set(newCornerRadius) {
+		cornerRadiusModel.value = newCornerRadius;
+		if (newCornerRadius === 'sharkey') {
+			miLocalStorage.removeItem('cornerRadius');
+		} else {
+			miLocalStorage.setItem('cornerRadius', newCornerRadius);
+		}
+	},
 });
 
 watch([
@@ -1117,6 +1140,7 @@ watch([
 	contextMenu,
 	fontSize,
 	useSystemFont,
+	cornerRadius,
 	makeEveryTextElementsSelectable,
 	noteDesign,
 ], async () => {

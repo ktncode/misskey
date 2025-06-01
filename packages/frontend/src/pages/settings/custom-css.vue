@@ -22,23 +22,24 @@ import { unisonReload } from '@/utility/unison-reload.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { miLocalStorage } from '@/local-storage.js';
+import { prefer } from '@/preferences.js';
+import { reloadAsk } from '@/utility/reload-ask';
 
-const localCustomCss = ref(miLocalStorage.getItem('customCss') ?? '');
+const customCssModel = prefer.model('customCss');
+const localCustomCss = computed<string>({
+	get() {
+		return customCssModel.value ?? miLocalStorage.getItem('customCss') ?? '';
+	},
+	set(newCustomCss) {
+		customCssModel.value = newCustomCss;
+		if (newCustomCss) {
+			miLocalStorage.setItem('customCss', newCustomCss);
+		} else {
+			miLocalStorage.removeItem('customCss');
+		}
 
-async function apply() {
-	miLocalStorage.setItem('customCss', localCustomCss.value);
-
-	const { canceled } = await os.confirm({
-		type: 'info',
-		text: i18n.ts.reloadToApplySetting,
-	});
-	if (canceled) return;
-
-	unisonReload();
-}
-
-watch(localCustomCss, async () => {
-	await apply();
+		reloadAsk(true);
+	},
 });
 
 const headerActions = computed(() => []);
