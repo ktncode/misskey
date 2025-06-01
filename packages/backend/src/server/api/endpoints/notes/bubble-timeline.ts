@@ -74,11 +74,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.btlDisabled);
 			}
 
-			const [
-				followings,
-			] = me ? await Promise.all([
-				this.cacheService.userFollowingsCache.fetch(me.id),
-			]) : [undefined];
+			const followings = me ? await this.cacheService.userFollowingsCache.fetch(me.id) : undefined;
 
 			//#region Construct query
 			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'),
@@ -86,7 +82,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.andWhere('note.visibility = \'public\'')
 				.andWhere('note.channelId IS NULL')
 				.andWhere('note.userHost IS NULL')
-				.andWhere('userInstance.isBubbled = true') // This comes from generateVisibilityQuery below
+				.andWhere('userInstance.isBubbled = true') // This comes from generateBlockedHostQueryForNote below
 				.innerJoinAndSelect('note.user', 'user')
 				.leftJoinAndSelect('note.reply', 'reply')
 				.leftJoinAndSelect('note.renote', 'renote')
@@ -105,14 +101,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (!ps.withBots) query.andWhere('user.isBot = FALSE');
 
-			if (ps.withRenotes === false) {
-				query.andWhere(new Brackets(qb => {
-					qb.where('note.renoteId IS NULL');
-					qb.orWhere(new Brackets(qb => {
-						qb.where('note.text IS NOT NULL');
-						qb.orWhere('note.fileIds != \'{}\'');
-					}));
-				}));
+			if (!ps.withRenotes) {
+				query.andWhere(new Brackets(qb => qb
+					.orWhere('note.renoteId IS NULL')
+					.orWhere('note.text IS NOT NULL')
+					.orWhere('note.cw IS NOT NULL')
+					.orWhere('note.replyId IS NOT NULL')
+					.orWhere('note.hasPoll = false')
+					.orWhere('note.fileIds != \'{}\'')));
 			}
 			//#endregion
 
