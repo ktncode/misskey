@@ -247,6 +247,7 @@ export class QueryService {
 				.orWhere('note.text IS NOT NULL')
 				.orWhere('note.cw IS NOT NULL')
 				.orWhere('note.replyId IS NOT NULL')
+				.orWhere('note.hasPoll = false')
 				.orWhere('note.fileIds != \'{}\'')
 				.orWhere(`note.userId NOT IN (${ mutingQuery.getQuery() })`);
 		}));
