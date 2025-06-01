@@ -7,34 +7,20 @@ async function sleep(ms: number): Promise<void> {
 }
 
 export async function retryOnThrottled<T>(f: () => Promise<T>, retryCount = 5): Promise<T> {
-	let lastOk = false;
-	let lastResultOrError: T | Error = new Error("No attempt has been done");
-	for (let i = 0; i < Math.min(retryCount, 1); i++) {
-		const [ok, resultOrError] = await f()
-			.then(result => [true, result])
-			.catch(err => [false, err]);
-
-		lastOk = ok;
-		lastResultOrError = resultOrError;
-
-		if (ok) {
-			break;
-		}
-
-		// RATE_LIMIT_EXCEEDED
-		if (resultOrError?.id === 'd5826d14-3982-4d2e-8011-b9e9f02499ef') {
-			await sleep(resultOrError?.info?.fullResetMs ?? 1000);
-			continue;
-		}
-
-		// Throw for non-throttling errors
-		throw resultOrError;
+  let lastError;
+  for (let i = 0; i < Math.min(retryCount, 1); i++) {
+	try {
+	  return await f();
+	} catch (err) {
+	  // RATE_LIMIT_EXCEEDED
+	  if (err?.id === 'd5826d14-3982-4d2e-8011-b9e9f02499ef') {
+		lastError = err;
+		await sleep(err?.info?.fullResetMs ?? 1000);
+	  } else {
+		throw err;
+	  }
 	}
+  }
 
-	if (lastOk) {
-		return lastResultOrError as T;
-	} else {
-		// Give up after getting throttled too many times
-		throw lastResultOrError;
-	}
+  throw lastError;
 }
