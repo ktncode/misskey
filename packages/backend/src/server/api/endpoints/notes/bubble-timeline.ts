@@ -81,7 +81,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('note.visibility = \'public\'')
 				.andWhere('note.channelId IS NULL')
-				.andWhere('note.userHost IS NULL')
+				.andWhere('note.userHost IS NOT NULL')
 				.andWhere('userInstance.isBubbled = true') // This comes from generateBlockedHostQueryForNote below
 				.innerJoinAndSelect('note.user', 'user')
 				.leftJoinAndSelect('note.reply', 'reply')
@@ -94,6 +94,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (me) this.queryService.generateMutedUserQueryForNotes(query, me);
 			if (me) this.queryService.generateBlockedUserQueryForNotes(query, me);
 			if (me) this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
+			if (!me) query.andWhere('user.requireSigninToViewContents = false');
 
 			if (ps.withFiles) {
 				query.andWhere('note.fileIds != \'{}\'');
@@ -115,7 +116,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			let timeline = await query.limit(ps.limit).getMany();
 
 			timeline = timeline.filter(note => {
-				if (note.user?.isSilenced && me && followings && note.userId !== me.id && !followings[note.userId]) return false;
+				if (note.user?.isSilenced) {
+					if (!me) return false;
+					if (!followings) return false;
+					if (note.userId !== me.id) {
+						return followings[note.userId];
+					}
+				}
 				return true;
 			});
 
