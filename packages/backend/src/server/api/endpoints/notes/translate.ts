@@ -140,7 +140,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (this.serverSettings.deeplAuthKey) params.append('auth_key', this.serverSettings.deeplAuthKey);
 				params.append('text', note.text);
 				params.append('target_lang', targetLang);
-				const endpoint = deeplFreeInstance ?? this.serverSettings.deeplIsPro ? 'https://api.deepl.com/v2/translate' : 'https://api-free.deepl.com/v2/translate';
+				const endpoint = deeplFreeInstance ?? ( this.serverSettings.deeplIsPro ? 'https://api.deepl.com/v2/translate' : 'https://api-free.deepl.com/v2/translate' );
 
 				const res = await this.httpRequestService.send(endpoint, {
 					method: 'POST',
