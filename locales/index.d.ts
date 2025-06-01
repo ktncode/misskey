@@ -13078,6 +13078,26 @@ export interface Locale extends ILocale {
      */
     "popularUsersLocal": ParameterizedString<"name">;
     /**
+     * Polls trending on {name}
+     */
+    "pollsOnLocal": ParameterizedString<"name">;
+    /**
+     * Polls trending on the global network
+     */
+    "pollsOnRemote": string;
+    /**
+     * Polls that have ended recently
+     */
+    "pollsExpired": string;
+    /**
+     * Trending polls are disabled on this instance.
+     */
+    "trendingPollsDisabled": string;
+    /**
+     * Please log in to view trending polls.
+     */
+    "trendingPollsDisabledLogIn": string;
+    /**
      * Silenced
      */
     "silenced": string;

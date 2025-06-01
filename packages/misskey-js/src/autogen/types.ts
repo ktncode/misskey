@@ -3317,7 +3317,7 @@ export type paths = {
      * notes/polls/recommendation
      * @description No description provided.
      *
-     * **Credential required**: *Yes* / **Permission**: *read:account*
+     * **Credential required**: *No*
      */
     post: operations['notes___polls___recommendation'];
   };
@@ -27498,7 +27498,7 @@ export type operations = {
    * notes/polls/recommendation
    * @description No description provided.
    *
-   * **Credential required**: *Yes* / **Permission**: *read:account*
+   * **Credential required**: *No*
    */
   notes___polls___recommendation: {
     requestBody: {
@@ -27510,6 +27510,10 @@ export type operations = {
           offset?: number;
           /** @default false */
           excludeChannels?: boolean;
+          /** @default null */
+          local?: boolean | null;
+          /** @default false */
+          expired?: boolean;
         };
       };
     };
