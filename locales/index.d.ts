@@ -12493,6 +12493,14 @@ export interface Locale extends ILocale {
          */
         "centerDescription": string;
         /**
+         * Unix Time
+         */
+        "unixtime": string;
+        /**
+         * Displays a timestamp in the viewer's current timezone.
+         */
+        "unixtimeDescription": string;
+        /**
          * Code (Inline)
          */
         "inlineCode": string;
