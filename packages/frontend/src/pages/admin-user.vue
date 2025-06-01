@@ -641,7 +641,7 @@ async function unassignRole(role, ev) {
 		danger: true,
 		action: async () => {
 			await os.promiseDialog(async () => {
-				await misskeyApi('admin/roles/unassign', { roleId: role.id, userId: props.userId});
+				await misskeyApi('admin/roles/unassign', { roleId: role.id, userId: props.userId });
 				await refreshUser();
 			});
 		},
