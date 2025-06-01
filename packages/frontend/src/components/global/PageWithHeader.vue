@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div ref="rootEl" :class="[$style.root, reversed ? '_pageScrollableReversed' : '_pageScrollable']">
 	<MkStickyContainer>
 		<template #header><MkPageHeader v-model:tab="tab" v-bind="pageHeaderProps" :class="{ _spacer: spacer }"/></template>
-		<div :class="{ [$style.body]: true, _spacer: spacer }">
+		<div :class="[ $style.body, { _spacer: spacer } ]">
 			<MkSwiper v-if="swipable && (props.tabs?.length ?? 1) > 1" v-model:tab="tab" :class="$style.swiper" :tabs="props.tabs" :page="props.page">
 				<slot></slot>
 			</MkSwiper>
