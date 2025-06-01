@@ -23,14 +23,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 				:moveClass=" $style.transition_x_move"
 				tag="div"
 			>
-				<div v-for="(note, i) in notes" :key="note.id">
-					<div v-if="note._shouldInsertAd_" :class="[$style.noteWithAd, { '_gaps': !noGap }]" :data-scroll-anchor="note.id">
-						<DynamicNote :class="$style.note" :note="note" :withHardMute="true"/>
-						<div :class="$style.ad">
-							<MkAd :preferForms="['horizontal', 'horizontal-big']"/>
-						</div>
-					</div>
-					<DynamicNote v-else :class="$style.note" :note="note" :withHardMute="true" :data-scroll-anchor="note.id"/>
+				<div v-for="(note, i) in notes" :key="note.id" :class="{ '_gaps': !noGap }">
+					<DynamicNote :class="$style.note" :note="note as Misskey.entities.Note" :withHardMute="true" :data-scroll-anchor="note.id"/>
+					<MkAd v-if="note._shouldInsertAd_" :preferForms="['horizontal', 'horizontal-big']" :class="$style.ad"/>
 				</div>
 			</SkTransitionGroup>
 		</template>
