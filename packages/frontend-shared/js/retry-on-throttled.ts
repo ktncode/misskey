@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: outvi and other Sharkey contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+*/
+
 async function sleep(ms: number): Promise<void> {
 	return new Promise((resolve) => {
 		window.setTimeout(() => {
