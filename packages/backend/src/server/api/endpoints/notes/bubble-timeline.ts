@@ -83,7 +83,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('note.visibility = \'public\'')
 				.andWhere('note.channelId IS NULL')
-				.andWhere('userInstance.isBubbled = true') // This comes from generateBlockedHostQueryForNote below
 				.innerJoinAndSelect('note.user', 'user')
 				.leftJoinAndSelect('note.reply', 'reply')
 				.leftJoinAndSelect('note.renote', 'renote')
@@ -94,7 +93,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (me) this.queryService.generateMutedUserQueryForNotes(query, me);
 			if (me) this.queryService.generateBlockedUserQueryForNotes(query, me);
 			if (me) this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
-			if (!me) query.andWhere('user.requireSigninToViewContents = false');
 
 			if (ps.withFiles) {
 				query.andWhere('note.fileIds != \'{}\'');
