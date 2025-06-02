@@ -92,7 +92,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			this.queryService.generateBlockedHostQueryForNote(query);
 			if (me) this.queryService.generateMutedUserQueryForNotes(query, me);
 			if (me) this.queryService.generateBlockedUserQueryForNotes(query, me);
-			if (me) this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
 
 			if (ps.withFiles) {
 				query.andWhere('note.fileIds != \'{}\'');
@@ -108,6 +107,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					.orWhere('note.replyId IS NOT NULL')
 					.orWhere('note.hasPoll = true')
 					.orWhere('note.fileIds != \'{}\'')));
+			} else if (me) {
+				this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
+			}
 			}
 			//#endregion
 
