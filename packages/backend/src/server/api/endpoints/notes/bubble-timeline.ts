@@ -90,8 +90,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.leftJoinAndSelect('renote.user', 'renoteUser');
 
 			this.queryService.generateBlockedHostQueryForNote(query);
-			if (me) this.queryService.generateMutedUserQueryForNotes(query, me);
-			if (me) this.queryService.generateBlockedUserQueryForNotes(query, me);
+			if (me) {
+				this.queryService.generateMutedUserQueryForNotes(query, me);
+				this.queryService.generateBlockedUserQueryForNotes(query, me);
+			}
 
 			if (ps.withFiles) {
 				query.andWhere('note.fileIds != \'{}\'');
