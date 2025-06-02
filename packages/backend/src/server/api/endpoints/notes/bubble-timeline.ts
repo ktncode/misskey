@@ -76,7 +76,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.btlDisabled);
 			}
 
-			const followings = me ? await this.cacheService.userFollowingsCache.fetch(me.id) : undefined;
+			// Run this asynchronously - we will await it after the query completes.
+			// Catch-suppression is needed to avoid "unhandled rejection" if the query throws.
+			const followingsPromise = me ? this.cacheService.userFollowingsCache.fetch(me.id).catch(() => null) : null;
 
 			//#region Construct query
 			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'),
@@ -122,16 +124,17 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			let timeline = await query.limit(ps.limit).getMany();
 
-			timeline = timeline.filter(note => {
-				if (note.user?.isSilenced) {
-					if (!me) return false;
-					if (!followings) return false;
-					if (note.userId !== me.id) {
-						return followings[note.userId];
-					}
-				}
-				return true;
-			});
+			const followings = await followingsPromise;
+			if (me && followings) {
+				timeline = timeline.filter(note => {
+					// Allow my own notes
+					if (note.userId === me.id) return true;
+					// Allow if not silenced
+					if (!note.user?.isSilenced) return true;
+					// Allow if following
+					return followings[note.userId];
+				});
+			}
 
 			if (me) {
 				process.nextTick(() => {
