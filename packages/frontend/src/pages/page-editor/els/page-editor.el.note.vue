@@ -25,6 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 /* eslint-disable vue/no-mutating-props */
 import { watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
+import { retryOnThrottled } from '@@/js/retry-on-throttled.js';
 import XContainer from '../page-editor.container.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
@@ -58,7 +59,7 @@ watch(id, async () => {
 		...props.modelValue,
 		note: id.value,
 	});
-	note.value = await misskeyApi('notes/show', { noteId: id.value });
+	note.value = await retryOnThrottled(() => misskeyApi('notes/show', { noteId: id.value }));
 }, {
 	immediate: true,
 });
