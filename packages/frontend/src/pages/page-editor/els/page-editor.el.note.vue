@@ -36,6 +36,7 @@ import { i18n } from '@/i18n.js';
 
 const props = defineProps<{
 	modelValue: Misskey.entities.PageBlock & { type: 'note' };
+	index: number;
 }>();
 
 const emit = defineEmits<{
@@ -59,7 +60,13 @@ watch(id, async () => {
 		...props.modelValue,
 		note: id.value,
 	});
-	note.value = await retryOnThrottled(() => misskeyApi('notes/show', { noteId: id.value }));
+	const timeoutId = window.setTimeout(async () => {
+		note.value = await retryOnThrottled(() => misskeyApi('notes/show', { noteId: id.value }));
+	}, 500 * props.index); // rate limit is 2 reqs per sec
+
+	return () => {
+		window.clearTimeout(timeoutId);
+	}
 }, {
 	immediate: true,
 });
