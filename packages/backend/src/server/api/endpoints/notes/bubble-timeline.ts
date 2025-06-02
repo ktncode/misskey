@@ -83,7 +83,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('note.visibility = \'public\'')
 				.andWhere('note.channelId IS NULL')
-				.andWhere('note.userHost IS NOT NULL')
 				.andWhere('userInstance.isBubbled = true') // This comes from generateBlockedHostQueryForNote below
 				.innerJoinAndSelect('note.user', 'user')
 				.leftJoinAndSelect('note.reply', 'reply')
