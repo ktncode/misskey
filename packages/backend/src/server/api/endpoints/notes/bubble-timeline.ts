@@ -106,7 +106,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					.orWhere('note.text IS NOT NULL')
 					.orWhere('note.cw IS NOT NULL')
 					.orWhere('note.replyId IS NOT NULL')
-					.orWhere('note.hasPoll = false')
+					.orWhere('note.hasPoll = true')
 					.orWhere('note.fileIds != \'{}\'')));
 			}
 			//#endregion
