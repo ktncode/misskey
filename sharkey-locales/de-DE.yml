@@ -416,3 +416,31 @@ _authorizedFetchValueDescription:
   essential: "Erlaubt einige begrenzte unsignierte Anfragen. Bietet eine Mischung aus \"Niemals\" und \"Immer\", indem nur die minimalen Profil-Metadaten offengelegt werden, die für die Föderation mit älterer Software erforderlich sind."
   staff: "Verwende den von den Administratoren der Instanz empfohlenen Standardwert von \"{value}\"."
 authorizedFetchLegacyWarning: "Die Konfigurationseigenschaft 'checkActivityPubGetSignature' ist veraltet und wurde durch die neue Einstellung „Authorized Fetch“ ersetzt. Bitte entferne sie aus deiner Konfigurationsdatei."
+
+_followRequest:
+  recieved: "Empfangen"
+  sent: "Gesendet"
+
+deleted: "Gelöscht"
+
+enableProxyAccount: "Proxy-Konto aktivieren"
+enableProxyAccountDescription: "Ist diese Option deaktiviert, wird das Proxy-Konto nicht verwendet. Die Benutzerlisten enthalten nur Notizen von lokalen oder gefolgten Benutzern."
+
+_confirmPollEdit:
+  title: Bist du sicher, dass du diese Umfrage bearbeiten möchtest?
+  text: Wenn du diese Umfrage bearbeitest, gehen alle bisherigen Stimmen verloren.
+
+wordMuteTestLabel: "Testmuster"
+wordMuteTestDescription: "Gib hier einen Text ein, um deine Wortmuster zu testen. Die übereinstimmenden Wörter, falls vorhanden, werden unten angezeigt."
+wordMuteTestTest: "Test"
+wordMuteTestMatch: "Übereinstimmende Wörter: {words}"
+wordMuteTestNoResults: "Noch keine Ergebnisse. Gib einen Text ein und klicke auf \"Test\", um ihn zu überprüfen."
+wordMuteTestNoMatch: "Der Text stimmt mit keinem Muster überein."
+wordMuteWarning: "Bei allen Wortstummschaltungen wird die Groß-/Kleinschreibung beachtet. Wortteile stimmen auch überein, zum Beispiel bei längeren Worten oder Namen. Für eine genauere Kontrolle kannst du reguläre Ausdrücke verwenden."
+
+bubbleTimeline: "Bubble-Chronik"
+bubbleTimelineDescription: "Wähle aus, welche Instanzen in der Bubble-Chronik erscheinen sollen."
+bubbleTimelineMustBeEnabled: "Beachte: Die Bubble-Chronik ist standardmäßig ausgeblendet und muss über Rollen aktiviert werden."
+
+popularUsersGlobal: "Beliebte Nutzer im weltweiten Netzwerk"
+popularUsersLocal: "Beliebte Nutzer bei {name}"
