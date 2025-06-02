@@ -112,6 +112,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			} else if (me) {
 				this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
 			}
+
+			if (me) {
+				this.queryService.generateMatchingHostQueryForNote(query, { isBubbled: true });
+			} else {
+				this.queryService.generateMatchingHostQueryForNote(query, { isBubbled: true, isSilenced: false });
 			}
 			//#endregion
 
