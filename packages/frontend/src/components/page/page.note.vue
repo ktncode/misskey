@@ -31,10 +31,8 @@ let timeoutId: ReturnType<typeof window.setTimeout> | null = null;
 
 onMounted(() => {
 	if (props.block.note == null) return;
-	timeoutId = window.setTimeout(() => {
-		retryOnThrottled(() => misskeyApi('notes/show', { noteId: props.block.note })).then(result => {
-			note.value = result;
-		});
+	timeoutId = window.setTimeout(async () => {
+		note.value = await retryOnThrottled(() => misskeyApi('notes/show', { noteId: props.block.note }));
 	}, 500 * props.index); // rate limit is 2 reqs per sec
 });
 
