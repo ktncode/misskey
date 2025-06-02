@@ -66,7 +66,7 @@ watch(id, async () => {
 
 	return () => {
 		window.clearTimeout(timeoutId);
-	}
+	};
 }, {
 	immediate: true,
 });
