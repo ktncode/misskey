@@ -43,11 +43,6 @@ class AntennaChannel extends Channel {
 
 			if (this.isNoteMutedOrBlocked(note)) return;
 
-			if (note.user.isSilenced || note.user.instance?.isSilenced) {
-				if (!this.user) return;
-				if (note.userId !== this.user.id && !this.following[note.userId]) return;
-			}
-
 			this.send('note', note);
 		} else {
 			this.send(data.type, data.body);

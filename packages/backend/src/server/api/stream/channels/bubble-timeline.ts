@@ -60,12 +60,6 @@ class BubbleTimelineChannel extends Channel {
 		if (!this.utilityService.isBubbledHost(note.user.host)) return;
 
 		if (isRenotePacked(note) && !isQuotePacked(note) && !this.withRenotes) return;
-
-		if (note.user.isSilenced) {
-			if (!this.user) return;
-			if (note.userId !== this.user.id && !this.following[note.userId]) return;
-		}
-
 		if (this.isNoteMutedOrBlocked(note)) return;
 
 		const clonedNote = await this.assignMyReaction(note);
