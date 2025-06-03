@@ -9,6 +9,7 @@ import { dirname, resolve } from 'node:path';
 import * as yaml from 'js-yaml';
 import { globSync } from 'glob';
 import ipaddr from 'ipaddr.js';
+import Logger from './logger.js';
 import type * as Sentry from '@sentry/node';
 import type * as SentryVue from '@sentry/vue';
 import type { RedisOptions } from 'ioredis';
@@ -40,6 +41,7 @@ type Source = {
 		db?: string;
 		user?: string;
 		pass?: string;
+		slowQueryThreshold?: number;
 		disableCache?: boolean;
 		extra?: { [x: string]: string };
 	};
@@ -111,6 +113,7 @@ type Source = {
 	deliverJobMaxAttempts?: number;
 	inboxJobMaxAttempts?: number;
 
+	mediaDirectory?: string;
 	mediaProxy?: string;
 	proxyRemoteFiles?: boolean;
 	videoThumbnailGenerator?: string;
@@ -154,6 +157,8 @@ type Source = {
 	}
 };
 
+const configLogger = new Logger('config');
+
 export type PrivateNetworkSource = string | { network?: string, ports?: number[] };
 
 export type PrivateNetwork = {
@@ -191,7 +196,7 @@ export function parsePrivateNetworks(patterns: PrivateNetworkSource[] | undefine
 				}
 			}
 
-			console.warn('[config] Skipping invalid entry in allowedPrivateNetworks: ', e);
+			configLogger.warn('Skipping invalid entry in allowedPrivateNetworks: ', e);
 			return null;
 		})
 		.filter(p => p != null);
@@ -221,6 +226,7 @@ export type Config = {
 		db: string;
 		user: string;
 		pass: string;
+		slowQueryThreshold?: number;
 		disableCache?: boolean;
 		extra?: { [x: string]: string };
 	};
@@ -297,6 +303,7 @@ export type Config = {
 	frontendManifestExists: boolean;
 	frontendEmbedEntry: string;
 	frontendEmbedManifestExists: boolean;
+	mediaDirectory: string;
 	mediaProxy: string;
 	externalMediaProxyEnabled: boolean;
 	videoThumbnailGenerator: string | null;
@@ -346,7 +353,7 @@ const _dirname = dirname(_filename);
 /**
  * Path of configuration directory
  */
-const dir = `${_dirname}/../../../.config`;
+const dir = process.env.MISSKEY_CONFIG_DIR ?? `${_dirname}/../../../.config`;
 
 /**
  * Path of configuration file
@@ -373,11 +380,14 @@ export function loadConfig(): Config {
 
 	if (configFiles.length === 0
 			&& !process.env['MK_WARNED_ABOUT_CONFIG']) {
-		console.log('No config files loaded, check if this is intentional');
+		configLogger.warn('No config files loaded, check if this is intentional');
 		process.env['MK_WARNED_ABOUT_CONFIG'] = '1';
 	}
 
-	const config = configFiles.map(path => fs.readFileSync(path, 'utf-8'))
+	const config = configFiles.map(path => {
+		configLogger.info(`Reading configuration from ${path}`);
+		return fs.readFileSync(path, 'utf-8');
+	})
 		.map(contents => yaml.load(contents) as Source)
 		.reduce(
 			(acc: Source, cur: Source) => Object.assign(acc, cur),
@@ -403,6 +413,10 @@ export function loadConfig(): Config {
 	const internalMediaProxy = `${scheme}://${host}/proxy`;
 	const redis = convertRedisOptions(config.redis, host);
 
+	// nullish => 300 (default)
+	// 0 => undefined (disabled)
+	const slowQueryThreshold = (config.db.slowQueryThreshold ?? 300) || undefined;
+
 	return {
 		version,
 		publishTarballInsteadOfProvideRepositoryUrl: !!config.publishTarballInsteadOfProvideRepositoryUrl,
@@ -421,7 +435,7 @@ export function loadConfig(): Config {
 		apiUrl: `${scheme}://${host}/api`,
 		authUrl: `${scheme}://${host}/auth`,
 		driveUrl: `${scheme}://${host}/files`,
-		db: { ...config.db, db: dbDb, user: dbUser, pass: dbPass },
+		db: { ...config.db, db: dbDb, user: dbUser, pass: dbPass, slowQueryThreshold },
 		dbReplications: config.dbReplications,
 		dbSlaves: config.dbSlaves,
 		fulltextSearch: config.fulltextSearch,
@@ -463,6 +477,7 @@ export function loadConfig(): Config {
 		signToActivityPubGet: config.signToActivityPubGet ?? true,
 		attachLdSignatureForRelays: config.attachLdSignatureForRelays ?? true,
 		checkActivityPubGetSignature: config.checkActivityPubGetSignature,
+		mediaDirectory: config.mediaDirectory ?? resolve(_dirname, '../../../files'),
 		mediaProxy: externalMediaProxy ?? internalMediaProxy,
 		externalMediaProxyEnabled: externalMediaProxy !== null && externalMediaProxy !== internalMediaProxy,
 		videoThumbnailGenerator: config.videoThumbnailGenerator ?
@@ -493,6 +508,10 @@ export function loadConfig(): Config {
 }
 
 function tryCreateUrl(url: string) {
+	if (!url) {
+		throw new Error('Failed to load: no "url" property found in config. Please check the value of "MISSKEY_CONFIG_DIR" and "MISSKEY_CONFIG_YML", and verify that all configuration files are correct.');
+	}
+
 	try {
 		return new URL(url);
 	} catch (e) {
@@ -624,7 +643,7 @@ function applyEnvOverrides(config: Source) {
 	// these are all the settings that can be overridden
 
 	_apply_top([['url', 'port', 'address', 'socket', 'chmodSocket', 'disableHsts', 'id', 'dbReplications', 'websocketCompression']]);
-	_apply_top(['db', ['host', 'port', 'db', 'user', 'pass', 'disableCache']]);
+	_apply_top(['db', ['host', 'port', 'db', 'user', 'pass', 'slowQueryThreshold', 'disableCache']]);
 	_apply_top(['dbSlaves', Array.from((config.dbSlaves ?? []).keys()), ['host', 'port', 'db', 'user', 'pass']]);
 	_apply_top([
 		['redis', 'redisForPubsub', 'redisForJobQueue', 'redisForTimelines', 'redisForReactions', 'redisForRateLimit'],
@@ -638,7 +657,7 @@ function applyEnvOverrides(config: Source) {
 	_apply_top(['sentryForFrontend', 'vueIntegration', 'tracingOptions', 'timeout']);
 	_apply_top(['sentryForFrontend', 'browserTracingIntegration', 'routeLabel']);
 	_apply_top([['clusterLimit', 'deliverJobConcurrency', 'inboxJobConcurrency', 'relashionshipJobConcurrency', 'deliverJobPerSec', 'inboxJobPerSec', 'relashionshipJobPerSec', 'deliverJobMaxAttempts', 'inboxJobMaxAttempts']]);
-	_apply_top([['outgoingAddress', 'outgoingAddressFamily', 'proxy', 'proxySmtp', 'mediaProxy', 'proxyRemoteFiles', 'videoThumbnailGenerator']]);
+	_apply_top([['outgoingAddress', 'outgoingAddressFamily', 'proxy', 'proxySmtp', 'mediaDirectory', 'mediaProxy', 'proxyRemoteFiles', 'videoThumbnailGenerator']]);
 	_apply_top([['maxFileSize', 'maxNoteLength', 'maxRemoteNoteLength', 'maxAltTextLength', 'maxRemoteAltTextLength', 'pidFile', 'filePermissionBits']]);
 	_apply_top(['import', ['downloadTimeout', 'maxFileSize']]);
 	_apply_top([['signToActivityPubGet', 'checkActivityPubGetSignature', 'setupPassword', 'disallowExternalApRedirect']]);
