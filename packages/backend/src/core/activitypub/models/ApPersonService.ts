@@ -54,6 +54,7 @@ import type { ApLoggerService } from '../ApLoggerService.js';
 
 import type { ApImageService } from './ApImageService.js';
 import type { IActor, ICollection, IObject, IOrderedCollection } from '../type.js';
+import { isArray } from 'util';
 
 const nameLength = 128;
 const summaryLength = 2048;
@@ -445,7 +446,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 					makeNotesFollowersOnlyBefore: (person as any).makeNotesFollowersOnlyBefore ?? null,
 					makeNotesHiddenBefore: (person as any).makeNotesHiddenBefore ?? null,
 					emojis,
-					attributionDomains: person.attributionDomains?.every(x => typeof x === 'string') ? person.attributionDomains : [],
+					attributionDomains: (Array.isArray(person.attributionDomains) && person.attributionDomains.every(x => typeof x === 'string')) ? person.attributionDomains : [],
 				})) as MiRemoteUser;
 
 				let _description: string | null = null;
@@ -629,7 +630,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 			// We use "!== false" to handle incorrect types, missing / null values, and "default to true" logic.
 			hideOnlineStatus: person.hideOnlineStatus !== false,
 			isExplorable: person.discoverable !== false,
-			attributionDomains: person.attributionDomains?.every(x => typeof x === 'string') ? person.attributionDomains : [],
+			attributionDomains: (Array.isArray(person.attributionDomains) && person.attributionDomains.every(x => typeof x === 'string')) ? person.attributionDomains : [],
 			...(await this.resolveAvatarAndBanner(exist, person.icon, person.image, person.backgroundUrl).catch(() => ({}))),
 		} as Partial<MiRemoteUser> & Pick<MiRemoteUser, 'isBot' | 'isCat' | 'speakAsCat' | 'isLocked' | 'movedToUri' | 'alsoKnownAs' | 'isExplorable'>;
 
