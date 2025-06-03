@@ -50,7 +50,7 @@ class LocalTimelineChannel extends Channel {
 
 	@bindThis
 	private async onNote(note: Packed<'Note'>) {
-		const isMe = this.user!.id === note.userId;
+		const isMe = this.user?.id === note.userId;
 
 		if (this.withFiles && (note.fileIds == null || note.fileIds.length === 0)) return;
 		if (!this.withBots && note.user.isBot) return;
@@ -69,7 +69,7 @@ class LocalTimelineChannel extends Channel {
 			if (!this.isNoteVisibleToMe(reply)) return;
 			if (!this.following[note.userId]?.withReplies) {
 				// 「チャンネル接続主への返信」でもなければ、「チャンネル接続主が行った返信」でもなければ、「投稿者の投稿者自身への返信」でもない場合
-				if (reply.userId !== this.user!.id && !isMe && reply.userId !== note.userId) return;
+				if (reply.userId !== this.user?.id && !isMe && reply.userId !== note.userId) return;
 			}
 		}
 

@@ -81,7 +81,7 @@ class UserListChannel extends Channel {
 
 	@bindThis
 	private async onNote(note: Packed<'Note'>) {
-		const isMe = this.user!.id === note.userId;
+		const isMe = this.user?.id === note.userId;
 
 		// チャンネル投稿は無視する
 		if (note.channelId) return;
