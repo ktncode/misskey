@@ -69,7 +69,7 @@ export default abstract class Channel {
 		if (note.user.requireSigninToViewContents && !this.user) return true;
 
 		// 流れてきたNoteがインスタンスミュートしたインスタンスが関わる
-		if (isInstanceMuted(note, new Set<string>(this.userProfile?.mutedInstances ?? [])) && !this.following[note.userId]) return true;
+		if (isInstanceMuted(note, this.userMutedInstances) && !this.following[note.userId]) return true;
 
 		// 流れてきたNoteがミュートしているユーザーが関わる
 		if (isUserRelated(note, this.userIdsWhoMeMuting)) return true;
