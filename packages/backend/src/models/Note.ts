@@ -13,6 +13,7 @@ import type { MiDriveFile } from './DriveFile.js';
 
 @Index('IDX_724b311e6f883751f261ebe378', ['userId', 'id'])
 @Index('IDX_note_userHost_id', { synchronize: false }) // (userHost, id desc)
+@Index('IDX_note_for_timelines', { synchronize: false }) // (id desc, channelId, visibility, userHost)
 @Entity('note')
 export class MiNote {
 	@PrimaryColumn(id())
