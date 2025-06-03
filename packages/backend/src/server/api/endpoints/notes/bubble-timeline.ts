@@ -100,13 +100,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (!ps.withBots) query.andWhere('user.isBot = FALSE');
 
 			if (!ps.withRenotes) {
-				query.andWhere(new Brackets(qb => qb
-					.orWhere('note.renoteId IS NULL')
-					.orWhere('note.text IS NOT NULL')
-					.orWhere('note.cw IS NOT NULL')
-					.orWhere('note.replyId IS NOT NULL')
-					.orWhere('note.hasPoll = true')
-					.orWhere('note.fileIds != \'{}\'')));
+				this.queryService.generateExcludedRenotesQueryForNotes(query);
 			} else if (me) {
 				this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
 			}
