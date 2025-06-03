@@ -4,7 +4,6 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import { Brackets } from 'typeorm';
 import type { NotesRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
@@ -12,7 +11,6 @@ import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import ActiveUsersChart from '@/core/chart/charts/active-users.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@/core/RoleService.js';
-import { CacheService } from '@/core/CacheService.js';
 import { ApiError } from '../../error.js';
 
 export const meta = {
@@ -80,11 +78,21 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('note.visibility = \'public\'')
 				.andWhere('note.channelId IS NULL')
+				.andWhere('note.userHost IS NOT NULL')
 				.innerJoinAndSelect('note.user', 'user')
 				.leftJoinAndSelect('note.reply', 'reply')
 				.leftJoinAndSelect('note.renote', 'renote')
-				.leftJoinAndSelect('reply.user', 'replyUser')
-				.leftJoinAndSelect('renote.user', 'renoteUser');
+				.leftJoinAndSelect('reply.user', 'replyUser', 'replyUser.id = note.replyUserId')
+				.leftJoinAndSelect('renote.user', 'renoteUser', 'renoteUser.id = note.renoteUserId');
+
+			// This subquery mess teaches postgres how to use the right indexes.
+			// Using WHERE or ON conditions causes a fallback to full sequence scan, which times out.
+			// Important: don't use a query builder here or TypeORM will get confused and stop quoting column names! (known, unfixed bug apparently)
+			query
+				.leftJoin('(select "host" from "instance" where "isBubbled" = true)', 'bubbleInstance', '"bubbleInstance"."host" = "note"."userHost"')
+				.andWhere('"bubbleInstance" IS NOT NULL');
+			this.queryService
+				.leftJoinInstance(query, 'note.userInstance', 'userInstance', '"userInstance"."host" = "bubbleInstance"."host"');
 
 			this.queryService.generateBlockedHostQueryForNote(query);
 			this.queryService.generateSilencedUserQueryForNotes(query, me);
@@ -103,12 +111,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				this.queryService.generateExcludedRenotesQueryForNotes(query);
 			} else if (me) {
 				this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
-			}
-
-			if (me) {
-				this.queryService.generateMatchingHostQueryForNote(query, { isBubbled: true });
-			} else {
-				this.queryService.generateMatchingHostQueryForNote(query, { isBubbled: true, isSilenced: false });
 			}
 			//#endregion
 
