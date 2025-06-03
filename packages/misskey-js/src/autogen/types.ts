@@ -28846,12 +28846,6 @@ export type operations = {
           /** @default false */
           allowPartial?: boolean;
           /** @default true */
-          includeMyRenotes?: boolean;
-          /** @default true */
-          includeRenotedMyNotes?: boolean;
-          /** @default true */
-          includeLocalRenotes?: boolean;
-          /** @default true */
           withRenotes?: boolean;
           /**
            * @description Only show notes that have attached files.
