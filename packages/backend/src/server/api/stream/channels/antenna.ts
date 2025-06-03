@@ -43,7 +43,15 @@ class AntennaChannel extends Channel {
 
 			if (this.isNoteMutedOrBlocked(note)) return;
 
-			this.send('note', note);
+			if (note.user.isSilenced) {
+				if (!this.user) return;
+				if (note.userId !== this.user.id && !this.following[note.userId]) return;
+			}
+
+			const clonedNote = await this.assignMyReaction(note);
+			await this.hideNote(clonedNote);
+
+			this.send('note', clonedNote);
 		} else {
 			this.send(data.type, data.body);
 		}
