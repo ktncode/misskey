@@ -50,6 +50,7 @@ class HomeTimelineChannel extends Channel {
 			if (!isMe && !Object.hasOwn(this.following, note.userId)) return;
 		}
 
+		if (this.isNoteMutedOrBlocked(note)) return;
 		if (!this.isNoteVisibleToMe(note)) return;
 
 		if (note.reply) {
@@ -62,8 +63,6 @@ class HomeTimelineChannel extends Channel {
 			}
 		}
 
-		if ((note.user.isSilenced || note.user.instance?.isSilenced) && !this.following[note.userId] && note.userId !== this.user!.id) return;
-
 		// 純粋なリノート（引用リノートでないリノート）の場合
 		if (isRenotePacked(note) && !isQuotePacked(note) && note.renote) {
 			if (!this.withRenotes) return;
@@ -73,8 +72,6 @@ class HomeTimelineChannel extends Channel {
 				if (!this.isNoteVisibleToMe(reply)) return;
 			}
 		}
-
-		if (this.isNoteMutedOrBlocked(note)) return;
 
 		const clonedNote = await this.assignMyReaction(note);
 		await this.hideNote(clonedNote);
