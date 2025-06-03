@@ -4281,6 +4281,7 @@ export type components = {
         iconUrl: string | null;
         faviconUrl: string | null;
         themeColor: string | null;
+        isSilenced: boolean;
       };
       emojis: {
         [key: string]: string;

@@ -200,6 +200,10 @@ export const packedUserLiteSchema = {
 					type: 'string',
 					nullable: true, optional: false,
 				},
+				isSilenced: {
+					type: 'boolean',
+					nullable: false, optional: false,
+				},
 			},
 		},
 		emojis: {

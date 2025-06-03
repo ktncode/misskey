@@ -616,6 +616,7 @@ export class UserEntityService implements OnModuleInit {
 				iconUrl: instance.iconUrl,
 				faviconUrl: instance.faviconUrl,
 				themeColor: instance.themeColor,
+				isSilenced: instance.isSilenced,
 			} : undefined) : undefined,
 			followersCount: followersCount ?? 0,
 			followingCount: followingCount ?? 0,
