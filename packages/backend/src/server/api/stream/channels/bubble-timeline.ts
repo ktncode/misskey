@@ -57,9 +57,7 @@ class BubbleTimelineChannel extends Channel {
 
 		if (note.visibility !== 'public') return;
 		if (note.channelId != null) return;
-		if (note.user.host == null) return;
 		if (!this.utilityService.isBubbledHost(note.user.host)) return;
-		if (note.user.requireSigninToViewContents && this.user == null) return;
 
 		if (isRenotePacked(note) && !isQuotePacked(note) && !this.withRenotes) return;
 
