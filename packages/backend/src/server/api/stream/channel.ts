@@ -61,6 +61,21 @@ export default abstract class Channel {
 		return this.connection.subscriber;
 	}
 
+	/**
+	 * Checks if a note is visible to the current user *excluding* blocks and mutes.
+	 */
+	protected isNoteVisibleToMe(note: Packed<'Note'>): boolean {
+		if (note.visibility === 'public') return true;
+		if (note.visibility === 'home') return true;
+		if (!this.user) return false;
+		if (this.user.id === note.userId) return true;
+		if (note.visibility === 'followers') {
+			return this.following[note.userId] != null;
+		}
+		if (!note.visibleUserIds) return false;
+		return note.visibleUserIds.includes(this.user.id);
+	}
+
 	/*
 	 * ミュートとブロックされてるを処理する
 	 */
