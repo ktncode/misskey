@@ -190,9 +190,8 @@ export class QueryService {
 			.setParameters({ meId: me.id });
 	}
 
-	// TODO replace allowSilenced with matchingHostQuery
 	@bindThis
-	public generateBlockedHostQueryForNote<E extends ObjectLiteral>(q: SelectQueryBuilder<E>, excludeAuthor?: boolean, allowSilenced = true): SelectQueryBuilder<E> {
+	public generateBlockedHostQueryForNote<E extends ObjectLiteral>(q: SelectQueryBuilder<E>, excludeAuthor?: boolean): SelectQueryBuilder<E> {
 		const checkFor = (key: 'user' | 'replyUser' | 'renoteUser') => {
 			q.andWhere(new Brackets(qb => {
 				qb.orWhere(`note.${key}Host IS NULL`); // local
@@ -207,18 +206,8 @@ export class QueryService {
 					}
 				}
 
-				if (allowSilenced) {
-					// not blocked
-					this.excludeInstanceWhere(qb, `note.${key}Host`, {
-						isBlocked: false,
-					}, 'orWhere');
-				} else {
-					// not blocked or silenced
-					this.excludeInstanceWhere(qb, `note.${key}Host`, {
-						isBlocked: false,
-						isSilenced: false,
-					}, 'orWhere');
-				}
+				// not blocked
+				this.excludeInstanceWhere(qb, `note.${key}Host`, { isBlocked: false }, 'orWhere');
 			}));
 		};
 
