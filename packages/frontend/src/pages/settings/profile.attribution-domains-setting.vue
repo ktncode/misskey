@@ -20,11 +20,11 @@ import { ref, watch, computed } from 'vue';
 import { host as hostRaw } from '@@/js/config.js';
 import { toUnicode } from 'punycode.js';
 import MkTextarea from '@/components/MkTextarea.vue';
-import MkInfo from '@/components/MkInfo.vue';
 import MkButton from '@/components/MkButton.vue';
 import { ensureSignin } from '@/i.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
+import * as os from '@/os.js';
 
 const $i = ensureSignin();
 
@@ -39,6 +39,15 @@ const changed = ref(false);
 const tutorialTag = '`<meta name="fediverse:creator" content="' + $i.username + '@' + toUnicode(hostRaw) + '" />`';
 
 async function save() {
+	// checks for a full line without whitespace.
+	if (!domainArray.value.every(d => /^\S+$/.test(d))) {
+		os.alert({
+			type: 'error',
+			title: i18n.ts.invalidValue,
+		});
+		return;
+	}
+
 	await misskeyApi('i/update', {
 		attributionDomains: domainArray.value,
 	});
