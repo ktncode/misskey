@@ -178,6 +178,22 @@ _role:
     canImportNotes: "Kann Notizen importieren"
     canUpdateBioMedia: "Kann das Profilbild oder den Banner anpassen"
     scheduleNoteMax: "Maximale Anzahl an geplanten Notizen"
+    canTrend: "Kann unter den beliebten Notizen/Benutzern erscheinen"
+  _condition:
+    isFromInstance: "Ist von einer bestimmten Instanz"
+    isFromInstanceHost: "Hostname (Groß-/Kleinschreibung wird ignoriert)"
+    isFromInstanceSubdomains: "Subdomains abgleichen"
+    fromBubbleInstance: "Benutzer ist von einer Bubble-Instanz"
+    localFollowersLessThanOrEq: "Hat X oder weniger lokale Follower"
+    localFollowersMoreThanOrEq: "Hat X oder mehr lokale Follower"
+    localFollowingLessThanOrEq: "Folgt X oder weniger lokalen Benutzern"
+    localFollowingMoreThanOrEq: "Folgt X oder mehr lokalen Benutzern"
+    remoteFollowersLessThanOrEq: "Hat X oder weniger entfernte Follower"
+    remoteFollowersMoreThanOrEq: "Hat X oder mehr entfernte Follower"
+    remoteFollowingLessThanOrEq: "Folgt X oder weniger entfernten Benutzern"
+    remoteFollowingMoreThanOrEq: "Folgt X oder mehr entfernten Benutzern"
+  remoteDataWarning: "Diese Bedingung kann für Benutzer andere Instanzen falsch sein."
+
 _signup:
   approvalPending: "Dein Konto wurde erstellt und wartet auf die Genehmigung."
   reasonInfo: "Bitte gib einen Grund an, warum du der Instanz beitreten möchtest."
@@ -202,6 +218,8 @@ _soundSettings:
   driveFileDurationWarnDescription: "Lange Töne können die Verwendung von Sharkey stören. Trotzdem fortfahren?"
 _widgets:
   search: "Suche"
+_poll:
+  multiple: "Mehrere Auswahlmöglichkeiten"
 _profile:
   changeBackground: "Hintergrund ändern"
   updateBackground: "Hintergrund aktualisieren"
@@ -239,6 +257,7 @@ _moderationLogTypes:
   importCustomEmojis: "Benutzerdefinierte Emojis importiert"
   clearInstanceFiles: "Drive-Inhalte einer fremden Instanz gelöscht"
   severFollowRelations: "Folgebeziehungen mit einer Instanz aufgelöst"
+  createPromo: "Werbung erstellt"
   addRelay: "Relay hinzugefügt"
   removeRelay: "Relay entfernt"
 
@@ -250,6 +269,8 @@ _mfm:
   mentionDescription: "Du kannst einen Benutzer mit Hilfe des At-Symbols und des Benutzernamens erwähnen."
   hashtag: "Hashtag"
   hashtagDescription: "Du kannst einen Hashtag mit einer Raute und Text angeben."
+  url: "URL"
+  urlDescription: "URLs können angezeigt werden."
   link: "Link"
   linkDescription: "Bestimmte Textabschnitte können als URL angezeigt werden."
   bold: "Fett"
@@ -258,6 +279,8 @@ _mfm:
   smallDescription: "Zeigt den Inhalt klein und dünn an."
   center: "Zentrieren"
   centerDescription: "Zeigt den Inhalt zentriert an."
+  unixtime: "Unixzeit"
+  unixtimeDescription: "Zeigt einen Zeitstempel in der aktuellen Zeitzone des Betrachters an."
   inlineCode: "Code (Inline)"
   inlineCodeDescription: "Zeigt die Inline-Syntaxhervorhebung für (Programm-)Code an."
   blockCode: "Code (Block)"
@@ -354,6 +377,7 @@ selectFollowRelationship: "Wähle eine Folgebeziehung aus..."
 
 schedulePost: "Plane eine Notiz"
 schedulePostList: "Liste von geplanten Notizen"
+postOn: "Veröffentlichen am"
 scheduledNotes: "Geplante Notizen"
 
 _permissions:
@@ -362,6 +386,8 @@ _permissions:
   "write:admin:nsfw-user": "Benutzer als NSFW markieren"
   "write:admin:unnsfw-user": "NSFW-Markierung eines Benutzers entfernen"
   "write:admin:cw-user": "Obligatorische Inhaltswarnung auf Benutzer anwenden"
+  "write:admin:silence-user": "Benutzer stummschalten"
+  "write:admin:unsilence-user": "Benutzerstummschaltung aufheben"
   "write:admin:reject-quotes": "Zitieren von Beiträgen eines Benutzers zulassen/verbieten"
   "read:notes-schedule": "Liste der geplanten Notizen anzeigen"
   "write:notes-schedule": "Geplante Notizen verfassen oder löschen"
@@ -398,6 +424,8 @@ _noteSearch:
 mandatoryCW: "Inhaltswarnung erzwingen"
 mandatoryCWDescription: "Wendet eine Inhaltswarnung auf alle von diesem Benutzer erstellten Beiträge an. Wenn der Beitrag bereits eine Warnung hat, wird diese an das Ende angehängt."
 fetchLinkedNote: "Verknüpfte Notiz abrufen"
+showTranslationButtonInNoteFooter: "Fügt \"Übersetzen\" zum Notizenmenü hinzu"
+translationFailed: "Notiz konnte nicht übersetzt werden. Bitte versuche es später erneut oder wende dich zur Unterstützung an einen Administrator."
 
 _processErrors:
   quoteUnavailable: "Zitat kann nicht verarbeitet werden. Diesem Beitrag fehlt möglicherweise der Kontext."
@@ -427,20 +455,51 @@ enableProxyAccount: "Proxy-Konto aktivieren"
 enableProxyAccountDescription: "Ist diese Option deaktiviert, wird das Proxy-Konto nicht verwendet. Die Benutzerlisten enthalten nur Notizen von lokalen oder gefolgten Benutzern."
 
 _confirmPollEdit:
-  title: Bist du sicher, dass du diese Umfrage bearbeiten möchtest?
-  text: Wenn du diese Umfrage bearbeitest, gehen alle bisherigen Stimmen verloren.
+  title: "Bist du sicher, dass du diese Umfrage bearbeiten möchtest?"
+  text: "Wenn du diese Umfrage bearbeitest, gehen alle bisherigen Stimmen verloren."
 
 wordMuteTestLabel: "Testmuster"
 wordMuteTestDescription: "Gib hier einen Text ein, um deine Wortmuster zu testen. Die übereinstimmenden Wörter, falls vorhanden, werden unten angezeigt."
-wordMuteTestTest: "Test"
 wordMuteTestMatch: "Übereinstimmende Wörter: {words}"
 wordMuteTestNoResults: "Noch keine Ergebnisse. Gib einen Text ein und klicke auf \"Test\", um ihn zu überprüfen."
 wordMuteTestNoMatch: "Der Text stimmt mit keinem Muster überein."
-wordMuteWarning: "Bei allen Wortstummschaltungen wird die Groß-/Kleinschreibung beachtet. Wortteile stimmen auch überein, zum Beispiel bei längeren Worten oder Namen. Für eine genauere Kontrolle kannst du reguläre Ausdrücke verwenden."
+wordMuteWarning: "Bei allen Wortstummschaltungen wird die Groß-/Kleinschreibung beachtet. Wortteile stimmen auch überein, zum Beispiel bei längeren Worten oder Namen. Für eine genauere Steuerung kannst du reguläre Ausdrücke verwenden."
 
 bubbleTimeline: "Bubble-Chronik"
 bubbleTimelineDescription: "Wähle aus, welche Instanzen in der Bubble-Chronik erscheinen sollen."
 bubbleTimelineMustBeEnabled: "Beachte: Die Bubble-Chronik ist standardmäßig ausgeblendet und muss über Rollen aktiviert werden."
 
-popularUsersGlobal: "Beliebte Nutzer im weltweiten Netzwerk"
-popularUsersLocal: "Beliebte Nutzer bei {name}"
+popularUsersGlobal: "Beliebte Benutzer im weltweiten Netzwerk"
+popularUsersLocal: "Beliebte Benutzer bei {name}"
+
+pollsOnLocal: "Laufende Umfragen bei {name}"
+pollsOnRemote: "Laufende Umfragen im weltweiten Netzwerk"
+pollsExpired: "Kürzlich beendete Umfragen"
+trendingPollsDisabled: "Laufende Umfragen sind auf dieser Instanz deaktiviert."
+trendingPollsDisabledLogIn: "Bitte melde dich an, um laufende Umfragen zu sehen."
+
+silenced: "Stummgeschaltet"
+totalFollowers: "Folgende insgesamt"
+totalFollowing: "Gefolgte insgesamt"
+localFollowers: "Lokal Folgende"
+localFollowing: "Lokal Gefolgte"
+remoteFollowers: "Entfernt Folgende"
+remoteFollowing: "Entfernt Gefolgte"
+ipTip: "Das Datum gibt an, wann die IP-Adresse zum ersten Mal verwendet wurde."
+rolePeriod: "Dauer"
+roleAssigned: "Zugewiesen"
+roleAutomatic: "automatisch"
+
+translationTimeoutLabel: "Zeitüberschreitung bei der Übersetzung"
+translationTimeoutCaption: "Zeitüberschreitung in Millisekunden für Übersetzungs-API-Anfragen."
+
+followingPub: "Gefolgte (Pub)"
+followersSub: "Folgende (Sub)"
+wellKnownResources: "Well-known Ressourcen"
+lastPosted: "Zuletzt geschrieben: {at}"
+raw: "Roh"
+cw: "IW"
+mediaSilenced: "Medien stummgeschaltet"
+verified: "Verifiziert"
+notVerified: "Nicht verifiziert"
+hibernated: "Im Ruhezustand"
