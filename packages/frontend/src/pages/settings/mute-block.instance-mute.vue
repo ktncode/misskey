@@ -22,6 +22,7 @@ import MkButton from '@/components/MkButton.vue';
 import { ensureSignin } from '@/i.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
+import * as os from '@/os.js';
 
 const $i = ensureSignin();
 
@@ -35,13 +36,17 @@ const domainArray = computed(() => {
 const changed = ref(false);
 
 async function save() {
-	const mutes = instanceMutes.value
-		.trim().split('\n')
-		.map(el => el.toLowerCase().trim())
-		.filter(el => el);
+	// checks for a full line without whitespace.
+	if (!domainArray.value.every(d => /^\S+$/.test(d))) {
+		os.alert({
+			type: 'error',
+			title: i18n.ts.invalidValue,
+		});
+		return;
+	}
 
 	await misskeyApi('i/update', {
-		mutedInstances: mutes,
+		mutedInstances: domainArray.value,
 	});
 
 	// Refresh filtered list to signal to the user how they've been saved
