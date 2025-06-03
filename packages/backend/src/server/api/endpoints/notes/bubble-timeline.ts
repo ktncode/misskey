@@ -68,17 +68,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private queryService: QueryService,
 		private roleService: RoleService,
 		private activeUsersChart: ActiveUsersChart,
-		private cacheService: CacheService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const policies = await this.roleService.getUserPolicies(me ? me.id : null);
 			if (!policies.btlAvailable) {
 				throw new ApiError(meta.errors.btlDisabled);
 			}
-
-			// Run this asynchronously - we will await it after the query completes.
-			// Catch-suppression is needed to avoid "unhandled rejection" if the query throws.
-			const followingsPromise = me ? this.cacheService.userFollowingsCache.fetch(me.id).catch(() => null) : null;
 
 			//#region Construct query
 			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'),
@@ -92,6 +87,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.leftJoinAndSelect('renote.user', 'renoteUser');
 
 			this.queryService.generateBlockedHostQueryForNote(query);
+			this.queryService.generateSilencedUserQueryForNotes(query, me);
 			if (me) {
 				this.queryService.generateMutedUserQueryForNotes(query, me);
 				this.queryService.generateBlockedUserQueryForNotes(query, me);
@@ -122,19 +118,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 			//#endregion
 
-			let timeline = await query.limit(ps.limit).getMany();
-
-			const followings = await followingsPromise;
-			if (me && followings) {
-				timeline = timeline.filter(note => {
-					// Allow my own notes
-					if (note.userId === me.id) return true;
-					// Allow if not silenced
-					if (!note.user?.isSilenced) return true;
-					// Allow if following
-					return followings[note.userId];
-				});
-			}
+			const timeline = await query.limit(ps.limit).getMany();
 
 			if (me) {
 				process.nextTick(() => {
