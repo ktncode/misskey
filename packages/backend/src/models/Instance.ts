@@ -6,7 +6,8 @@
 import { Entity, PrimaryColumn, Index, Column } from 'typeorm';
 import { id } from './util/id.js';
 
-@Index('IDX_instance_host_key', { synchronize: false })
+@Index('IDX_instance_host_key', { synchronize: false }) // ((lower(reverse("host"::text)) || '.'::text)
+@Index('IDX_instance_host_filters', { synchronize: false }) // ("host", "isBlocked", "isSilenced", "isMediaSilenced", "isAllowListed", "isBubbled", "suspensionState")
 @Entity('instance')
 export class MiInstance {
 	@PrimaryColumn(id())
