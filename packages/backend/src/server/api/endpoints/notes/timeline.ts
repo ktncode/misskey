@@ -49,9 +49,6 @@ export const paramDef = {
 		sinceDate: { type: 'integer' },
 		untilDate: { type: 'integer' },
 		allowPartial: { type: 'boolean', default: false }, // true is recommended but for compatibility false by default
-		includeMyRenotes: { type: 'boolean', default: true },
-		includeRenotedMyNotes: { type: 'boolean', default: true },
-		includeLocalRenotes: { type: 'boolean', default: true },
 		withFiles: { type: 'boolean', default: false },
 		withRenotes: { type: 'boolean', default: true },
 		withBots: { type: 'boolean', default: true },
@@ -88,9 +85,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					untilId,
 					sinceId,
 					limit: ps.limit,
-					includeMyRenotes: ps.includeMyRenotes,
-					includeRenotedMyNotes: ps.includeRenotedMyNotes,
-					includeLocalRenotes: ps.includeLocalRenotes,
 					withFiles: ps.withFiles,
 					withRenotes: ps.withRenotes,
 					withBots: ps.withBots,
@@ -131,9 +125,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					untilId,
 					sinceId,
 					limit,
-					includeMyRenotes: ps.includeMyRenotes,
-					includeRenotedMyNotes: ps.includeRenotedMyNotes,
-					includeLocalRenotes: ps.includeLocalRenotes,
 					withFiles: ps.withFiles,
 					withRenotes: ps.withRenotes,
 					withBots: ps.withBots,
@@ -148,7 +139,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		});
 	}
 
-	private async getFromDb(ps: { untilId: string | null; sinceId: string | null; limit: number; includeMyRenotes: boolean; includeRenotedMyNotes: boolean; includeLocalRenotes: boolean; withFiles: boolean; withRenotes: boolean; withBots: boolean; }, me: MiLocalUser) {
+	private async getFromDb(ps: { untilId: string | null; sinceId: string | null; limit: number; withFiles: boolean; withRenotes: boolean; withBots: boolean; }, me: MiLocalUser) {
 		const followees = await this.userFollowingService.getFollowees(me.id);
 		const followingChannels = await this.channelFollowingsRepository.find({
 			where: {
@@ -161,8 +152,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			.innerJoinAndSelect('note.user', 'user')
 			.leftJoinAndSelect('note.reply', 'reply')
 			.leftJoinAndSelect('note.renote', 'renote')
-			.leftJoinAndSelect('reply.user', 'replyUser')
-			.leftJoinAndSelect('renote.user', 'renoteUser');
+			.leftJoinAndSelect('reply.user', 'replyUser', 'replyUser.id = note.replyUserId')
+			.leftJoinAndSelect('renote.user', 'renoteUser', 'renoteUser.id = note.renoteUserId');
 
 		if (followees.length > 0 && followingChannels.length > 0) {
 			// ユーザー・チャンネルともにフォローあり
@@ -212,47 +203,18 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		this.queryService.generateBlockedHostQueryForNote(query);
 		this.queryService.generateMutedUserQueryForNotes(query, me);
 		this.queryService.generateBlockedUserQueryForNotes(query, me);
-		this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
-
-		if (ps.includeMyRenotes === false) {
-			query.andWhere(new Brackets(qb => {
-				qb.orWhere('note.userId != :meId', { meId: me.id });
-				qb.orWhere('note.renoteId IS NULL');
-				qb.orWhere('note.text IS NOT NULL');
-				qb.orWhere('note.fileIds != \'{}\'');
-				qb.orWhere('0 < (SELECT COUNT(*) FROM poll WHERE poll."noteId" = note.id)');
-			}));
-		}
-
-		if (ps.includeRenotedMyNotes === false) {
-			query.andWhere(new Brackets(qb => {
-				qb.orWhere('note.renoteUserId != :meId', { meId: me.id });
-				qb.orWhere('note.renoteId IS NULL');
-				qb.orWhere('note.text IS NOT NULL');
-				qb.orWhere('note.fileIds != \'{}\'');
-				qb.orWhere('0 < (SELECT COUNT(*) FROM poll WHERE poll."noteId" = note.id)');
-			}));
-		}
-
-		if (ps.includeLocalRenotes === false) {
-			query.andWhere(new Brackets(qb => {
-				qb.orWhere('note.renoteUserHost IS NOT NULL');
-				qb.orWhere('note.renoteId IS NULL');
-				qb.orWhere('note.text IS NOT NULL');
-				qb.orWhere('note.fileIds != \'{}\'');
-				qb.orWhere('0 < (SELECT COUNT(*) FROM poll WHERE poll."noteId" = note.id)');
-			}));
-		}
 
 		if (ps.withFiles) {
 			query.andWhere('note.fileIds != \'{}\'');
 		}
 
-		if (ps.withRenotes === false) {
-			query.andWhere('note.renoteId IS NULL');
-		}
-
 		if (!ps.withBots) query.andWhere('user.isBot = FALSE');
+
+		if (!ps.withRenotes) {
+			this.queryService.generateExcludedRenotesQueryForNotes(query);
+		} else if (me) {
+			this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
+		}
 		//#endregion
 
 		return await query.limit(ps.limit).getMany();
