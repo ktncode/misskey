@@ -120,7 +120,7 @@ export const PREF_DEF = {
 		default: false,
 	},
 	keepCw: {
-		default: true,
+		default: true as boolean | 'prepend-re',
 	},
 	rememberNoteVisibility: {
 		default: false,

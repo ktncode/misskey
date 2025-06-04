@@ -403,9 +403,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div class="_gaps_s">
 							<SearchMarker :keywords="['remember', 'keep', 'note', 'cw']">
 								<MkPreferenceContainer k="keepCw">
-									<MkSwitch v-model="keepCw">
+									<MkSelect v-model="keepCw">
 										<template #label><SearchLabel>{{ i18n.ts.keepCw }}</SearchLabel></template>
-									</MkSwitch>
+										<template #caption><SearchKeyword>{{ i18n.ts.keepCwDescription }}</SearchKeyword></template>
+										<option :value="false">{{ i18n.ts.keepCwDisabled }}</option>>
+										<option :value="true">{{ i18n.ts.keepCwEnabled }}</option>>
+										<option value="prepend-re">{{ i18n.ts.keepCwPrependRe }}</option>
+									</MkSelect>
 								</MkPreferenceContainer>
 							</SearchMarker>
 
