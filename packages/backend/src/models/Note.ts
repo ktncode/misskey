@@ -12,6 +12,8 @@ import { MiChannel } from './Channel.js';
 import type { MiDriveFile } from './DriveFile.js';
 
 @Index('IDX_724b311e6f883751f261ebe378', ['userId', 'id'])
+@Index('IDX_note_userHost_id', { synchronize: false }) // (userHost, id desc)
+@Index('IDX_note_for_timelines', { synchronize: false }) // (id desc, channelId, visibility, userHost)
 @Entity('note')
 export class MiNote {
 	@PrimaryColumn(id())
@@ -216,7 +218,6 @@ export class MiNote {
 	public processErrors: string[] | null;
 
 	//#region Denormalized fields
-	@Index()
 	@Column('varchar', {
 		length: 128, nullable: true,
 		comment: '[Denormalized]',

@@ -96,7 +96,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (!this.serverSettings.enableBotTrending) query.andWhere('user.isBot = FALSE');
 
-			this.queryService.generateBlockedHostQueryForNote(query, undefined, false);
+			this.queryService.generateBlockedHostQueryForNote(query);
+			this.queryService.generateSilencedUserQueryForNotes(query, me);
 			if (me) this.queryService.generateMutedUserQueryForNotes(query, me);
 			if (me) this.queryService.generateBlockedUserQueryForNotes(query, me);
 			if (me) this.queryService.generateMutedUserRenotesQueryForNotes(query, me);

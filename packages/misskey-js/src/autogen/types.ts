@@ -4281,6 +4281,7 @@ export type components = {
         iconUrl: string | null;
         faviconUrl: string | null;
         themeColor: string | null;
+        isSilenced: boolean;
       };
       emojis: {
         [key: string]: string;
@@ -27232,12 +27233,6 @@ export type operations = {
           untilDate?: number;
           /** @default false */
           allowPartial?: boolean;
-          /** @default true */
-          includeMyRenotes?: boolean;
-          /** @default true */
-          includeRenotedMyNotes?: boolean;
-          /** @default true */
-          includeLocalRenotes?: boolean;
           /** @default false */
           withFiles?: boolean;
           /** @default true */
@@ -28653,12 +28648,6 @@ export type operations = {
           untilDate?: number;
           /** @default false */
           allowPartial?: boolean;
-          /** @default true */
-          includeMyRenotes?: boolean;
-          /** @default true */
-          includeRenotedMyNotes?: boolean;
-          /** @default true */
-          includeLocalRenotes?: boolean;
           /** @default false */
           withFiles?: boolean;
           /** @default true */
@@ -28859,12 +28848,6 @@ export type operations = {
           untilDate?: number;
           /** @default false */
           allowPartial?: boolean;
-          /** @default true */
-          includeMyRenotes?: boolean;
-          /** @default true */
-          includeRenotedMyNotes?: boolean;
-          /** @default true */
-          includeLocalRenotes?: boolean;
           /** @default true */
           withRenotes?: boolean;
           /**

@@ -96,7 +96,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.noSuchChannel);
 			}
 
-			if (me) this.activeUsersChart.read(me);
+			if (me) {
+				process.nextTick(() => {
+					this.activeUsersChart.read(me);
+				});
+			}
 
 			if (!this.serverSettings.enableFanoutTimeline) {
 				return await this.noteEntityService.packMany(await this.getFromDb({ untilId, sinceId, limit: ps.limit, channelId: channel.id, withFiles: ps.withFiles, withRenotes: ps.withRenotes }, me), me);
@@ -133,8 +137,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			.innerJoinAndSelect('note.user', 'user')
 			.leftJoinAndSelect('note.reply', 'reply')
 			.leftJoinAndSelect('note.renote', 'renote')
-			.leftJoinAndSelect('reply.user', 'replyUser')
-			.leftJoinAndSelect('renote.user', 'renoteUser')
+			.leftJoinAndSelect('reply.user', 'replyUser', 'replyUser.id = note.replyUserId')
+			.leftJoinAndSelect('renote.user', 'renoteUser', 'renoteUser.id = note.renoteUserId')
 			.leftJoinAndSelect('note.channel', 'channel');
 
 		this.queryService.generateBlockedHostQueryForNote(query);
@@ -142,21 +146,16 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		if (me) {
 			this.queryService.generateMutedUserQueryForNotes(query, me);
 			this.queryService.generateBlockedUserQueryForNotes(query, me);
-			this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
-		}
-
-		if (ps.withRenotes === false) {
-			query.andWhere(new Brackets(qb => {
-				qb.orWhere('note.renoteId IS NULL');
-				qb.orWhere(new Brackets(qb => {
-					qb.orWhere('note.text IS NOT NULL');
-					qb.orWhere('note.fileIds != \'{}\'');
-				}));
-			}));
 		}
 
 		if (ps.withFiles) {
 			query.andWhere('note.fileIds != \'{}\'');
+		}
+
+		if (!ps.withRenotes) {
+			this.queryService.generateExcludedRenotesQueryForNotes(query);
+		} else if (me) {
+			this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
 		}
 		//#endregion
 

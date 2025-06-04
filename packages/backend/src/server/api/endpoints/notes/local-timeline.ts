@@ -103,13 +103,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					withFiles: ps.withFiles,
 					withReplies: ps.withReplies,
 					withBots: ps.withBots,
+					withRenotes: ps.withRenotes,
 				}, me);
 
-				process.nextTick(() => {
-					if (me) {
+				if (me) {
+					process.nextTick(() => {
 						this.activeUsersChart.read(me);
-					}
-				});
+					});
+				}
 
 				return await this.noteEntityService.packMany(timeline, me);
 			}
@@ -136,14 +137,15 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					withFiles: ps.withFiles,
 					withReplies: ps.withReplies,
 					withBots: ps.withBots,
+					withRenotes: ps.withRenotes,
 				}, me),
 			});
 
-			process.nextTick(() => {
-				if (me) {
+			if (me) {
+				process.nextTick(() => {
 					this.activeUsersChart.read(me);
-				}
-			});
+				});
+			}
 
 			return timeline;
 		});
@@ -156,24 +158,36 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		withFiles: boolean,
 		withReplies: boolean,
 		withBots: boolean,
+		withRenotes: boolean,
 	}, me: MiLocalUser | null) {
 		const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'),
 			ps.sinceId, ps.untilId)
-			.andWhere('(note.visibility = \'public\') AND (note.userHost IS NULL) AND (note.channelId IS NULL)')
+			.andWhere('note.visibility = \'public\'')
+			.andWhere('note.channelId IS NULL')
+			.andWhere('note.userHost IS NULL')
 			.innerJoinAndSelect('note.user', 'user')
 			.leftJoinAndSelect('note.reply', 'reply')
 			.leftJoinAndSelect('note.renote', 'renote')
-			.leftJoinAndSelect('reply.user', 'replyUser')
-			.leftJoinAndSelect('renote.user', 'renoteUser');
+			.leftJoinAndSelect('reply.user', 'replyUser', 'replyUser.id = note.replyUserId')
+			.leftJoinAndSelect('renote.user', 'renoteUser', 'renoteUser.id = note.renoteUserId');
 
-		this.queryService.generateVisibilityQuery(query, me);
 		this.queryService.generateBlockedHostQueryForNote(query);
-		if (me) this.queryService.generateMutedUserQueryForNotes(query, me);
-		if (me) this.queryService.generateBlockedUserQueryForNotes(query, me);
-		if (me) this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
+		this.queryService.generateSilencedUserQueryForNotes(query, me);
+		if (me) {
+			this.queryService.generateMutedUserQueryForNotes(query, me);
+			this.queryService.generateBlockedUserQueryForNotes(query, me);
+		}
 
 		if (ps.withFiles) {
 			query.andWhere('note.fileIds != \'{}\'');
+		}
+
+		if (!ps.withBots) query.andWhere('user.isBot = FALSE');
+
+		if (!ps.withRenotes) {
+			this.queryService.generateExcludedRenotesQueryForNotes(query);
+		} else if (me) {
+			this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
 		}
 
 		if (!ps.withReplies) {
@@ -187,8 +201,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					}));
 			}));
 		}
-
-		if (!ps.withBots) query.andWhere('user.isBot = FALSE');
 
 		return await query.limit(ps.limit).getMany();
 	}
