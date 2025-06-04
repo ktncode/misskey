@@ -118,7 +118,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<MkA v-if="appearNote.channel && !inChannel" :class="$style.channel" :to="`/channels/${appearNote.channel.id}`"><i class="ti ti-device-tv"></i> {{ appearNote.channel.name }}</MkA>
 		</div>
-		<footer :class="$style.footer">
+		<footer :class="$style.footer" class="_gaps _h_gaps">
 			<div :class="$style.noteFooterInfo">
 				<div v-if="appearNote.updatedAt">
 					{{ i18n.ts.edited }}: <MkTime :time="appearNote.updatedAt" mode="detail"/>
@@ -886,12 +886,12 @@ function animatedMFM() {
 }
 
 .footer {
-		position: relative;
-		z-index: 1;
-		margin-top: 0.4em;
-		width: max-content;
-		min-width: min-content;
-		max-width: fit-content;
+	position: relative;
+	z-index: 1;
+	margin-top: 0.4em;
+	width: max-content;
+	min-width: min-content;
+	max-width: fit-content;
 }
 
 .replyTo {
@@ -1083,10 +1083,6 @@ function animatedMFM() {
 	padding: 8px;
 	opacity: 0.7;
 
-	&:not(:last-child) {
-		margin-right: 1.5em;
-	}
-
 	&:hover {
 		color: var(--MI_THEME-fgHighlighted);
 	}
@@ -1169,14 +1165,6 @@ function animatedMFM() {
 	}
 }
 
-@container (max-width: 350px) {
-	.noteFooterButton {
-		&:not(:last-child) {
-			margin-right: 0.1em;
-		}
-	}
-}
-
 @container (max-width: 300px) {
 	.root {
 		font-size: 0.825em;
@@ -1185,12 +1173,6 @@ function animatedMFM() {
 	.noteHeaderAvatar {
 		width: 50px;
 		height: 50px;
-	}
-
-	.noteFooterButton {
-		&:not(:last-child) {
-			margin-right: 0.1em;
-		}
 	}
 }
 

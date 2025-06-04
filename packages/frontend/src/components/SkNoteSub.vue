@@ -28,7 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</div>
 			<MkReactionsViewer ref="reactionsViewer" :note="note"/>
-			<footer :class="$style.footer">
+			<footer :class="$style.footer" class="_gaps _h_gaps">
 				<button class="_button" :class="$style.noteFooterButton" @click="reply()">
 					<i class="ph-arrow-u-up-left ph-bold ph-lg"></i>
 					<p v-if="note.repliesCount > 0" :class="$style.noteFooterButtonCount">{{ note.repliesCount }}</p>
@@ -556,14 +556,6 @@ if (props.detail) {
 	.line {
 		top: calc(23px + var(--MI-avatar));
 		left: calc(25px + .5 * var(--MI-avatar));
-	}
-}
-
-@container (max-width: 400px) {
-	.noteFooterButton {
-		&:not(:last-child) {
-			margin-right: 0.7em;
-		}
 	}
 }
 
