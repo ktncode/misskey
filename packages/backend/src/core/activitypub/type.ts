@@ -75,24 +75,31 @@ export function getOneApId(value: ApObject): string {
 /**
  * Get ActivityStreams Object id
  */
-export function getApId(value: string | IObject | [string | IObject]): string {
-	// eslint-disable-next-line no-param-reassign
-	value = fromTuple(value);
+export function getApId(source: string | IObject | [string | IObject]): string {
+	const value = getNullableApId(source);
 
-	if (typeof value === 'string') return value;
-	if (typeof value.id === 'string') return value.id;
-	throw new IdentifiableError('ad2dc287-75c1-44c4-839d-3d2e64576675', `invalid AP object ${value}: missing id`);
+	if (value == null) {
+		throw new IdentifiableError('ad2dc287-75c1-44c4-839d-3d2e64576675', `invalid AP object ${value}: missing or invalid id`);
+	}
+
+	return value;
 }
 
 /**
  * Get ActivityStreams Object id, or null if not present
  */
-export function getNullableApId(value: string | IObject | [string | IObject]): string | null {
-	// eslint-disable-next-line no-param-reassign
-	value = fromTuple(value);
+export function getNullableApId(source: string | IObject | [string | IObject]): string | null {
+	const value: unknown = fromTuple(source);
 
-	if (typeof value === 'string') return value;
-	if (typeof value.id === 'string') return value.id;
+	if (value != null) {
+		if (typeof value === 'string') {
+			return value;
+		}
+		if (typeof (value) === 'object' && 'id' in value && typeof (value.id) === 'string') {
+			return value.id;
+		}
+	}
+
 	return null;
 }
 

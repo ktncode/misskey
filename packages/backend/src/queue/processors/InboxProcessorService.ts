@@ -125,6 +125,14 @@ export class InboxProcessorService implements OnApplicationShutdown {
 			return `Old keyId is no longer supported. ${keyIdLower}`;
 		}
 
+		if (activity.actor as unknown == null || (Array.isArray(activity.actor) && activity.actor.length < 1)) {
+			return 'skip: activity has no actor';
+		}
+		if (typeof(activity.actor) !== 'string' && typeof(activity.actor) !== 'object') {
+			return `skip: activity actor has invalid type: ${typeof(activity.actor)}`;
+		}
+		const actorId = getApId(activity.actor);
+
 		// HTTP-Signature keyIdを元にDBから取得
 		let authUser: {
 			user: MiRemoteUser;
@@ -134,26 +142,26 @@ export class InboxProcessorService implements OnApplicationShutdown {
 		// keyIdでわからなければ、activity.actorを元にDBから取得 || activity.actorを元にリモートから取得
 		if (authUser == null) {
 			try {
-				authUser = await this.apDbResolverService.getAuthUserFromApId(getApId(activity.actor));
+				authUser = await this.apDbResolverService.getAuthUserFromApId(actorId);
 			} catch (err) {
 				// 対象が4xxならスキップ
 				if (err instanceof StatusError) {
 					if (!err.isRetryable) {
-						throw new Bull.UnrecoverableError(`skip: Ignored deleted actors on both ends ${activity.actor} - ${err.statusCode}`);
+						throw new Bull.UnrecoverableError(`skip: Ignored deleted actors on both ends ${actorId} - ${err.statusCode}`);
 					}
-					throw new Error(`Error in actor ${activity.actor} - ${err.statusCode}`);
+					throw new Error(`Error in actor ${actorId} - ${err.statusCode}`);
 				}
 			}
 		}
 
 		// それでもわからなければ終了
 		if (authUser == null) {
-			throw new Bull.UnrecoverableError(`skip: failed to resolve user ${getApId(activity.actor)}`);
+			throw new Bull.UnrecoverableError(`skip: failed to resolve user ${actorId}`);
 		}
 
 		// publicKey がなくても終了
 		if (authUser.key == null) {
-			throw new Bull.UnrecoverableError(`skip: failed to resolve user publicKey ${getApId(activity.actor)}`);
+			throw new Bull.UnrecoverableError(`skip: failed to resolve user publicKey ${actorId}`);
 		}
 
 		// HTTP-Signatureの検証
@@ -168,7 +176,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 		}
 
 		// また、signatureのsignerは、activity.actorと一致する必要がある
-		if (!httpSignatureValidated || authUser.user.uri !== getApId(activity.actor)) {
+		if (!httpSignatureValidated || authUser.user.uri !== actorId) {
 			// 一致しなくても、でもLD-Signatureがありそうならそっちも見る
 			const ldSignature = activity.signature;
 			if (ldSignature) {
@@ -213,8 +221,8 @@ export class InboxProcessorService implements OnApplicationShutdown {
 				activity.signature = ldSignature;
 
 				// もう一度actorチェック
-				if (authUser.user.uri !== activity.actor) {
-					throw new Bull.UnrecoverableError(`skip: LD-Signature user(${authUser.user.uri}) !== activity.actor(${activity.actor})`);
+				if (authUser.user.uri !== actorId) {
+					throw new Bull.UnrecoverableError(`skip: LD-Signature user(${authUser.user.uri}) !== activity.actor(${actorId})`);
 				}
 
 				const ldHost = this.utilityService.extractDbHost(authUser.user.uri);
