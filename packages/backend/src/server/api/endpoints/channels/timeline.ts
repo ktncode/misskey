@@ -137,9 +137,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			.innerJoinAndSelect('note.user', 'user')
 			.leftJoinAndSelect('note.reply', 'reply')
 			.leftJoinAndSelect('note.renote', 'renote')
-			.leftJoinAndSelect('reply.user', 'replyUser')
 			.leftJoinAndSelect('reply.user', 'replyUser', 'replyUser.id = note.replyUserId')
-			.leftJoinAndSelect('renote.user', 'renoteUser', 'renoteUser.id = note.renoteUserId');
+			.leftJoinAndSelect('renote.user', 'renoteUser', 'renoteUser.id = note.renoteUserId')
+			.leftJoinAndSelect('note.channel', 'channel');
 
 		this.queryService.generateBlockedHostQueryForNote(query);
 		this.queryService.generateVisibilityQuery(query, me);
