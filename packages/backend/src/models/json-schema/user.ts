@@ -236,6 +236,14 @@ export const packedUserLiteSchema = {
 				},
 			},
 		},
+		attributionDomains: {
+			type: 'array',
+			nullable: false, optional: false,
+			items: {
+				type: 'string',
+				nullable: false, optional: false,
+			},
+		},
 	},
 } as const;
 

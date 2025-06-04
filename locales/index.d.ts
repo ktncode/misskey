@@ -13158,6 +13158,18 @@ export interface Locale extends ILocale {
      */
     "translationTimeoutCaption": string;
     /**
+     * Attribution Domains
+     */
+    "attributionDomains": string;
+    /**
+     * A list of domains whose content can be attributed to you on link previews, separated by new-line. Any subdomain will also be valid. The following needs to be on the webpage:
+     */
+    "attributionDomainsDescription": string;
+    /**
+     * Written by {user}
+     */
+    "writtenBy": ParameterizedString<"user">;
+    /**
      * Following (Pub)
      */
     "followingPub": string;

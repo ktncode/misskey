@@ -598,6 +598,10 @@ roleAutomatic: "automatic"
 translationTimeoutLabel: "Translation timeout"
 translationTimeoutCaption: "Timeout in milliseconds for translation API requests."
 
+attributionDomains: "Attribution Domains"
+attributionDomainsDescription: "A list of domains whose content can be attributed to you on link previews, separated by new-line. Any subdomain will also be valid. The following needs to be on the webpage:"
+writtenBy: "Written by {user}"
+
 followingPub: "Following (Pub)"
 followersSub: "Followers (Sub)"
 wellKnownResources: "Well-known resources"

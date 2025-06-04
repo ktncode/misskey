@@ -263,6 +263,9 @@ export const paramDef = {
 			enum: userUnsignedFetchOptions,
 			nullable: false,
 		},
+		attributionDomains: { type: 'array', items: {
+			type: 'string',
+		} },
 	},
 } as const;
 
@@ -373,6 +376,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 			if (ps.mutedInstances !== undefined) profileUpdates.mutedInstances = ps.mutedInstances;
 			if (ps.notificationRecieveConfig !== undefined) profileUpdates.notificationRecieveConfig = ps.notificationRecieveConfig;
+			if (ps.attributionDomains !== undefined) updates.attributionDomains = ps.attributionDomains;
 			if (typeof ps.isLocked === 'boolean') updates.isLocked = ps.isLocked;
 			if (typeof ps.isExplorable === 'boolean') updates.isExplorable = ps.isExplorable;
 			if (typeof ps.hideOnlineStatus === 'boolean') updates.hideOnlineStatus = ps.hideOnlineStatus;
@@ -663,7 +667,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	// these two methods need to be kept in sync with
 	// `ApRendererService.renderPerson`
 	private userNeedsPublishing(oldUser: MiLocalUser, newUser: Partial<MiUser>): boolean {
-		const basicFields: (keyof MiUser)[] = ['avatarId', 'bannerId', 'backgroundId', 'isBot', 'username', 'name', 'isLocked', 'isExplorable', 'isCat', 'noindex', 'speakAsCat', 'movedToUri', 'alsoKnownAs', 'hideOnlineStatus', 'enableRss', 'requireSigninToViewContents', 'makeNotesFollowersOnlyBefore', 'makeNotesHiddenBefore'];
+		const basicFields: (keyof MiUser)[] = ['avatarId', 'bannerId', 'backgroundId', 'isBot', 'username', 'name', 'isLocked', 'isExplorable', 'isCat', 'noindex', 'speakAsCat', 'movedToUri', 'alsoKnownAs', 'hideOnlineStatus', 'enableRss', 'requireSigninToViewContents', 'makeNotesFollowersOnlyBefore', 'makeNotesHiddenBefore', 'attributionDomains'];
 		for (const field of basicFields) {
 			if ((field in newUser) && oldUser[field] !== newUser[field]) {
 				return true;

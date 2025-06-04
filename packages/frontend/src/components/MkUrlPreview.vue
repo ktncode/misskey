@@ -65,6 +65,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</footer>
 		</article>
 	</component>
+
+	<I18n v-if="attributionUser" :src="i18n.ts.writtenBy" :class="$style.linkAttribution" tag="p">
+		<template #user>
+			<MkA v-user-preview="attributionUser.id" :to="userPage(attributionUser)">
+				<MkAvatar :class="$style.linkAttributionIcon" :user="attributionUser"/>
+				<MkUserName :user="attributionUser" style="color: var(--MI_THEME-accent)"/>
+			</MkA>
+		</template>
+	</I18n>
+	<p v-else-if="linkAttribution" :class="$style.linkAttribution"><MkEllipsis/></p>
+
 	<template v-if="showActions">
 		<div v-if="tweetId" :class="$style.action">
 			<MkButton :small="true" inline @click="tweetExpanded = true">
@@ -106,6 +117,7 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { warningExternalWebsite } from '@/utility/warning-external-website.js';
 import DynamicNoteSimple from '@/components/DynamicNoteSimple.vue';
 import { $i } from '@/i';
+import { userPage } from '@/filters/user.js';
 
 type SummalyResult = Awaited<ReturnType<typeof summaly>>;
 
@@ -146,6 +158,10 @@ const player = ref<SummalyResult['player']>({
 	height: null,
 	allow: [],
 });
+const linkAttribution = ref<{
+	userId: string,
+} | null>(null);
+const attributionUser = ref<Misskey.entities.User | null>(null);
 const playerEnabled = ref(false);
 const tweetId = ref<string | null>(null);
 const tweetExpanded = ref(props.detail);
@@ -221,7 +237,12 @@ function refresh(withFetch = false) {
 
 			return res.json();
 		})
-		.then(async (info: SummalyResult & { haveNoteLocally?: boolean } | null) => {
+		.then(async (info: SummalyResult & {
+			haveNoteLocally?: boolean,
+			linkAttribution?: {
+				userId: string,
+			}
+		} | null) => {
 			unknownUrl.value = info == null;
 			title.value = info?.title ?? null;
 			description.value = info?.description ?? null;
@@ -236,6 +257,16 @@ function refresh(withFetch = false) {
 			};
 			sensitive.value = info?.sensitive ?? false;
 			activityPub.value = info?.activityPub ?? null;
+			linkAttribution.value = info?.linkAttribution ?? null;
+			if (linkAttribution.value) {
+				try {
+					const response = await misskeyApi('users/show', { userId: linkAttribution.value.userId });
+					attributionUser.value = response;
+				} catch {
+					// makes the loading ellipsis vanish.
+					linkAttribution.value = null;
+				}
+			}
 
 			theNote.value = null;
 			if (info?.haveNoteLocally) {
@@ -393,6 +424,28 @@ refresh();
 	font-size: 0.8em;
 	line-height: 16px;
 	vertical-align: top;
+}
+
+.linkAttributionIcon {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin-left: 0.25em;
+	margin-right: 0.25em;
+	vertical-align: middle;
+	border-radius: 50%;
+	* {
+		border-radius: 4px;
+	}
+}
+
+.linkAttribution {
+	width: 100%;
+	font-size: 0.8em;
+	display: inline-block;
+	margin: auto;
+	padding-top: 0.5em;
+	text-align: right;
 }
 
 .action {
