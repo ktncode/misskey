@@ -14,6 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		:url="preview.url"
 		:previewHint="preview"
 		:noteHint="preview.note"
+		:attributionHint="preview.attributionUser"
 		:detail="detail"
 		:compact="compact"
 		:showAsQuote="showAsQuote"
@@ -29,7 +30,7 @@ import * as mfm from '@transfem-org/sfm-js';
 import { computed, ref, watch } from 'vue';
 import { versatileLang } from '@@/js/intl-const';
 import promiseLimit from 'promise-limit';
-import type { summaly } from '@misskey-dev/summaly';
+import type { SummalyResult } from '@/components/MkUrlPreview.vue';
 import { extractPreviewUrls } from '@/utility/extract-preview-urls';
 import { extractUrlFromMfm } from '@/utility/extract-url-from-mfm';
 import { $i } from '@/i';
@@ -37,10 +38,12 @@ import { misskeyApi } from '@/utility/misskey-api';
 import MkUrlPreview from '@/components/MkUrlPreview.vue';
 import { getNoteUrls } from '@/utility/getNoteUrls';
 
-type Summary = Awaited<ReturnType<typeof summaly>> & {
-	haveNoteLocally?: boolean;
+type Summary = SummalyResult & {
 	note?: Misskey.entities.Note | null;
+	attributionUser?: Misskey.entities.User | null;
 };
+
+type Limiter<T> = ReturnType<typeof promiseLimit<T>>;
 
 const props = withDefaults(defineProps<{
 	sourceUrls?: string[];
@@ -90,9 +93,11 @@ const urls = computed<string[]>(() => {
 	return [];
 });
 
+// todo un-ref these
 const isRefreshing = ref<Promise<void> | false>(false);
 const cachedNotes = ref(new Map<string, Misskey.entities.Note | null>());
 const cachedPreviews = ref(new Map<string, Summary | null>());
+const cachedUsers = new Map<string, Misskey.entities.User | null>();
 
 /**
  * Refreshes the group.
@@ -124,6 +129,7 @@ async function doRefresh(): Promise<void> {
 }
 
 async function fetchPreviews(): Promise<Summary[]> {
+	const userLimiter = promiseLimit<Misskey.entities.User | null>(4);
 	const noteLimiter = promiseLimit<Misskey.entities.Note | null>(2);
 	const summaryLimiter = promiseLimit<Summary | null>(5);
 
@@ -131,13 +137,11 @@ async function fetchPreviews(): Promise<Summary[]> {
 		summaryLimiter(async () => {
 			return await fetchPreview(url);
 		}).then(async (summary) => {
-			if (summary && props.showAsQuote && summary.activityPub && summary.haveNoteLocally) {
-				// Have to pull this out to make TS happy
-				const noteUri = summary.activityPub;
-
-				summary.note = await noteLimiter(async () => {
-					return await fetchNote(noteUri);
-				});
+			if (summary) {
+				await Promise.all([
+					attachNote(summary, noteLimiter),
+					attachAttribution(summary, userLimiter),
+				]);
 			}
 
 			return summary;
@@ -171,6 +175,17 @@ async function fetchPreview(url: string): Promise<Summary | null> {
 	return null;
 }
 
+async function attachNote(summary: Summary, noteLimiter: Limiter<Misskey.entities.Note | null>): Promise<void> {
+	if (props.showAsQuote && summary.activityPub && summary.haveNoteLocally) {
+		// Have to pull this out to make TS happy
+		const noteUri = summary.activityPub;
+
+		summary.note = await noteLimiter(async () => {
+			return await fetchNote(noteUri);
+		});
+	}
+}
+
 async function fetchNote(noteUri: string): Promise<Misskey.entities.Note | null> {
 	const cached = cachedNotes.value.get(noteUri);
 	if (cached) {
@@ -192,6 +207,29 @@ async function fetchNote(noteUri: string): Promise<Misskey.entities.Note | null>
 	// Failed, blocked, or not found
 	cachedNotes.value.set(noteUri, null);
 	return null;
+}
+
+async function attachAttribution(summary: Summary, userLimiter: Limiter<Misskey.entities.User | null>): Promise<void> {
+	if (summary.linkAttribution) {
+		// Have to pull this out to make TS happy
+		const userId = summary.linkAttribution.userId;
+
+		summary.attributionUser = await userLimiter(async () => {
+			return await fetchUser(userId);
+		});
+	}
+}
+
+async function fetchUser(userId: string): Promise<Misskey.entities.User | null> {
+	const cached = cachedUsers.get(userId);
+	if (cached) {
+		return cached;
+	}
+
+	const user = await misskeyApi('users/show', { userId }).catch(() => null);
+
+	cachedUsers.set(userId, user);
+	return user;
 }
 
 function deduplicatePreviews(previews: Summary[]): Summary[] {

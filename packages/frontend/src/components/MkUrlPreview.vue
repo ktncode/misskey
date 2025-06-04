@@ -99,13 +99,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 </div>
 </template>
 
+<script lang="ts">
+// eslint-disable-next-line import/order
+import type { summaly } from '@misskey-dev/summaly';
+
+export type SummalyResult = Awaited<ReturnType<typeof summaly>> & {
+	haveNoteLocally?: boolean,
+	linkAttribution?: {
+		userId: string,
+	}
+};
+</script>
+
 <script lang="ts" setup>
 import { defineAsyncComponent, onDeactivated, onUnmounted, ref } from 'vue';
 import { url as local } from '@@/js/config.js';
 import { versatileLang } from '@@/js/intl-const.js';
 import * as Misskey from 'misskey-js';
 import { maybeMakeRelative } from '@@/js/url.js';
-import type { summaly } from '@misskey-dev/summaly';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { deviceKind } from '@/utility/device-kind.js';
@@ -119,13 +130,6 @@ import DynamicNoteSimple from '@/components/DynamicNoteSimple.vue';
 import { $i } from '@/i';
 import { userPage } from '@/filters/user.js';
 
-type SummalyResult = Awaited<ReturnType<typeof summaly>> & {
-	haveNoteLocally?: boolean,
-	linkAttribution?: {
-		userId: string,
-	}
-};
-
 const props = withDefaults(defineProps<{
 	url: string;
 	detail?: boolean;
@@ -135,6 +139,7 @@ const props = withDefaults(defineProps<{
 	skipNoteIds?: (string | undefined)[];
 	previewHint?: SummalyResult;
 	noteHint?: Misskey.entities.Note | null;
+	attributionHint?: Misskey.entities.User | null;
 }>(), {
 	detail: false,
 	compact: false,
@@ -143,6 +148,7 @@ const props = withDefaults(defineProps<{
 	skipNoteIds: undefined,
 	previewHint: undefined,
 	noteHint: undefined,
+	attributionHint: undefined,
 });
 
 const MOBILE_THRESHOLD = 500;
@@ -179,10 +185,33 @@ const tweetHeight = ref(150);
 const unknownUrl = ref(false);
 const theNote = ref<Misskey.entities.Note | null>(null);
 const fetchingTheNote = ref(false);
+const fetchingAttribution = ref<Promise<void> | null>(null);
 
 onDeactivated(() => {
 	playerEnabled.value = false;
 });
+
+async function fetchAttribution(initial: boolean): Promise<void> {
+	if (!linkAttribution.value) return;
+	if (attributionUser.value) return;
+	if (fetchingAttribution.value) return fetchingAttribution.value;
+
+	return fetchingAttribution.value ??= (async (userId: string): Promise<void> => {
+		try {
+			if (initial && props.attributionHint !== undefined) {
+				attributionUser.value = props.attributionHint;
+			} else {
+				attributionUser.value = await misskeyApi('users/show', { userId });
+			}
+		} catch {
+			// makes the loading ellipsis vanish.
+			linkAttribution.value = null;
+		} finally {
+			// Reset promise to mark as done
+			fetchingAttribution.value = null;
+		}
+	})(linkAttribution.value.userId);
+}
 
 async function fetchNote(initial: boolean) {
 	if (!props.showAsQuote) return;
@@ -275,20 +304,15 @@ function refresh(withFetch = false, initial = false) {
 			sensitive.value = info?.sensitive ?? false;
 			activityPub.value = info?.activityPub ?? null;
 			linkAttribution.value = info?.linkAttribution ?? null;
-			if (linkAttribution.value) {
-				try {
-					const response = await misskeyApi('users/show', { userId: linkAttribution.value.userId });
-					attributionUser.value = response;
-				} catch {
-					// makes the loading ellipsis vanish.
-					linkAttribution.value = null;
-				}
-			}
 
+			// These will be populated by the fetch* functions
+			attributionUser.value = null;
 			theNote.value = null;
-			if (info?.haveNoteLocally) {
-				await fetchNote(initial);
-			}
+
+			await Promise.all([
+				fetchAttribution(initial),
+				fetchNote(initial),
+			]);
 		})
 		.finally(() => {
 			fetching.value = null;
