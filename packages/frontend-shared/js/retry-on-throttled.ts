@@ -18,7 +18,7 @@ export async function retryOnThrottled<T>(f: () => Promise<T>, retryCount = 5): 
 	  return await f();
 	} catch (err: any) {
 	  // RATE_LIMIT_EXCEEDED
-	  if (err?.id === 'd5826d14-3982-4d2e-8011-b9e9f02499ef') {
+	  if (typeof err === 'object' && err?.id === 'd5826d14-3982-4d2e-8011-b9e9f02499ef') {
 		lastError = err;
 		await sleep(err?.info?.fullResetMs ?? 1000);
 	  } else {
