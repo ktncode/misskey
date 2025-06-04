@@ -13217,6 +13217,22 @@ export interface Locale extends ILocale {
      * Hibernated
      */
     "hibernated": string;
+    /**
+     * When replying to a post with a Content Warning, automatically use the same CW for the reply.
+     */
+    "keepCwDescription": string;
+    /**
+     * Disabled (do not keep CWs)
+     */
+    "keepCwDisabled": string;
+    /**
+     * Enabled (copy CWs verbatim)
+     */
+    "keepCwEnabled": string;
+    /**
+     * Enabled (copy CW and prepend "RE:", like email)
+     */
+    "keepCwPrependRe": string;
 }
 declare const locales: {
     [lang: string]: Locale;
