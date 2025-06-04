@@ -13222,7 +13222,7 @@ export interface Locale extends ILocale {
      */
     "keepCwDescription": string;
     /**
-     * Disabled (do not keep CWs)
+     * Disabled (do not copy CWs)
      */
     "keepCwDisabled": string;
     /**
@@ -13230,7 +13230,7 @@ export interface Locale extends ILocale {
      */
     "keepCwEnabled": string;
     /**
-     * Enabled (copy CW and prepend "RE:", like email)
+     * Enabled (copy CW and prepend "RE:")
      */
     "keepCwPrependRe": string;
 }

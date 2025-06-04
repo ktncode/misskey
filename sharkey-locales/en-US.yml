@@ -616,6 +616,6 @@ notVerified: "Not Verified"
 hibernated: "Hibernated"
 
 keepCwDescription: "When replying to a post with a Content Warning, automatically use the same CW for the reply."
-keepCwDisabled: "Disabled (do not keep CWs)"
+keepCwDisabled: "Disabled (do not copy CWs)"
 keepCwEnabled: "Enabled (copy CWs verbatim)"
-keepCwPrependRe: "Enabled (copy CW and prepend \"RE:\", like email)"
+keepCwPrependRe: "Enabled (copy CW and prepend \"RE:\")"
