@@ -13233,6 +13233,10 @@ export interface Locale extends ILocale {
      * Enabled (copy CW and prepend "RE:")
      */
     "keepCwPrependRe": string;
+    /**
+     * Note controls
+     */
+    "noteFooterLabel": string;
 }
 declare const locales: {
     [lang: string]: Locale;

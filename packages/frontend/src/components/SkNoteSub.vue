@@ -28,7 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</div>
 			<MkReactionsViewer ref="reactionsViewer" :note="note"/>
-			<footer :class="$style.footer" class="_gaps _h_gaps">
+			<footer :class="$style.footer" class="_gaps _h_gaps" tabindex="0" role="group" :aria-label="i18n.ts.noteFooterLabel">
 				<button class="_button" :class="$style.noteFooterButton" @click="reply()">
 					<i class="ph-arrow-u-up-left ph-bold ph-lg"></i>
 					<p v-if="note.repliesCount > 0" :class="$style.noteFooterButtonCount">{{ note.repliesCount }}</p>
@@ -449,11 +449,11 @@ if (props.detail) {
 .footer {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: flex-start;
 	position: relative;
 	z-index: 1;
 	margin-top: 0.4em;
-	max-width: 400px;
+	overflow-x: auto;
 }
 
 .main {

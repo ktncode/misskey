@@ -118,7 +118,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<MkA v-if="appearNote.channel && !inChannel" :class="$style.channel" :to="`/channels/${appearNote.channel.id}`"><i class="ti ti-device-tv"></i> {{ appearNote.channel.name }}</MkA>
 		</div>
-		<footer :class="$style.footer" class="_gaps _h_gaps">
+		<footer :class="$style.footer" class="_gaps _h_gaps" tabindex="0" role="group" :aria-label="i18n.ts.noteFooterLabel">
 			<div :class="$style.noteFooterInfo">
 				<div v-if="appearNote.updatedAt">
 					{{ i18n.ts.edited }}: <MkTime :time="appearNote.updatedAt" mode="detail"/>
@@ -889,9 +889,7 @@ function animatedMFM() {
 	position: relative;
 	z-index: 1;
 	margin-top: 0.4em;
-	width: max-content;
-	min-width: min-content;
-	max-width: fit-content;
+	overflow-x: auto;
 }
 
 .replyTo {

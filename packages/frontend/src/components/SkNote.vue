@@ -114,7 +114,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkA :to="`/notes/${appearNote.id}/reactions`" :class="[$style.reactionOmitted]">{{ i18n.ts.more }}</MkA>
 				</template>
 			</MkReactionsViewer>
-			<footer :class="$style.footer" class="_gaps _h_gaps">
+			<footer :class="$style.footer" class="_gaps _h_gaps" tabindex="0" role="group" :aria-label="i18n.ts.noteFooterLabel">
 				<button :class="$style.footerButton" class="_button" @click.stop @click="reply()">
 					<i class="ti ti-arrow-back-up"></i>
 					<p v-if="appearNote.repliesCount > 0" :class="$style.footerButtonCount">{{ number(appearNote.repliesCount) }}</p>
@@ -921,11 +921,11 @@ function emitUpdReaction(emoji: string, delta: number) {
 	.footer {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: flex-start;
 		position: relative;
 		z-index: 1;
 		margin-top: 0.4em;
-		max-width: 400px;
+		overflow-x: auto;
 	}
 
 	&:hover > .article > .main > .footer > .footerButton {

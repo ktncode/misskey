@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkSubNoteContent :class="$style.text" :note="note" :translating="translating" :translation="translation" :expandAllCws="props.expandAllCws"/>
 				</div>
 			</div>
-			<footer :class="$style.footer" class="_gaps _h_gaps">
+			<footer :class="$style.footer" class="_gaps _h_gaps" tabindex="0" role="group" :aria-label="i18n.ts.noteFooterLabel">
 				<MkReactionsViewer ref="reactionsViewer" :note="note"/>
 				<button class="_button" :class="$style.noteFooterButton" @click="reply()">
 					<i class="ph-arrow-u-up-left ph-bold ph-lg"></i>
@@ -422,9 +422,7 @@ if (props.detail) {
 	position: relative;
 	z-index: 1;
 	margin-top: 0.4em;
-	width: max-content;
-	min-width: min-content;
-	max-width: fit-content;
+	overflow-x: auto;
 }
 
 .main {

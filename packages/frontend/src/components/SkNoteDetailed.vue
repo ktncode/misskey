@@ -132,7 +132,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkA>
 		</div>
 		<MkReactionsViewer v-if="appearNote.reactionAcceptance !== 'likeOnly'" ref="reactionsViewer" style="margin-top: 6px;" :note="appearNote"/>
-		<footer :class="$style.footer" class="_gaps _h_gaps">
+		<footer :class="$style.footer" class="_gaps _h_gaps" tabindex="0" role="group" :aria-label="i18n.ts.noteFooterLabel">
 			<button class="_button" :class="$style.noteFooterButton" @click="reply()">
 				<i class="ti ti-arrow-back-up"></i>
 				<p v-if="appearNote.repliesCount > 0" :class="$style.noteFooterButtonCount">{{ number(appearNote.repliesCount) }}</p>
@@ -918,13 +918,13 @@ onUnmounted(() => {
 }
 
 .footer {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		position: relative;
-		z-index: 1;
-		margin-top: 0.4em;
-		max-width: 400px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	position: relative;
+	z-index: 1;
+	margin-top: 0.4em;
+	overflow-x: auto;
 }
 
 .replyTo {

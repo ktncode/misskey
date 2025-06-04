@@ -52,7 +52,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<MkA v-if="appearNote.channel && !inChannel" :class="$style.channel" :to="`/channels/${appearNote.channel.id}`"><i class="ph-television ph-bold ph-lg"></i> {{ appearNote.channel.name }}</MkA>
 			</div>
-			<footer :class="$style.footer" class="_gaps _h_gaps">
+			<footer :class="$style.footer" class="_gaps _h_gaps" tabindex="0" role="group" :aria-label="i18n.ts.noteFooterLabel">
 				<div :class="$style.noteFooterInfo">
 					<MkTime :time="appearNote.createdAt" mode="detail"/>
 				</div>
@@ -163,11 +163,12 @@ const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceT
 }
 
 .footer {
-		position: relative;
-		z-index: 1;
-		margin-top: 0.4em;
-		width: max-content;
-		min-width: max-content;
+	position: relative;
+	z-index: 1;
+	margin-top: 0.4em;
+	width: max-content;
+	min-width: max-content;
+	overflow-x: auto;
 }
 
 .note {
