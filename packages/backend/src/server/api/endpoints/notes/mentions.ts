@@ -64,9 +64,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'),
 				ps.sinceId, ps.untilId)
 				.andWhere(new Brackets(qb => qb
-					.orWhere(':meId = ANY (note.mentions)')
-					.orWhere(':meId = ANY (note.visibleUserIds)')))
-				.setParameters({ meId: me.id })
+					.where(':meIdAsList <@ note.mentions')
+					.orWhere(':meIdAsList <@ note.visibleUserIds')))
+				.setParameters({ meIdAsList: [me.id] })
 				// Avoid scanning primary key index
 				.orderBy('CONCAT(note.id)', 'DESC')
 				.innerJoinAndSelect('note.user', 'user')
@@ -80,7 +80,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			this.queryService.generateMutedUserQueryForNotes(query, me);
 			this.queryService.generateMutedNoteThreadQuery(query, me);
 			this.queryService.generateBlockedUserQueryForNotes(query, me);
-			this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
+			// A renote can't mention a user, so it will never appear here anyway.
+			//this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
 
 			if (ps.visibility) {
 				query.andWhere('note.visibility = :visibility', { visibility: ps.visibility });
