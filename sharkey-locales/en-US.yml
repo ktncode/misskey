@@ -622,3 +622,5 @@ keepCwDescription: "When replying to a post with a Content Warning, automaticall
 keepCwDisabled: "Disabled (do not copy CWs)"
 keepCwEnabled: "Enabled (copy CWs verbatim)"
 keepCwPrependRe: "Enabled (copy CW and prepend \"RE:\")"
+
+noteFooterLabel: "Note controls"
