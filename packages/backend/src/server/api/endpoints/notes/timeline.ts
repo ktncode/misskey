@@ -142,11 +142,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	private async getFromDb(ps: { untilId: string | null; sinceId: string | null; limit: number; withFiles: boolean; withRenotes: boolean; withBots: boolean; }, me: MiLocalUser) {
 		//#region Construct query
 		const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId)
-			.innerJoinAndSelect('note.user', 'user')
-			.leftJoinAndSelect('note.reply', 'reply')
-			.leftJoinAndSelect('note.renote', 'renote')
-			.leftJoinAndSelect('reply.user', 'replyUser')
-			.leftJoinAndSelect('renote.user', 'renoteUser')
 			// 1. in a channel I follow, 2. my own post, 3. by a user I follow
 			.andWhere(new Brackets(qb => this.queryService
 				.orFollowingChannel(qb, ':meId', 'note.channelId')
@@ -160,10 +155,16 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.orWhere('note.replyId IS NULL') // 返信ではない
 				.orWhere('note.replyUserId = note.userId')))
 			.setParameters({ meId: me.id })
+			.innerJoinAndSelect('note.user', 'user')
+			.leftJoinAndSelect('note.reply', 'reply')
+			.leftJoinAndSelect('note.renote', 'renote')
+			.leftJoinAndSelect('reply.user', 'replyUser')
+			.leftJoinAndSelect('renote.user', 'renoteUser')
 			.limit(ps.limit);
 
 		this.queryService.generateVisibilityQuery(query, me);
 		this.queryService.generateBlockedHostQueryForNote(query);
+		this.queryService.generateSilencedUserQueryForNotes(query, me);
 		this.queryService.generateMutedUserQueryForNotes(query, me);
 		this.queryService.generateBlockedUserQueryForNotes(query, me);
 

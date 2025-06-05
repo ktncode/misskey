@@ -87,7 +87,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const query = this.notesRepository
 				.createQueryBuilder('note')
-				.setParameter('me', me.id)
+				.setParameters({ meId: me.id })
 
 				// Limit to latest notes
 				.innerJoin(
@@ -130,8 +130,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.innerJoinAndSelect('note.user', 'user')
 				.leftJoinAndSelect('note.reply', 'reply')
 				.leftJoinAndSelect('note.renote', 'renote')
-				.leftJoinAndSelect('reply.user', 'replyUser', 'replyUser.id = note.replyUserId')
-				.leftJoinAndSelect('renote.user', 'renoteUser', 'renoteUser.id = note.renoteUserId')
+				.leftJoinAndSelect('reply.user', 'replyUser')
+				.leftJoinAndSelect('renote.user', 'renoteUser')
 
 				// Exclude channel notes
 				.andWhere({ channelId: IsNull() })
@@ -177,14 +177,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
  * Limit to followers (they follow us)
  */
 function addFollower<T extends SelectQueryBuilder<ObjectLiteral>>(query: T): T {
-	return query.innerJoin(MiFollowing, 'follower', 'follower."followerId" = latest.user_id AND follower."followeeId" = :me');
+	return query.innerJoin(MiFollowing, 'follower', 'follower."followerId" = latest.user_id AND follower."followeeId" = :meId');
 }
 
 /**
  * Limit to followees (we follow them)
  */
 function addFollowee<T extends SelectQueryBuilder<ObjectLiteral>>(query: T): T {
-	return query.innerJoin(MiFollowing, 'followee', 'followee."followerId" = :me AND followee."followeeId" = latest.user_id');
+	return query.innerJoin(MiFollowing, 'followee', 'followee."followerId" = :meId AND followee."followeeId" = latest.user_id');
 }
 
 /**

@@ -197,51 +197,32 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		withBots: boolean,
 		withRenotes: boolean,
 	}, me: MiLocalUser) {
-		const followees = await this.userFollowingService.getFollowees(me.id);
-		const followingChannels = await this.channelFollowingsRepository.find({
-			where: {
-				followerId: me.id,
-			},
-		});
-
 		const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId)
-			.andWhere(new Brackets(qb => {
-				if (followees.length > 0) {
-					const meOrFolloweeIds = [me.id, ...followees.map(f => f.followeeId)];
-					qb.where('note.userId IN (:...meOrFolloweeIds)', { meOrFolloweeIds: meOrFolloweeIds });
-					qb.orWhere('(note.visibility = \'public\') AND (note.userHost IS NULL)');
-				} else {
-					qb.where('note.userId = :meId', { meId: me.id });
-					qb.orWhere('(note.visibility = \'public\') AND (note.userHost IS NULL)');
-				}
-			}))
+			// 1. by a user I follow, 2. a public local post, 3. my own post
+			.andWhere(new Brackets(qb => this.queryService
+				.orFollowingUser(qb, ':meId', 'note.userId')
+				.orWhere(new Brackets(qbb => qbb
+					.andWhere('note.visibility = \'public\'')
+					.andWhere('note.userHost IS NULL')))
+				.orWhere(':meId = note.userId')))
+			// 1. in a channel I follow, 2. not in a channel
+			.andWhere(new Brackets(qb => this.queryService
+				.orFollowingChannel(qb, ':meId', 'note.channelId')
+				.orWhere('note.channelId IS NULL')))
+			.setParameters({ meId: me.id })
 			.innerJoinAndSelect('note.user', 'user')
 			.leftJoinAndSelect('note.reply', 'reply')
 			.leftJoinAndSelect('note.renote', 'renote')
-			.leftJoinAndSelect('reply.user', 'replyUser', 'replyUser.id = note.replyUserId')
-			.leftJoinAndSelect('renote.user', 'renoteUser', 'renoteUser.id = note.renoteUserId');
-
-		if (followingChannels.length > 0) {
-			const followingChannelIds = followingChannels.map(x => x.followeeId);
-
-			query.andWhere(new Brackets(qb => {
-				qb.where('note.channelId IN (:...followingChannelIds)', { followingChannelIds });
-				qb.orWhere('note.channelId IS NULL');
-			}));
-		} else {
-			query.andWhere('note.channelId IS NULL');
-		}
+			.leftJoinAndSelect('reply.user', 'replyUser')
+			.leftJoinAndSelect('renote.user', 'renoteUser')
+			.limit(ps.limit);
 
 		if (!ps.withReplies) {
-			query.andWhere(new Brackets(qb => {
-				qb
-					.where('note.replyId IS NULL') // 返信ではない
-					.orWhere(new Brackets(qb => {
-						qb // 返信だけど投稿者自身への返信
-							.where('note.replyId IS NOT NULL')
-							.andWhere('note.replyUserId = note.userId');
-					}));
-			}));
+			query
+				// 1. Not a reply, 2. a self-reply
+				.andWhere(new Brackets(qb => qb
+					.orWhere('note.replyId IS NULL') // 返信ではない
+					.orWhere('note.replyUserId = note.userId')));
 		}
 
 		this.queryService.generateVisibilityQuery(query, me);
@@ -263,6 +244,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		}
 		//#endregion
 
-		return await query.limit(ps.limit).getMany();
+		return await query.getMany();
 	}
 }

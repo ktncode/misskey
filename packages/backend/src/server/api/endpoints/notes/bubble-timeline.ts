@@ -82,8 +82,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.innerJoinAndSelect('note.user', 'user')
 				.leftJoinAndSelect('note.reply', 'reply')
 				.leftJoinAndSelect('note.renote', 'renote')
-				.leftJoinAndSelect('reply.user', 'replyUser', 'replyUser.id = note.replyUserId')
-				.leftJoinAndSelect('renote.user', 'renoteUser', 'renoteUser.id = note.renoteUserId');
+				.leftJoinAndSelect('reply.user', 'replyUser')
+				.leftJoinAndSelect('renote.user', 'renoteUser')
+				.limit(ps.limit);
 
 			// This subquery mess teaches postgres how to use the right indexes.
 			// Using WHERE or ON conditions causes a fallback to full sequence scan, which times out.
@@ -114,7 +115,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 			//#endregion
 
-			const timeline = await query.limit(ps.limit).getMany();
+			const timeline = await query.getMany();
 
 			if (me) {
 				process.nextTick(() => {
