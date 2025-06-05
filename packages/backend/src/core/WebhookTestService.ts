@@ -77,6 +77,7 @@ function generateDummyUser(override?: Partial<MiUser>): MiUser {
 		mandatoryCW: null,
 		rejectQuotes: false,
 		allowUnsignedFetch: 'staff',
+		userProfile: null,
 		attributionDomains: [],
 		...override,
 	};
@@ -363,8 +364,10 @@ export class WebhookTestService {
 			id: 'dummy-abuse-report1',
 			targetUserId: 'dummy-target-user',
 			targetUser: null,
+			targetUserInstance: null,
 			reporterId: 'dummy-reporter-user',
 			reporter: null,
+			reporterInstance: null,
 			assigneeId: null,
 			assignee: null,
 			resolved: false,

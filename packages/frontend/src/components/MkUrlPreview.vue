@@ -99,13 +99,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 </div>
 </template>
 
+<script lang="ts">
+// eslint-disable-next-line import/order
+import type { summaly } from '@misskey-dev/summaly';
+
+export type SummalyResult = Awaited<ReturnType<typeof summaly>> & {
+	haveNoteLocally?: boolean,
+	linkAttribution?: {
+		userId: string,
+	}
+};
+</script>
+
 <script lang="ts" setup>
 import { defineAsyncComponent, onDeactivated, onUnmounted, ref } from 'vue';
 import { url as local } from '@@/js/config.js';
 import { versatileLang } from '@@/js/intl-const.js';
 import * as Misskey from 'misskey-js';
 import { maybeMakeRelative } from '@@/js/url.js';
-import type { summaly } from '@misskey-dev/summaly';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { deviceKind } from '@/utility/device-kind.js';
@@ -119,8 +130,6 @@ import DynamicNoteSimple from '@/components/DynamicNoteSimple.vue';
 import { $i } from '@/i';
 import { userPage } from '@/filters/user.js';
 
-type SummalyResult = Awaited<ReturnType<typeof summaly>>;
-
 const props = withDefaults(defineProps<{
 	url: string;
 	detail?: boolean;
@@ -128,12 +137,18 @@ const props = withDefaults(defineProps<{
 	showAsQuote?: boolean;
 	showActions?: boolean;
 	skipNoteIds?: (string | undefined)[];
+	previewHint?: SummalyResult;
+	noteHint?: Misskey.entities.Note | null;
+	attributionHint?: Misskey.entities.User | null;
 }>(), {
 	detail: false,
 	compact: false,
 	showAsQuote: false,
 	showActions: true,
 	skipNoteIds: undefined,
+	previewHint: undefined,
+	noteHint: undefined,
+	attributionHint: undefined,
 });
 
 const MOBILE_THRESHOLD = 500;
@@ -170,12 +185,35 @@ const tweetHeight = ref(150);
 const unknownUrl = ref(false);
 const theNote = ref<Misskey.entities.Note | null>(null);
 const fetchingTheNote = ref(false);
+const fetchingAttribution = ref<Promise<void> | null>(null);
 
 onDeactivated(() => {
 	playerEnabled.value = false;
 });
 
-async function fetchNote() {
+async function fetchAttribution(initial: boolean): Promise<void> {
+	if (!linkAttribution.value) return;
+	if (attributionUser.value) return;
+	if (fetchingAttribution.value) return fetchingAttribution.value;
+
+	return fetchingAttribution.value ??= (async (userId: string): Promise<void> => {
+		try {
+			if (initial && props.attributionHint !== undefined) {
+				attributionUser.value = props.attributionHint;
+			} else {
+				attributionUser.value = await misskeyApi('users/show', { userId });
+			}
+		} catch {
+			// makes the loading ellipsis vanish.
+			linkAttribution.value = null;
+		} finally {
+			// Reset promise to mark as done
+			fetchingAttribution.value = null;
+		}
+	})(linkAttribution.value.userId);
+}
+
+async function fetchNote(initial: boolean) {
 	if (!props.showAsQuote) return;
 	if (!activityPub.value) return;
 	if (theNote.value) return;
@@ -183,8 +221,15 @@ async function fetchNote() {
 
 	fetchingTheNote.value = true;
 	try {
-		const response = await misskeyApi('ap/show', { uri: activityPub.value });
+		const response = (initial && props.noteHint !== undefined)
+			? { type: 'Note', object: props.noteHint }
+			: await misskeyApi('ap/show', { uri: activityPub.value });
 		if (response.type !== 'Note') return;
+		if (!response.object) {
+			activityPub.value = null;
+			theNote.value = null;
+			return;
+		}
 		const theNoteId = response['object'].id;
 		if (theNoteId && props.skipNoteIds && props.skipNoteIds.includes(theNoteId)) {
 			hidePreview.value = true;
@@ -210,13 +255,16 @@ if (requestUrl.hostname === 'twitter.com' || requestUrl.hostname === 'mobile.twi
 	if (m) tweetId.value = m[1];
 }
 
+// This is now handled on the backend
+/*
 if (requestUrl.hostname === 'music.youtube.com' && requestUrl.pathname.match('^/(?:watch|channel)')) {
 	requestUrl.hostname = 'www.youtube.com';
 }
 
 requestUrl.hash = '';
+*/
 
-function refresh(withFetch = false) {
+function refresh(withFetch = false, initial = false) {
 	const params = new URLSearchParams({
 		url: requestUrl.href,
 		lang: versatileLang,
@@ -226,23 +274,21 @@ function refresh(withFetch = false) {
 	}
 
 	const headers = $i ? { Authorization: `Bearer ${$i.token}` } : undefined;
-	return fetching.value ??= window.fetch(`/url?${params.toString()}`, { headers })
-		.then(res => {
-			if (!res.ok) {
-				if (_DEV_) {
-					console.warn(`[HTTP${res.status}] Failed to fetch url preview`);
+	const fetchPromise: Promise<SummalyResult | null> = (initial && props.previewHint)
+		? Promise.resolve(props.previewHint)
+		: window.fetch(`/url?${params.toString()}`, { headers })
+			.then(res => {
+				if (!res.ok) {
+					if (_DEV_) {
+						console.warn(`[HTTP${res.status}] Failed to fetch url preview`);
+					}
+					return null;
 				}
-				return null;
-			}
 
-			return res.json();
-		})
-		.then(async (info: SummalyResult & {
-			haveNoteLocally?: boolean,
-			linkAttribution?: {
-				userId: string,
-			}
-		} | null) => {
+				return res.json();
+			});
+	return fetching.value ??= fetchPromise
+		.then(async (info: SummalyResult | null) => {
 			unknownUrl.value = info == null;
 			title.value = info?.title ?? null;
 			description.value = info?.description ?? null;
@@ -258,20 +304,15 @@ function refresh(withFetch = false) {
 			sensitive.value = info?.sensitive ?? false;
 			activityPub.value = info?.activityPub ?? null;
 			linkAttribution.value = info?.linkAttribution ?? null;
-			if (linkAttribution.value) {
-				try {
-					const response = await misskeyApi('users/show', { userId: linkAttribution.value.userId });
-					attributionUser.value = response;
-				} catch {
-					// makes the loading ellipsis vanish.
-					linkAttribution.value = null;
-				}
-			}
 
+			// These will be populated by the fetch* functions
+			attributionUser.value = null;
 			theNote.value = null;
-			if (info?.haveNoteLocally) {
-				await fetchNote();
-			}
+
+			await Promise.all([
+				fetchAttribution(initial),
+				fetchNote(initial),
+			]);
 		})
 		.finally(() => {
 			fetching.value = null;
@@ -304,7 +345,7 @@ onUnmounted(() => {
 });
 
 // Load initial data
-refresh();
+refresh(false, true);
 </script>
 
 <style lang="scss" module>
@@ -388,7 +429,7 @@ refresh();
 .body {
 	position: relative;
 	box-sizing: border-box;
-	padding: 16px;
+	padding: 16px !important; // Unfortunately needed to win a specificity race with MkNoteSimple / SkNoteSimple
 }
 
 .header {

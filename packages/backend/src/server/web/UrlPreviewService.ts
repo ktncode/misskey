@@ -123,18 +123,6 @@ export class UrlPreviewService {
 		request: FastifyRequest<PreviewRoute>,
 		reply: FastifyReply,
 	): Promise<void> {
-		const url = request.query.url;
-		if (typeof url !== 'string' || !URL.canParse(url)) {
-			reply.code(400);
-			return;
-		}
-
-		const lang = request.query.lang;
-		if (Array.isArray(lang)) {
-			reply.code(400);
-			return;
-		}
-
 		if (!this.meta.urlPreviewEnabled) {
 			return reply.code(403).send({
 				error: {
@@ -145,13 +133,44 @@ export class UrlPreviewService {
 			});
 		}
 
+		const url = request.query.url;
+		if (typeof url !== 'string' || !URL.canParse(url)) {
+			reply.code(400);
+			return;
+		}
+
+		// Enforce HTTP(S) for input URLs
+		const urlScheme = this.utilityService.getUrlScheme(url);
+		if (urlScheme !== 'http:' && urlScheme !== 'https:') {
+			reply.code(400);
+			return;
+		}
+
+		const lang = request.query.lang;
+		if (Array.isArray(lang)) {
+			reply.code(400);
+			return;
+		}
+
+		// Strip out hash (anchor)
+		const urlObj = new URL(url);
+		if (urlObj.hash) {
+			urlObj.hash = '';
+			const params = new URLSearchParams({ url: urlObj.href });
+			if (lang) params.set('lang', lang);
+			const newUrl = `/url?${params.toString()}`;
+
+			reply.redirect(newUrl, 301);
+			return;
+		}
+
 		// Check rate limit
 		const auth = await this.authenticate(request);
 		if (!await this.checkRateLimit(auth, reply)) {
 			return;
 		}
 
-		if (this.utilityService.isBlockedHost(this.meta.blockedHosts, new URL(url).host)) {
+		if (this.utilityService.isBlockedHost(this.meta.blockedHosts, urlObj.host)) {
 			return reply.code(403).send({
 				error: {
 					message: 'URL is blocked',
@@ -166,7 +185,7 @@ export class UrlPreviewService {
 			return;
 		}
 
-		const cacheKey = `${url}@${lang}@${cacheFormatVersion}`;
+		const cacheKey = getCacheKey(url, lang);
 		if (await this.sendCachedPreview(cacheKey, reply, fetch)) {
 			return;
 		}
@@ -216,6 +235,18 @@ export class UrlPreviewService {
 
 			// Await this to avoid hammering redis when a bunch of URLs are fetched at once
 			await this.previewCache.set(cacheKey, summary);
+
+			// Also cache the response URL in case of redirects
+			if (summary.url !== url) {
+				const responseCacheKey = getCacheKey(summary.url, lang);
+				await this.previewCache.set(responseCacheKey, summary);
+			}
+
+			// Also cache the ActivityPub URL, if different from the others
+			if (summary.activityPub && summary.activityPub !== summary.url) {
+				const apCacheKey = getCacheKey(summary.activityPub, lang);
+				await this.previewCache.set(apCacheKey, summary);
+			}
 
 			// Cache 1 day (matching redis), but only once we finalize the result
 			if (!summary.activityPub || summary.haveNoteLocally) {
@@ -532,4 +563,8 @@ export class UrlPreviewService {
 
 		return true;
 	}
+}
+
+function getCacheKey(url: string, lang = 'none') {
+	return `${url}@${lang}@${cacheFormatVersion}`;
 }
