@@ -70,8 +70,8 @@ export class FakeInternalEventService extends InternalEventService {
 	public async emit<K extends keyof InternalEventTypes>(type: K, value: InternalEventTypes[K], isLocal = true): Promise<void> {
 		for (const listener of this._listeners) {
 			if (listener[0] === type) {
-				if (!isLocal || !listener[2].ignoreLocal) {
-					await listener[1](value, type);
+				if ((isLocal && !listener[2].ignoreLocal) || (!isLocal && !listener[2].ignoreRemote)) {
+					await listener[1](value, type, isLocal);
 				}
 			}
 		}

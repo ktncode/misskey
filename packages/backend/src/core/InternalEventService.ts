@@ -10,10 +10,11 @@ import { GlobalEventService } from '@/core/GlobalEventService.js';
 import type { GlobalEvents, InternalEventTypes } from '@/core/GlobalEventService.js';
 import { bindThis } from '@/decorators.js';
 
-export type Listener<K extends keyof InternalEventTypes> = (value: InternalEventTypes[K], key: K) => void | Promise<void>;
+export type Listener<K extends keyof InternalEventTypes> = (value: InternalEventTypes[K], key: K, isLocal: boolean) => void | Promise<void>;
 
 export interface ListenerProps {
 	ignoreLocal?: boolean,
+	ignoreRemote?: boolean,
 }
 
 @Injectable()
@@ -61,8 +62,8 @@ export class InternalEventService implements OnApplicationShutdown {
 
 		const promises: Promise<void>[] = [];
 		for (const [listener, props] of listeners) {
-			if (!isLocal || !props.ignoreLocal) {
-				const promise = Promise.resolve(listener(value, type));
+			if ((isLocal && !props.ignoreLocal) || (!isLocal && !props.ignoreRemote)) {
+				const promise = Promise.resolve(listener(value, type, isLocal));
 				promises.push(promise);
 			}
 		}
