@@ -17,11 +17,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<b><i class="ph-eye ph-bold ph-lg"></i> Pattern Hidden</b>
 			<span>{{ i18n.ts.clickToShow }}</span>
 		</div>
-		<!--
 		<span :class="$style.patternShadowTop"></span>
 		<span :class="$style.patternShadowBottom"></span>
-		<canvas ref="displayCanvas" :class="$style.pattern_canvas"></canvas>
-		-->
 		<div ref="sliceDisplay" :class="$style.slice_display">
 			<canvas v-for="slice in dummyArray" :key="slice.id" ref="canvasRefs" :class="$style.patternSlice"></canvas>
 		</div>
@@ -46,7 +43,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+// Foreword anyone wanting to change anything, it's jank filled with hacks on top of jank.
 // Don't forget to autohide the pattern.
+
+/* Bugs
+
+	Bad index at line `canvasSlice[toDraw[i].i].data.slicePos = isRowDirPos ? (rowBuffer - rowDif) + drawnSlices : drawnSlices;`, itterator mess up?
+	Wild CSS tranforms
+
+*/
 
 // Also don't forget to remove this. Yes, I'm that lazy.
 const debug = console.debug;
@@ -107,6 +112,8 @@ interface CanvasSlice {
 const isSensitive = props.module.isSensitive;
 const url = props.module.url;
 let hide = ref((prefer.s.nsfw === 'force') ? true : isSensitive && (prefer.s.nsfw !== 'ignore'));
+// Goto display function and set the default value there on the first frame.
+// Yes, this is my solution to a problem. That or have a constant kicking round doing nothing of note.
 let patternHide = ref(false);
 let playing = ref(false);
 let sliceDisplay = ref<HTMLDivElement>();
@@ -131,7 +138,6 @@ let lastPattern = -1;
 let lastDrawnRow = -1;
 let numberRowCanvas = new OffscreenCanvas(2 * CHAR_WIDTH + 1, maxRowNumbers * CHAR_HEIGHT + 1);
 let alreadyHiddenOnce = false;
-let alreadyDrawn: boolean[] = [];
 let dummyArray: DummyCanvas[] = [];
 let patternTime = { 'current': 0, 'max': 0, 'initial': 0 };
 let canvasSlice: CanvasSlice[] = [];
@@ -304,13 +310,9 @@ function togglePattern() {
 }
 
 function drawSlices(skipOptimizationChecks = false) {
-	const startTime = performance.now();
 	const pattern = player.value.getPattern();
-	const nbRows = player.value.getPatternNumRows(pattern);
 	const row = player.value.getRow();
 	const halfbuf = Math.floor(rowBuffer / 2);
-	const minRow = row - halfbuf;
-	const maxRow = row + halfbuf;
 
 	if (rowBuffer <= 0) {
 		lastDrawnRow = row;
@@ -326,7 +328,7 @@ function drawSlices(skipOptimizationChecks = false) {
 
 		// Debug
 		if (rowDif > 1 || rowDif < 0) {
-			//debug_playpause();
+			debug_playpause();
 			debug_w('Row diff', rowDif);
 		}
 
@@ -347,29 +349,33 @@ function drawSlices(skipOptimizationChecks = false) {
 
 		for (let i = 0; i < canvasSlice.length; i++) {
 			canvasSlice[i].data.slicePos = canvasSlice[i].data.slicePos - rowDif;
-			debug('i: ', i, 'slicepos:', canvasSlice[i].data.slicePos, 'row:', row, canvasSlice[i].ctx.canvas);
+			//debug('i: ', i, 'slicepos:', canvasSlice[i].data.slicePos, 'row:', row, canvasSlice[i].ctx.canvas);
 			if (canvasSlice[i].data.slicePos > -1 && canvasSlice[i].data.slicePos < rowBuffer) continue;
 
-			if (lowestRow > Math.abs(canvasSlice[i].data.slicePos)) lowestRow = Math.abs(canvasSlice[i].data.slicePos);
-			toDraw[Math.abs(canvasSlice[i].data.slicePos)] = { p: canvasSlice[i].data.slicePos, i: i };
-			debug('Added to draw.');
+			const abs_pos = Math.abs(canvasSlice[i].data.slicePos);
+			if (lowestRow > abs_pos) lowestRow = abs_pos;
+			toDraw[abs_pos] = { p: canvasSlice[i].data.slicePos, i: i };
+			//debug('Added to draw.', abs_pos);
 		}
 
 		debug(lowestRow, norm);
 		console.table(toDraw);
 
+		toDraw.forEach((v, i) => {
+			debug('test print:', v, i);
+		});
+
 		for (let i = toDraw.length - 1; i >= lowestRow; i += -1) {
-			debug('fl:', i, toDraw[i]);
+			//debug('fl:', i, toDraw[i]);
+			if (!toDraw[i]) continue;
 
 			canvasSlice[toDraw[i].i].data.slicePos = isRowDirPos ? (rowBuffer - rowDif) + drawnSlices : drawnSlices;
-			//canvasSlice[toDraw[i].i].data.slicePos = canvasSlice[toDraw[i].i].data.slicePos - rowDif;
 			canvasSlice[toDraw[i].i].data.position = canvasSlice[toDraw[i].i].data.position + rowBuffer * norm;
 
 			const curRow = offByOneFix + (row + (drawnSlices - rowDif)) + halfbuf * norm;
 
 			canvasSlice[toDraw[i].i].ctx.clearRect(0, 0, canvasSlice[toDraw[i].i].ref.width, canvasSlice[toDraw[i].i].ref.height);
 			canvasSlice[toDraw[i].i].ref.style.transform = 'translateY(' + (canvasSlice[toDraw[i].i].data.offest + (canvasSlice[toDraw[i].i].data.position) * CHAR_HEIGHT + CHAR_HEIGHT) + 'px)';
-			//debug('i: ', i, canvasSlice[toDraw[i].i].ref.style.transform, '\ncurRow', curRow, '\nhalfbuf * norm', halfbuf * norm, '\nrow', row, 'halfbuf', halfbuf, 'norm', norm, 'drawnSlices', drawnSlices, canvasSlice[toDraw[i].i].ctx.canvas);
 			drawRow(canvasSlice[toDraw[i].i].ctx, curRow, nbChannels, pattern);
 
 			canvasSlice[toDraw[i].i].ctx.fillStyle = isRowDirPos ? colours.foreground.fx : colours.foreground.operant; // Debug
@@ -393,9 +399,6 @@ function drawSlices(skipOptimizationChecks = false) {
 		if (drawnSlices === 0) { debug_w('No changed Slices, is this intentional?\nrow', row, 'pattern', pattern); }
 	} else {
 		if (patternTime.initial !== 0 && !alreadyHiddenOnce) {
-			//const arrLen = patternTime.length - 1;
-			//const averageDraw = patternTime.total / (patternTime.at - 1);
-			//const initialDraw = patternTime.initial;
 			const trackerTime = player.value.currentPlayingNode.getProcessTime();
 
 			//debug( initialDraw, averageDraw, player.value.getCurrentTempo(), player.value.getCurrentSpeed() );
@@ -410,15 +413,11 @@ function drawSlices(skipOptimizationChecks = false) {
 
 		patternTime = { 'current': 0, 'max': 0, 'initial': 0 };
 
-		let curtime = performance.now();
 		for (let i = 0; i < canvasSlice.length; i++) {
 			let curRow = row - halfbuf + i;
 			// just paint which slice, row and pushed row it is.
-			//canvasSlice[i].ctx.fillStyle = colours.background;
-			//canvasSlice[i].ctx.fillRect(0, 0, canvasSlice[i].ref.width, canvasSlice[i].ref.height);
 			canvasSlice[i].ctx.clearRect(0, 0, canvasSlice[i].ref.width, canvasSlice[i].ref.height);
 			drawRow(canvasSlice[i].ctx, curRow, nbChannels, pattern);
-			//alreadyDrawn[curRow] = true;
 			canvasSlice[i].data.slicePos = i;
 			canvasSlice[i].data.position = 0;
 			canvasSlice[i].data.offest = row * CHAR_HEIGHT;
@@ -448,12 +447,11 @@ function drawSlices(skipOptimizationChecks = false) {
 
 	lastDrawnRow = row;
 	lastPattern = pattern;
-	//debug_playpause();
 }
 
 function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, pattern: number, drawX = (2 * CHAR_WIDTH), drawY = ROW_OFFSET_Y) {
 	if (!player.value.currentPlayingNode) return false;
-	//if (row < 0 || row > player.value.getPatternNumRows(pattern) - 1) return false;
+	if (row < 0 || row > player.value.getPatternNumRows(pattern) - 1) return false;
 	const spacer = 11;
 	const space = ' ';
 	let seperators = '';
@@ -509,7 +507,7 @@ function display(skipOptimizationChecks = false) {
 
 	if (firstFrame) {
 		// Changing it to false should enable pattern display by default.
-		patternHide.value = false;
+		patternHide.value = true;
 		handleScrollBarEnable();
 		firstFrame = false;
 	}
@@ -518,17 +516,6 @@ function display(skipOptimizationChecks = false) {
 	const pattern = player.value.getPattern();
 
 	if ( row === lastDrawnRow && pattern === lastPattern && !skipOptimizationChecks) return;
-
-	/*
-	canvasRefs.value..forEach((canvas) => {
-		debug(canvas);
-	});*/
-
-	// Size vs speed
-	//if (patternHide.value) drawPetternPreview();
-	//else drawPattern();
-
-	//displayCanvas.value.style.top = !patternHide.value ? 'calc( 50% - ' + (row * CHAR_HEIGHT) + 'px )' : '0%';
 
 	drawSlices(skipOptimizationChecks);
 }
@@ -628,13 +615,10 @@ onDeactivated(() => {
 		}
 
 		.slice_display {
-			/*display: inline-grid;*/
 			display: grid;
 			position: relative;
-			background-color: white;
+			background-color: black;
 			image-rendering: pixelated;
-			/*transform: translateY(-24px);*/
-			/*pointer-events: none;*/
 			z-index: 0;
 
 			.patternSlice {
@@ -643,41 +627,14 @@ onDeactivated(() => {
 				image-rendering: pixelated;
 				/*pointer-events: none;*/
 				z-index: 0;
-				/*filter: grayscale(50%);*/
 			}
-
-			.patternSlice.offScreen {
-				position: relative;
-				background-color: black;
-				image-rendering: pixelated;
-				pointer-events: none;
-				z-index: 0;
-				filter: opacity(0);
-			}
-
-			.patternSlice.activeSlice {
-				position: relative;
-				background-color: black;
-				image-rendering: pixelated;
-				pointer-events: none;
-				z-index: 0;
-				filter: invert(1);
-			}
-		}
-
-		.pattern_canvas {
-			position: relative;
-			background-color: black;
-			image-rendering: pixelated;
-			pointer-events: none;
-			z-index: 0;
 		}
 
 		.patternShadowTop {
 			background: #00000080;
 			width: 100%;
 			height: calc( 50% - 14px );
-			translate: 0 -100%;
+			translate: -50% -100%;
 			top: calc( 50% - 14px );
 			position: absolute;
 			pointer-events: none;
@@ -688,6 +645,7 @@ onDeactivated(() => {
 			background: #00000080;
 			width: 100%;
 			height: calc( 50% - 12px );
+			translate: -50% 0;
 			top: calc( 50% - 1px );
 			position: absolute;
 			pointer-events: none;
