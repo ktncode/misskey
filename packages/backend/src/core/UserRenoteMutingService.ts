@@ -33,7 +33,7 @@ export class UserRenoteMutingService {
 			muteeId: target.id,
 		});
 
-		await this.cacheService.renoteMutingsCache.refresh(user.id);
+		await this.cacheService.renoteMutingsCache.delete(user.id);
 	}
 
 	@bindThis
@@ -44,9 +44,8 @@ export class UserRenoteMutingService {
 			id: In(mutings.map(m => m.id)),
 		});
 
-		const muterIds = [...new Set(mutings.map(m => m.muterId))];
-		for (const muterId of muterIds) {
-			await this.cacheService.renoteMutingsCache.refresh(muterId);
-		}
+		await Promise.all(Array
+			.from(new Set(mutings.map(m => m.muterId)))
+			.map(muterId => this.cacheService.renoteMutingsCache.delete(muterId)));
 	}
 }

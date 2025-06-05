@@ -7,12 +7,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { IsNull } from 'typeorm';
 import type { BlockingsRepository, FollowingsRepository, MutingsRepository, RenoteMutingsRepository, MiUserProfile, UserProfilesRepository, UsersRepository, MiFollowing, MiNote } from '@/models/_.js';
-import { MemoryKVCache, RedisKVCache } from '@/misc/cache.js';
+import { MemoryKVCache, QuantumKVCache, RedisKVCache } from '@/misc/cache.js';
 import type { MiLocalUser, MiUser } from '@/models/User.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
-import type { GlobalEvents } from '@/core/GlobalEventService.js';
+import type { GlobalEvents, InternalEventTypes } from '@/core/GlobalEventService.js';
+import { InternalEventService } from '@/core/InternalEventService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 
 export interface FollowStats {
@@ -39,12 +40,12 @@ export class CacheService implements OnApplicationShutdown {
 	public localUserByNativeTokenCache: MemoryKVCache<MiLocalUser | null>;
 	public localUserByIdCache: MemoryKVCache<MiLocalUser>;
 	public uriPersonCache: MemoryKVCache<MiUser | null>;
-	public userProfileCache: RedisKVCache<MiUserProfile>;
-	public userMutingsCache: RedisKVCache<Set<string>>;
-	public userBlockingCache: RedisKVCache<Set<string>>;
-	public userBlockedCache: RedisKVCache<Set<string>>; // NOTE: 「被」Blockキャッシュ
-	public renoteMutingsCache: RedisKVCache<Set<string>>;
-	public userFollowingsCache: RedisKVCache<Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>;
+	public userProfileCache: QuantumKVCache<MiUserProfile>;
+	public userMutingsCache: QuantumKVCache<Set<string>>;
+	public userBlockingCache: QuantumKVCache<Set<string>>;
+	public userBlockedCache: QuantumKVCache<Set<string>>; // NOTE: 「被」Blockキャッシュ
+	public renoteMutingsCache: QuantumKVCache<Set<string>>;
+	public userFollowingsCache: QuantumKVCache<Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>;
 	private readonly userFollowStatsCache = new MemoryKVCache<FollowStats>(1000 * 60 * 10); // 10 minutes
 	private readonly translationsCache: RedisKVCache<CachedTranslationEntity>;
 
@@ -74,6 +75,7 @@ export class CacheService implements OnApplicationShutdown {
 		private followingsRepository: FollowingsRepository,
 
 		private userEntityService: UserEntityService,
+		private readonly internalEventService: InternalEventService,
 	) {
 		//this.onMessage = this.onMessage.bind(this);
 
@@ -82,49 +84,33 @@ export class CacheService implements OnApplicationShutdown {
 		this.localUserByIdCache = new MemoryKVCache<MiLocalUser>(1000 * 60 * 5); // 5m
 		this.uriPersonCache = new MemoryKVCache<MiUser | null>(1000 * 60 * 5); // 5m
 
-		this.userProfileCache = new RedisKVCache<MiUserProfile>(this.redisClient, 'userProfile', {
+		this.userProfileCache = new QuantumKVCache(this.internalEventService, 'userProfile', {
 			lifetime: 1000 * 60 * 30, // 30m
-			memoryCacheLifetime: 1000 * 60, // 1m
 			fetcher: (key) => this.userProfilesRepository.findOneByOrFail({ userId: key }),
-			toRedisConverter: (value) => JSON.stringify(value),
-			fromRedisConverter: (value) => JSON.parse(value), // TODO: date型の考慮
 		});
 
-		this.userMutingsCache = new RedisKVCache<Set<string>>(this.redisClient, 'userMutings', {
+		this.userMutingsCache = new QuantumKVCache<Set<string>>(this.internalEventService, 'userMutings', {
 			lifetime: 1000 * 60 * 30, // 30m
-			memoryCacheLifetime: 1000 * 60, // 1m
 			fetcher: (key) => this.mutingsRepository.find({ where: { muterId: key }, select: ['muteeId'] }).then(xs => new Set(xs.map(x => x.muteeId))),
-			toRedisConverter: (value) => JSON.stringify(Array.from(value)),
-			fromRedisConverter: (value) => new Set(JSON.parse(value)),
 		});
 
-		this.userBlockingCache = new RedisKVCache<Set<string>>(this.redisClient, 'userBlocking', {
+		this.userBlockingCache = new QuantumKVCache<Set<string>>(this.internalEventService, 'userBlocking', {
 			lifetime: 1000 * 60 * 30, // 30m
-			memoryCacheLifetime: 1000 * 60, // 1m
 			fetcher: (key) => this.blockingsRepository.find({ where: { blockerId: key }, select: ['blockeeId'] }).then(xs => new Set(xs.map(x => x.blockeeId))),
-			toRedisConverter: (value) => JSON.stringify(Array.from(value)),
-			fromRedisConverter: (value) => new Set(JSON.parse(value)),
 		});
 
-		this.userBlockedCache = new RedisKVCache<Set<string>>(this.redisClient, 'userBlocked', {
+		this.userBlockedCache = new QuantumKVCache<Set<string>>(this.internalEventService, 'userBlocked', {
 			lifetime: 1000 * 60 * 30, // 30m
-			memoryCacheLifetime: 1000 * 60, // 1m
 			fetcher: (key) => this.blockingsRepository.find({ where: { blockeeId: key }, select: ['blockerId'] }).then(xs => new Set(xs.map(x => x.blockerId))),
-			toRedisConverter: (value) => JSON.stringify(Array.from(value)),
-			fromRedisConverter: (value) => new Set(JSON.parse(value)),
 		});
 
-		this.renoteMutingsCache = new RedisKVCache<Set<string>>(this.redisClient, 'renoteMutings', {
+		this.renoteMutingsCache = new QuantumKVCache<Set<string>>(this.internalEventService, 'renoteMutings', {
 			lifetime: 1000 * 60 * 30, // 30m
-			memoryCacheLifetime: 1000 * 60, // 1m
 			fetcher: (key) => this.renoteMutingsRepository.find({ where: { muterId: key }, select: ['muteeId'] }).then(xs => new Set(xs.map(x => x.muteeId))),
-			toRedisConverter: (value) => JSON.stringify(Array.from(value)),
-			fromRedisConverter: (value) => new Set(JSON.parse(value)),
 		});
 
-		this.userFollowingsCache = new RedisKVCache<Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>(this.redisClient, 'userFollowings', {
+		this.userFollowingsCache = new QuantumKVCache<Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>(this.internalEventService, 'userFollowings', {
 			lifetime: 1000 * 60 * 30, // 30m
-			memoryCacheLifetime: 1000 * 60, // 1m
 			fetcher: (key) => this.followingsRepository.find({ where: { followerId: key }, select: ['followeeId', 'withReplies'] }).then(xs => {
 				const obj: Record<string, Pick<MiFollowing, 'withReplies'> | undefined> = {};
 				for (const x of xs) {
@@ -132,8 +118,6 @@ export class CacheService implements OnApplicationShutdown {
 				}
 				return obj;
 			}),
-			toRedisConverter: (value) => JSON.stringify(value),
-			fromRedisConverter: (value) => JSON.parse(value),
 		});
 
 		this.translationsCache = new RedisKVCache<CachedTranslationEntity>(this.redisClient, 'translations', {
@@ -143,20 +127,21 @@ export class CacheService implements OnApplicationShutdown {
 
 		// NOTE: チャンネルのフォロー状況キャッシュはChannelFollowingServiceで行っている
 
-		this.redisForSub.on('message', this.onMessage);
+		this.internalEventService.on('userChangeSuspendedState', this.onUserEvent);
+		this.internalEventService.on('userChangeDeletedState', this.onUserEvent);
+		this.internalEventService.on('remoteUserUpdated', this.onUserEvent);
+		this.internalEventService.on('localUserUpdated', this.onUserEvent);
+		this.internalEventService.on('userChangeSuspendedState', this.onUserEvent);
+		this.internalEventService.on('userTokenRegenerated', this.onTokenEvent);
+		this.internalEventService.on('follow', this.onFollowEvent);
+		this.internalEventService.on('unfollow', this.onFollowEvent);
 	}
 
 	@bindThis
-	private async onMessage(_: string, data: string): Promise<void> {
-		const obj = JSON.parse(data);
-
-		if (obj.channel === 'internal') {
-			const { type, body } = obj.message as GlobalEvents['internal']['payload'];
-			switch (type) {
-				case 'userChangeSuspendedState':
-				case 'userChangeDeletedState':
-				case 'remoteUserUpdated':
-				case 'localUserUpdated': {
+	private async onUserEvent<E extends 'userChangeSuspendedState' | 'userChangeDeletedState' | 'remoteUserUpdated' | 'localUserUpdated'>(body: InternalEventTypes[E]): Promise<void> {
+		{
+			{
+				{
 					const user = await this.usersRepository.findOneBy({ id: body.id });
 					if (user == null) {
 						this.userByIdCache.delete(body.id);
@@ -178,20 +163,32 @@ export class CacheService implements OnApplicationShutdown {
 							this.localUserByIdCache.set(user.id, user);
 						}
 					}
-					break;
 				}
-				case 'userTokenRegenerated': {
+			}
+		}
+	}
+
+	private async onTokenEvent<E extends 'userTokenRegenerated'>(body: InternalEventTypes[E]): Promise<void> {
+		{
+			{
+				{
 					const user = await this.usersRepository.findOneByOrFail({ id: body.id }) as MiLocalUser;
 					this.localUserByNativeTokenCache.delete(body.oldToken);
 					this.localUserByNativeTokenCache.set(body.newToken, user);
-					break;
 				}
+			}
+		}
+	}
+
+	private async onFollowEvent<E extends 'follow' | 'unfollow'>(body: InternalEventTypes[E], type: E): Promise<void> {
+		{
+			switch (type) {
 				case 'follow': {
 					const follower = this.userByIdCache.get(body.followerId);
 					if (follower) follower.followingCount++;
 					const followee = this.userByIdCache.get(body.followeeId);
 					if (followee) followee.followersCount++;
-					this.userFollowingsCache.delete(body.followerId);
+					await this.userFollowingsCache.delete(body.followerId);
 					this.userFollowStatsCache.delete(body.followerId);
 					this.userFollowStatsCache.delete(body.followeeId);
 					break;
@@ -201,13 +198,11 @@ export class CacheService implements OnApplicationShutdown {
 					if (follower) follower.followingCount--;
 					const followee = this.userByIdCache.get(body.followeeId);
 					if (followee) followee.followersCount--;
-					this.userFollowingsCache.delete(body.followerId);
+					await this.userFollowingsCache.delete(body.followerId);
 					this.userFollowStatsCache.delete(body.followerId);
 					this.userFollowStatsCache.delete(body.followeeId);
 					break;
 				}
-				default:
-					break;
 			}
 		}
 	}
@@ -300,7 +295,14 @@ export class CacheService implements OnApplicationShutdown {
 
 	@bindThis
 	public dispose(): void {
-		this.redisForSub.off('message', this.onMessage);
+		this.internalEventService.off('userChangeSuspendedState', this.onUserEvent);
+		this.internalEventService.off('userChangeDeletedState', this.onUserEvent);
+		this.internalEventService.off('remoteUserUpdated', this.onUserEvent);
+		this.internalEventService.off('localUserUpdated', this.onUserEvent);
+		this.internalEventService.off('userChangeSuspendedState', this.onUserEvent);
+		this.internalEventService.off('userTokenRegenerated', this.onTokenEvent);
+		this.internalEventService.off('follow', this.onFollowEvent);
+		this.internalEventService.off('unfollow', this.onFollowEvent);
 		this.userByIdCache.dispose();
 		this.localUserByNativeTokenCache.dispose();
 		this.localUserByIdCache.dispose();

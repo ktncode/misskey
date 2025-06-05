@@ -29,6 +29,7 @@ import { AccountMoveService } from '@/core/AccountMoveService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import type { ThinUser } from '@/queue/types.js';
 import { LoggerService } from '@/core/LoggerService.js';
+import { InternalEventService } from '@/core/InternalEventService.js';
 import type Logger from '../logger.js';
 
 type Local = MiLocalUser | {
@@ -86,6 +87,7 @@ export class UserFollowingService implements OnModuleInit {
 		private accountMoveService: AccountMoveService,
 		private perUserFollowingChart: PerUserFollowingChart,
 		private instanceChart: InstanceChart,
+		private readonly internalEventService: InternalEventService,
 
 		loggerService: LoggerService,
 	) {
@@ -264,7 +266,8 @@ export class UserFollowingService implements OnModuleInit {
 			}
 		});
 
-		this.cacheService.userFollowingsCache.refresh(follower.id);
+		// Handled by CacheService
+		//this.cacheService.userFollowingsCache.refresh(follower.id);
 
 		const requestExist = await this.followRequestsRepository.exists({
 			where: {
@@ -291,7 +294,7 @@ export class UserFollowingService implements OnModuleInit {
 			}, followee.id);
 		}
 
-		this.globalEventService.publishInternalEvent('follow', { followerId: follower.id, followeeId: followee.id });
+		await this.internalEventService.emit('follow', { followerId: follower.id, followeeId: followee.id });
 
 		const [followeeUser, followerUser] = await Promise.all([
 			this.usersRepository.findOneByOrFail({ id: followee.id }),
@@ -381,7 +384,8 @@ export class UserFollowingService implements OnModuleInit {
 
 		await this.followingsRepository.delete(following.id);
 
-		this.cacheService.userFollowingsCache.refresh(follower.id);
+		// Handled by CacheService
+		// this.cacheService.userFollowingsCache.refresh(follower.id);
 
 		this.decrementFollowing(following.follower, following.followee);
 
@@ -412,7 +416,7 @@ export class UserFollowingService implements OnModuleInit {
 		follower: MiUser,
 		followee: MiUser,
 	): Promise<void> {
-		this.globalEventService.publishInternalEvent('unfollow', { followerId: follower.id, followeeId: followee.id });
+		await this.internalEventService.emit('unfollow', { followerId: follower.id, followeeId: followee.id });
 
 		// Neither followee nor follower has moved.
 		if (!follower.movedToUri && !followee.movedToUri) {
