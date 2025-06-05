@@ -160,15 +160,15 @@ export class QueryService {
 					// Reply to me
 					.orWhere(':meId = note.replyUserId')
 					// DM to me
-					.orWhere(':meId = ANY (note.visibleUserIds)')
+					.orWhere(':meIdAsList <@ note.visibleUserIds')
 					// Mentions me
-					.orWhere(':meId = ANY (note.mentions)')
+					.orWhere(':meIdAsList <@ note.mentions')
 					// Followers-only post
 					.orWhere(new Brackets(qb => this
 						.andFollowingUser(qb, ':meId', 'note.userId')
 						.andWhere('note.visibility = \'followers\'')));
 
-				q.setParameters({ meId: me.id });
+				q.setParameters({ meId: me.id, meIdAsList: [me.id] });
 			}
 		}));
 	}
@@ -282,6 +282,33 @@ export class QueryService {
 
 		return q[join](`EXISTS (${followingQuery.getQuery()})`, followingQuery.getParameters());
 	};
+
+	/**
+	 * Adds OR condition that followerProp (user ID) is following followeeProp (channel ID).
+	 * Both props should be expressions, not raw values.
+	 */
+	@bindThis
+	public orFollowingChannel<Q extends WhereExpressionBuilder>(q: Q, followerProp: string, followeeProp: string): Q {
+		return this.addFollowingChannel(q, followerProp, followeeProp, 'orWhere');
+	}
+
+	/**
+	 * Adds AND condition that followerProp (user ID) is following followeeProp (channel ID).
+	 * Both props should be expressions, not raw values.
+	 */
+	@bindThis
+	public andFollowingChannel<Q extends WhereExpressionBuilder>(q: Q, followerProp: string, followeeProp: string): Q {
+		return this.addFollowingChannel(q, followerProp, followeeProp, 'andWhere');
+	}
+
+	private addFollowingChannel<Q extends WhereExpressionBuilder>(q: Q, followerProp: string, followeeProp: string, join: 'andWhere' | 'orWhere'): Q {
+		const followingQuery = this.channelFollowingsRepository.createQueryBuilder('following')
+			.select('1')
+			.andWhere(`following.followerId = ${followerProp}`)
+			.andWhere(`following.followeeId = ${followeeProp}`);
+
+		return q[join](`EXISTS (${followingQuery.getQuery()})`, followingQuery.getParameters());
+	}
 
 	/**
 	 * Adds OR condition that blockerProp (user ID) is not blocking blockeeProp (user ID).
