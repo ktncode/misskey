@@ -531,7 +531,7 @@ export class QuantumKVCache<T> implements Iterable<[key: string, value: T]> {
 
 		this.memoryCache.set(key, value);
 
-		await this.internalEventService.emit('quantumCacheUpdated', { name: this.name, op: 's', key });
+		await this.internalEventService.emit('quantumCacheUpdated', { name: this.name, op: 's', keys: [key] });
 
 		if (this.onSet) {
 			await this.onSet(key, this);
@@ -539,11 +539,46 @@ export class QuantumKVCache<T> implements Iterable<[key: string, value: T]> {
 	}
 
 	/**
+	 * Creates or updates multiple value in the cache, and erases any stale caches across the cluster.
+	 * Fires an onSet for each changed item event after the cache has been updated in all processes.
+	 * Skips if all values are unchanged.
+	 */
+	@bindThis
+	public async setMany(items: Iterable<[key: string, value: T]>): Promise<void> {
+		const changedKeys: string[] = [];
+
+		for (const item of items) {
+			if (this.memoryCache.get(item[0]) !== item[1]) {
+				changedKeys.push(item[0]);
+				this.memoryCache.set(item[0], item[1]);
+			}
+		}
+
+		if (changedKeys.length > 0) {
+			await this.internalEventService.emit('quantumCacheUpdated', { name: this.name, op: 's', keys: changedKeys });
+
+			if (this.onSet) {
+				for (const key of changedKeys) {
+					await this.onSet(key, this);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Gets a value from the local memory cache, or returns undefined if not found.
+	 */
+	@bindThis
+	public get(key: string): T | undefined {
+		return this.memoryCache.get(key);
+	}
+
+	/**
 	 * Gets or fetches a value from the cache.
 	 * Fires an onSet event, but does not emit an update event to other processes.
 	 */
 	@bindThis
-	public async get(key: string): Promise<T> {
+	public async fetch(key: string): Promise<T> {
 		let value = this.memoryCache.get(key);
 		if (value === undefined) {
 			value = await this.fetcher(key, this);
@@ -554,15 +589,6 @@ export class QuantumKVCache<T> implements Iterable<[key: string, value: T]> {
 			}
 		}
 		return value;
-	}
-
-	/**
-	 * Alias to get(), included for backwards-compatibility with RedisKVCache.
-	 * @deprecated use get() instead
-	 */
-	@bindThis
-	public async fetch(key: string): Promise<T> {
-		return await this.get(key);
 	}
 
 	/**
@@ -582,10 +608,33 @@ export class QuantumKVCache<T> implements Iterable<[key: string, value: T]> {
 	public async delete(key: string): Promise<void> {
 		this.memoryCache.delete(key);
 
-		await this.internalEventService.emit('quantumCacheUpdated', { name: this.name, op: 'd', key });
+		await this.internalEventService.emit('quantumCacheUpdated', { name: this.name, op: 'd', keys: [key] });
 
 		if (this.onDelete) {
 			await this.onDelete(key, this);
+		}
+	}
+	/**
+	 * Deletes multiple values from the cache, and erases any stale caches across the cluster.
+	 * Fires an onDelete event for each key after the cache has been updated in all processes.
+	 * Skips if the input is empty.
+	 */
+	@bindThis
+	public async deleteMany(keys: string[]): Promise<void> {
+		if (keys.length === 0) {
+			return;
+		}
+
+		for (const key of keys) {
+			this.memoryCache.delete(key);
+		}
+
+		await this.internalEventService.emit('quantumCacheUpdated', { name: this.name, op: 'd', keys });
+
+		if (this.onDelete) {
+			for (const key of keys) {
+				await this.onDelete(key, this);
+			}
 		}
 	}
 
@@ -623,14 +672,16 @@ export class QuantumKVCache<T> implements Iterable<[key: string, value: T]> {
 	@bindThis
 	private async onQuantumCacheUpdated(data: InternalEventTypes['quantumCacheUpdated']): Promise<void> {
 		if (data.name === this.name) {
-			this.memoryCache.delete(data.key);
+			for (const key of data.keys) {
+				this.memoryCache.delete(key);
 
-			if (data.op === 's' && this.onSet) {
-				await this.onSet(data.key, this);
-			}
+				if (data.op === 's' && this.onSet) {
+					await this.onSet(key, this);
+				}
 
-			if (data.op === 'd' && this.onDelete) {
-				await this.onDelete(data.key, this);
+				if (data.op === 'd' && this.onDelete) {
+					await this.onDelete(key, this);
+				}
 			}
 		}
 	}

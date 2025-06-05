@@ -73,7 +73,7 @@ describe(QuantumKVCache, () => {
 
 		await cache.set('foo', 'bar');
 
-		expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', key: 'foo' }]]);
+		expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', keys: ['foo'] }]]);
 	});
 
 	it('should call onSet when storing', async () => {
@@ -110,13 +110,13 @@ describe(QuantumKVCache, () => {
 		expect(fakeOnSet).toHaveBeenCalledTimes(1);
 	});
 
-	it('should fetch when getting an unknown value', async () => {
+	it('should fetch an unknown value', async () => {
 		const cache = makeCache<string>({
 			name: 'fake',
 			fetcher: key => `value#${key}`,
 		});
 
-		const result = await cache.get('foo');
+		const result = await cache.fetch('foo');
 
 		expect(result).toBe('value#foo');
 	});
@@ -127,7 +127,7 @@ describe(QuantumKVCache, () => {
 			fetcher: key => `value#${key}`,
 		});
 
-		await cache.get('foo');
+		await cache.fetch('foo');
 
 		const result = cache.has('foo');
 		expect(result).toBe(true);
@@ -141,7 +141,7 @@ describe(QuantumKVCache, () => {
 			onSet: fakeOnSet,
 		});
 
-		await cache.get('foo');
+		await cache.fetch('foo');
 
 		expect(fakeOnSet).toHaveBeenCalledWith('foo', cache);
 	});
@@ -152,9 +152,9 @@ describe(QuantumKVCache, () => {
 			fetcher: key => `value#${key}`,
 		});
 
-		await cache.get('foo');
+		await cache.fetch('foo');
 
-		expect(fakeInternalEventService._calls).not.toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', key: 'foo' }]]);
+		expect(fakeInternalEventService._calls).not.toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', keys: ['foo'] }]]);
 	});
 
 	it('should delete from memory cache', async () => {
@@ -186,14 +186,14 @@ describe(QuantumKVCache, () => {
 		await cache.set('foo', 'bar');
 		await cache.delete('foo');
 
-		expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 'd', key: 'foo' }]]);
+		expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 'd', keys: ['foo'] }]]);
 	});
 
 	it('should delete when receiving set event', async () => {
 		const cache = makeCache<string>({ name: 'fake' });
 		await cache.set('foo', 'bar');
 
-		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', op: 's', key: 'foo' });
+		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', op: 's', keys: ['foo'] });
 
 		const result = cache.has('foo');
 		expect(result).toBe(false);
@@ -206,7 +206,7 @@ describe(QuantumKVCache, () => {
 			onSet: fakeOnSet,
 		});
 
-		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', op: 's', key: 'foo' });
+		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', op: 's', keys: ['foo'] });
 
 		expect(fakeOnSet).toHaveBeenCalledWith('foo', cache);
 	});
@@ -215,7 +215,7 @@ describe(QuantumKVCache, () => {
 		const cache = makeCache<string>({ name: 'fake' });
 		await cache.set('foo', 'bar');
 
-		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', op: 'd', key: 'foo' });
+		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', op: 'd', keys: ['foo'] });
 
 		const result = cache.has('foo');
 		expect(result).toBe(false);
@@ -229,26 +229,130 @@ describe(QuantumKVCache, () => {
 		});
 		await cache.set('foo', 'bar');
 
-		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', op: 'd', key: 'foo' });
+		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', op: 'd', keys: ['foo'] });
 
 		expect(fakeOnDelete).toHaveBeenCalledWith('foo', cache);
 	});
 
-	describe('fetch', () => {
-		it('should perform same logic as get', async () => {
+	describe('get', () => {
+		it('should return value if present', async () => {
+			const cache = makeCache<string>();
+			await cache.set('foo', 'bar');
+
+			const result = cache.get('foo');
+
+			expect(result).toBe('bar');
+		});
+		it('should return undefined if missing', () => {
+			const cache = makeCache<string>();
+
+			const result = cache.get('foo');
+
+			expect(result).toBe(undefined);
+		});
+	});
+
+	describe('setMany', () => {
+		it('should populate all values', async () => {
+			const cache = makeCache<string>();
+
+			await cache.setMany([['foo', 'bar'], ['alpha', 'omega']]);
+
+			expect(cache.has('foo')).toBe(true);
+			expect(cache.has('alpha')).toBe(true);
+		});
+
+		it('should emit one event', async () => {
+			const cache = makeCache<string>({
+				name: 'fake',
+			});
+
+			await cache.setMany([['foo', 'bar'], ['alpha', 'omega']]);
+
+			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', keys: ['foo', 'alpha'] }]]);
+			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(1);
+		});
+
+		it('should call onSet for each item', async () => {
 			const fakeOnSet = jest.fn(() => Promise.resolve());
 			const cache = makeCache<string>({
 				name: 'fake',
-				fetcher: key => `value#${key}`,
 				onSet: fakeOnSet,
 			});
 
-			// noinspection JSDeprecatedSymbols
-			const result = await cache.fetch('foo');
+			await cache.setMany([['foo', 'bar'], ['alpha', 'omega']]);
 
-			expect(result).toBe('value#foo');
 			expect(fakeOnSet).toHaveBeenCalledWith('foo', cache);
-			expect(fakeInternalEventService._calls).not.toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', key: 'foo' }]]);
+			expect(fakeOnSet).toHaveBeenCalledWith('alpha', cache);
+		});
+
+		it('should emit events only for changed items', async () => {
+			const fakeOnSet = jest.fn(() => Promise.resolve());
+			const cache = makeCache<string>({
+				name: 'fake',
+				onSet: fakeOnSet,
+			});
+
+			await cache.set('foo', 'bar');
+			fakeOnSet.mockClear();
+			fakeInternalEventService._reset();
+
+			await cache.setMany([['foo', 'bar'], ['alpha', 'omega']]);
+
+			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', keys: ['alpha'] }]]);
+			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(1);
+			expect(fakeOnSet).toHaveBeenCalledWith('alpha', cache);
+			expect(fakeOnSet).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	describe('deleteMany', () => {
+		it('should remove keys from memory cache', async () => {
+			const cache = makeCache<string>();
+
+			await cache.set('foo', 'bar');
+			await cache.set('alpha', 'omega');
+			await cache.deleteMany(['foo', 'alpha']);
+
+			expect(cache.has('foo')).toBe(false);
+			expect(cache.has('alpha')).toBe(false);
+		});
+
+		it('should emit only one event', async () => {
+			const cache = makeCache<string>({
+				name: 'fake',
+			});
+
+			await cache.deleteMany(['foo', 'alpha']);
+
+			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 'd', keys: ['foo', 'alpha'] }]]);
+			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(1);
+		});
+
+		it('should call onDelete for each key', async () => {
+			const fakeOnDelete = jest.fn(() => Promise.resolve());
+			const cache = makeCache<string>({
+				name: 'fake',
+				onDelete: fakeOnDelete,
+			});
+
+			await cache.deleteMany(['foo', 'alpha']);
+
+			expect(fakeOnDelete).toHaveBeenCalledWith('foo', cache);
+			expect(fakeOnDelete).toHaveBeenCalledWith('alpha', cache);
+		});
+
+		it('should do nothing if no keys are provided', async () => {
+			const fakeOnDelete = jest.fn(() => Promise.resolve());
+			const cache = makeCache<string>({
+				name: 'fake',
+				onDelete: fakeOnDelete,
+			});
+
+			await cache.deleteMany([]);
+
+			expect(fakeOnDelete).not.toHaveBeenCalled();
+			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(0);
 		});
 	});
 
@@ -296,7 +400,7 @@ describe(QuantumKVCache, () => {
 				onSet: fakeOnSet,
 			});
 
-			await cache.refresh('foo')
+			await cache.refresh('foo');
 
 			expect(fakeOnSet).toHaveBeenCalledWith('foo', cache);
 		});
@@ -309,7 +413,7 @@ describe(QuantumKVCache, () => {
 
 			await cache.refresh('foo');
 
-			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', key: 'foo' }]]);
+			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', keys: ['foo'] }]]);
 		});
 	});
 

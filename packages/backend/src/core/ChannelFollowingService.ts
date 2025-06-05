@@ -17,7 +17,6 @@ import { InternalEventService } from './InternalEventService.js';
 
 @Injectable()
 export class ChannelFollowingService implements OnModuleInit {
-	// TODO check for regs
 	public userFollowingChannelsCache: QuantumKVCache<Set<string>>;
 
 	constructor(

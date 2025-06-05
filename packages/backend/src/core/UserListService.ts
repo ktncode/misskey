@@ -70,16 +70,16 @@ export class UserListService implements OnApplicationShutdown, OnModuleInit {
 			switch (type) {
 				case 'userListMemberAdded': {
 					const { userListId, memberId } = body;
-					if (this.membersCache.has(userListId)) {
-						const members = await this.membersCache.get(userListId);
+					const members = this.membersCache.get(userListId);
+					if (members) {
 						members.add(memberId);
 					}
 					break;
 				}
 				case 'userListMemberRemoved': {
 					const { userListId, memberId } = body;
-					if (this.membersCache.has(userListId)) {
-						const members = await this.membersCache.get(userListId);
+					const members = this.membersCache.get(userListId);
+					if (members) {
 						members.delete(memberId);
 					}
 					break;

@@ -44,8 +44,6 @@ export class UserRenoteMutingService {
 			id: In(mutings.map(m => m.id)),
 		});
 
-		await Promise.all(Array
-			.from(new Set(mutings.map(m => m.muterId)))
-			.map(muterId => this.cacheService.renoteMutingsCache.delete(muterId)));
+		await this.cacheService.renoteMutingsCache.deleteMany(mutings.map(m => m.muterId));
 	}
 }
