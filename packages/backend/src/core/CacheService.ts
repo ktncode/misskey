@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import { IsNull } from 'typeorm';
+import { In, IsNull } from 'typeorm';
 import type { BlockingsRepository, FollowingsRepository, MutingsRepository, RenoteMutingsRepository, MiUserProfile, UserProfilesRepository, UsersRepository, MiFollowing, MiNote } from '@/models/_.js';
 import { MemoryKVCache, QuantumKVCache, RedisKVCache } from '@/misc/cache.js';
 import type { MiLocalUser, MiUser } from '@/models/User.js';
@@ -291,6 +291,114 @@ export class CacheService implements OnApplicationShutdown {
 			t: translation.text,
 			u: note.updatedAt?.valueOf(),
 		});
+	}
+
+	@bindThis
+	public async getUserFollowings(userIds: Iterable<string>): Promise<Map<string, Set<string>>> {
+		const followings = new Map<string, Set<string>>();
+
+		const toFetch: string[] = [];
+		for (const userId of userIds) {
+			const fromCache = this.userFollowingsCache.get(userId);
+			if (fromCache) {
+				followings.set(userId, new Set(Object.keys(fromCache)));
+			} else {
+				toFetch.push(userId);
+			}
+		}
+
+		if (toFetch.length > 0) {
+			const fetchedFollowings = await this.followingsRepository
+				.createQueryBuilder('following')
+				.select([
+					'following.followerId',
+					'following.followeeId',
+					'following.withReplies',
+				])
+				.where({
+					followerId: In(toFetch),
+				})
+				.getMany();
+
+			const toCache = new Map<string, Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>();
+
+			// Pivot to a map
+			for (const { followerId, followeeId, withReplies } of fetchedFollowings) {
+				// Queue for cache
+				let cacheSet = toCache.get(followerId);
+				if (!cacheSet) {
+					cacheSet = {};
+					toCache.set(followerId, cacheSet);
+				}
+				cacheSet[followeeId] = { withReplies };
+
+				// Queue for return
+				let returnSet = followings.get(followerId);
+				if (!returnSet) {
+					returnSet = new Set();
+					followings.set(followerId, returnSet);
+				}
+				returnSet.add(followeeId);
+			}
+
+			// Update cache to speed up future calls
+			await this.userFollowingsCache.setMany(toCache.entries());
+		}
+
+		return followings;
+	}
+
+	@bindThis
+	public async getUserBlockers(userIds: Iterable<string>): Promise<Map<string, Set<string>>> {
+		const blockers = new Map<string, Set<string>>();
+
+		const toFetch: string[] = [];
+		for (const userId of userIds) {
+			const fromCache = this.userBlockedCache.get(userId);
+			if (fromCache) {
+				blockers.set(userId, fromCache);
+			} else {
+				toFetch.push(userId);
+			}
+		}
+
+		if (toFetch.length > 0) {
+			const fetchedBlockers = await this.blockingsRepository.createQueryBuilder('blocking')
+				.select([
+					'blocking.blockerId',
+					'blocking.blockeeId',
+				])
+				.where({
+					blockeeId: In(toFetch),
+				})
+				.getMany();
+
+			const toCache = new Map<string, Set<string>>();
+
+			// Pivot to a map
+			for (const { blockerId, blockeeId } of fetchedBlockers) {
+				// Queue for cache
+				let cacheSet = toCache.get(blockeeId);
+				if (!cacheSet) {
+					cacheSet = new Set();
+					toCache.set(blockeeId, cacheSet);
+				}
+				cacheSet.add(blockerId);
+
+				// Queue for return
+				let returnSet = blockers.get(blockeeId);
+				if (!returnSet) {
+					returnSet = new Set();
+					blockers.set(blockeeId, returnSet);
+				}
+				returnSet.add(blockerId);
+			}
+
+			// Update cache to speed up future calls
+			await this.userBlockedCache.setMany(toCache.entries());
+		}
+
+		return blockers;
 	}
 
 	@bindThis
