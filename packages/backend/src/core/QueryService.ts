@@ -160,15 +160,15 @@ export class QueryService {
 					// Reply to me
 					.orWhere(':meId = note.replyUserId')
 					// DM to me
-					.orWhere(':meId = ANY (note.visibleUserIds)')
+					.orWhere(':meIdAsList <@ note.visibleUserIds')
 					// Mentions me
-					.orWhere(':meId = ANY (note.mentions)')
+					.orWhere(':meIdAsList <@ note.mentions')
 					// Followers-only post
 					.orWhere(new Brackets(qb => this
 						.andFollowingUser(qb, ':meId', 'note.userId')
 						.andWhere('note.visibility = \'followers\'')));
 
-				q.setParameters({ meId: me.id });
+				q.setParameters({ meId: me.id, meIdAsList: [me.id] });
 			}
 		}));
 	}
@@ -188,15 +188,8 @@ export class QueryService {
 	}
 
 	@bindThis
-	public generateExcludedRenotesQueryForNotes<E extends ObjectLiteral>(q: SelectQueryBuilder<E>): SelectQueryBuilder<E> {
-		return q
-			.andWhere(new Brackets(qb => qb
-				.orWhere('note.renoteId IS NULL')
-				.orWhere('note.text IS NOT NULL')
-				.orWhere('note.cw IS NOT NULL')
-				.orWhere('note.replyId IS NOT NULL')
-				.orWhere('note.hasPoll = true')
-				.orWhere('note.fileIds != \'{}\'')));
+	public generateExcludedRenotesQueryForNotes<Q extends WhereExpressionBuilder>(q: Q): Q {
+		return this.andIsNotRenote(q, 'note');
 	}
 
 	@bindThis
@@ -257,6 +250,120 @@ export class QueryService {
 	}
 
 	/**
+	 * Adds OR condition that noteProp (note ID) refers to a quote.
+	 * The prop should be an expression, not a raw value.
+	 */
+	@bindThis
+	public orIsQuote<Q extends WhereExpressionBuilder>(q: Q, noteProp: string): Q {
+		return this.addIsQuote(q, noteProp, 'orWhere');
+	}
+
+	/**
+	 * Adds AND condition that noteProp (note ID) refers to a quote.
+	 * The prop should be an expression, not a raw value.
+	 */
+	@bindThis
+	public andIsQuote<Q extends WhereExpressionBuilder>(q: Q, noteProp: string): Q {
+		return this.addIsQuote(q, noteProp, 'andWhere');
+	}
+
+	private addIsQuote<Q extends WhereExpressionBuilder>(q: Q, noteProp: string, join: 'andWhere' | 'orWhere'): Q {
+		return q[join](new Brackets(qb => qb
+			.andWhere(`${noteProp}.renoteId IS NOT NULL`)
+			.andWhere(new Brackets(qbb => qbb
+				.orWhere(`${noteProp}.text IS NOT NULL`)
+				.orWhere(`${noteProp}.cw IS NOT NULL`)
+				.orWhere(`${noteProp}.replyId IS NOT NULL`)
+				.orWhere(`${noteProp}.hasPoll = true`)
+				.orWhere(`${noteProp}.fileIds != '{}'`)))));
+	}
+
+	/**
+	 * Adds OR condition that noteProp (note ID) does not refer to a quote.
+	 * The prop should be an expression, not a raw value.
+	 */
+	@bindThis
+	public orIsNotQuote<Q extends WhereExpressionBuilder>(q: Q, noteProp: string): Q {
+		return this.addIsNotQuote(q, noteProp, 'orWhere');
+	}
+
+	/**
+	 * Adds AND condition that noteProp (note ID) does not refer to a quote.
+	 * The prop should be an expression, not a raw value.
+	 */
+	@bindThis
+	public andIsNotQuote<Q extends WhereExpressionBuilder>(q: Q, noteProp: string): Q {
+		return this.addIsNotQuote(q, noteProp, 'andWhere');
+	}
+
+	private addIsNotQuote<Q extends WhereExpressionBuilder>(q: Q, noteProp: string, join: 'andWhere' | 'orWhere'): Q {
+		return q[join](new Brackets(qb => qb
+			.orWhere(`${noteProp}.renoteId IS NULL`)
+			.orWhere(new Brackets(qb => qb
+				.andWhere(`${noteProp}.text IS NULL`)
+				.andWhere(`${noteProp}.cw IS NULL`)
+				.andWhere(`${noteProp}.replyId IS NULL`)
+				.andWhere(`${noteProp}.hasPoll = false`)
+				.andWhere(`${noteProp}.fileIds = '{}'`)))));
+	}
+
+	/**
+	 * Adds OR condition that noteProp (note ID) refers to a renote.
+	 * The prop should be an expression, not a raw value.
+	 */
+	@bindThis
+	public orIsRenote<Q extends WhereExpressionBuilder>(q: Q, noteProp: string): Q {
+		return this.addIsRenote(q, noteProp, 'orWhere');
+	}
+
+	/**
+	 * Adds AND condition that noteProp (note ID) refers to a renote.
+	 * The prop should be an expression, not a raw value.
+	 */
+	@bindThis
+	public andIsRenote<Q extends WhereExpressionBuilder>(q: Q, noteProp: string): Q {
+		return this.addIsRenote(q, noteProp, 'andWhere');
+	}
+
+	private addIsRenote<Q extends WhereExpressionBuilder>(q: Q, noteProp: string, join: 'andWhere' | 'orWhere'): Q {
+		return q[join](new Brackets(qb => qb
+			.andWhere(`${noteProp}.renoteId IS NOT NULL`)
+			.andWhere(`${noteProp}.text IS NULL`)
+			.andWhere(`${noteProp}.cw IS NULL`)
+			.andWhere(`${noteProp}.replyId IS NULL`)
+			.andWhere(`${noteProp}.hasPoll = false`)
+			.andWhere(`${noteProp}.fileIds = '{}'`)));
+	}
+
+	/**
+	 * Adds OR condition that noteProp (note ID) does not refer to a renote.
+	 * The prop should be an expression, not a raw value.
+	 */
+	@bindThis
+	public orIsNotRenote<Q extends WhereExpressionBuilder>(q: Q, noteProp: string): Q {
+		return this.addIsNotRenote(q, noteProp, 'orWhere');
+	}
+
+	/**
+	 * Adds AND condition that noteProp (note ID) does not refer to a renote.
+	 * The prop should be an expression, not a raw value.
+	 */
+	@bindThis
+	public andIsNotRenote<Q extends WhereExpressionBuilder>(q: Q, noteProp: string): Q {
+		return this.addIsNotRenote(q, noteProp, 'andWhere');
+	}
+
+	private addIsNotRenote<Q extends WhereExpressionBuilder>(q: Q, noteProp: string, join: 'andWhere' | 'orWhere'): Q {
+		return q[join](new Brackets(qb => qb
+			.orWhere(`${noteProp}.renoteId IS NULL`)
+			.orWhere(`${noteProp}.text IS NOT NULL`)
+			.orWhere(`${noteProp}.cw IS NOT NULL`)
+			.orWhere(`${noteProp}.replyId IS NOT NULL`)
+			.orWhere(`${noteProp}.hasPoll = true`)
+			.orWhere(`${noteProp}.fileIds != '{}'`)));
+	}
+
+	/**
 	 * Adds OR condition that followerProp (user ID) is following followeeProp (user ID).
 	 * Both props should be expressions, not raw values.
 	 */
@@ -282,6 +389,33 @@ export class QueryService {
 
 		return q[join](`EXISTS (${followingQuery.getQuery()})`, followingQuery.getParameters());
 	};
+
+	/**
+	 * Adds OR condition that followerProp (user ID) is following followeeProp (channel ID).
+	 * Both props should be expressions, not raw values.
+	 */
+	@bindThis
+	public orFollowingChannel<Q extends WhereExpressionBuilder>(q: Q, followerProp: string, followeeProp: string): Q {
+		return this.addFollowingChannel(q, followerProp, followeeProp, 'orWhere');
+	}
+
+	/**
+	 * Adds AND condition that followerProp (user ID) is following followeeProp (channel ID).
+	 * Both props should be expressions, not raw values.
+	 */
+	@bindThis
+	public andFollowingChannel<Q extends WhereExpressionBuilder>(q: Q, followerProp: string, followeeProp: string): Q {
+		return this.addFollowingChannel(q, followerProp, followeeProp, 'andWhere');
+	}
+
+	private addFollowingChannel<Q extends WhereExpressionBuilder>(q: Q, followerProp: string, followeeProp: string, join: 'andWhere' | 'orWhere'): Q {
+		const followingQuery = this.channelFollowingsRepository.createQueryBuilder('following')
+			.select('1')
+			.andWhere(`following.followerId = ${followerProp}`)
+			.andWhere(`following.followeeId = ${followeeProp}`);
+
+		return q[join](`EXISTS (${followingQuery.getQuery()})`, followingQuery.getParameters());
+	}
 
 	/**
 	 * Adds OR condition that blockerProp (user ID) is not blocking blockeeProp (user ID).

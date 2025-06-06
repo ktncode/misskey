@@ -114,8 +114,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.innerJoinAndSelect('note.user', 'user')
 				.leftJoinAndSelect('note.reply', 'reply')
 				.leftJoinAndSelect('note.renote', 'renote')
-				.leftJoinAndSelect('reply.user', 'replyUser', 'replyUser.id = note.replyUserId')
-				.leftJoinAndSelect('renote.user', 'renoteUser', 'renoteUser.id = note.renoteUserId');
+				.leftJoinAndSelect('reply.user', 'replyUser')
+				.leftJoinAndSelect('renote.user', 'renoteUser');
 
 			// NOTE: センシティブ除外の設定はこのエンドポイントでは無視する。
 			// https://github.com/misskey-dev/misskey/pull/15346#discussion_r1929950255

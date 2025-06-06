@@ -137,12 +137,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			.innerJoinAndSelect('note.user', 'user')
 			.leftJoinAndSelect('note.reply', 'reply')
 			.leftJoinAndSelect('note.renote', 'renote')
-			.leftJoinAndSelect('reply.user', 'replyUser', 'replyUser.id = note.replyUserId')
-			.leftJoinAndSelect('renote.user', 'renoteUser', 'renoteUser.id = note.renoteUserId')
-			.leftJoinAndSelect('note.channel', 'channel');
+			.leftJoinAndSelect('reply.user', 'replyUser')
+			.leftJoinAndSelect('renote.user', 'renoteUser')
+			.leftJoinAndSelect('note.channel', 'channel')
+			.limit(ps.limit);
 
-		this.queryService.generateBlockedHostQueryForNote(query);
 		this.queryService.generateVisibilityQuery(query, me);
+		this.queryService.generateBlockedHostQueryForNote(query);
+		this.queryService.generateSilencedUserQueryForNotes(query, me);
 		if (me) {
 			this.queryService.generateMutedUserQueryForNotes(query, me);
 			this.queryService.generateBlockedUserQueryForNotes(query, me);
@@ -159,6 +161,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		}
 		//#endregion
 
-		return await query.limit(ps.limit).getMany();
+		return await query.getMany();
 	}
 }

@@ -168,8 +168,17 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			.innerJoinAndSelect('note.user', 'user')
 			.leftJoinAndSelect('note.reply', 'reply')
 			.leftJoinAndSelect('note.renote', 'renote')
-			.leftJoinAndSelect('reply.user', 'replyUser', 'replyUser.id = note.replyUserId')
-			.leftJoinAndSelect('renote.user', 'renoteUser', 'renoteUser.id = note.renoteUserId');
+			.leftJoinAndSelect('reply.user', 'replyUser')
+			.leftJoinAndSelect('renote.user', 'renoteUser')
+			.limit(ps.limit);
+
+		if (!ps.withReplies) {
+			query
+				// 1. Not a reply, 2. a self-reply
+				.andWhere(new Brackets(qb => qb
+					.orWhere('note.replyId IS NULL') // 返信ではない
+					.orWhere('note.replyUserId = note.userId')));
+		}
 
 		this.queryService.generateBlockedHostQueryForNote(query);
 		this.queryService.generateSilencedUserQueryForNotes(query, me);
@@ -190,18 +199,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
 		}
 
-		if (!ps.withReplies) {
-			query.andWhere(new Brackets(qb => {
-				qb
-					.where('note.replyId IS NULL') // 返信ではない
-					.orWhere(new Brackets(qb => {
-						qb // 返信だけど投稿者自身への返信
-							.where('note.replyId IS NOT NULL')
-							.andWhere('note.replyUserId = note.userId');
-					}));
-			}));
-		}
-
-		return await query.limit(ps.limit).getMany();
+		return await query.getMany();
 	}
 }
