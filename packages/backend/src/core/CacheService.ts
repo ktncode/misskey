@@ -138,7 +138,7 @@ export class CacheService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	private async onUserEvent<E extends 'userChangeSuspendedState' | 'userChangeDeletedState' | 'remoteUserUpdated' | 'localUserUpdated'>(body: InternalEventTypes[E]): Promise<void> {
+	private async onUserEvent<E extends 'userChangeSuspendedState' | 'userChangeDeletedState' | 'remoteUserUpdated' | 'localUserUpdated'>(body: InternalEventTypes[E], _: E, isLocal: boolean): Promise<void> {
 		{
 			{
 				{
@@ -150,6 +150,16 @@ export class CacheService implements OnApplicationShutdown {
 							if (v.value?.id === body.id) {
 								this.uriPersonCache.delete(k);
 							}
+						}
+						if (isLocal) {
+							await Promise.all([
+								this.userProfileCache.delete(body.id),
+								this.userMutingsCache.delete(body.id),
+								this.userBlockingCache.delete(body.id),
+								this.userBlockedCache.delete(body.id),
+								this.renoteMutingsCache.delete(body.id),
+								this.userFollowingsCache.delete(body.id),
+							]);
 						}
 					} else {
 						this.userByIdCache.set(user.id, user);
