@@ -35,6 +35,7 @@ export interface IObject {
 	mediaType?: string;
 	url?: ApObject | string;
 	href?: string;
+	rel?: string | string[];
 	tag?: IObject | IObject[];
 	sensitive?: boolean;
 }
@@ -54,6 +55,16 @@ export interface IAnonymousObject extends IObject {
 export function isAnonymousObject(object: IObject): object is IAnonymousObject {
 	return object.id === undefined;
 }
+
+export interface ILink extends IObject {
+	'@context'?: string | string[] | Obj | Obj[];
+	type: 'Link' | 'Mention';
+	href: string;
+}
+
+export const isLink = (object: IObject): object is ILink =>
+	(getApType(object) === 'Link' || getApType(object) === 'Link') &&
+	typeof object.href === 'string';
 
 /**
  * Get array of ActivityStreams Objects id
@@ -307,9 +318,8 @@ export const isPropertyValue = (object: IObject): object is IApPropertyValue =>
 	'value' in object &&
 	typeof object.value === 'string';
 
-export interface IApMention extends IObject {
+export interface IApMention extends ILink {
 	type: 'Mention';
-	href: string;
 	name: string;
 }
 
