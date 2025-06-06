@@ -263,9 +263,15 @@ export const paramDef = {
 			enum: userUnsignedFetchOptions,
 			nullable: false,
 		},
-		attributionDomains: { type: 'array', items: {
-			type: 'string',
-		} },
+		attributionDomains: {
+			type: 'array',
+			items: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 128,
+			},
+			maxLength: 32,
+		},
 	},
 } as const;
 
