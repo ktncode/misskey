@@ -28,7 +28,7 @@ export interface CachedTranslation {
 	text: string | undefined;
 }
 
-interface CachedTranslationEntity {
+export interface CachedTranslationEntity {
 	l?: string;
 	t?: string;
 	u?: number;
@@ -46,8 +46,8 @@ export class CacheService implements OnApplicationShutdown {
 	public userBlockedCache: QuantumKVCache<Set<string>>; // NOTE: 「被」Blockキャッシュ
 	public renoteMutingsCache: QuantumKVCache<Set<string>>;
 	public userFollowingsCache: QuantumKVCache<Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>;
-	private readonly userFollowStatsCache = new MemoryKVCache<FollowStats>(1000 * 60 * 10); // 10 minutes
-	private readonly translationsCache: RedisKVCache<CachedTranslationEntity>;
+	protected userFollowStatsCache = new MemoryKVCache<FollowStats>(1000 * 60 * 10); // 10 minutes
+	protected translationsCache: RedisKVCache<CachedTranslationEntity>;
 
 	constructor(
 		@Inject(DI.redis)
@@ -465,6 +465,22 @@ export class CacheService implements OnApplicationShutdown {
 		}
 
 		return users;
+	}
+
+	@bindThis
+	public clear(): void {
+		this.userByIdCache.clear();
+		this.localUserByNativeTokenCache.clear();
+		this.localUserByIdCache.clear();
+		this.uriPersonCache.clear();
+		this.userProfileCache.clear();
+		this.userMutingsCache.clear();
+		this.userBlockingCache.clear();
+		this.userBlockedCache.clear();
+		this.renoteMutingsCache.clear();
+		this.userFollowingsCache.clear();
+		this.userFollowStatsCache.clear();
+		this.translationsCache.clear();
 	}
 
 	@bindThis

@@ -11,9 +11,9 @@ import { InternalEventTypes } from '@/core/GlobalEventService.js';
 export class RedisKVCache<T> {
 	private readonly lifetime: number;
 	private readonly memoryCache: MemoryKVCache<T>;
-	private readonly fetcher: (key: string) => Promise<T>;
-	private readonly toRedisConverter: (value: T) => string;
-	private readonly fromRedisConverter: (value: string) => T | undefined;
+	public readonly fetcher: (key: string) => Promise<T>;
+	public readonly toRedisConverter: (value: T) => string;
+	public readonly fromRedisConverter: (value: string) => T | undefined;
 
 	constructor(
 		private redisClient: Redis.Redis,
@@ -102,6 +102,11 @@ export class RedisKVCache<T> {
 	}
 
 	@bindThis
+	public clear() {
+		this.memoryCache.clear();
+	}
+
+	@bindThis
 	public gc() {
 		this.memoryCache.gc();
 	}
@@ -125,16 +130,17 @@ export class RedisSingleCache<T> {
 		opts: {
 			lifetime: number;
 			memoryCacheLifetime: number;
-			fetcher: RedisSingleCache<T>['fetcher'];
-			toRedisConverter: RedisSingleCache<T>['toRedisConverter'];
-			fromRedisConverter: RedisSingleCache<T>['fromRedisConverter'];
+			fetcher?: RedisSingleCache<T>['fetcher'];
+			toRedisConverter?: RedisSingleCache<T>['toRedisConverter'];
+			fromRedisConverter?: RedisSingleCache<T>['fromRedisConverter'];
 		},
 	) {
 		this.lifetime = opts.lifetime;
 		this.memoryCache = new MemorySingleCache(opts.memoryCacheLifetime);
-		this.fetcher = opts.fetcher;
-		this.toRedisConverter = opts.toRedisConverter;
-		this.fromRedisConverter = opts.fromRedisConverter;
+
+		this.fetcher = opts.fetcher ?? (() => { throw new Error('fetch not supported - use get/set directly'); });
+		this.toRedisConverter = opts.toRedisConverter ?? ((value) => JSON.stringify(value));
+		this.fromRedisConverter = opts.fromRedisConverter ?? ((value) => JSON.parse(value));
 	}
 
 	@bindThis
@@ -417,6 +423,8 @@ export class MemorySingleCache<T> {
 	}
 }
 
+// TODO move to separate file
+
 export interface QuantumKVOpts<T> {
 	/**
 	 * Memory cache lifetime in milliseconds.
@@ -452,9 +460,9 @@ export interface QuantumKVOpts<T> {
 export class QuantumKVCache<T> implements Iterable<[key: string, value: T]> {
 	private readonly memoryCache: MemoryKVCache<T>;
 
-	private readonly fetcher: QuantumKVOpts<T>['fetcher'];
-	private readonly onSet: QuantumKVOpts<T>['onSet'];
-	private readonly onDelete: QuantumKVOpts<T>['onDelete'];
+	public readonly fetcher: QuantumKVOpts<T>['fetcher'];
+	public readonly onSet: QuantumKVOpts<T>['onSet'];
+	public readonly onDelete: QuantumKVOpts<T>['onDelete'];
 
 	/**
 	 * @param internalEventService Service bus to synchronize events.
@@ -673,6 +681,15 @@ export class QuantumKVCache<T> implements Iterable<[key: string, value: T]> {
 
 	/**
 	 * Erases all entries from the local memory cache.
+	 * Does not send any events or update other processes.
+	 */
+	@bindThis
+	public clear() {
+		this.memoryCache.clear();
+	}
+
+	/**
+	 * Removes expired cache entries from the local view.
 	 * Does not send any events or update other processes.
 	 */
 	@bindThis
