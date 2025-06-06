@@ -342,7 +342,7 @@ export class CacheService implements OnApplicationShutdown {
 			}
 
 			// Update cache to speed up future calls
-			await this.userFollowingsCache.setMany(toCache.entries());
+			this.userFollowingsCache.addMany(toCache);
 		}
 
 		return followings;
@@ -395,7 +395,7 @@ export class CacheService implements OnApplicationShutdown {
 			}
 
 			// Update cache to speed up future calls
-			await this.userBlockedCache.setMany(toCache.entries());
+			this.userBlockedCache.addMany(toCache);
 		}
 
 		return blockers;
