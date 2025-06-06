@@ -27,7 +27,7 @@ import { checkHttps } from '@/misc/check-https.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { isRetryableError } from '@/misc/is-retryable-error.js';
 import { renderInlineError } from '@/misc/render-inline-error.js';
-import { getOneApId, getApId, validPost, isEmoji, getApType, isApObject, isDocument, IApDocument } from '../type.js';
+import { getOneApId, getApId, validPost, isEmoji, getApType, isApObject, isDocument, IApDocument, isLink } from '../type.js';
 import { ApLoggerService } from '../ApLoggerService.js';
 import { ApMfmService } from '../ApMfmService.js';
 import { ApDbResolverService } from '../ApDbResolverService.js';
@@ -660,7 +660,26 @@ export class ApNoteService {
 		if (note._misskey_quote && typeof(note._misskey_quote as unknown) === 'string') quoteUris.add(note._misskey_quote);
 		if (note.quoteUrl && typeof(note.quoteUrl as unknown) === 'string') quoteUris.add(note.quoteUrl);
 		if (note.quoteUri && typeof(note.quoteUri as unknown) === 'string') quoteUris.add(note.quoteUri);
+
+		// https://codeberg.org/fediverse/fep/src/branch/main/fep/044f/fep-044f.md
 		if (note.quote && typeof(note.quote as unknown) === 'string') quoteUris.add(note.quote);
+
+		// https://codeberg.org/fediverse/fep/src/branch/main/fep/e232/fep-e232.md
+		const tags = toArray(note.tag).filter(tag => typeof(tag) === 'object' && isLink(tag));
+		for (const tag of tags) {
+			if (!tag.href || typeof (tag.href as unknown) !== 'string') continue;
+
+			const mediaTypes = toArray(tag.mediaType);
+			if (
+				!mediaTypes.includes('application/ld+json; profile="https://www.w3.org/ns/activitystreams"') &&
+				!mediaTypes.includes('application/activity+json')
+			) continue;
+
+			const rels = toArray(tag.rel);
+			if (!rels.includes('https://misskey-hub.net/ns#_misskey_quote')) continue;
+
+			quoteUris.add(tag.href);
+		}
 
 		// No quote, return undefined
 		if (quoteUris.size < 1) return undefined;
