@@ -155,6 +155,8 @@ export class ApRequestService {
 
 	@bindThis
 	public async signedPost(user: { id: MiUser['id'] }, url: string, object: unknown, digest?: string): Promise<void> {
+		this.apUtilityService.assertApUrl(url);
+
 		const body = typeof object === 'string' ? object : JSON.stringify(object);
 
 		const keypair = await this.userKeypairService.getUserKeypair(user.id);
@@ -182,10 +184,13 @@ export class ApRequestService {
 	 * Get AP object with http-signature
 	 * @param user http-signature user
 	 * @param url URL to fetch
-	 * @param followAlternate
+	 * @param allowAnonymous If a fetched object lacks an ID, then it will be auto-generated from the final URL. (default: false)
+	 * @param followAlternate Whether to resolve HTML responses to their referenced canonical AP endpoint. (default: true)
 	 */
 	@bindThis
-	public async signedGet(url: string, user: { id: MiUser['id'] }, followAlternate?: boolean): Promise<IObjectWithId> {
+	public async signedGet(url: string, user: { id: MiUser['id'] }, allowAnonymous = false, followAlternate?: boolean): Promise<IObjectWithId> {
+		this.apUtilityService.assertApUrl(url);
+
 		const _followAlternate = followAlternate ?? true;
 		const keypair = await this.userKeypairService.getUserKeypair(user.id);
 
@@ -254,7 +259,7 @@ export class ApRequestService {
 				if (alternate) {
 					const href = alternate.getAttribute('href');
 					if (href && this.apUtilityService.haveSameAuthority(url, href)) {
-						return await this.signedGet(href, user, false);
+						return await this.signedGet(href, user, allowAnonymous, false);
 					}
 				}
 			} catch {
@@ -271,7 +276,11 @@ export class ApRequestService {
 
 		// Make sure the object ID matches the final URL (which is where it actually exists).
 		// The caller (ApResolverService) will verify the ID against the original / entry URL, which ensures that all three match.
-		this.apUtilityService.assertIdMatchesUrlAuthority(activity, res.url);
+		if (allowAnonymous && activity.id == null) {
+			activity.id = res.url;
+		} else {
+			this.apUtilityService.assertIdMatchesUrlAuthority(activity, res.url);
+		}
 
 		return activity as IObjectWithId;
 	}

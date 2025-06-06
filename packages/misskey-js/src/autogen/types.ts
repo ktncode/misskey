@@ -3317,7 +3317,7 @@ export type paths = {
      * notes/polls/recommendation
      * @description No description provided.
      *
-     * **Credential required**: *Yes* / **Permission**: *read:account*
+     * **Credential required**: *No*
      */
     post: operations['notes___polls___recommendation'];
   };
@@ -4281,6 +4281,7 @@ export type components = {
         iconUrl: string | null;
         faviconUrl: string | null;
         themeColor: string | null;
+        isSilenced: boolean;
       };
       emojis: {
         [key: string]: string;
@@ -4292,6 +4293,7 @@ export type components = {
           iconUrl: string | null;
           displayOrder: number;
         })[];
+      attributionDomains: string[];
     };
     UserDetailedNotMeOnly: {
       /** Format: url */
@@ -5294,6 +5296,7 @@ export type components = {
       rejectReports: boolean;
       rejectQuotes: boolean;
       moderationNote?: string | null;
+      isBubbled: boolean;
     };
     GalleryPost: {
       /**
@@ -6195,6 +6198,7 @@ export type operations = {
               assigneeId: string | null;
               reporter: components['schemas']['UserDetailedNotMe'];
               targetUser: components['schemas']['UserDetailedNotMe'];
+              targetInstance: components['schemas']['FederationInstance'] | null;
               assignee: components['schemas']['UserDetailedNotMe'] | null;
               forwarded: boolean;
               /** @enum {string|null} */
@@ -9259,6 +9263,7 @@ export type operations = {
             libreTranslateKey: string | null;
             defaultDarkTheme: string | null;
             defaultLightTheme: string | null;
+            defaultLike: string;
             description: string | null;
             disableRegistration: boolean;
             impressumUrl: string | null;
@@ -11208,6 +11213,7 @@ export type operations = {
               }]>;
             };
             isModerator: boolean;
+            isAdministrator: boolean;
             isSystem: boolean;
             isSilenced: boolean;
             isSuspended: boolean;
@@ -11222,6 +11228,14 @@ export type operations = {
                 expiresAt: string | null;
                 roleId: string;
               })[];
+            followStats: {
+              totalFollowing: number;
+              totalFollowers: number;
+              localFollowing: number;
+              localFollowers: number;
+              remoteFollowing: number;
+              remoteFollowers: number;
+            };
           };
         };
       };
@@ -12129,7 +12143,7 @@ export type operations = {
           description?: string | null;
           defaultLightTheme?: string | null;
           defaultDarkTheme?: string | null;
-          defaultLike?: string | null;
+          defaultLike?: string;
           cacheRemoteFiles?: boolean;
           cacheRemoteSensitiveFiles?: boolean;
           emailRequiredForSignup?: boolean;
@@ -12909,6 +12923,9 @@ export type operations = {
       content: {
         'application/json': {
           uri: string;
+          expandCollectionItems?: boolean;
+          expandCollectionLimit?: number | null;
+          allowAnonymous?: boolean;
         };
       };
     };
@@ -25171,6 +25188,7 @@ export type operations = {
           defaultCWPriority?: 'default' | 'parent' | 'defaultParent' | 'parentDefault';
           /** @enum {string} */
           allowUnsignedFetch?: 'never' | 'always' | 'essential' | 'staff';
+          attributionDomains?: string[];
         };
       };
     };
@@ -27216,12 +27234,6 @@ export type operations = {
           untilDate?: number;
           /** @default false */
           allowPartial?: boolean;
-          /** @default true */
-          includeMyRenotes?: boolean;
-          /** @default true */
-          includeRenotedMyNotes?: boolean;
-          /** @default true */
-          includeLocalRenotes?: boolean;
           /** @default false */
           withFiles?: boolean;
           /** @default true */
@@ -27484,7 +27496,7 @@ export type operations = {
    * notes/polls/recommendation
    * @description No description provided.
    *
-   * **Credential required**: *Yes* / **Permission**: *read:account*
+   * **Credential required**: *No*
    */
   notes___polls___recommendation: {
     requestBody: {
@@ -27496,6 +27508,10 @@ export type operations = {
           offset?: number;
           /** @default false */
           excludeChannels?: boolean;
+          /** @default null */
+          local?: boolean | null;
+          /** @default false */
+          expired?: boolean;
         };
       };
     };
@@ -28633,12 +28649,6 @@ export type operations = {
           untilDate?: number;
           /** @default false */
           allowPartial?: boolean;
-          /** @default true */
-          includeMyRenotes?: boolean;
-          /** @default true */
-          includeRenotedMyNotes?: boolean;
-          /** @default true */
-          includeLocalRenotes?: boolean;
           /** @default false */
           withFiles?: boolean;
           /** @default true */
@@ -28839,12 +28849,6 @@ export type operations = {
           untilDate?: number;
           /** @default false */
           allowPartial?: boolean;
-          /** @default true */
-          includeMyRenotes?: boolean;
-          /** @default true */
-          includeRenotedMyNotes?: boolean;
-          /** @default true */
-          includeLocalRenotes?: boolean;
           /** @default true */
           withRenotes?: boolean;
           /**

@@ -2447,7 +2447,7 @@ export interface Locale extends ILocale {
      */
     "disablePagesScript": string;
     /**
-     * リモートユーザー情報の更新
+     * Refresh remote data
      */
     "updateRemoteUser": string;
     /**
@@ -12493,6 +12493,14 @@ export interface Locale extends ILocale {
          */
         "centerDescription": string;
         /**
+         * Unix Time
+         */
+        "unixtime": string;
+        /**
+         * Displays a timestamp in the viewer's current timezone.
+         */
+        "unixtimeDescription": string;
+        /**
          * Code (Inline)
          */
         "inlineCode": string;
@@ -12933,6 +12941,14 @@ export interface Locale extends ILocale {
      * Fetch linked note
      */
     "fetchLinkedNote": string;
+    /**
+     * Add "Translate" to note action menu
+     */
+    "showTranslationButtonInNoteFooter": string;
+    /**
+     * Failed to translate note. Please try again later or contact an administrator for assistance.
+     */
+    "translationFailed": string;
     "_processErrors": {
         /**
          * Unable to process quote. This post may be missing context.
@@ -13038,6 +13054,10 @@ export interface Locale extends ILocale {
      */
     "wordMuteTestNoMatch": string;
     /**
+     * All word mutes are *case-sensitive* and match on any substring, including part of a longer word or name. You can use regular expressions for more precise control.
+     */
+    "wordMuteWarning": string;
+    /**
      * Bubble timeline
      */
     "bubbleTimeline": string;
@@ -13058,6 +13078,78 @@ export interface Locale extends ILocale {
      */
     "popularUsersLocal": ParameterizedString<"name">;
     /**
+     * Polls trending on {name}
+     */
+    "pollsOnLocal": ParameterizedString<"name">;
+    /**
+     * Polls trending on the global network
+     */
+    "pollsOnRemote": string;
+    /**
+     * Polls that have ended recently
+     */
+    "pollsExpired": string;
+    /**
+     * Trending polls are disabled on this instance.
+     */
+    "trendingPollsDisabled": string;
+    /**
+     * Please log in to view trending polls.
+     */
+    "trendingPollsDisabledLogIn": string;
+    /**
+     * Silenced
+     */
+    "silenced": string;
+    /**
+     * Total followers
+     */
+    "totalFollowers": string;
+    /**
+     * Total following
+     */
+    "totalFollowing": string;
+    /**
+     * Local followers
+     */
+    "localFollowers": string;
+    /**
+     * Local following
+     */
+    "localFollowing": string;
+    /**
+     * Remote followers
+     */
+    "remoteFollowers": string;
+    /**
+     * Remote following
+     */
+    "remoteFollowing": string;
+    /**
+     * Activity Pub
+     */
+    "activityPub": string;
+    /**
+     * IP
+     */
+    "ip": string;
+    /**
+     * The date is when IP address was first used.
+     */
+    "ipTip": string;
+    /**
+     * Period
+     */
+    "rolePeriod": string;
+    /**
+     * Assigned
+     */
+    "roleAssigned": string;
+    /**
+     * automatic
+     */
+    "roleAutomatic": string;
+    /**
      * Translation timeout
      */
     "translationTimeoutLabel": string;
@@ -13065,6 +13157,94 @@ export interface Locale extends ILocale {
      * Timeout in milliseconds for translation API requests.
      */
     "translationTimeoutCaption": string;
+    /**
+     * Staff notes
+     */
+    "staffNotes": string;
+    /**
+     * Icon of {name}
+     */
+    "instanceIconAlt": ParameterizedString<"name">;
+    /**
+     * Attribution Domains
+     */
+    "attributionDomains": string;
+    /**
+     * A list of domains whose content can be attributed to you on link previews, separated by new-line. Any subdomain will also be valid. The following needs to be on the webpage:
+     */
+    "attributionDomainsDescription": string;
+    /**
+     * Written by {user}
+     */
+    "writtenBy": ParameterizedString<"user">;
+    /**
+     * Following (Pub)
+     */
+    "followingPub": string;
+    /**
+     * Followers (Sub)
+     */
+    "followersSub": string;
+    /**
+     * Well-known resources
+     */
+    "wellKnownResources": string;
+    /**
+     * Last posted: {at}
+     */
+    "lastPosted": ParameterizedString<"at">;
+    /**
+     * NSFW
+     */
+    "nsfw": string;
+    /**
+     * Raw
+     */
+    "raw": string;
+    /**
+     * CW
+     */
+    "cw": string;
+    /**
+     * Media Silenced
+     */
+    "mediaSilenced": string;
+    /**
+     * Bubble
+     */
+    "bubble": string;
+    /**
+     * Verified
+     */
+    "verified": string;
+    /**
+     * Not Verified
+     */
+    "notVerified": string;
+    /**
+     * Hibernated
+     */
+    "hibernated": string;
+    /**
+     * When replying to a post with a Content Warning, automatically use the same CW for the reply.
+     */
+    "keepCwDescription": string;
+    /**
+     * Disabled (do not copy CWs)
+     */
+    "keepCwDisabled": string;
+    /**
+     * Enabled (copy CWs verbatim)
+     */
+    "keepCwEnabled": string;
+    /**
+     * Enabled (copy CW and prepend "RE:")
+     */
+    "keepCwPrependRe": string;
+    /**
+     * Note controls
+     */
+    "noteFooterLabel": string;
 }
 declare const locales: {
     [lang: string]: Locale;

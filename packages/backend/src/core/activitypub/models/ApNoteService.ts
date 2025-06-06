@@ -95,6 +95,7 @@ export class ApNoteService {
 		actor?: MiRemoteUser,
 		user?: MiRemoteUser,
 	): Error | null {
+		this.apUtilityService.assertApUrl(uri);
 		const expectHost = this.utilityService.extractDbHost(uri);
 		const apType = getApType(object);
 
@@ -283,6 +284,13 @@ export class ApNoteService {
 		// 引用
 		const quote = await this.getQuote(note, entryUri, resolver);
 		const processErrors = quote === null ? ['quoteUnavailable'] : null;
+
+		if (reply && reply.userHost == null && reply.localOnly) {
+			throw new IdentifiableError('12e23cec-edd9-442b-aa48-9c21f0c3b215', 'Cannot reply to local-only note');
+		}
+		if (quote && quote.userHost == null && quote.localOnly) {
+			throw new IdentifiableError('12e23cec-edd9-442b-aa48-9c21f0c3b215', 'Cannot quote a local-only note');
+		}
 
 		// vote
 		if (reply && reply.hasPoll) {
@@ -480,6 +488,10 @@ export class ApNoteService {
 		// 引用
 		const quote = await this.getQuote(note, entryUri, resolver);
 		const processErrors = quote === null ? ['quoteUnavailable'] : null;
+
+		if (quote && quote.userHost == null && quote.localOnly) {
+			throw new IdentifiableError('12e23cec-edd9-442b-aa48-9c21f0c3b215', 'Cannot quote a local-only note');
+		}
 
 		// vote
 		if (reply && reply.hasPoll) {

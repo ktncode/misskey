@@ -120,7 +120,7 @@ export const PREF_DEF = {
 		default: false,
 	},
 	keepCw: {
-		default: true,
+		default: true as boolean | 'prepend-re',
 	},
 	rememberNoteVisibility: {
 		default: false,
@@ -246,6 +246,9 @@ export const PREF_DEF = {
 		default: false,
 	},
 	showClipButtonInNoteFooter: {
+		default: false,
+	},
+	showTranslationButtonInNoteFooter: {
 		default: false,
 	},
 	reactionsDisplaySize: {
@@ -472,6 +475,34 @@ export const PREF_DEF = {
 	},
 	warnMissingAltText: {
 		default: true,
+	},
+	//#endregion
+
+	//#region hybrid options
+	// These exist in preferences, but may have a legacy value in local storage.
+	// Some parts of the system may still reference the legacy storage so both need to stay in sync!
+	// Null means "fall back to existing value from localStorage"
+	// For all of these preferences, "null" means fall back to existing value in localStorage.
+	fontSize: {
+		default: null as null | '0' | '1' | '2' | '3',
+	},
+	useSystemFont: {
+		default: null as null | boolean,
+	},
+	cornerRadius: {
+		default: null as null | 'misskey' | 'sharkey',
+	},
+	lang: {
+		default: null as null | string,
+	},
+	customCss: {
+		default: null as null | string,
+	},
+	neverShowDonationInfo: {
+		default: null as null | 'true',
+	},
+	neverShowLocalOnlyInfo: {
+		default: null as null | 'true',
 	},
 	//#endregion
 } satisfies PreferencesDefinition;
