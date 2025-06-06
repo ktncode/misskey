@@ -425,6 +425,7 @@ export class NoteEntityService implements OnModuleInit {
 				polls: Map<string, MiPoll>;
 				pollVotes: Map<string, Map<string, MiPollVote[]>>;
 				channels: Map<string, MiChannel>;
+				notes: Map<string, MiNote>;
 			};
 		},
 	): Promise<Packed<'Note'>> {
@@ -517,14 +518,14 @@ export class NoteEntityService implements OnModuleInit {
 				clippedCount: note.clippedCount,
 				processErrors: note.processErrors,
 
-				reply: note.replyId ? this.pack(note.reply ?? note.replyId, me, {
+				reply: note.replyId ? this.pack(note.reply ?? opts._hint_?.notes.get(note.replyId) ?? note.replyId, me, {
 					detail: false,
 					skipHide: opts.skipHide,
 					withReactionAndUserPairCache: opts.withReactionAndUserPairCache,
 					_hint_: options?._hint_,
 				}) : undefined,
 
-				renote: note.renoteId ? this.pack(note.renote ?? note.renoteId, me, {
+				renote: note.renoteId ? this.pack(note.renote ?? opts._hint_?.notes.get(note.renoteId) ?? note.renoteId, me, {
 					detail: true,
 					skipHide: opts.skipHide,
 					withReactionAndUserPairCache: opts.withReactionAndUserPairCache,
@@ -556,16 +557,16 @@ export class NoteEntityService implements OnModuleInit {
 	) {
 		if (notes.length === 0) return [];
 
-		const targetNotes: MiNote[] = [];
-		const targetNotesToFetch: string[] = [];
+		const targetNotesMap = new Map<string, MiNote>();
+		const targetNotesToFetch : string[] = [];
 		for (const note of notes) {
 			if (isPureRenote(note)) {
 				// we may need to fetch 'my reaction' for renote target.
 				if (note.renote) {
-					targetNotes.push(note.renote);
+					targetNotesMap.set(note.renote.id, note.renote);
 					if (note.renote.reply) {
 						// idem if the renote is also a reply.
-						targetNotes.push(note.renote.reply);
+						targetNotesMap.set(note.renote.reply.id, note.renote.reply);
 					}
 				} else if (options?.detail) {
 					targetNotesToFetch.push(note.renoteId);
@@ -573,12 +574,19 @@ export class NoteEntityService implements OnModuleInit {
 			} else {
 				if (note.reply) {
 					// idem for OP of a regular reply.
-					targetNotes.push(note.reply);
+					targetNotesMap.set(note.reply.id, note.reply);
 				} else if (note.replyId && options?.detail) {
 					targetNotesToFetch.push(note.replyId);
 				}
 
-				targetNotes.push(note);
+				targetNotesMap.set(note.id, note);
+			}
+		}
+
+		// Don't fetch notes that were added by ID and then found inline in another note.
+		for (let i = targetNotesToFetch.length - 1; i >= 0; i--) {
+			if (targetNotesMap.has(targetNotesToFetch[i])) {
+				targetNotesToFetch.splice(i, 1);
 			}
 		}
 
@@ -610,36 +618,50 @@ export class NoteEntityService implements OnModuleInit {
 					channel: true,
 				},
 			});
-			targetNotes.push(...newNotes);
+
+			for (const note of newNotes) {
+				targetNotesMap.set(note.id, note);
+			}
 		}
 
-		const fileIds = notes.map(n => [n.fileIds, n.renote?.fileIds, n.reply?.fileIds]).flat(2).filter(x => x != null);
-		const users = [
-			...notes.map(({ user, userId }) => user ?? userId),
-			...notes.map(({ reply, replyUserId }) => reply?.user ?? replyUserId).filter(x => x != null),
-			...notes.map(({ renote, renoteUserId }) => renote?.user ?? renoteUserId).filter(x => x != null),
-		];
+		const targetNotes = Array.from(targetNotesMap.values());
+		const noteIds = Array.from(targetNotesMap.keys());
 
-		// Recursively add all mentioned users from all notes + replies + renotes
-		const allMentionedUsers = targetNotes.reduce((users, note) => {
-			for (const user of note.mentions) {
-				users.add(user);
+		const usersMap = new Map<string, MiUser | string>();
+		const allUsers = notes.flatMap(note => [
+			note.user ?? note.userId,
+			note.reply?.user ?? note.replyUserId,
+			note.renote?.user ?? note.renoteUserId,
+		]);
+
+		for (const user of allUsers) {
+			if (!user) continue;
+
+			if (typeof(user) === 'object') {
+				// ID -> Entity
+				usersMap.set(user.id, user);
+			} else if (!usersMap.has(user)) {
+				// ID -> ID
+				usersMap.set(user, user);
 			}
-			return users;
-		}, new Set<string>());
+		}
 
-		const userIds = Array.from(new Set(users.map(u => typeof(u) === 'string' ? u : u.id)));
-		const noteIds = Array.from(new Set(targetNotes.map(n => n.id)));
+		const users = Array.from(usersMap.values());
+		const userIds = Array.from(usersMap.keys());
+
+		const fileIds = new Set(targetNotes.flatMap(n => n.fileIds));
+		const mentionedUsers = new Set(targetNotes.flatMap(note => note.mentions));
+
 		const [{ bufferedReactions, myReactionsMap }, packedFiles, packedUsers, mentionHandles, userFollowings, userBlockers, polls, pollVotes, channels] = await Promise.all([
 			// bufferedReactions & myReactionsMap
 			this.getReactions(targetNotes, me),
 			// packedFiles
-			this.driveFileEntityService.packManyByIdsMap(fileIds),
+			this.driveFileEntityService.packManyByIdsMap(Array.from(fileIds)),
 			// packedUsers
 			this.userEntityService.packMany(users, me)
 				.then(users => new Map(users.map(u => [u.id, u]))),
 			// mentionHandles
-			this.getUserHandles(Array.from(allMentionedUsers)),
+			this.getUserHandles(Array.from(mentionedUsers)),
 			// userFollowings
 			this.cacheService.getUserFollowings(userIds),
 			// userBlockers
@@ -682,6 +704,7 @@ export class NoteEntityService implements OnModuleInit {
 				polls,
 				pollVotes,
 				channels,
+				notes: new Map(targetNotes.map(n => [n.id, n])),
 			},
 		})));
 	}
