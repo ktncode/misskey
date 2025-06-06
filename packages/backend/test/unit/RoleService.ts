@@ -10,12 +10,15 @@ import { jest } from '@jest/globals';
 import { ModuleMocker } from 'jest-mock';
 import { Test } from '@nestjs/testing';
 import * as lolex from '@sinonjs/fake-timers';
+import { NoOpCacheService } from '../misc/noOpCaches.js';
+import { FakeInternalEventService } from '../misc/FakeInternalEventService.js';
 import type { TestingModule } from '@nestjs/testing';
 import type { MockFunctionMetadata } from 'jest-mock';
 import { GlobalModule } from '@/GlobalModule.js';
 import { RoleService } from '@/core/RoleService.js';
 import {
 	InstancesRepository,
+	MetasRepository,
 	MiMeta,
 	MiRole,
 	MiRoleAssignment,
@@ -34,6 +37,7 @@ import { secureRndstr } from '@/misc/secure-rndstr.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import { RoleCondFormulaValue } from '@/models/Role.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { InternalEventService } from '@/core/InternalEventService.js';
 
 const moduleMocker = new ModuleMocker(global);
 
@@ -45,6 +49,7 @@ describe('RoleService', () => {
 	let rolesRepository: RolesRepository;
 	let roleAssignmentsRepository: RoleAssignmentsRepository;
 	let meta: jest.Mocked<MiMeta>;
+	let metasRepository: MetasRepository;
 	let notificationService: jest.Mocked<NotificationService>;
 	let clock: lolex.InstalledClock;
 
@@ -143,18 +148,20 @@ describe('RoleService', () => {
 					provide: NotificationService.name,
 					useExisting: NotificationService,
 				},
+				MetaService,
+				InternalEventService,
 			],
 		})
 			.useMocker((token) => {
-				if (token === MetaService) {
-					return { fetch: jest.fn() };
-				}
 				if (typeof token === 'function') {
 					const mockMetadata = moduleMocker.getMetadata(token) as MockFunctionMetadata<any, any>;
 					const Mock = moduleMocker.generateFromMetadata(mockMetadata);
 					return new Mock();
 				}
 			})
+			.overrideProvider(MetaService).useValue({ fetch: jest.fn() })
+			.overrideProvider(InternalEventService).useClass(FakeInternalEventService)
+			.overrideProvider(CacheService).useClass(NoOpCacheService)
 			.compile();
 
 		app.enableShutdownHooks();
@@ -164,6 +171,7 @@ describe('RoleService', () => {
 		usersRepository = app.get<UsersRepository>(DI.usersRepository);
 		rolesRepository = app.get<RolesRepository>(DI.rolesRepository);
 		roleAssignmentsRepository = app.get<RoleAssignmentsRepository>(DI.roleAssignmentsRepository);
+		metasRepository = app.get<MetasRepository>(DI.metasRepository);
 
 		meta = app.get<MiMeta>(DI.meta) as jest.Mocked<MiMeta>;
 		notificationService = app.get<NotificationService>(NotificationService) as jest.Mocked<NotificationService>;
@@ -175,7 +183,7 @@ describe('RoleService', () => {
 		clock.uninstall();
 
 		await Promise.all([
-			app.get(DI.metasRepository).delete({}),
+			metasRepository.delete({}),
 			usersRepository.delete({}),
 			rolesRepository.delete({}),
 			roleAssignmentsRepository.delete({}),
