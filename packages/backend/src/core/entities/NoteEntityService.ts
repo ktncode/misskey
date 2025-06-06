@@ -589,9 +589,24 @@ export class NoteEntityService implements OnModuleInit {
 					id: In(targetNotesToFetch),
 				},
 				relations: {
-					user: true,
-					reply: true,
-					renote: true,
+					user: {
+						userProfile: true,
+					},
+					reply: {
+						user: {
+							userProfile: true,
+						},
+					},
+					renote: {
+						user: {
+							userProfile: true,
+						},
+						reply: {
+							user: {
+								userProfile: true,
+							},
+						},
+					},
 					channel: true,
 				},
 			});

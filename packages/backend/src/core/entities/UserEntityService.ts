@@ -789,11 +789,11 @@ export class UserEntityService implements OnModuleInit {
 			.map(user => user.host)
 			.filter((host): host is string => host != null));
 
-		const _profiles: MiUserProfile[] = [];
+		const _profilesFromUsers: MiUserProfile[] = [];
 		const _profilesToFetch: string[] = [];
 		for (const user of _users) {
 			if (user.userProfile) {
-				_profiles.push(user.userProfile);
+				_profilesFromUsers.push(user.userProfile);
 			} else {
 				_profilesToFetch.push(user.id);
 			}
@@ -805,7 +805,7 @@ export class UserEntityService implements OnModuleInit {
 			// profilesMap
 			this.cacheService.getUserProfiles(_profilesToFetch)
 				.then(profiles => {
-					for (const profile of _profiles) {
+					for (const profile of _profilesFromUsers) {
 						profiles.set(profile.userId, profile);
 					}
 					return profiles;
