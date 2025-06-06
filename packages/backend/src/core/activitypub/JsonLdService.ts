@@ -8,6 +8,8 @@ import { Injectable } from '@nestjs/common';
 import { UnrecoverableError } from 'bullmq';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import { bindThis } from '@/decorators.js';
+import Logger from '@/logger.js';
+import { LoggerService } from '@/core/LoggerService.js';
 import { StatusError } from '@/misc/status-error.js';
 import { CONTEXT, PRELOADED_CONTEXTS } from './misc/contexts.js';
 import { validateContentTypeSetAsJsonLD } from './misc/validator.js';
@@ -17,12 +19,12 @@ import type { JsonLd as JsonLdObject, RemoteDocument } from 'jsonld/jsonld-spec.
 // RsaSignature2017 implementation is based on https://github.com/transmute-industries/RsaSignature2017
 
 class JsonLd {
-	public debug = false;
 	public preLoad = true;
 	public loderTimeout = 5000;
 
 	constructor(
 		private httpRequestService: HttpRequestService,
+		private readonly logger: Logger,
 	) {
 	}
 
@@ -84,7 +86,7 @@ class JsonLd {
 		const transformedData = { ...data };
 		delete transformedData['signature'];
 		const cannonidedData = await this.normalize(transformedData);
-		if (this.debug) console.debug(`cannonidedData: ${cannonidedData}`);
+		this.logger.debug('cannonidedData', cannonidedData);
 		const documentHash = this.sha256(cannonidedData.toString());
 		const verifyData = `${optionsHash}${documentHash}`;
 		return verifyData;
@@ -115,7 +117,7 @@ class JsonLd {
 
 			if (this.preLoad) {
 				if (url in PRELOADED_CONTEXTS) {
-					if (this.debug) console.debug(`HIT: ${url}`);
+					this.logger.debug(`Preload HIT: ${url}`);
 					return {
 						contextUrl: undefined,
 						document: PRELOADED_CONTEXTS[url],
@@ -124,7 +126,7 @@ class JsonLd {
 				}
 			}
 
-			if (this.debug) console.debug(`MISS: ${url}`);
+			this.logger.debug(`Preload MISS: ${url}`);
 			const document = await this.fetchDocument(url);
 			return {
 				contextUrl: undefined,
@@ -169,13 +171,16 @@ class JsonLd {
 
 @Injectable()
 export class JsonLdService {
+	private readonly logger: Logger;
 	constructor(
 		private httpRequestService: HttpRequestService,
+		loggerService: LoggerService,
 	) {
+		this.logger = loggerService.getLogger('json-ld');
 	}
 
 	@bindThis
 	public use(): JsonLd {
-		return new JsonLd(this.httpRequestService);
+		return new JsonLd(this.httpRequestService, this.logger);
 	}
 }
