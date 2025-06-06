@@ -220,13 +220,13 @@ export class UserEntityService implements OnModuleInit {
 				},
 			}),
 			this.cacheService.userBlockedCache.fetch(me)
-				.then(blockers => blockers.size > 0),
+				.then(blockers => blockers.has(target)),
 			this.cacheService.userBlockingCache.fetch(me)
-				.then(blockees => blockees.size > 0),
+				.then(blockees => blockees.has(target)),
 			this.cacheService.userMutingsCache.fetch(me)
-				.then(mutings => mutings.size > 0),
+				.then(mutings => mutings.has(target)),
 			this.cacheService.renoteMutingsCache.fetch(me)
-				.then(mutings => mutings.size > 0),
+				.then(mutings => mutings.has(target)),
 			this.cacheService.userByIdCache.fetch(target, () => this.usersRepository.findOneByOrFail({ id: target }))
 				.then(user => user.host),
 			this.userMemosRepository.createQueryBuilder('m')
