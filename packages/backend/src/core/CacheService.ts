@@ -411,6 +411,62 @@ export class CacheService implements OnApplicationShutdown {
 		return blockers;
 	}
 
+	public async getUserProfiles(userIds: Iterable<string>): Promise<Map<string, MiUserProfile>> {
+		const profiles = new Map<string, MiUserProfile>;
+
+		const toFetch: string[] = [];
+		for (const userId of userIds) {
+			const fromCache = this.userProfileCache.get(userId);
+			if (fromCache) {
+				profiles.set(userId, fromCache);
+			} else {
+				toFetch.push(userId);
+			}
+		}
+
+		if (toFetch.length > 0) {
+			const fetched = await this.userProfilesRepository.findBy({
+				userId: In(toFetch),
+			});
+
+			for (const profile of fetched) {
+				profiles.set(profile.userId, profile);
+			}
+
+			const toCache = new Map(fetched.map(p => [p.userId, p]));
+			this.userProfileCache.addMany(toCache);
+		}
+
+		return profiles;
+	}
+
+	public async getUsers(userIds: Iterable<string>): Promise<Map<string, MiUser>> {
+		const users = new Map<string, MiUser>;
+
+		const toFetch: string[] = [];
+		for (const userId of userIds) {
+			const fromCache = this.userByIdCache.get(userId);
+			if (fromCache) {
+				users.set(userId, fromCache);
+			} else {
+				toFetch.push(userId);
+			}
+		}
+
+		if (toFetch.length > 0) {
+			const fetched = await this.usersRepository.findBy({
+				id: In(toFetch),
+			});
+
+			for (const user of fetched) {
+				users.set(user.id, user);
+				this.userByIdCache.set(user.id, user);
+			}
+		}
+
+		return users;
+	}
+
 	@bindThis
 	public dispose(): void {
 		this.internalEventService.off('userChangeSuspendedState', this.onUserEvent);
