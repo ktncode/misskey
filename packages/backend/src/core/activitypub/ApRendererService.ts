@@ -34,7 +34,7 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { JsonLdService } from './JsonLdService.js';
 import { ApMfmService } from './ApMfmService.js';
 import { CONTEXT } from './misc/contexts.js';
-import { getApId, IOrderedCollection, IOrderedCollectionPage } from './type.js';
+import { getApId, ILink, IOrderedCollection, IOrderedCollectionPage } from './type.js';
 import type { IAccept, IActivity, IAdd, IAnnounce, IApDocument, IApEmoji, IApHashtag, IApImage, IApMention, IBlock, ICreate, IDelete, IFlag, IFollow, IKey, ILike, IMove, IObject, IPost, IQuestion, IReject, IRemove, ITombstone, IUndo, IUpdate } from './type.js';
 
 @Injectable()
@@ -500,11 +500,21 @@ export class ApRendererService {
 		const emojis = await this.getEmojis(note.emojis);
 		const apemojis = emojis.filter(emoji => !emoji.localOnly).map(emoji => this.renderEmoji(emoji));
 
-		const tag = [
+		const tag: IObject[] = [
 			...hashtagTags,
 			...mentionTags,
 			...apemojis,
 		];
+
+		// https://codeberg.org/fediverse/fep/src/branch/main/fep/e232/fep-e232.md
+		if (quote) {
+			tag.push({
+				type: 'Link',
+				mediaType: 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
+				rel: 'https://misskey-hub.net/ns#_misskey_quote',
+				href: quote,
+			} satisfies ILink);
+		}
 
 		const asPoll = poll ? {
 			type: 'Question',
@@ -537,6 +547,7 @@ export class ApRendererService {
 			_misskey_quote: quote,
 			quoteUrl: quote,
 			quoteUri: quote,
+			// https://codeberg.org/fediverse/fep/src/branch/main/fep/044f/fep-044f.md
 			quote: quote,
 			published: this.idService.parse(note.id).date.toISOString(),
 			to,
@@ -853,11 +864,21 @@ export class ApRendererService {
 		const emojis = await this.getEmojis(note.emojis);
 		const apemojis = emojis.filter(emoji => !emoji.localOnly).map(emoji => this.renderEmoji(emoji));
 
-		const tag = [
+		const tag: IObject[] = [
 			...hashtagTags,
 			...mentionTags,
 			...apemojis,
 		];
+
+		// https://codeberg.org/fediverse/fep/src/branch/main/fep/e232/fep-e232.md
+		if (quote) {
+			tag.push({
+				type: 'Link',
+				mediaType: 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
+				rel: 'https://misskey-hub.net/ns#_misskey_quote',
+				href: quote,
+			} satisfies ILink);
+		}
 
 		const asPoll = poll ? {
 			type: 'Question',
@@ -887,6 +908,7 @@ export class ApRendererService {
 			_misskey_quote: quote,
 			quoteUrl: quote,
 			quoteUri: quote,
+			// https://codeberg.org/fediverse/fep/src/branch/main/fep/044f/fep-044f.md
 			quote: quote,
 			published: this.idService.parse(note.id).date.toISOString(),
 			to,
