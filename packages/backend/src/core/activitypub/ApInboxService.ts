@@ -365,7 +365,7 @@ export class ApInboxService {
 			const renote = await this.apNoteService.resolveNote(target, { resolver, sentFrom: getApId(target) });
 			if (renote == null) return 'announce target is null';
 
-			if (!await this.noteEntityService.isVisibleForMe(renote, actor.id)) {
+			if (!await this.noteEntityService.isVisibleForMe(renote, actor.id, { me: actor })) {
 				return 'skip: invalid actor for this activity';
 			}
 

@@ -30,6 +30,7 @@ import type {
 	FollowingsRepository,
 	FollowRequestsRepository,
 	MiFollowing,
+	MiInstance,
 	MiMeta,
 	MiUserNotePining,
 	MiUserProfile,
@@ -42,7 +43,7 @@ import type {
 	UsersRepository,
 } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import { RoleService } from '@/core/RoleService.js';
+import { RolePolicies, RoleService } from '@/core/RoleService.js';
 import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
 import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
 import { IdService } from '@/core/IdService.js';
@@ -52,6 +53,7 @@ import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
 import { ChatService } from '@/core/ChatService.js';
 import { isSystemAccount } from '@/misc/is-system-account.js';
 import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
+import type { CacheService } from '@/core/CacheService.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { NoteEntityService } from './NoteEntityService.js';
 import type { PageEntityService } from './PageEntityService.js';
@@ -103,6 +105,7 @@ export class UserEntityService implements OnModuleInit {
 	private idService: IdService;
 	private avatarDecorationService: AvatarDecorationService;
 	private chatService: ChatService;
+	private cacheService: CacheService;
 
 	constructor(
 		private moduleRef: ModuleRef,
@@ -163,6 +166,7 @@ export class UserEntityService implements OnModuleInit {
 		this.idService = this.moduleRef.get('IdService');
 		this.avatarDecorationService = this.moduleRef.get('AvatarDecorationService');
 		this.chatService = this.moduleRef.get('ChatService');
+		this.cacheService = this.moduleRef.get('CacheService');
 	}
 
 	//#region Validators
@@ -215,45 +219,23 @@ export class UserEntityService implements OnModuleInit {
 					followeeId: me,
 				},
 			}),
-			this.blockingsRepository.exists({
-				where: {
-					blockerId: me,
-					blockeeId: target,
-				},
-			}),
-			this.blockingsRepository.exists({
-				where: {
-					blockerId: target,
-					blockeeId: me,
-				},
-			}),
-			this.mutingsRepository.exists({
-				where: {
-					muterId: me,
-					muteeId: target,
-				},
-			}),
-			this.renoteMutingsRepository.exists({
-				where: {
-					muterId: me,
-					muteeId: target,
-				},
-			}),
-			this.usersRepository.createQueryBuilder('u')
-				.select('u.host')
-				.where({ id: target })
-				.getRawOne<{ u_host: string }>()
-				.then(it => it?.u_host ?? null),
+			this.cacheService.userBlockedCache.fetch(me)
+				.then(blockers => blockers.size > 0),
+			this.cacheService.userBlockingCache.fetch(me)
+				.then(blockees => blockees.size > 0),
+			this.cacheService.userMutingsCache.fetch(me)
+				.then(mutings => mutings.size > 0),
+			this.cacheService.renoteMutingsCache.fetch(me)
+				.then(mutings => mutings.size > 0),
+			this.cacheService.userByIdCache.fetch(target, () => this.usersRepository.findOneByOrFail({ id: target }))
+				.then(user => user.host),
 			this.userMemosRepository.createQueryBuilder('m')
 				.select('m.memo')
 				.where({ userId: me, targetUserId: target })
 				.getRawOne<{ m_memo: string | null }>()
 				.then(it => it?.m_memo ?? null),
-			this.userProfilesRepository.createQueryBuilder('p')
-				.select('p.mutedInstances')
-				.where({ userId: me })
-				.getRawOne<{ p_mutedInstances: string[] }>()
-				.then(it => it?.p_mutedInstances ?? []),
+			this.cacheService.userProfileCache.fetch(me)
+				.then(profile => profile.mutedInstances),
 		]);
 
 		const isInstanceMuted = !!host && mutedInstances.includes(host);
@@ -306,34 +288,18 @@ export class UserEntityService implements OnModuleInit {
 				.where('f.followeeId = :me', { me })
 				.getRawMany<{ f_followerId: string }>()
 				.then(it => it.map(it => it.f_followerId)),
-			this.blockingsRepository.createQueryBuilder('b')
-				.select('b.blockeeId')
-				.where('b.blockerId = :me', { me })
-				.getRawMany<{ b_blockeeId: string }>()
-				.then(it => it.map(it => it.b_blockeeId)),
-			this.blockingsRepository.createQueryBuilder('b')
-				.select('b.blockerId')
-				.where('b.blockeeId = :me', { me })
-				.getRawMany<{ b_blockerId: string }>()
-				.then(it => it.map(it => it.b_blockerId)),
-			this.mutingsRepository.createQueryBuilder('m')
-				.select('m.muteeId')
-				.where('m.muterId = :me', { me })
-				.getRawMany<{ m_muteeId: string }>()
-				.then(it => it.map(it => it.m_muteeId)),
-			this.renoteMutingsRepository.createQueryBuilder('m')
-				.select('m.muteeId')
-				.where('m.muterId = :me', { me })
-				.getRawMany<{ m_muteeId: string }>()
-				.then(it => it.map(it => it.m_muteeId)),
-			this.usersRepository.createQueryBuilder('u')
-				.select(['u.id', 'u.host'])
-				.where({ id: In(targets) } )
-				.getRawMany<{ m_id: string, m_host: string }>()
-				.then(it => it.reduce((map, it) => {
-					map[it.m_id] = it.m_host;
-					return map;
-				}, {} as Record<string, string>)),
+			this.cacheService.userBlockedCache.fetch(me),
+			this.cacheService.userBlockingCache.fetch(me),
+			this.cacheService.userMutingsCache.fetch(me),
+			this.cacheService.renoteMutingsCache.fetch(me),
+			this.cacheService.getUsers(targets)
+				.then(users => {
+					const record: Record<string, string | null> = {};
+					for (const [id, user] of users) {
+						record[id] = user.host;
+					}
+					return record;
+				}),
 			this.userMemosRepository.createQueryBuilder('m')
 				.select(['m.targetUserId', 'm.memo'])
 				.where({ userId: me, targetUserId: In(targets) })
@@ -342,11 +308,8 @@ export class UserEntityService implements OnModuleInit {
 					map[it.m_targetUserId] = it.m_memo;
 					return map;
 				}, {} as Record<string, string | null>)),
-			this.userProfilesRepository.createQueryBuilder('p')
-				.select('p.mutedInstances')
-				.where({ userId: me })
-				.getRawOne<{ p_mutedInstances: string[] }>()
-				.then(it => it?.p_mutedInstances ?? []),
+			this.cacheService.userProfileCache.fetch(me)
+				.then(p => p.mutedInstances),
 		]);
 
 		return new Map(
@@ -362,11 +325,11 @@ export class UserEntityService implements OnModuleInit {
 						isFollowed: followees.includes(target),
 						hasPendingFollowRequestFromYou: followersRequests.includes(target),
 						hasPendingFollowRequestToYou: followeesRequests.includes(target),
-						isBlocking: blockers.includes(target),
-						isBlocked: blockees.includes(target),
-						isMuted: muters.includes(target),
-						isRenoteMuted: renoteMuters.includes(target),
-						isInstanceMuted: mutedInstances.includes(hosts[target]),
+						isBlocking: blockers.has(target),
+						isBlocked: blockees.has(target),
+						isMuted: muters.has(target),
+						isRenoteMuted: renoteMuters.has(target),
+						isInstanceMuted: hosts[target] != null && mutedInstances.includes(hosts[target]),
 						memo: memos[target] ?? null,
 					},
 				];
@@ -391,6 +354,7 @@ export class UserEntityService implements OnModuleInit {
 		return false; // TODO
 	}
 
+	// TODO make redis calls in MULTI?
 	@bindThis
 	public async getNotificationsInfo(userId: MiUser['id']): Promise<{
 		hasUnread: boolean;
@@ -424,16 +388,14 @@ export class UserEntityService implements OnModuleInit {
 
 	@bindThis
 	public async getHasPendingReceivedFollowRequest(userId: MiUser['id']): Promise<boolean> {
-		const count = await this.followRequestsRepository.countBy({
+		return await this.followRequestsRepository.existsBy({
 			followeeId: userId,
 		});
-
-		return count > 0;
 	}
 
 	@bindThis
 	public async getHasPendingSentFollowRequest(userId: MiUser['id']): Promise<boolean> {
-		return this.followRequestsRepository.existsBy({
+		return await this.followRequestsRepository.existsBy({
 			followerId: userId,
 		});
 	}
@@ -480,6 +442,12 @@ export class UserEntityService implements OnModuleInit {
 			userRelations?: Map<MiUser['id'], UserRelation>,
 			userMemos?: Map<MiUser['id'], string | null>,
 			pinNotes?: Map<MiUser['id'], MiUserNotePining[]>,
+			iAmModerator?: boolean,
+			userIdsByUri?: Map<string, string>,
+			instances?: Map<string, MiInstance | null>,
+			securityKeyCounts?: Map<string, number>,
+			pendingReceivedFollows?: Set<string>,
+			pendingSentFollows?: Set<string>,
 		},
 	): Promise<Packed<S>> {
 		const opts = Object.assign({
@@ -521,7 +489,7 @@ export class UserEntityService implements OnModuleInit {
 		const isDetailed = opts.schema !== 'UserLite';
 		const meId = me ? me.id : null;
 		const isMe = meId === user.id;
-		const iAmModerator = me ? await this.roleService.isModerator(me as MiUser) : false;
+		const iAmModerator = opts.iAmModerator ?? (me ? await this.roleService.isModerator(me as MiUser) : false);
 
 		const profile = isDetailed
 			? (opts.userProfile ?? user.userProfile ?? await this.userProfilesRepository.findOneByOrFail({ userId: user.id }))
@@ -582,6 +550,9 @@ export class UserEntityService implements OnModuleInit {
 		const checkHost = user.host == null ? this.config.host : user.host;
 		const notificationsInfo = isMe && isDetailed ? await this.getNotificationsInfo(user.id) : null;
 
+		let fetchPoliciesPromise: Promise<RolePolicies> | null = null;
+		const fetchPolicies = () => fetchPoliciesPromise ??= this.roleService.getUserPolicies(user);
+
 		const packed = {
 			id: user.id,
 			name: user.name,
@@ -607,13 +578,13 @@ export class UserEntityService implements OnModuleInit {
 			mandatoryCW: user.mandatoryCW,
 			rejectQuotes: user.rejectQuotes,
 			attributionDomains: user.attributionDomains,
-			isSilenced: user.isSilenced || this.roleService.getUserPolicies(user.id).then(r => !r.canPublicNote),
+			isSilenced: user.isSilenced || fetchPolicies().then(r => !r.canPublicNote),
 			speakAsCat: user.speakAsCat ?? false,
 			approved: user.approved,
 			requireSigninToViewContents: user.requireSigninToViewContents === false ? undefined : true,
 			makeNotesFollowersOnlyBefore: user.makeNotesFollowersOnlyBefore ?? undefined,
 			makeNotesHiddenBefore: user.makeNotesHiddenBefore ?? undefined,
-			instance: user.host ? this.federatedInstanceService.fetch(user.host).then(instance => instance ? {
+			instance: user.host ? Promise.resolve(opts.instances?.has(user.host) ? opts.instances.get(user.host) : this.federatedInstanceService.fetch(user.host)).then(instance => instance ? {
 				name: instance.name,
 				softwareName: instance.softwareName,
 				softwareVersion: instance.softwareVersion,
@@ -628,7 +599,7 @@ export class UserEntityService implements OnModuleInit {
 			emojis: this.customEmojiService.populateEmojis(user.emojis, checkHost),
 			onlineStatus: this.getOnlineStatus(user),
 			// パフォーマンス上の理由でローカルユーザーのみ
-			badgeRoles: user.host == null ? this.roleService.getUserBadgeRoles(user.id).then((rs) => rs
+			badgeRoles: user.host == null ? this.roleService.getUserBadgeRoles(user).then((rs) => rs
 				.filter((r) => r.isPublic || iAmModerator)
 				.sort((a, b) => b.displayOrder - a.displayOrder)
 				.map((r) => ({
@@ -641,9 +612,9 @@ export class UserEntityService implements OnModuleInit {
 			...(isDetailed ? {
 				url: profile!.url,
 				uri: user.uri,
-				movedTo: user.movedToUri ? this.apPersonService.resolvePerson(user.movedToUri).then(user => user.id).catch(() => null) : null,
+				movedTo: user.movedToUri ? Promise.resolve(opts.userIdsByUri?.get(user.movedToUri) ?? this.apPersonService.resolvePerson(user.movedToUri).then(user => user.id).catch(() => null)) : null,
 				alsoKnownAs: user.alsoKnownAs
-					? Promise.all(user.alsoKnownAs.map(uri => this.apPersonService.fetchPerson(uri).then(user => user?.id).catch(() => null)))
+					? Promise.all(user.alsoKnownAs.map(uri => Promise.resolve(opts.userIdsByUri?.get(uri) ?? this.apPersonService.fetchPerson(uri).then(user => user?.id).catch(() => null))))
 						.then(xs => xs.length === 0 ? null : xs.filter(x => x != null))
 					: null,
 				updatedAt: user.updatedAt ? user.updatedAt.toISOString() : null,
@@ -670,8 +641,8 @@ export class UserEntityService implements OnModuleInit {
 				followersVisibility: profile!.followersVisibility,
 				followingVisibility: profile!.followingVisibility,
 				chatScope: user.chatScope,
-				canChat: this.roleService.getUserPolicies(user.id).then(r => r.chatAvailability === 'available'),
-				roles: this.roleService.getUserRoles(user.id).then(roles => roles.filter(role => role.isPublic).sort((a, b) => b.displayOrder - a.displayOrder).map(role => ({
+				canChat: fetchPolicies().then(r => r.chatAvailability === 'available'),
+				roles: this.roleService.getUserRoles(user).then(roles => roles.filter(role => role.isPublic).sort((a, b) => b.displayOrder - a.displayOrder).map(role => ({
 					id: role.id,
 					name: role.name,
 					color: role.color,
@@ -689,7 +660,7 @@ export class UserEntityService implements OnModuleInit {
 				twoFactorEnabled: profile!.twoFactorEnabled,
 				usePasswordLessLogin: profile!.usePasswordLessLogin,
 				securityKeys: profile!.twoFactorEnabled
-					? this.userSecurityKeysRepository.countBy({ userId: user.id }).then(result => result >= 1)
+					? Promise.resolve(opts.securityKeyCounts?.get(user.id) ?? this.userSecurityKeysRepository.countBy({ userId: user.id })).then(result => result >= 1)
 					: false,
 			} : {}),
 
@@ -722,8 +693,8 @@ export class UserEntityService implements OnModuleInit {
 				hasUnreadAntenna: this.getHasUnreadAntenna(user.id),
 				hasUnreadChannel: false, // 後方互換性のため
 				hasUnreadNotification: notificationsInfo?.hasUnread, // 後方互換性のため
-				hasPendingReceivedFollowRequest: this.getHasPendingReceivedFollowRequest(user.id),
-				hasPendingSentFollowRequest: this.getHasPendingSentFollowRequest(user.id),
+				hasPendingReceivedFollowRequest: opts.pendingReceivedFollows?.has(user.id) ?? this.getHasPendingReceivedFollowRequest(user.id),
+				hasPendingSentFollowRequest: opts.pendingSentFollows?.has(user.id) ?? this.getHasPendingSentFollowRequest(user.id),
 				unreadNotificationsCount: notificationsInfo?.unreadCount,
 				mutedWords: profile!.mutedWords,
 				hardMutedWords: profile!.hardMutedWords,
@@ -733,7 +704,7 @@ export class UserEntityService implements OnModuleInit {
 				emailNotificationTypes: profile!.emailNotificationTypes,
 				achievements: profile!.achievements,
 				loggedInDays: profile!.loggedInDates.length,
-				policies: this.roleService.getUserPolicies(user.id),
+				policies: fetchPolicies(),
 				defaultCW: profile!.defaultCW,
 				defaultCWPriority: profile!.defaultCWPriority,
 				allowUnsignedFetch: user.allowUnsignedFetch,
@@ -783,6 +754,8 @@ export class UserEntityService implements OnModuleInit {
 			includeSecrets?: boolean,
 		},
 	): Promise<Packed<S>[]> {
+		if (users.length === 0) return [];
+
 		// -- IDのみの要素を補完して完全なエンティティ一覧を作る
 
 		const _users = users.filter((user): user is MiUser => typeof user !== 'string');
@@ -800,56 +773,110 @@ export class UserEntityService implements OnModuleInit {
 		}
 		const _userIds = _users.map(u => u.id);
 
-		// -- 実行者の有無や指定スキーマの種別によって要否が異なる値群を取得
+		const iAmModerator = await this.roleService.isModerator(me as MiUser);
+		const meId = me ? me.id : null;
+		const isMe = meId && _userIds.includes(meId);
+		const isDetailed = options && options.schema !== 'UserLite';
+		const isDetailedAndMe = isDetailed && isMe;
+		const isDetailedAndMeOrMod = isDetailed && (isMe || iAmModerator);
+		const isDetailedAndNotMe = isDetailed && !isMe;
 
-		let profilesMap: Map<MiUser['id'], MiUserProfile> = new Map();
-		let userRelations: Map<MiUser['id'], UserRelation> = new Map();
-		let userMemos: Map<MiUser['id'], string | null> = new Map();
-		let pinNotes: Map<MiUser['id'], MiUserNotePining[]> = new Map();
+		const userUris = new Set(_users
+			.flatMap(user => [user.uri, user.movedToUri])
+			.filter((uri): uri is string => uri != null));
 
-		if (options?.schema !== 'UserLite') {
-			const _profiles: MiUserProfile[] = [];
-			const _profilesToFetch: string[] = [];
-			for (const user of _users) {
-				if (user.userProfile) {
-					_profiles.push(user.userProfile);
-				} else {
-					_profilesToFetch.push(user.id);
-				}
-			}
-			if (_profilesToFetch.length > 0) {
-				const fetched = await this.userProfilesRepository.findBy({ userId: In(_profilesToFetch) });
-				_profiles.push(...fetched);
-			}
-			profilesMap = new Map(_profiles.map(p => [p.userId, p]));
+		const userHosts = new Set(_users
+			.map(user => user.host)
+			.filter((host): host is string => host != null));
 
-			const meId = me ? me.id : null;
-			if (meId) {
-				userMemos = await this.userMemosRepository.findBy({ userId: meId })
-					.then(memos => new Map(memos.map(memo => [memo.targetUserId, memo.memo])));
-
-				if (_userIds.length > 0) {
-					userRelations = await this.getRelations(meId, _userIds);
-					pinNotes = await this.userNotePiningsRepository.createQueryBuilder('pin')
-						.where('pin.userId IN (:...userIds)', { userIds: _userIds })
-						.innerJoinAndSelect('pin.note', 'note')
-						.getMany()
-						.then(pinsNotes => {
-							const map = new Map<MiUser['id'], MiUserNotePining[]>();
-							for (const note of pinsNotes) {
-								const notes = map.get(note.userId) ?? [];
-								notes.push(note);
-								map.set(note.userId, notes);
-							}
-							for (const [, notes] of map.entries()) {
-								// pack側ではDESCで取得しているので、それに合わせて降順に並び替えておく
-								notes.sort((a, b) => b.id.localeCompare(a.id));
-							}
-							return map;
-						});
-				}
+		const _profiles: MiUserProfile[] = [];
+		const _profilesToFetch: string[] = [];
+		for (const user of _users) {
+			if (user.userProfile) {
+				_profiles.push(user.userProfile);
+			} else {
+				_profilesToFetch.push(user.id);
 			}
 		}
+
+		// -- 実行者の有無や指定スキーマの種別によって要否が異なる値群を取得
+
+		const [profilesMap, userMemos, userRelations, pinNotes, userIdsByUri, instances, securityKeyCounts, pendingReceivedFollows, pendingSentFollows] = await Promise.all([
+			// profilesMap
+			this.cacheService.getUserProfiles(_profilesToFetch)
+				.then(profiles => {
+					for (const profile of _profiles) {
+						profiles.set(profile.userId, profile);
+					}
+					return profiles;
+				}),
+			// userMemos
+			isDetailed && meId ? this.userMemosRepository.findBy({ userId: meId })
+				.then(memos => new Map(memos.map(memo => [memo.targetUserId, memo.memo]))) : new Map(),
+			// userRelations
+			isDetailedAndNotMe && meId ? this.getRelations(meId, _userIds) : new Map(),
+			// pinNotes
+			isDetailed ? this.userNotePiningsRepository.createQueryBuilder('pin')
+				.where('pin.userId IN (:...userIds)', { userIds: _userIds })
+				.innerJoinAndSelect('pin.note', 'note')
+				.getMany()
+				.then(pinsNotes => {
+					const map = new Map<MiUser['id'], MiUserNotePining[]>();
+					for (const note of pinsNotes) {
+						const notes = map.get(note.userId) ?? [];
+						notes.push(note);
+						map.set(note.userId, notes);
+					}
+					for (const [, notes] of map.entries()) {
+						// pack側ではDESCで取得しているので、それに合わせて降順に並び替えておく
+						notes.sort((a, b) => b.id.localeCompare(a.id));
+					}
+					return map;
+				}) : new Map(),
+			// userIdsByUrl
+			isDetailed ? this.usersRepository.createQueryBuilder('user')
+				.select([
+					'user.id',
+					'user.uri',
+				])
+				.where({
+					uri: In(Array.from(userUris)),
+				})
+				.getRawMany<{ user_uri: string, user_id: string }>()
+				.then(users => new Map(users.map(u => [u.user_uri, u.user_id]))) : new Map(),
+			// instances
+			Promise.all(Array.from(userHosts).map(async host => [host, await this.federatedInstanceService.fetch(host)] as const))
+				.then(hosts => new Map(hosts)),
+			// securityKeyCounts
+			isDetailedAndMeOrMod ? this.userSecurityKeysRepository.createQueryBuilder('key')
+				.select('key.userId', 'userId')
+				.addSelect('count(key.id)', 'userCount')
+				.where({
+					userId: In(_userIds),
+				})
+				.groupBy('key.userId')
+				.getRawMany<{ userId: string, userCount: number }>()
+				.then(counts => new Map(counts.map(c => [c.userId, c.userCount]))) : new Map(),
+			// TODO check query performance
+			// pendingReceivedFollows
+			isDetailedAndMe ? this.followRequestsRepository.createQueryBuilder('req')
+				.select('req.followeeId', 'followeeId')
+				.where({
+					followeeId: In(_userIds),
+				})
+				.groupBy('req.followeeId')
+				.getRawMany<{ followeeId: string }>()
+				.then(reqs => new Set(reqs.map(r => r.followeeId))) : new Set<string>(),
+			// pendingSentFollows
+			isDetailedAndMe ? this.followRequestsRepository.createQueryBuilder('req')
+				.select('req.followerId', 'followerId')
+				.where({
+					followerId: In(_userIds),
+				})
+				.groupBy('req.followerId')
+				.getRawMany<{ followerId: string }>()
+				.then(reqs => new Set(reqs.map(r => r.followerId))) : new Set<string>(),
+		]);
 
 		return Promise.all(
 			_users.map(u => this.pack(
@@ -861,6 +888,12 @@ export class UserEntityService implements OnModuleInit {
 					userRelations: userRelations,
 					userMemos: userMemos,
 					pinNotes: pinNotes,
+					iAmModerator,
+					userIdsByUri,
+					instances,
+					securityKeyCounts,
+					pendingReceivedFollows,
+					pendingSentFollows,
 				},
 			)),
 		);
