@@ -657,9 +657,10 @@ export class ApNoteService {
 	 */
 	private async getQuote(note: IPost, entryUri: string, resolver: Resolver): Promise<MiNote | null | undefined> {
 		const quoteUris = new Set<string>();
-		if (note._misskey_quote) quoteUris.add(note._misskey_quote);
-		if (note.quoteUrl) quoteUris.add(note.quoteUrl);
-		if (note.quoteUri) quoteUris.add(note.quoteUri);
+		if (note._misskey_quote && typeof(note._misskey_quote as unknown) === 'string') quoteUris.add(note._misskey_quote);
+		if (note.quoteUrl && typeof(note.quoteUrl as unknown) === 'string') quoteUris.add(note.quoteUrl);
+		if (note.quoteUri && typeof(note.quoteUri as unknown) === 'string') quoteUris.add(note.quoteUri);
+		if (note.quote && typeof(note.quote as unknown) === 'string') quoteUris.add(note.quote);
 
 		// No quote, return undefined
 		if (quoteUris.size < 1) return undefined;
