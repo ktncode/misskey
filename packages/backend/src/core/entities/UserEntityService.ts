@@ -219,10 +219,10 @@ export class UserEntityService implements OnModuleInit {
 					followeeId: me,
 				},
 			}),
-			this.cacheService.userBlockedCache.fetch(me)
-				.then(blockers => blockers.has(target)),
 			this.cacheService.userBlockingCache.fetch(me)
 				.then(blockees => blockees.has(target)),
+			this.cacheService.userBlockedCache.fetch(me)
+				.then(blockers => blockers.has(target)),
 			this.cacheService.userMutingsCache.fetch(me)
 				.then(mutings => mutings.has(target)),
 			this.cacheService.renoteMutingsCache.fetch(me)
@@ -325,8 +325,8 @@ export class UserEntityService implements OnModuleInit {
 						isFollowed: followees.includes(target),
 						hasPendingFollowRequestFromYou: followersRequests.includes(target),
 						hasPendingFollowRequestToYou: followeesRequests.includes(target),
-						isBlocking: blockers.has(target),
-						isBlocked: blockees.has(target),
+						isBlocking: blockees.has(target),
+						isBlocked: blockers.has(target),
 						isMuted: muters.has(target),
 						isRenoteMuted: renoteMuters.has(target),
 						isInstanceMuted: hosts[target] != null && mutedInstances.includes(hosts[target]),
