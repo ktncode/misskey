@@ -566,6 +566,28 @@ export class QuantumKVCache<T> implements Iterable<[key: string, value: T]> {
 	}
 
 	/**
+	 * Adds a value to the local memory cache without notifying other process.
+	 * Neither a Redis event nor onSet callback will be fired, as the value has not actually changed.
+	 * This should only be used when the value is known to be current, like after fetching from the database.
+	 */
+	@bindThis
+	public add(key: string, value: T): void {
+		this.memoryCache.set(key, value);
+	}
+
+	/**
+	 * Adds multiple values to the local memory cache without notifying other process.
+	 * Neither a Redis event nor onSet callback will be fired, as the value has not actually changed.
+	 * This should only be used when the value is known to be current, like after fetching from the database.
+	 */
+	@bindThis
+	public addMany(items: Iterable<[key: string, value: T]>): void {
+		for (const [key, value] of items) {
+			this.memoryCache.set(key, value);
+		}
+	}
+
+	/**
 	 * Gets a value from the local memory cache, or returns undefined if not found.
 	 */
 	@bindThis

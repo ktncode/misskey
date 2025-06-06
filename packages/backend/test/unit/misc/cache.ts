@@ -417,6 +417,68 @@ describe(QuantumKVCache, () => {
 		});
 	});
 
+	describe('add', () => {
+		it('should add the item', () => {
+			const cache = makeCache();
+			cache.add('foo', 'bar');
+			expect(cache.has('foo')).toBe(true);
+		});
+
+		it('should not emit event', () => {
+			const cache = makeCache({
+				name: 'fake',
+			});
+
+			cache.add('foo', 'bar');
+
+			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(0);
+		});
+
+		it('should not call onSet', () => {
+			const fakeOnSet = jest.fn(() => Promise.resolve());
+			const cache = makeCache({
+				onSet: fakeOnSet,
+			});
+
+			cache.add('foo', 'bar');
+
+			expect(fakeOnSet).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('addMany', () => {
+		it('should add all items', () => {
+			const cache = makeCache();
+
+			cache.addMany([['foo', 'bar'], ['alpha', 'omega']]);
+
+			expect(cache.has('foo')).toBe(true);
+			expect(cache.has('alpha')).toBe(true);
+		});
+
+
+		it('should not emit event', () => {
+			const cache = makeCache({
+				name: 'fake',
+			});
+
+			cache.addMany([['foo', 'bar'], ['alpha', 'omega']]);
+
+			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(0);
+		});
+
+		it('should not call onSet', () => {
+			const fakeOnSet = jest.fn(() => Promise.resolve());
+			const cache = makeCache({
+				onSet: fakeOnSet,
+			});
+
+			cache.addMany([['foo', 'bar'], ['alpha', 'omega']]);
+
+			expect(fakeOnSet).not.toHaveBeenCalled();
+		});
+	});
+
 	describe('has', () => {
 		it('should return false when empty', () => {
 			const cache = makeCache();
