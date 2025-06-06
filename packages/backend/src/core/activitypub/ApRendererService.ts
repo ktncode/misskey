@@ -419,7 +419,7 @@ export class ApRendererService {
 			inReplyTo = null;
 		}
 
-		let quote;
+		let quote: string | undefined = undefined;
 
 		if (note.renoteId) {
 			const renote = await this.notesRepository.findOneBy({ id: note.renoteId });
@@ -537,6 +537,7 @@ export class ApRendererService {
 			_misskey_quote: quote,
 			quoteUrl: quote,
 			quoteUri: quote,
+			quote: quote,
 			published: this.idService.parse(note.id).date.toISOString(),
 			to,
 			cc,
@@ -774,7 +775,7 @@ export class ApRendererService {
 			inReplyTo = null;
 		}
 
-		let quote;
+		let quote: string | undefined = undefined;
 
 		if (note.renoteId) {
 			const renote = await this.notesRepository.findOneBy({ id: note.renoteId });
@@ -886,6 +887,7 @@ export class ApRendererService {
 			_misskey_quote: quote,
 			quoteUrl: quote,
 			quoteUri: quote,
+			quote: quote,
 			published: this.idService.parse(note.id).date.toISOString(),
 			to,
 			cc,
