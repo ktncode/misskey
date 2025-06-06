@@ -5,7 +5,7 @@
 
 import { jest } from '@jest/globals';
 import { FakeInternalEventService } from '../../misc/FakeInternalEventService.js';
-import { QuantumKVCache, QuantumKVOpts } from '@/misc/cache.js';
+import { QuantumKVCache, QuantumKVOpts } from '@/misc/QuantumKVCache.js';
 
 describe(QuantumKVCache, () => {
 	let fakeInternalEventService: FakeInternalEventService;
@@ -455,7 +455,6 @@ describe(QuantumKVCache, () => {
 			expect(cache.has('foo')).toBe(true);
 			expect(cache.has('alpha')).toBe(true);
 		});
-
 
 		it('should not emit event', () => {
 			const cache = makeCache({

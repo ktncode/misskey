@@ -12,7 +12,7 @@ import { IdService } from '@/core/IdService.js';
 import { GlobalEvents, GlobalEventService, InternalEventTypes } from '@/core/GlobalEventService.js';
 import { bindThis } from '@/decorators.js';
 import type { MiLocalUser } from '@/models/User.js';
-import { QuantumKVCache, RedisKVCache } from '@/misc/cache.js';
+import { QuantumKVCache } from '@/misc/QuantumKVCache.js';
 import { InternalEventService } from './InternalEventService.js';
 
 @Injectable()

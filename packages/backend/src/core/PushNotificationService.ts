@@ -12,7 +12,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import { getNoteSummary } from '@/misc/get-note-summary.js';
 import type { MiMeta, MiSwSubscription, SwSubscriptionsRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import { QuantumKVCache, RedisKVCache } from '@/misc/cache.js';
+import { QuantumKVCache } from '@/misc/QuantumKVCache.js';
 import { InternalEventService } from '@/core/InternalEventService.js';
 
 // Defined also packages/sw/types.ts#L13
