@@ -133,6 +133,7 @@ export class MiNote {
 	})
 	public uri: string | null;
 
+	@Index('IDX_note_url')
 	@Column('varchar', {
 		length: 512, nullable: true,
 		comment: 'The human readable url of a note. it will be null when the note is local.',

@@ -390,9 +390,9 @@ export class MiUser {
 	})
 	public allowUnsignedFetch: UserUnsignedFetchOption;
 
-	@Column('varchar', {
+	@Column('text', {
 		name: 'attributionDomains',
-		length: 128, array: true, default: '{}',
+		array: true, default: '{}',
 	})
 	public attributionDomains: string[];
 
