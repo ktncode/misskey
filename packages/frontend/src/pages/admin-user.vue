@@ -423,15 +423,11 @@ function createFetcher(withHint = true) {
 			? (withHint && props.ipsHint) ? props.ipsHint : misskeyApi('admin/get-user-ips', {
 				userId: props.userId,
 			})
-			: null,
-		iAmAdmin ? misskeyApi('ap/get', {
-			uri: `${url}/users/${props.userId}`,
-		}).catch(() => null) : null],
-	).then(([_user, _info, _ips, _ap]) => {
+			: null],
+	).then(async ([_user, _info, _ips]) => {
 		user.value = _user;
 		info.value = _info;
 		ips.value = _ips;
-		ap.value = _ap;
 		moderator.value = info.value.isModerator;
 		silenced.value = info.value.isSilenced;
 		approved.value = info.value.approved;
@@ -440,6 +436,12 @@ function createFetcher(withHint = true) {
 		rejectQuotes.value = user.value.rejectQuotes ?? false;
 		moderationNote.value = info.value.moderationNote;
 		mandatoryCW.value = user.value.mandatoryCW;
+
+		if (iAmAdmin) {
+			ap.value = await misskeyApi('ap/get', {
+				uri: _user.uri ?? `${url}/users/${props.userId}`,
+			}).catch(() => null);
+		}
 	});
 }
 
