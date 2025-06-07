@@ -460,14 +460,14 @@ async function onMandatoryCWChanged(value: string) {
 async function onModerationNoteChanged(value: string) {
 	await os.promiseDialog(async () => {
 		await misskeyApi('admin/update-user-note', { userId: props.userId, text: value });
-		refreshUser();
+		await refreshUser();
 	});
 }
 
 async function updateRemoteUser() {
 	await os.promiseDialog(async () => {
 		await misskeyApi('federation/update-remote-user', { userId: props.userId });
-		refreshUser();
+		await refreshUser();
 	});
 }
 
