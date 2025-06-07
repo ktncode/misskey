@@ -473,8 +473,6 @@ describe('ActivityPub', () => {
 
 	describe('JSON-LD', () => {
 		test('Compaction', async () => {
-			const jsonLd = jsonLdService.use();
-
 			const object = {
 				'@context': [
 					'https://www.w3.org/ns/activitystreams',
@@ -493,7 +491,7 @@ describe('ActivityPub', () => {
 				unknown: 'test test bar',
 				undefined: 'test test baz',
 			};
-			const compacted = await jsonLd.compact(object);
+			const compacted = await jsonLdService.compact(object);
 
 			assert.deepStrictEqual(compacted, {
 				'@context': CONTEXT,
