@@ -270,7 +270,7 @@ export const paramDef = {
 				minLength: 1,
 				maxLength: 128,
 			},
-			maxLength: 32,
+			maxItems: 32,
 		},
 	},
 } as const;
