@@ -12922,7 +12922,11 @@ export type operations = {
     requestBody: {
       content: {
         'application/json': {
-          uri: string;
+          uri?: string | null;
+          /** Format: misskey:id */
+          userId?: string | null;
+          /** Format: misskey:id */
+          noteId?: string | null;
           expandCollectionItems?: boolean;
           expandCollectionLimit?: number | null;
           allowAnonymous?: boolean;

@@ -13245,6 +13245,18 @@ export interface Locale extends ILocale {
      * Note controls
      */
     "noteFooterLabel": string;
+    /**
+     * Packed user data in its raw form. Most of these fields are public and visible to all users.
+     */
+    "rawUserDescription": string;
+    /**
+     * Extended user data in its raw form. These fields are private and can only be accessed by moderators.
+     */
+    "rawInfoDescription": string;
+    /**
+     * ActivityPub user data in its raw form. These fields are public and accessible to other instances.
+     */
+    "rawApDescription": string;
 }
 declare const locales: {
     [lang: string]: Locale;

@@ -231,6 +231,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkFolder :sticky="false" :defaultOpen="true">
 					<template #icon><i class="ph-user-circle ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts.user }}</template>
+					<template #header>
+						<div :class="$style.rawFolderHeader">
+							<span>{{ i18n.ts.rawUserDescription }}</span>
+							<button class="_textButton" @click="copyToClipboard(JSON.stringify(user, null, 4))"><i class="ti ti-copy"></i> {{ i18n.ts.copy }}</button>
+						</div>
+					</template>
 
 					<MkObjectView tall :value="user"/>
 				</MkFolder>
@@ -238,6 +244,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkFolder :sticky="false">
 					<template #icon><i class="ti ti-info-circle"></i></template>
 					<template #label>{{ i18n.ts.details }}</template>
+					<template #header>
+						<div :class="$style.rawFolderHeader">
+							<span>{{ i18n.ts.rawInfoDescription }}</span>
+							<button class="_textButton" @click="copyToClipboard(JSON.stringify(info, null, 4))"><i class="ti ti-copy"></i> {{ i18n.ts.copy }}</button>
+						</div>
+					</template>
 
 					<MkObjectView tall :value="info"/>
 				</MkFolder>
@@ -245,7 +257,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkFolder v-if="ap" :sticky="false">
 					<template #icon><i class="ph-globe ph-bold ph-lg"></i></template>
 					<template #label>{{ i18n.ts.activityPub }}</template>
-
+					<template #header>
+						<div :class="$style.rawFolderHeader">
+							<span>{{ i18n.ts.rawApDescription }}</span>
+							<button class="_textButton" @click="copyToClipboard(JSON.stringify(ap, null, 4))"><i class="ti ti-copy"></i> {{ i18n.ts.copy }}</button>
+						</div>
+					</template>
 					<MkObjectView tall :value="ap"/>
 				</MkFolder>
 			</div>
@@ -437,12 +454,15 @@ function createFetcher(withHint = true) {
 		(withHint && props.infoHint) ? props.infoHint : misskeyApi('admin/show-user', {
 			userId: props.userId,
 		}),
-		(withHint && props.ipsHint) ? props.ipsHint : misskeyApi('admin/get-user-ips', {
-			userId: props.userId,
-		}),
-		(withHint && props.apHint) ? props.apHint : misskeyApi('ap/get', {
-			userId: props.userId,
-		}).catch(() => null)],
+		iAmAdmin
+			? (withHint && props.ipsHint) ? props.ipsHint : misskeyApi('admin/get-user-ips', {
+				userId: props.userId,
+			})
+			: null,
+		iAmAdmin
+			? (withHint && props.apHint) ? props.apHint : misskeyApi('ap/get', {
+				userId: props.userId,
+			}).catch(() => null) : null],
 	).then(async ([_user, _info, _ips, _ap]) => {
 		user.value = _user;
 		info.value = _info;
@@ -901,5 +921,14 @@ definePage(() => ({
 	>* {
 		margin: calc(var(--MI-margin) / 2);
 	}
+}
+
+.rawFolderHeader {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: flex-start;
+	padding: var(--MI-marginHalf);
+	gap: var(--MI-marginHalf);
 }
 </style>
