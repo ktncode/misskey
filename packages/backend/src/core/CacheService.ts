@@ -47,6 +47,7 @@ export class CacheService implements OnApplicationShutdown {
 	public userBlockedCache: QuantumKVCache<Set<string>>; // NOTE: 「被」Blockキャッシュ
 	public renoteMutingsCache: QuantumKVCache<Set<string>>;
 	public userFollowingsCache: QuantumKVCache<Map<string, { withReplies: boolean }>>;
+	public userFollowersCache: QuantumKVCache<Set<string>>;
 	protected userFollowStatsCache = new MemoryKVCache<FollowStats>(1000 * 60 * 10); // 10 minutes
 	protected translationsCache: RedisKVCache<CachedTranslationEntity>;
 
@@ -115,6 +116,11 @@ export class CacheService implements OnApplicationShutdown {
 			fetcher: (key) => this.followingsRepository.find({ where: { followerId: key }, select: ['followeeId', 'withReplies'] }).then(xs => new Map(xs.map(f => [f.followeeId, { withReplies: f.withReplies }]))),
 		});
 
+		this.userFollowersCache = new QuantumKVCache<Set<string>>(this.internalEventService, 'userFollowers', {
+			lifetime: 1000 * 60 * 30, // 30m
+			fetcher: (key) => this.followingsRepository.find({ where: { followeeId: key }, select: ['followerId'] }).then(xs => new Set(xs.map(x => x.followerId))),
+		});
+
 		this.translationsCache = new RedisKVCache<CachedTranslationEntity>(this.redisClient, 'translations', {
 			lifetime: 1000 * 60 * 60 * 24 * 7, // 1 week,
 			memoryCacheLifetime: 1000 * 60, // 1 minute
@@ -154,6 +160,7 @@ export class CacheService implements OnApplicationShutdown {
 								this.userBlockedCache.delete(body.id),
 								this.renoteMutingsCache.delete(body.id),
 								this.userFollowingsCache.delete(body.id),
+								this.userFollowersCache.delete(body.id),
 							]);
 						}
 					} else {
@@ -193,7 +200,10 @@ export class CacheService implements OnApplicationShutdown {
 					if (follower) follower.followingCount++;
 					const followee = this.userByIdCache.get(body.followeeId);
 					if (followee) followee.followersCount++;
-					await this.userFollowingsCache.delete(body.followerId);
+					await Promise.all([
+						this.userFollowingsCache.delete(body.followerId),
+						this.userFollowersCache.delete(body.followeeId),
+					]);
 					this.userFollowStatsCache.delete(body.followerId);
 					this.userFollowStatsCache.delete(body.followeeId);
 					break;
@@ -203,7 +213,10 @@ export class CacheService implements OnApplicationShutdown {
 					if (follower) follower.followingCount--;
 					const followee = this.userByIdCache.get(body.followeeId);
 					if (followee) followee.followersCount--;
-					await this.userFollowingsCache.delete(body.followerId);
+					await Promise.all([
+						this.userFollowingsCache.delete(body.followerId),
+						this.userFollowersCache.delete(body.followeeId),
+					]);
 					this.userFollowStatsCache.delete(body.followerId);
 					this.userFollowStatsCache.delete(body.followeeId);
 					break;

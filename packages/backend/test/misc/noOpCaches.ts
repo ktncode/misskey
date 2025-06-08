@@ -112,6 +112,12 @@ export class NoOpCacheService extends CacheService {
 			onSet: this.userFollowingsCache.onSet,
 			onDelete: this.userFollowingsCache.onDelete,
 		});
+		this.userFollowersCache = new NoOpQuantumKVCache<Set<string>>({
+			internalEventService: fakeInternalEventService,
+			fetcher: this.userFollowersCache.fetcher,
+			onSet: this.userFollowersCache.onSet,
+			onDelete: this.userFollowersCache.onDelete,
+		});
 		this.userFollowStatsCache = new NoOpMemoryKVCache<FollowStats>();
 		this.translationsCache = new NoOpRedisKVCache<CachedTranslationEntity>({
 			redis: fakeRedis,
