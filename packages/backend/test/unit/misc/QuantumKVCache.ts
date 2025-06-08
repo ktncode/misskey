@@ -73,19 +73,19 @@ describe(QuantumKVCache, () => {
 
 		await cache.set('foo', 'bar');
 
-		expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', keys: ['foo'] }]]);
+		expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', keys: ['foo'] }]]);
 	});
 
-	it('should call onSet when storing', async () => {
-		const fakeOnSet = jest.fn(() => Promise.resolve());
+	it('should call onChanged when storing', async () => {
+		const fakeOnChanged = jest.fn(() => Promise.resolve());
 		const cache = makeCache<string>({
 			name: 'fake',
-			onSet: fakeOnSet,
+			onChanged: fakeOnChanged,
 		});
 
 		await cache.set('foo', 'bar');
 
-		expect(fakeOnSet).toHaveBeenCalledWith('foo', cache);
+		expect(fakeOnChanged).toHaveBeenCalledWith(['foo'], cache);
 	});
 
 	it('should not emit event when storing unchanged value', async () => {
@@ -97,17 +97,17 @@ describe(QuantumKVCache, () => {
 		expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(1);
 	});
 
-	it('should not call onSet when storing unchanged value', async () => {
-		const fakeOnSet = jest.fn(() => Promise.resolve());
+	it('should not call onChanged when storing unchanged value', async () => {
+		const fakeOnChanged = jest.fn(() => Promise.resolve());
 		const cache = makeCache<string>({
 			name: 'fake',
-			onSet: fakeOnSet,
+			onChanged: fakeOnChanged,
 		});
 
 		await cache.set('foo', 'bar');
 		await cache.set('foo', 'bar');
 
-		expect(fakeOnSet).toHaveBeenCalledTimes(1);
+		expect(fakeOnChanged).toHaveBeenCalledTimes(1);
 	});
 
 	it('should fetch an unknown value', async () => {
@@ -133,17 +133,17 @@ describe(QuantumKVCache, () => {
 		expect(result).toBe(true);
 	});
 
-	it('should call onSet when fetching', async () => {
-		const fakeOnSet = jest.fn(() => Promise.resolve());
+	it('should call onChanged when fetching', async () => {
+		const fakeOnChanged = jest.fn(() => Promise.resolve());
 		const cache = makeCache<string>({
 			name: 'fake',
 			fetcher: key => `value#${key}`,
-			onSet: fakeOnSet,
+			onChanged: fakeOnChanged,
 		});
 
 		await cache.fetch('foo');
 
-		expect(fakeOnSet).toHaveBeenCalledWith('foo', cache);
+		expect(fakeOnChanged).toHaveBeenCalledWith(['foo'], cache);
 	});
 
 	it('should not emit event when fetching', async () => {
@@ -154,7 +154,7 @@ describe(QuantumKVCache, () => {
 
 		await cache.fetch('foo');
 
-		expect(fakeInternalEventService._calls).not.toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', keys: ['foo'] }]]);
+		expect(fakeInternalEventService._calls).not.toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', keys: ['foo'] }]]);
 	});
 
 	it('should delete from memory cache', async () => {
@@ -167,17 +167,17 @@ describe(QuantumKVCache, () => {
 		expect(result).toBe(false);
 	});
 
-	it('should call onDelete when deleting', async () => {
-		const fakeOnDelete = jest.fn(() => Promise.resolve());
+	it('should call onChanged when deleting', async () => {
+		const fakeOnChanged = jest.fn(() => Promise.resolve());
 		const cache = makeCache<string>({
 			name: 'fake',
-			onDelete: fakeOnDelete,
+			onChanged: fakeOnChanged,
 		});
 
 		await cache.set('foo', 'bar');
 		await cache.delete('foo');
 
-		expect(fakeOnDelete).toHaveBeenCalledWith('foo', cache);
+		expect(fakeOnChanged).toHaveBeenCalledWith(['foo'], cache);
 	});
 
 	it('should emit event when deleting', async () => {
@@ -186,52 +186,52 @@ describe(QuantumKVCache, () => {
 		await cache.set('foo', 'bar');
 		await cache.delete('foo');
 
-		expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 'd', keys: ['foo'] }]]);
+		expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', keys: ['foo'] }]]);
 	});
 
 	it('should delete when receiving set event', async () => {
 		const cache = makeCache<string>({ name: 'fake' });
 		await cache.set('foo', 'bar');
 
-		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', op: 's', keys: ['foo'] });
+		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', keys: ['foo'] });
 
 		const result = cache.has('foo');
 		expect(result).toBe(false);
 	});
 
-	it('should call onSet when receiving set event', async () => {
-		const fakeOnSet = jest.fn(() => Promise.resolve());
+	it('should call onChanged when receiving set event', async () => {
+		const fakeOnChanged = jest.fn(() => Promise.resolve());
 		const cache = makeCache<string>({
 			name: 'fake',
-			onSet: fakeOnSet,
+			onChanged: fakeOnChanged,
 		});
 
-		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', op: 's', keys: ['foo'] });
+		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', keys: ['foo'] });
 
-		expect(fakeOnSet).toHaveBeenCalledWith('foo', cache);
+		expect(fakeOnChanged).toHaveBeenCalledWith(['foo'], cache);
 	});
 
 	it('should delete when receiving delete event', async () => {
 		const cache = makeCache<string>({ name: 'fake' });
 		await cache.set('foo', 'bar');
 
-		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', op: 'd', keys: ['foo'] });
+		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', keys: ['foo'] });
 
 		const result = cache.has('foo');
 		expect(result).toBe(false);
 	});
 
-	it('should call onDelete when receiving delete event', async () => {
-		const fakeOnDelete = jest.fn(() => Promise.resolve());
+	it('should call onChanged when receiving delete event', async () => {
+		const fakeOnChanged = jest.fn(() => Promise.resolve());
 		const cache = makeCache<string>({
 			name: 'fake',
-			onDelete: fakeOnDelete,
+			onChanged: fakeOnChanged,
 		});
 		await cache.set('foo', 'bar');
 
-		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', op: 'd', keys: ['foo'] });
+		await fakeInternalEventService._emitRedis('quantumCacheUpdated', { name: 'fake', keys: ['foo'] });
 
-		expect(fakeOnDelete).toHaveBeenCalledWith('foo', cache);
+		expect(fakeOnChanged).toHaveBeenCalledWith(['foo'], cache);
 	});
 
 	describe('get', () => {
@@ -269,40 +269,243 @@ describe(QuantumKVCache, () => {
 
 			await cache.setMany([['foo', 'bar'], ['alpha', 'omega']]);
 
-			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', keys: ['foo', 'alpha'] }]]);
+			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', keys: ['foo', 'alpha'] }]]);
 			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(1);
 		});
 
-		it('should call onSet for each item', async () => {
-			const fakeOnSet = jest.fn(() => Promise.resolve());
+		it('should call onChanged once with all items', async () => {
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
 			const cache = makeCache<string>({
 				name: 'fake',
-				onSet: fakeOnSet,
+				onChanged: fakeOnChanged,
 			});
 
 			await cache.setMany([['foo', 'bar'], ['alpha', 'omega']]);
 
-			expect(fakeOnSet).toHaveBeenCalledWith('foo', cache);
-			expect(fakeOnSet).toHaveBeenCalledWith('alpha', cache);
+			expect(fakeOnChanged).toHaveBeenCalledWith(['foo', 'alpha'], cache);
+			expect(fakeOnChanged).toHaveBeenCalledTimes(1);
 		});
 
 		it('should emit events only for changed items', async () => {
-			const fakeOnSet = jest.fn(() => Promise.resolve());
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
 			const cache = makeCache<string>({
 				name: 'fake',
-				onSet: fakeOnSet,
+				onChanged: fakeOnChanged,
 			});
 
 			await cache.set('foo', 'bar');
-			fakeOnSet.mockClear();
+			fakeOnChanged.mockClear();
 			fakeInternalEventService._reset();
 
 			await cache.setMany([['foo', 'bar'], ['alpha', 'omega']]);
 
-			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', keys: ['alpha'] }]]);
+			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', keys: ['alpha'] }]]);
 			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(1);
-			expect(fakeOnSet).toHaveBeenCalledWith('alpha', cache);
-			expect(fakeOnSet).toHaveBeenCalledTimes(1);
+			expect(fakeOnChanged).toHaveBeenCalledWith(['alpha'], cache);
+			expect(fakeOnChanged).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	describe('getMany', () => {
+		it('should return empty for empty input', () => {
+			const cache = makeCache();
+			const result = cache.getMany([]);
+			expect(result).toEqual([]);
+		});
+
+		it('should return the value for all keys', () => {
+			const cache = makeCache();
+			cache.add('foo', 'bar');
+			cache.add('alpha', 'omega');
+
+			const result = cache.getMany(['foo', 'alpha']);
+
+			expect(result).toEqual([['foo', 'bar'], ['alpha', 'omega']]);
+		});
+
+		it('should return undefined for missing keys', () => {
+			const cache = makeCache();
+			cache.add('foo', 'bar');
+
+			const result = cache.getMany(['foo', 'alpha']);
+
+			expect(result).toEqual([['foo', 'bar'], ['alpha', undefined]]);
+		});
+	});
+
+	describe('fetchMany', () => {
+		it('should do nothing for empty input', async () => {
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
+			const cache = makeCache({
+				onChanged: fakeOnChanged,
+			});
+
+			await cache.fetchMany([]);
+
+			expect(fakeOnChanged).not.toHaveBeenCalled();
+			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(0);
+		});
+
+		it('should return existing items', async () => {
+			const cache = makeCache();
+			cache.add('foo', 'bar');
+			cache.add('alpha', 'omega');
+
+			const result = await cache.fetchMany(['foo', 'alpha']);
+
+			expect(result).toEqual([['foo', 'bar'], ['alpha', 'omega']]);
+		});
+
+		it('should return existing items without events', async () => {
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
+			const cache = makeCache({
+				onChanged: fakeOnChanged,
+			});
+			cache.add('foo', 'bar');
+			cache.add('alpha', 'omega');
+
+			await cache.fetchMany(['foo', 'alpha']);
+
+			expect(fakeOnChanged).not.toHaveBeenCalled();
+			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(0);
+		});
+
+		it('should call bulkFetcher for missing items', async () => {
+			const cache = makeCache({
+				bulkFetcher: keys => keys.map(k => [k, `${k}#many`]),
+				fetcher: key => `${key}#single`,
+			});
+
+			const results = await cache.fetchMany(['foo', 'alpha']);
+
+			expect(results).toEqual([['foo', 'foo#many'], ['alpha', 'alpha#many']]);
+		});
+
+		it('should call bulkFetcher only once', async () => {
+			const mockBulkFetcher = jest.fn((keys: string[]) => keys.map(k => [k, `${k}#value`] as [string, string]));
+			const cache = makeCache({
+				bulkFetcher: mockBulkFetcher,
+			});
+
+			await cache.fetchMany(['foo', 'bar']);
+
+			expect(mockBulkFetcher).toHaveBeenCalledTimes(1);
+		});
+
+		it('should call fetcher when fetchMany is undefined', async () => {
+			const cache = makeCache({
+				fetcher: key => `${key}#single`,
+			});
+
+			const results = await cache.fetchMany(['foo', 'alpha']);
+
+			expect(results).toEqual([['foo', 'foo#single'], ['alpha', 'alpha#single']]);
+		});
+
+		it('should call onChanged', async () => {
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
+			const cache = makeCache({
+				onChanged: fakeOnChanged,
+				fetcher: k => k,
+			});
+
+			await cache.fetchMany(['foo', 'alpha']);
+
+			expect(fakeOnChanged).toHaveBeenCalledWith(['foo', 'alpha'], cache);
+			expect(fakeOnChanged).toHaveBeenCalledTimes(1);
+		});
+
+		it('should call onChanged only for changed', async () => {
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
+			const cache = makeCache({
+				onChanged: fakeOnChanged,
+				fetcher: k => k,
+			});
+			cache.add('foo', 'bar');
+
+			await cache.fetchMany(['foo', 'alpha']);
+
+			expect(fakeOnChanged).toHaveBeenCalledWith(['alpha'], cache);
+			expect(fakeOnChanged).toHaveBeenCalledTimes(1);
+		});
+
+		it('should not emit event', async () => {
+			const cache = makeCache({
+				fetcher: k => k,
+			});
+
+			await cache.fetchMany(['foo', 'alpha']);
+
+			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(0);
+		});
+	});
+
+	describe('refreshMany', () => {
+		it('should do nothing for empty input', async () => {
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
+			const cache = makeCache({
+				onChanged: fakeOnChanged,
+			});
+
+			const result = await cache.refreshMany([]);
+
+			expect(result).toEqual([]);
+			expect(fakeOnChanged).not.toHaveBeenCalled();
+			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(0);
+		});
+
+		it('should call bulkFetcher for all keys', async () => {
+			const mockBulkFetcher = jest.fn((keys: string[]) => keys.map(k => [k, `${k}#value`] as [string, string]));
+			const cache = makeCache({
+				bulkFetcher: mockBulkFetcher,
+			});
+
+			const result = await cache.refreshMany(['foo', 'alpha']);
+
+			expect(result).toEqual([['foo', 'foo#value'], ['alpha', 'alpha#value']]);
+			expect(mockBulkFetcher).toHaveBeenCalledWith(['foo', 'alpha'], cache);
+			expect(mockBulkFetcher).toHaveBeenCalledTimes(1);
+		});
+
+		it('should replace any existing keys', async () => {
+			const mockBulkFetcher = jest.fn((keys: string[]) => keys.map(k => [k, `${k}#value`] as [string, string]));
+			const cache = makeCache({
+				bulkFetcher: mockBulkFetcher,
+			});
+			cache.add('foo', 'bar');
+
+			const result = await cache.refreshMany(['foo', 'alpha']);
+
+			expect(result).toEqual([['foo', 'foo#value'], ['alpha', 'alpha#value']]);
+			expect(mockBulkFetcher).toHaveBeenCalledWith(['foo', 'alpha'], cache);
+			expect(mockBulkFetcher).toHaveBeenCalledTimes(1);
+		});
+
+		it('should call onChanged for all keys', async () => {
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
+			const cache = makeCache({
+				bulkFetcher: keys => keys.map(k => [k, `${k}#value`]),
+				onChanged: fakeOnChanged,
+			});
+			cache.add('foo', 'bar');
+
+			await cache.refreshMany(['foo', 'alpha']);
+
+			expect(fakeOnChanged).toHaveBeenCalledWith(['foo', 'alpha'], cache);
+			expect(fakeOnChanged).toHaveBeenCalledTimes(1);
+		});
+
+		it('should emit event for all keys', async () => {
+			const cache = makeCache({
+				name: 'fake',
+				bulkFetcher: keys => keys.map(k => [k, `${k}#value`]),
+			});
+			cache.add('foo', 'bar');
+
+			await cache.refreshMany(['foo', 'alpha']);
+
+			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', keys: ['foo', 'alpha'] }]]);
+			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(1);
 		});
 	});
 
@@ -325,33 +528,33 @@ describe(QuantumKVCache, () => {
 
 			await cache.deleteMany(['foo', 'alpha']);
 
-			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 'd', keys: ['foo', 'alpha'] }]]);
+			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', keys: ['foo', 'alpha'] }]]);
 			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(1);
 		});
 
-		it('should call onDelete for each key', async () => {
-			const fakeOnDelete = jest.fn(() => Promise.resolve());
+		it('should call onChanged once with all items', async () => {
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
 			const cache = makeCache<string>({
 				name: 'fake',
-				onDelete: fakeOnDelete,
+				onChanged: fakeOnChanged,
 			});
 
 			await cache.deleteMany(['foo', 'alpha']);
 
-			expect(fakeOnDelete).toHaveBeenCalledWith('foo', cache);
-			expect(fakeOnDelete).toHaveBeenCalledWith('alpha', cache);
+			expect(fakeOnChanged).toHaveBeenCalledWith(['foo', 'alpha'], cache);
+			expect(fakeOnChanged).toHaveBeenCalledTimes(1);
 		});
 
 		it('should do nothing if no keys are provided', async () => {
-			const fakeOnDelete = jest.fn(() => Promise.resolve());
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
 			const cache = makeCache<string>({
 				name: 'fake',
-				onDelete: fakeOnDelete,
+				onChanged: fakeOnChanged,
 			});
 
 			await cache.deleteMany([]);
 
-			expect(fakeOnDelete).not.toHaveBeenCalled();
+			expect(fakeOnChanged).not.toHaveBeenCalled();
 			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(0);
 		});
 	});
@@ -392,17 +595,17 @@ describe(QuantumKVCache, () => {
 			expect(result).toBe('value#foo');
 		});
 
-		it('should call onSet', async () => {
-			const fakeOnSet = jest.fn(() => Promise.resolve());
+		it('should call onChanged', async () => {
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
 			const cache = makeCache<string>({
 				name: 'fake',
 				fetcher: key => `value#${key}`,
-				onSet: fakeOnSet,
+				onChanged: fakeOnChanged,
 			});
 
 			await cache.refresh('foo');
 
-			expect(fakeOnSet).toHaveBeenCalledWith('foo', cache);
+			expect(fakeOnChanged).toHaveBeenCalledWith(['foo'], cache);
 		});
 
 		it('should emit event', async () => {
@@ -413,7 +616,7 @@ describe(QuantumKVCache, () => {
 
 			await cache.refresh('foo');
 
-			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', op: 's', keys: ['foo'] }]]);
+			expect(fakeInternalEventService._calls).toContainEqual(['emit', ['quantumCacheUpdated', { name: 'fake', keys: ['foo'] }]]);
 		});
 	});
 
@@ -434,15 +637,15 @@ describe(QuantumKVCache, () => {
 			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(0);
 		});
 
-		it('should not call onSet', () => {
-			const fakeOnSet = jest.fn(() => Promise.resolve());
+		it('should not call onChanged', () => {
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
 			const cache = makeCache({
-				onSet: fakeOnSet,
+				onChanged: fakeOnChanged,
 			});
 
 			cache.add('foo', 'bar');
 
-			expect(fakeOnSet).not.toHaveBeenCalled();
+			expect(fakeOnChanged).not.toHaveBeenCalled();
 		});
 	});
 
@@ -466,15 +669,15 @@ describe(QuantumKVCache, () => {
 			expect(fakeInternalEventService._calls.filter(c => c[0] === 'emit')).toHaveLength(0);
 		});
 
-		it('should not call onSet', () => {
-			const fakeOnSet = jest.fn(() => Promise.resolve());
+		it('should not call onChanged', () => {
+			const fakeOnChanged = jest.fn(() => Promise.resolve());
 			const cache = makeCache({
-				onSet: fakeOnSet,
+				onChanged: fakeOnChanged,
 			});
 
 			cache.addMany([['foo', 'bar'], ['alpha', 'omega']]);
 
-			expect(fakeOnSet).not.toHaveBeenCalled();
+			expect(fakeOnChanged).not.toHaveBeenCalled();
 		});
 	});
 

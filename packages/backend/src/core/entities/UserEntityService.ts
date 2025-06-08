@@ -79,7 +79,7 @@ function isRemoteUser(user: MiUser | { host: MiUser['host'] }): boolean {
 
 export type UserRelation = {
 	id: MiUser['id']
-	following: MiFollowing | null,
+	following: Omit<MiFollowing, 'isFollowerHibernated'> | null,
 	isFollowing: boolean
 	isFollowed: boolean
 	hasPendingFollowRequestFromYou: boolean
@@ -197,16 +197,8 @@ export class UserEntityService implements OnModuleInit {
 			memo,
 			mutedInstances,
 		] = await Promise.all([
-			this.followingsRepository.findOneBy({
-				followerId: me,
-				followeeId: target,
-			}),
-			this.followingsRepository.exists({
-				where: {
-					followerId: target,
-					followeeId: me,
-				},
-			}),
+			this.cacheService.userFollowingsCache.fetch(me).then(f => f.get(target) ?? null),
+			this.cacheService.userFollowingsCache.fetch(target).then(f => f.has(me)),
 			this.followRequestsRepository.exists({
 				where: {
 					followerId: me,
@@ -227,8 +219,7 @@ export class UserEntityService implements OnModuleInit {
 				.then(mutings => mutings.has(target)),
 			this.cacheService.renoteMutingsCache.fetch(me)
 				.then(mutings => mutings.has(target)),
-			this.cacheService.userByIdCache.fetch(target, () => this.usersRepository.findOneByOrFail({ id: target }))
-				.then(user => user.host),
+			this.cacheService.findUserById(target).then(u => u.host),
 			this.userMemosRepository.createQueryBuilder('m')
 				.select('m.memo')
 				.where({ userId: me, targetUserId: target })
@@ -271,13 +262,8 @@ export class UserEntityService implements OnModuleInit {
 			memos,
 			mutedInstances,
 		] = await Promise.all([
-			this.followingsRepository.findBy({ followerId: me })
-				.then(f => new Map(f.map(it => [it.followeeId, it]))),
-			this.followingsRepository.createQueryBuilder('f')
-				.select('f.followerId')
-				.where('f.followeeId = :me', { me })
-				.getRawMany<{ f_followerId: string }>()
-				.then(it => it.map(it => it.f_followerId)),
+			this.cacheService.userFollowingsCache.fetch(me),
+			this.cacheService.userFollowersCache.fetch(me),
 			this.followRequestsRepository.createQueryBuilder('f')
 				.select('f.followeeId')
 				.where('f.followerId = :me', { me })
@@ -322,7 +308,7 @@ export class UserEntityService implements OnModuleInit {
 						id: target,
 						following: following,
 						isFollowing: following != null,
-						isFollowed: followees.includes(target),
+						isFollowed: followees.has(target),
 						hasPendingFollowRequestFromYou: followersRequests.includes(target),
 						hasPendingFollowRequestToYou: followeesRequests.includes(target),
 						isBlocking: blockees.has(target),
@@ -354,7 +340,7 @@ export class UserEntityService implements OnModuleInit {
 		return false; // TODO
 	}
 
-	// TODO make redis calls in MULTI?
+	// TODO optimization: make redis calls in MULTI
 	@bindThis
 	public async getNotificationsInfo(userId: MiUser['id']): Promise<{
 		hasUnread: boolean;
@@ -789,11 +775,11 @@ export class UserEntityService implements OnModuleInit {
 			.map(user => user.host)
 			.filter((host): host is string => host != null));
 
-		const _profilesFromUsers: MiUserProfile[] = [];
+		const _profilesFromUsers: [string, MiUserProfile][] = [];
 		const _profilesToFetch: string[] = [];
 		for (const user of _users) {
 			if (user.userProfile) {
-				_profilesFromUsers.push(user.userProfile);
+				_profilesFromUsers.push([user.id, user.userProfile]);
 			} else {
 				_profilesToFetch.push(user.id);
 			}
@@ -803,13 +789,7 @@ export class UserEntityService implements OnModuleInit {
 
 		const [profilesMap, userMemos, userRelations, pinNotes, userIdsByUri, instances, securityKeyCounts, pendingReceivedFollows, pendingSentFollows] = await Promise.all([
 			// profilesMap
-			this.cacheService.getUserProfiles(_profilesToFetch)
-				.then(profiles => {
-					for (const profile of _profilesFromUsers) {
-						profiles.set(profile.userId, profile);
-					}
-					return profiles;
-				}),
+			this.cacheService.userProfileCache.fetchMany(_profilesToFetch).then(profiles => new Map(profiles.concat(_profilesFromUsers))),
 			// userMemos
 			isDetailed && meId ? this.userMemosRepository.findBy({ userId: meId })
 				.then(memos => new Map(memos.map(memo => [memo.targetUserId, memo.memo]))) : new Map(),
@@ -857,7 +837,7 @@ export class UserEntityService implements OnModuleInit {
 				.groupBy('key.userId')
 				.getRawMany<{ userId: string, userCount: number }>()
 				.then(counts => new Map(counts.map(c => [c.userId, c.userCount]))) : new Map(),
-			// TODO check query performance
+			// TODO optimization: cache follow requests
 			// pendingReceivedFollows
 			isDetailedAndMe ? this.followRequestsRepository.createQueryBuilder('req')
 				.select('req.followeeId', 'followeeId')

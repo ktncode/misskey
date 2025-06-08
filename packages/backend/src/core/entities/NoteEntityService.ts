@@ -11,7 +11,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { MiUser } from '@/models/User.js';
 import type { MiNote } from '@/models/Note.js';
-import type { UsersRepository, NotesRepository, FollowingsRepository, PollsRepository, PollVotesRepository, NoteReactionsRepository, ChannelsRepository, MiMeta, MiPollVote, MiPoll, MiChannel } from '@/models/_.js';
+import type { UsersRepository, NotesRepository, FollowingsRepository, PollsRepository, PollVotesRepository, NoteReactionsRepository, ChannelsRepository, MiMeta, MiPollVote, MiPoll, MiChannel, MiFollowing } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { DebounceLoader } from '@/misc/loader.js';
 import { IdService } from '@/core/IdService.js';
@@ -133,7 +133,7 @@ export class NoteEntityService implements OnModuleInit {
 
 	@bindThis
 	public async hideNote(packedNote: Packed<'Note'>, meId: MiUser['id'] | null, hint?: {
-		myFollowing?: ReadonlyMap<string, { withReplies: boolean }>,
+		myFollowing?: ReadonlyMap<string, unknown>,
 		myBlockers?: ReadonlySet<string>,
 	}): Promise<void> {
 		if (meId === packedNote.userId) return;
@@ -416,7 +416,7 @@ export class NoteEntityService implements OnModuleInit {
 				packedFiles: Map<MiNote['fileIds'][number], Packed<'DriveFile'> | null>;
 				packedUsers: Map<MiUser['id'], Packed<'UserLite'>>;
 				mentionHandles: Record<string, string | undefined>;
-				userFollowings: Map<string, Map<string, { withReplies: boolean }>>;
+				userFollowings: Map<string, Map<string, Omit<MiFollowing, 'isFollowerHibernated'>>>;
 				userBlockers: Map<string, Set<string>>;
 				polls: Map<string, MiPoll>;
 				pollVotes: Map<string, Map<string, MiPollVote[]>>;
@@ -659,9 +659,9 @@ export class NoteEntityService implements OnModuleInit {
 			// mentionHandles
 			this.getUserHandles(Array.from(mentionedUsers)),
 			// userFollowings
-			this.cacheService.getUserFollowings(userIds),
+			this.cacheService.userFollowingsCache.fetchMany(userIds).then(fs => new Map(fs)),
 			// userBlockers
-			this.cacheService.getUserBlockers(userIds),
+			this.cacheService.userBlockedCache.fetchMany(userIds).then(bs => new Map(bs)),
 			// polls
 			this.pollsRepository.findBy({ noteId: In(noteIds) })
 				.then(polls => new Map(polls.map(p => [p.noteId, p]))),

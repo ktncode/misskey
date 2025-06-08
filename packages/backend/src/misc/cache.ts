@@ -5,8 +5,6 @@
 
 import * as Redis from 'ioredis';
 import { bindThis } from '@/decorators.js';
-import { InternalEventService } from '@/core/InternalEventService.js';
-import { InternalEventTypes } from '@/core/GlobalEventService.js';
 
 export class RedisKVCache<T> {
 	private readonly lifetime: number;
@@ -120,9 +118,9 @@ export class RedisKVCache<T> {
 export class RedisSingleCache<T> {
 	private readonly lifetime: number;
 	private readonly memoryCache: MemorySingleCache<T>;
-	private readonly fetcher: () => Promise<T>;
-	private readonly toRedisConverter: (value: T) => string;
-	private readonly fromRedisConverter: (value: string) => T | undefined;
+	public readonly fetcher: () => Promise<T>;
+	public readonly toRedisConverter: (value: T) => string;
+	public readonly fromRedisConverter: (value: string) => T | undefined;
 
 	constructor(
 		private redisClient: Redis.Redis,
@@ -243,6 +241,16 @@ export class MemoryKVCache<T> {
 			return undefined;
 		}
 		return cached.value;
+	}
+
+	public has(key: string): boolean {
+		const cached = this.cache.get(key);
+		if (cached == null) return false;
+		if ((Date.now() - cached.date) > this.lifetime) {
+			this.cache.delete(key);
+			return false;
+		}
+		return true;
 	}
 
 	@bindThis

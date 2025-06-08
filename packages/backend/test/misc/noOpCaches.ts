@@ -6,13 +6,14 @@
 import * as Redis from 'ioredis';
 import { Inject } from '@nestjs/common';
 import { FakeInternalEventService } from './FakeInternalEventService.js';
-import type { BlockingsRepository, FollowingsRepository, MiUser, MiUserProfile, MutingsRepository, RenoteMutingsRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import type { BlockingsRepository, FollowingsRepository, MiUser, MutingsRepository, RenoteMutingsRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
 import type { MiLocalUser } from '@/models/User.js';
 import { MemoryKVCache, MemorySingleCache, RedisKVCache, RedisSingleCache } from '@/misc/cache.js';
 import { QuantumKVCache, QuantumKVOpts } from '@/misc/QuantumKVCache.js';
-import { CacheService, CachedTranslationEntity, FollowStats } from '@/core/CacheService.js';
+import { CacheService, FollowStats } from '@/core/CacheService.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { InternalEventService } from '@/core/InternalEventService.js';
 
 export function noOpRedis() {
 	return {
@@ -76,55 +77,16 @@ export class NoOpCacheService extends CacheService {
 		this.localUserByNativeTokenCache = new NoOpMemoryKVCache<MiLocalUser | null>();
 		this.localUserByIdCache = new NoOpMemoryKVCache<MiLocalUser>();
 		this.uriPersonCache = new NoOpMemoryKVCache<MiUser | null>();
-		this.userProfileCache = new NoOpQuantumKVCache<MiUserProfile>({
-			internalEventService: fakeInternalEventService,
-			fetcher: this.userProfileCache.fetcher,
-			onSet: this.userProfileCache.onSet,
-			onDelete: this.userProfileCache.onDelete,
-		});
-		this.userMutingsCache = new NoOpQuantumKVCache<Set<string>>({
-			internalEventService: fakeInternalEventService,
-			fetcher: this.userMutingsCache.fetcher,
-			onSet: this.userMutingsCache.onSet,
-			onDelete: this.userMutingsCache.onDelete,
-		});
-		this.userBlockingCache = new NoOpQuantumKVCache<Set<string>>({
-			internalEventService: fakeInternalEventService,
-			fetcher: this.userBlockingCache.fetcher,
-			onSet: this.userBlockingCache.onSet,
-			onDelete: this.userBlockingCache.onDelete,
-		});
-		this.userBlockedCache = new NoOpQuantumKVCache<Set<string>>({
-			internalEventService: fakeInternalEventService,
-			fetcher: this.userBlockedCache.fetcher,
-			onSet: this.userBlockedCache.onSet,
-			onDelete: this.userBlockedCache.onDelete,
-		});
-		this.renoteMutingsCache = new NoOpQuantumKVCache<Set<string>>({
-			internalEventService: fakeInternalEventService,
-			fetcher: this.renoteMutingsCache.fetcher,
-			onSet: this.renoteMutingsCache.onSet,
-			onDelete: this.renoteMutingsCache.onDelete,
-		});
-		this.userFollowingsCache = new NoOpQuantumKVCache<Map<string, { withReplies: boolean }>>({
-			internalEventService: fakeInternalEventService,
-			fetcher: this.userFollowingsCache.fetcher,
-			onSet: this.userFollowingsCache.onSet,
-			onDelete: this.userFollowingsCache.onDelete,
-		});
-		this.userFollowersCache = new NoOpQuantumKVCache<Set<string>>({
-			internalEventService: fakeInternalEventService,
-			fetcher: this.userFollowersCache.fetcher,
-			onSet: this.userFollowersCache.onSet,
-			onDelete: this.userFollowersCache.onDelete,
-		});
+		this.userProfileCache = NoOpQuantumKVCache.copy(this.userProfileCache, fakeInternalEventService);
+		this.userMutingsCache = NoOpQuantumKVCache.copy(this.userMutingsCache, fakeInternalEventService);
+		this.userBlockingCache = NoOpQuantumKVCache.copy(this.userBlockingCache, fakeInternalEventService);
+		this.userBlockedCache = NoOpQuantumKVCache.copy(this.userBlockedCache, fakeInternalEventService);
+		this.renoteMutingsCache = NoOpQuantumKVCache.copy(this.renoteMutingsCache, fakeInternalEventService);
+		this.userFollowingsCache = NoOpQuantumKVCache.copy(this.userFollowingsCache, fakeInternalEventService);
+		this.userFollowersCache = NoOpQuantumKVCache.copy(this.userFollowersCache, fakeInternalEventService);
+		this.hibernatedUserCache = NoOpQuantumKVCache.copy(this.hibernatedUserCache, fakeInternalEventService);
 		this.userFollowStatsCache = new NoOpMemoryKVCache<FollowStats>();
-		this.translationsCache = new NoOpRedisKVCache<CachedTranslationEntity>({
-			redis: fakeRedis,
-			fetcher: this.translationsCache.fetcher,
-			toRedisConverter: this.translationsCache.toRedisConverter,
-			fromRedisConverter: this.translationsCache.fromRedisConverter,
-		});
+		this.translationsCache = NoOpRedisKVCache.copy(this.translationsCache, fakeRedis);
 	}
 }
 
@@ -159,17 +121,26 @@ export class NoOpRedisKVCache<T> extends RedisKVCache<T> {
 			},
 		);
 	}
+
+	public static copy<T>(cache: RedisKVCache<T>, redis?: Redis.Redis): NoOpRedisKVCache<T> {
+		return new NoOpRedisKVCache<T>({
+			redis,
+			fetcher: cache.fetcher,
+			toRedisConverter: cache.toRedisConverter,
+			fromRedisConverter: cache.fromRedisConverter,
+		});
+	}
 }
 
 export class NoOpRedisSingleCache<T> extends RedisSingleCache<T> {
 	constructor(opts?: {
-		fakeRedis?: Redis.Redis;
+		redis?: Redis.Redis;
 		fetcher?: RedisSingleCache<T>['fetcher'];
 		toRedisConverter?: RedisSingleCache<T>['toRedisConverter'];
 		fromRedisConverter?: RedisSingleCache<T>['fromRedisConverter'];
 	}) {
 		super(
-			opts?.fakeRedis ?? noOpRedis(),
+			opts?.redis ?? noOpRedis(),
 			'no-op',
 			{
 				lifetime: -1,
@@ -180,24 +151,37 @@ export class NoOpRedisSingleCache<T> extends RedisSingleCache<T> {
 			},
 		);
 	}
+
+	public static copy<T>(cache: RedisSingleCache<T>, redis?: Redis.Redis): NoOpRedisSingleCache<T> {
+		return new NoOpRedisSingleCache<T>({
+			redis,
+			fetcher: cache.fetcher,
+			toRedisConverter: cache.toRedisConverter,
+			fromRedisConverter: cache.fromRedisConverter,
+		});
+	}
 }
 
 export class NoOpQuantumKVCache<T> extends QuantumKVCache<T> {
-	constructor(opts: {
-		internalEventService?: FakeInternalEventService,
-		fetcher: QuantumKVOpts<T>['fetcher'],
-		onSet?: QuantumKVOpts<T>['onSet'],
-		onDelete?: QuantumKVOpts<T>['onDelete'],
+	constructor(opts: Omit<QuantumKVOpts<T>, 'lifetime'> & {
+		internalEventService?: InternalEventService,
 	}) {
 		super(
 			opts.internalEventService ?? new FakeInternalEventService(),
 			'no-op',
 			{
+				...opts,
 				lifetime: -1,
-				fetcher: opts.fetcher,
-				onSet: opts.onSet,
-				onDelete: opts.onDelete,
 			},
 		);
+	}
+
+	public static copy<T>(cache: QuantumKVCache<T>, internalEventService?: InternalEventService): NoOpQuantumKVCache<T> {
+		return new NoOpQuantumKVCache<T>({
+			internalEventService,
+			fetcher: cache.fetcher,
+			bulkFetcher: cache.bulkFetcher,
+			onChanged: cache.onChanged,
+		});
 	}
 }
