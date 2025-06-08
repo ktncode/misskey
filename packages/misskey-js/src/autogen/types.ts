@@ -24267,7 +24267,7 @@ export type operations = {
       /** @description OK (with results) */
       200: {
         content: {
-          'application/json': Record<string, never>;
+          'application/json': unknown;
         };
       };
       /** @description Client error */
