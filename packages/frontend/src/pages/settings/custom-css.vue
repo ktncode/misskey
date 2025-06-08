@@ -23,24 +23,8 @@ import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { prefer } from '@/preferences.js';
-import { reloadAsk } from '@/utility/reload-ask';
 
-const customCssModel = prefer.model('customCss');
-const localCustomCss = computed<string>({
-	get() {
-		return customCssModel.value ?? miLocalStorage.getItem('customCss') ?? '';
-	},
-	set(newCustomCss) {
-		customCssModel.value = newCustomCss;
-		if (newCustomCss) {
-			miLocalStorage.setItem('customCss', newCustomCss);
-		} else {
-			miLocalStorage.removeItem('customCss');
-		}
-
-		reloadAsk(true);
-	},
-});
+const localCustomCss = prefer.model('customCss');
 
 const headerActions = computed(() => []);
 

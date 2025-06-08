@@ -13,6 +13,7 @@ import { deckStore } from '@/ui/deck/deck-store.js';
 import { unisonReload } from '@/utility/unison-reload.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
+import { miLocalStorage } from '@/local-storage';
 
 // TODO: そのうち消す
 export function migrateOldSettings() {
@@ -167,5 +168,15 @@ export function migrateOldSettings() {
 		window.setTimeout(() => {
 			unisonReload();
 		}, 10000);
+		//#region Hybrid migrations
+		prefer.commit('fontSize', miLocalStorage.getItem('fontSize') ?? '0');
+		prefer.commit('useSystemFont', miLocalStorage.getItem('useSystemFont') != null);
+		prefer.commit('cornerRadius', miLocalStorage.getItem('cornerRadius') ?? 'sharkey');
+		prefer.commit('lang', miLocalStorage.getItem('lang') ?? 'en-US');
+		prefer.commit('customCss', miLocalStorage.getItem('customCss') ?? '');
+		prefer.commit('neverShowDonationInfo', miLocalStorage.getItem('neverShowDonationInfo') != null);
+		prefer.commit('neverShowLocalOnlyInfo', miLocalStorage.getItem('neverShowLocalOnlyInfo') != null);
+		//#endregion
+
 	});
 }
