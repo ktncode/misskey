@@ -1059,68 +1059,13 @@ const clickToOpen = prefer.model('clickToOpen');
 const useCustomSearchEngine = computed(() => !Object.keys(searchEngineMap).includes(searchEngine.value));
 const defaultCW = ref($i.defaultCW);
 const defaultCWPriority = ref($i.defaultCWPriority);
-
-const langModel = prefer.model('lang');
-const lang = computed<string>({
-	get() {
-		return langModel.value ?? miLocalStorage.getItem('lang') ?? 'en-US';
-	},
-	set(newLang) {
-		langModel.value = newLang;
-		miLocalStorage.setItem('lang', newLang);
-		miLocalStorage.removeItem('locale');
-		miLocalStorage.removeItem('localeVersion');
-	},
-});
-
-const fontSizeModel = prefer.model('fontSize');
-const fontSize = computed<'0' | '1' | '2' | '3'>({
-	get() {
-		return fontSizeModel.value ?? miLocalStorage.getItem('fontSize') ?? '0';
-	},
-	set(newFontSize) {
-		fontSizeModel.value = newFontSize;
-		if (newFontSize !== '0') {
-			miLocalStorage.setItem('fontSize', newFontSize);
-		} else {
-			miLocalStorage.removeItem('fontSize');
-		}
-	},
-});
-
-const useSystemFontModel = prefer.model('useSystemFont');
-const useSystemFont = computed<boolean>({
-	get() {
-		return useSystemFontModel.value ?? (miLocalStorage.getItem('useSystemFont') != null);
-	},
-	set(newUseSystemFont) {
-		useSystemFontModel.value = newUseSystemFont;
-		if (newUseSystemFont) {
-			miLocalStorage.setItem('useSystemFont', 't');
-		} else {
-			miLocalStorage.removeItem('useSystemFont');
-		}
-	},
-});
-
-const cornerRadiusModel = prefer.model('cornerRadius');
-const cornerRadius = computed<'misskey' | 'sharkey'>({
-	get() {
-		return cornerRadiusModel.value ?? miLocalStorage.getItem('cornerRadius') ?? 'sharkey';
-	},
-	set(newCornerRadius) {
-		cornerRadiusModel.value = newCornerRadius;
-		if (newCornerRadius === 'sharkey') {
-			miLocalStorage.removeItem('cornerRadius');
-		} else {
-			miLocalStorage.setItem('cornerRadius', newCornerRadius);
-		}
-	},
-});
+const lang = prefer.model('lang');
+const fontSize = prefer.model('fontSize');
+const useSystemFont = prefer.model('useSystemFont');
+const cornerRadius = prefer.model('cornerRadius');
 
 watch([
 	hemisphere,
-	lang,
 	enableInfiniteScroll,
 	showNoteActionsOnlyHover,
 	overridedDeviceKind,
@@ -1142,9 +1087,6 @@ watch([
 	useStickyIcons,
 	keepScreenOn,
 	contextMenu,
-	fontSize,
-	useSystemFont,
-	cornerRadius,
 	makeEveryTextElementsSelectable,
 	noteDesign,
 ], async () => {

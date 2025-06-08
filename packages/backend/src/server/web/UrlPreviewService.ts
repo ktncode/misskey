@@ -32,6 +32,7 @@ import type { MiLocalUser } from '@/models/User.js';
 import { getIpHash } from '@/misc/get-ip-hash.js';
 import { isRetryableError } from '@/misc/is-retryable-error.js';
 import * as Acct from '@/misc/acct.js';
+import { isNote } from '@/core/activitypub/type.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 
 export type LocalSummalyResult = SummalyResult & {
@@ -42,7 +43,7 @@ export type LocalSummalyResult = SummalyResult & {
 };
 
 // Increment this to invalidate cached previews after a major change.
-const cacheFormatVersion = 3;
+const cacheFormatVersion = 4;
 
 type PreviewRoute = {
 	Querystring: {
@@ -409,7 +410,7 @@ export class UrlPreviewService {
 		// Finally, attempt a signed GET in case it's a direct link to an instance with authorized fetch.
 		const instanceActor = await this.systemAccountService.getInstanceActor();
 		const remoteObject = await this.apRequestService.signedGet(summary.url, instanceActor).catch(() => null);
-		if (remoteObject && this.apUtilityService.haveSameAuthority(remoteObject.id, summary.url)) {
+		if (remoteObject && isNote(remoteObject) && this.apUtilityService.haveSameAuthority(remoteObject.id, summary.url)) {
 			summary.activityPub = remoteObject.id;
 			return;
 		}

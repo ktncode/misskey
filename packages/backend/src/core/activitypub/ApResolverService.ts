@@ -354,7 +354,7 @@ export class Resolver {
 
 		switch (parsed.type) {
 			case 'notes':
-				return this.notesRepository.findOneByOrFail({ id: parsed.id })
+				return this.notesRepository.findOneByOrFail({ id: parsed.id, userHost: IsNull() })
 					.then(async note => {
 						const author = await this.usersRepository.findOneByOrFail({ id: note.userId });
 						if (parsed.rest === 'activity') {
@@ -365,18 +365,22 @@ export class Resolver {
 						}
 					}) as Promise<IObjectWithId>;
 			case 'users':
-				return this.usersRepository.findOneByOrFail({ id: parsed.id })
+				return this.usersRepository.findOneByOrFail({ id: parsed.id, host: IsNull() })
 					.then(user => this.apRendererService.renderPerson(user as MiLocalUser));
 			case 'questions':
 				// Polls are indexed by the note they are attached to.
 				return Promise.all([
-					this.notesRepository.findOneByOrFail({ id: parsed.id }),
-					this.pollsRepository.findOneByOrFail({ noteId: parsed.id }),
+					this.notesRepository.findOneByOrFail({ id: parsed.id, userHost: IsNull() }),
+					this.pollsRepository.findOneByOrFail({ noteId: parsed.id, userHost: IsNull() }),
 				])
 					.then(([note, poll]) => this.apRendererService.renderQuestion({ id: note.userId }, note, poll)) as Promise<IObjectWithId>;
 			case 'likes':
-				return this.noteReactionsRepository.findOneByOrFail({ id: parsed.id }).then(async reaction =>
-					this.apRendererService.addContext(await this.apRendererService.renderLike(reaction, { uri: null })));
+				return this.noteReactionsRepository.findOneOrFail({ where: { id: parsed.id }, relations: { user: true } }).then(async reaction => {
+					if (reaction.user?.host == null) {
+						throw new IdentifiableError('02b40cd0-fa92-4b0c-acc9-fb2ada952ab8', `failed to resolve local ${url}: not a local reaction`);
+					}
+					return this.apRendererService.addContext(await this.apRendererService.renderLike(reaction, { uri: null }));
+				});
 			case 'follows':
 				return this.followRequestsRepository.findOneBy({ id: parsed.id })
 					.then(async followRequest => {
