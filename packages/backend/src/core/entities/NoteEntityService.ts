@@ -133,7 +133,7 @@ export class NoteEntityService implements OnModuleInit {
 
 	@bindThis
 	public async hideNote(packedNote: Packed<'Note'>, meId: MiUser['id'] | null, hint?: {
-		myFollowing?: ReadonlySet<string>,
+		myFollowing?: ReadonlyMap<string, { withReplies: boolean }>,
 		myBlockers?: ReadonlySet<string>,
 	}): Promise<void> {
 		if (meId === packedNote.userId) return;
@@ -193,7 +193,7 @@ export class NoteEntityService implements OnModuleInit {
 				} else {
 					const isFollowing = hint?.myFollowing
 						? hint.myFollowing.has(packedNote.userId)
-						: (await this.cacheService.userFollowingsCache.fetch(meId))[packedNote.userId] != null;
+						: (await this.cacheService.userFollowingsCache.fetch(meId)).has(packedNote.userId);
 
 					hide = !isFollowing;
 				}
@@ -358,14 +358,10 @@ export class NoteEntityService implements OnModuleInit {
 						: this.cacheService.userBlockingCache.fetch(meId).then((ids) => ids.has(note.userId)),
 					hint?.myFollowing
 						? hint.myFollowing.has(note.userId)
-						: this.followingsRepository.existsBy({
-							followeeId: note.userId,
-							followerId: meId,
-						}),
+						: this.cacheService.userFollowingsCache.fetch(meId).then(ids => ids.has(note.userId)),
 					hint?.me !== undefined
 						? (hint.me?.host ?? null)
-						: this.cacheService.userByIdCache.fetch(meId, () => this.usersRepository.findOneByOrFail({ id: meId }))
-							.then(me => me.host),
+						: this.cacheService.findUserById(meId).then(me => me.host),
 				]);
 
 				if (blocked) return false;
@@ -420,7 +416,7 @@ export class NoteEntityService implements OnModuleInit {
 				packedFiles: Map<MiNote['fileIds'][number], Packed<'DriveFile'> | null>;
 				packedUsers: Map<MiUser['id'], Packed<'UserLite'>>;
 				mentionHandles: Record<string, string | undefined>;
-				userFollowings: Map<string, Set<string>>;
+				userFollowings: Map<string, Map<string, { withReplies: boolean }>>;
 				userBlockers: Map<string, Set<string>>;
 				polls: Map<string, MiPoll>;
 				pollVotes: Map<string, Map<string, MiPollVote[]>>;

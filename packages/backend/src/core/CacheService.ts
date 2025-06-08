@@ -6,14 +6,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In, IsNull } from 'typeorm';
-import type { BlockingsRepository, FollowingsRepository, MutingsRepository, RenoteMutingsRepository, MiUserProfile, UserProfilesRepository, UsersRepository, MiFollowing, MiNote } from '@/models/_.js';
+import type { BlockingsRepository, FollowingsRepository, MutingsRepository, RenoteMutingsRepository, MiUserProfile, UserProfilesRepository, UsersRepository, MiNote } from '@/models/_.js';
 import { MemoryKVCache, RedisKVCache } from '@/misc/cache.js';
 import { QuantumKVCache } from '@/misc/QuantumKVCache.js';
 import type { MiLocalUser, MiUser } from '@/models/User.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
-import type { GlobalEvents, InternalEventTypes } from '@/core/GlobalEventService.js';
+import type { InternalEventTypes } from '@/core/GlobalEventService.js';
 import { InternalEventService } from '@/core/InternalEventService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 
@@ -46,7 +46,7 @@ export class CacheService implements OnApplicationShutdown {
 	public userBlockingCache: QuantumKVCache<Set<string>>;
 	public userBlockedCache: QuantumKVCache<Set<string>>; // NOTE: 「被」Blockキャッシュ
 	public renoteMutingsCache: QuantumKVCache<Set<string>>;
-	public userFollowingsCache: QuantumKVCache<Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>;
+	public userFollowingsCache: QuantumKVCache<Map<string, { withReplies: boolean }>>;
 	protected userFollowStatsCache = new MemoryKVCache<FollowStats>(1000 * 60 * 10); // 10 minutes
 	protected translationsCache: RedisKVCache<CachedTranslationEntity>;
 
@@ -110,15 +110,9 @@ export class CacheService implements OnApplicationShutdown {
 			fetcher: (key) => this.renoteMutingsRepository.find({ where: { muterId: key }, select: ['muteeId'] }).then(xs => new Set(xs.map(x => x.muteeId))),
 		});
 
-		this.userFollowingsCache = new QuantumKVCache<Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>(this.internalEventService, 'userFollowings', {
+		this.userFollowingsCache = new QuantumKVCache<Map<string, { withReplies: boolean }>>(this.internalEventService, 'userFollowings', {
 			lifetime: 1000 * 60 * 30, // 30m
-			fetcher: (key) => this.followingsRepository.find({ where: { followerId: key }, select: ['followeeId', 'withReplies'] }).then(xs => {
-				const obj: Record<string, Pick<MiFollowing, 'withReplies'> | undefined> = {};
-				for (const x of xs) {
-					obj[x.followeeId] = { withReplies: x.withReplies };
-				}
-				return obj;
-			}),
+			fetcher: (key) => this.followingsRepository.find({ where: { followerId: key }, select: ['followeeId', 'withReplies'] }).then(xs => new Map(xs.map(f => [f.followeeId, { withReplies: f.withReplies }]))),
 		});
 
 		this.translationsCache = new RedisKVCache<CachedTranslationEntity>(this.redisClient, 'translations', {
@@ -305,14 +299,14 @@ export class CacheService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	public async getUserFollowings(userIds: Iterable<string>): Promise<Map<string, Set<string>>> {
-		const followings = new Map<string, Set<string>>();
+	public async getUserFollowings(userIds: Iterable<string>): Promise<Map<string, Map<string, { withReplies: boolean }>>> {
+		const followings = new Map<string, Map<string, { withReplies: boolean }>>();
 
 		const toFetch: string[] = [];
 		for (const userId of userIds) {
 			const fromCache = this.userFollowingsCache.get(userId);
 			if (fromCache) {
-				followings.set(userId, new Set(Object.keys(fromCache)));
+				followings.set(userId, fromCache);
 			} else {
 				toFetch.push(userId);
 			}
@@ -331,25 +325,25 @@ export class CacheService implements OnApplicationShutdown {
 				})
 				.getMany();
 
-			const toCache = new Map<string, Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>();
+			const toCache = new Map<string, Map<string, { withReplies: boolean }>>();
 
 			// Pivot to a map
 			for (const { followerId, followeeId, withReplies } of fetchedFollowings) {
 				// Queue for cache
-				let cacheSet = toCache.get(followerId);
-				if (!cacheSet) {
-					cacheSet = {};
-					toCache.set(followerId, cacheSet);
+				let cacheMap = toCache.get(followerId);
+				if (!cacheMap) {
+					cacheMap = new Map();
+					toCache.set(followerId, cacheMap);
 				}
-				cacheSet[followeeId] = { withReplies };
+				cacheMap.set(followeeId, { withReplies });
 
 				// Queue for return
 				let returnSet = followings.get(followerId);
 				if (!returnSet) {
-					returnSet = new Set();
+					returnSet = new Map();
 					followings.set(followerId, returnSet);
 				}
-				returnSet.add(followeeId);
+				returnSet.set(followeeId, { withReplies });
 			}
 
 			// Update cache to speed up future calls

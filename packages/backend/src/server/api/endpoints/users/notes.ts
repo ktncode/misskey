@@ -134,7 +134,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (ps.withReplies) redisTimelines.push(`userTimelineWithReplies:${ps.userId}`);
 			if (ps.withChannelNotes) redisTimelines.push(`userTimelineWithChannel:${ps.userId}`);
 
-			const isFollowing = me && Object.hasOwn(await this.cacheService.userFollowingsCache.fetch(me.id), ps.userId);
+			const isFollowing = me && (await this.cacheService.userFollowingsCache.fetch(me.id)).has(ps.userId);
 
 			const timeline = await this.fanoutTimelineEndpointService.timeline({
 				untilId,

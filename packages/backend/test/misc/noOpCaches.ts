@@ -6,7 +6,7 @@
 import * as Redis from 'ioredis';
 import { Inject } from '@nestjs/common';
 import { FakeInternalEventService } from './FakeInternalEventService.js';
-import type { BlockingsRepository, FollowingsRepository, MiFollowing, MiUser, MiUserProfile, MutingsRepository, RenoteMutingsRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import type { BlockingsRepository, FollowingsRepository, MiUser, MiUserProfile, MutingsRepository, RenoteMutingsRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
 import type { MiLocalUser } from '@/models/User.js';
 import { MemoryKVCache, MemorySingleCache, RedisKVCache, RedisSingleCache } from '@/misc/cache.js';
 import { QuantumKVCache, QuantumKVOpts } from '@/misc/QuantumKVCache.js';
@@ -106,7 +106,7 @@ export class NoOpCacheService extends CacheService {
 			onSet: this.renoteMutingsCache.onSet,
 			onDelete: this.renoteMutingsCache.onDelete,
 		});
-		this.userFollowingsCache = new NoOpQuantumKVCache<Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>({
+		this.userFollowingsCache = new NoOpQuantumKVCache<Map<string, { withReplies: boolean }>>({
 			internalEventService: fakeInternalEventService,
 			fetcher: this.userFollowingsCache.fetcher,
 			onSet: this.userFollowingsCache.onSet,
