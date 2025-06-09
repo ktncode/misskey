@@ -49,7 +49,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			<MkPagination v-slot="{items}" ref="reports" :pagination="pagination" :displayLimit="50">
 				<SkDateSeparatedList v-slot="{ item: report }" :items="items">
-					<XAbuseReport :report="report" @resolved="resolved"/>
+					<XAbuseReport :report="report" :metaHint="metaHint" @resolved="resolved"/>
 				</SkDateSeparatedList>
 			</MkPagination>
 		</div>
@@ -59,6 +59,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, useTemplateRef, ref } from 'vue';
+import * as Misskey from 'misskey-js';
 import MkSelect from '@/components/MkSelect.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import XAbuseReport from '@/components/MkAbuseReport.vue';
@@ -68,6 +69,8 @@ import MkButton from '@/components/MkButton.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import { store } from '@/store.js';
 import SkDateSeparatedList from '@/components/SkDateSeparatedList.vue';
+import { iAmAdmin } from '@/i';
+import { misskeyApi } from '@/utility/misskey-api';
 
 const reports = useTemplateRef('reports');
 
@@ -76,6 +79,14 @@ const reporterOrigin = ref('combined');
 const targetUserOrigin = ref('combined');
 const searchUsername = ref('');
 const searchHost = ref('');
+
+const metaHint = ref<Misskey.entities.AdminMetaResponse | undefined>(undefined);
+
+if (iAmAdmin) {
+	misskeyApi('admin/meta')
+		.then(meta => metaHint.value = meta)
+		.catch(err => console.error('[MkAbuseReport] Error fetching meta:', err));
+}
 
 const pagination = {
 	endpoint: 'admin/abuse-user-reports' as const,
