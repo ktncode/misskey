@@ -113,7 +113,7 @@ class DeliverManager {
 		if (this.recipes.some(r => isFollowers(r))) {
 			// followers deliver
 			// ただ、sharedInboxがnullなリモートユーザーも稀におり、その対応ができなさそう？
-			const followers = await this.cacheService.userFollowingsCache
+			const followers = await this.cacheService.userFollowersCache
 				.fetch(this.actor.id)
 				.then(f => Array
 					.from(f.values())

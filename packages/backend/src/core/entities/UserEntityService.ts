@@ -250,8 +250,8 @@ export class UserEntityService implements OnModuleInit {
 	@bindThis
 	public async getRelations(me: MiUser['id'], targets: MiUser['id'][]): Promise<Map<MiUser['id'], UserRelation>> {
 		const [
-			followers,
-			followees,
+			myFollowing,
+			myFollowers,
 			followersRequests,
 			followeesRequests,
 			blockers,
@@ -300,7 +300,7 @@ export class UserEntityService implements OnModuleInit {
 
 		return new Map(
 			targets.map(target => {
-				const following = followers.get(target) ?? null;
+				const following = myFollowing.get(target) ?? null;
 
 				return [
 					target,
@@ -308,7 +308,7 @@ export class UserEntityService implements OnModuleInit {
 						id: target,
 						following: following,
 						isFollowing: following != null,
-						isFollowed: followees.has(target),
+						isFollowed: myFollowers.has(target),
 						hasPendingFollowRequestFromYou: followersRequests.includes(target),
 						hasPendingFollowRequestToYou: followeesRequests.includes(target),
 						isBlocking: blockees.has(target),
