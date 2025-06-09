@@ -373,7 +373,7 @@ if (props.specified) {
 // keep cw when reply
 if (prefer.s.keepCw && props.reply && props.reply.cw) {
 	useCw.value = true;
-	cw.value = prefer.s.keepCw === 'prepend-re'
+	cw.value = (prefer.s.keepCw === 'prepend-re' && !props.reply.cw.toLowerCase().startsWith('re:'))
 		? `RE: ${props.reply.cw}`
 		: props.reply.cw;
 }
