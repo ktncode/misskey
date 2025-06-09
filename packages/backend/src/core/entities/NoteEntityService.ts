@@ -94,7 +94,7 @@ export class NoteEntityService implements OnModuleInit {
 		private channelsRepository: ChannelsRepository,
 
 		@Inject(DI.config)
-		private readonly config: Config
+		private readonly config: Config,
 
 		//private userEntityService: UserEntityService,
 		//private driveFileEntityService: DriveFileEntityService,
