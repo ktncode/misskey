@@ -347,6 +347,7 @@ export class Resolver {
 		return object;
 	}
 
+	// TODO try to remove this, as it creates a large attack surface
 	@bindThis
 	private resolveLocal(url: string): Promise<IObjectWithId> {
 		const parsed = this.apDbResolverService.parseUri(url);
@@ -376,7 +377,7 @@ export class Resolver {
 					.then(([note, poll]) => this.apRendererService.renderQuestion({ id: note.userId }, note, poll)) as Promise<IObjectWithId>;
 			case 'likes':
 				return this.noteReactionsRepository.findOneOrFail({ where: { id: parsed.id }, relations: { user: true } }).then(async reaction => {
-					if (reaction.user?.host == null) {
+					if (reaction.user?.host != null) {
 						throw new IdentifiableError('02b40cd0-fa92-4b0c-acc9-fb2ada952ab8', `failed to resolve local ${url}: not a local reaction`);
 					}
 					return this.apRendererService.addContext(await this.apRendererService.renderLike(reaction, { uri: null }));
