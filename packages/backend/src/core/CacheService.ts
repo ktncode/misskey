@@ -159,7 +159,7 @@ export class CacheService implements OnApplicationShutdown {
 						}
 						group.set(f.followeeId, f);
 						return groups;
-					}, {} as Map<string, Map<string, Omit<MiFollowing, 'isFollowerHibernated'>>>)),
+					}, new Map<string, Map<string, Omit<MiFollowing, 'isFollowerHibernated'>>>)),
 		});
 
 		this.userFollowersCache = new QuantumKVCache<Map<string, Omit<MiFollowing, 'isFollowerHibernated'>>>(this.internalEventService, 'userFollowers', {
@@ -176,7 +176,7 @@ export class CacheService implements OnApplicationShutdown {
 						}
 						group.set(f.followerId, f);
 						return groups;
-					}, {} as Map<string, Map<string, Omit<MiFollowing, 'isFollowerHibernated'>>>)),
+					}, new Map<string, Map<string, Omit<MiFollowing, 'isFollowerHibernated'>>>)),
 		});
 
 		this.hibernatedUserCache = new QuantumKVCache<boolean>(this.internalEventService, 'hibernatedUsers', {
