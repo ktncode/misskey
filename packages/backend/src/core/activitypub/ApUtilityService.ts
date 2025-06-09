@@ -24,7 +24,7 @@ export class ApUtilityService {
 	public assertIdMatchesUrlAuthority(object: IObject, url: string): void {
 		// This throws if the ID is missing or invalid, but that's ok.
 		// Anonymous objects are impossible to verify, so we don't allow fetching them.
-		const id = getApId(object);
+		const id = getApId(object, url);
 
 		// Make sure the object ID matches the final URL (which is where it actually exists).
 		// The caller (ApResolverService) will verify the ID against the original / entry URL, which ensures that all three match.

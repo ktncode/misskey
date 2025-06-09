@@ -31,6 +31,8 @@ import { SkApInboxLog } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import { ApLogService, calculateDurationSince } from '@/core/ApLogService.js';
 import { UpdateInstanceQueue } from '@/core/UpdateInstanceQueue.js';
+import { isRetryableError } from '@/misc/is-retryable-error.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type { InboxJobData } from '../types.js';
 
@@ -145,12 +147,11 @@ export class InboxProcessorService implements OnApplicationShutdown {
 				authUser = await this.apDbResolverService.getAuthUserFromApId(actorId);
 			} catch (err) {
 				// 対象が4xxならスキップ
-				if (err instanceof StatusError) {
-					if (!err.isRetryable) {
-						throw new Bull.UnrecoverableError(`skip: Ignored deleted actors on both ends ${actorId} - ${err.statusCode}`);
-					}
-					throw new Error(`Error in actor ${actorId} - ${err.statusCode}`);
+				if (!isRetryableError(err)) {
+					throw new Bull.UnrecoverableError(`skip: Ignored deleted actors on both ends ${actorId}`);
 				}
+
+				throw err;
 			}
 		}
 
@@ -227,7 +228,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 
 				const ldHost = this.utilityService.extractDbHost(authUser.user.uri);
 				if (!this.utilityService.isFederationAllowedHost(ldHost)) {
-					throw new Bull.UnrecoverableError(`Blocked request: ${ldHost}`);
+					throw new Bull.UnrecoverableError(`skip: request host is blocked: ${ldHost}`);
 				}
 			} else {
 				throw new Bull.UnrecoverableError(`skip: http-signature verification failed and no LD-Signature. keyId=${signature.keyId}`);
@@ -300,16 +301,8 @@ export class InboxProcessorService implements OnApplicationShutdown {
 				}
 			}
 
-			if (e instanceof StatusError && !e.isRetryable) {
-				return `skip: permanent error ${e.statusCode}`;
-			}
-
-			if (e instanceof IdentifiableError && !e.isRetryable) {
-				if (e.message) {
-					return `skip: permanent error ${e.id}: ${e.message}`;
-				} else {
-					return `skip: permanent error ${e.id}`;
-				}
+			if (!isRetryableError(e)) {
+				return `skip: permanent error ${renderInlineError(e)}`;
 			}
 
 			throw e;
