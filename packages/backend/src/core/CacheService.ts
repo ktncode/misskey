@@ -291,6 +291,7 @@ export class CacheService implements OnApplicationShutdown {
 		}
 	}
 
+	@bindThis
 	private async onTokenEvent<E extends 'userTokenRegenerated'>(body: InternalEventTypes[E]): Promise<void> {
 		{
 			{
@@ -303,6 +304,7 @@ export class CacheService implements OnApplicationShutdown {
 		}
 	}
 
+	@bindThis
 	private async onFollowEvent<E extends 'follow' | 'unfollow'>(body: InternalEventTypes[E], type: E): Promise<void> {
 		{
 			switch (type) {
