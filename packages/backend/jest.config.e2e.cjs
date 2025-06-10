@@ -12,5 +12,4 @@ module.exports = {
 	testMatch: [
 		"<rootDir>/test/e2e/**/*.ts",
 	],
-	maxConcurrency: 1, // these tests share a database, running more than one at a time is a bad idea
 };
