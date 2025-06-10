@@ -9,6 +9,7 @@ process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
 import { MiNote } from '@/models/Note.js';
+import { MiInstance } from '@/models/Instance.js';
 import { api, castAsError, initTestDb, post, role, signup, uploadFile, uploadUrl } from '../utils.js';
 import type * as misskey from 'misskey-js';
 
@@ -26,6 +27,12 @@ describe('Note', () => {
 	beforeAll(async () => {
 		const connection = await initTestDb(true);
 		Notes = connection.getRepository(MiNote);
+		const instances = connection.getRepository(MiInstance);
+		await instances.insert({
+			id: 'aaaaaa',
+			host: 'example.com',
+			firstRetrievedAt: new Date(),
+		});
 		root = await signup({ username: 'root' });
 		alice = await signup({ username: 'alice' });
 		bob = await signup({ username: 'bob' });
@@ -983,6 +990,18 @@ describe('Note', () => {
 	});
 
 	describe('notes/translate', () => {
+		beforeAll(async () => {
+			await api('admin/roles/update-default-policies', { policies: {
+				canUseTranslator: true,
+			}}, root);
+		});
+
+		afterAll(async () => {
+			await api('admin/roles/update-default-policies', { policies: {
+				canUseTranslator: false,
+			}}, root);
+		});
+
 		describe('翻訳機能の利用が許可されていない場合', () => {
 			let cannotTranslateRole: misskey.entities.Role;
 
@@ -998,8 +1017,8 @@ describe('Note', () => {
 					targetLang: 'ja',
 				}, alice);
 
-				assert.strictEqual(res.status, 400);
-				assert.strictEqual(castAsError(res.body).error.code, 'UNAVAILABLE');
+				assert.strictEqual(res.status, 403);
+				assert.strictEqual(castAsError(res.body).error.code, 'ROLE_PERMISSION_DENIED');
 			});
 
 			afterAll(async () => {
@@ -1026,7 +1045,8 @@ describe('Note', () => {
 			const aliceNote = await post(alice, { text: null, poll: { choices: ['kinoko', 'takenoko'] } });
 			const res = await api('notes/translate', { noteId: aliceNote.id, targetLang: 'ja' }, alice);
 
-			assert.strictEqual(res.status, 204);
+			assert.strictEqual(res.status, 200);
+			assert.deepStrictEqual(res.body, {});
 		});
 
 		test('サーバーに DeepL 認証キーが登録されていない場合翻訳できない', async () => {
