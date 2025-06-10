@@ -11989,6 +11989,18 @@ export interface Locale extends ILocale {
      */
     "renoteMuted": string;
     /**
+     * Mute note
+     */
+    "muteNote": string;
+    /**
+     * Unmute note
+     */
+    "unmuteNote": string;
+    /**
+     * {name} said something in a muted post
+     */
+    "userSaysSomethingInMutedNote": ParameterizedString<"name">;
+    /**
      * {name} said something in a muted thread
      */
     "userSaysSomethingInMutedThread": ParameterizedString<"name">;

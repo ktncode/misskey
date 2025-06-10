@@ -173,7 +173,19 @@ export const packedNoteSchema = {
 				},
 			},
 		},
-		isMuting: {
+		isMutingThread: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		isMutingNote: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		isFavorited: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		isRenoted: {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},

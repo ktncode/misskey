@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div
-	v-if="!hardMuted && muted === false && !threadMuted"
+	v-if="!hardMuted && muted === false && !threadMuted && !noteMuted"
 	v-show="!isDeleted"
 	ref="rootEl"
 	v-hotkey="keymap"
@@ -125,9 +125,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					v-tooltip="renoteTooltip"
 					:class="$style.footerButton"
 					class="_button"
-					:style="renoted ? 'color: var(--MI_THEME-accent) !important;' : ''"
+					:style="appearNote.isRenoted ? 'color: var(--MI_THEME-accent) !important;' : ''"
 					@click.stop
-					@mousedown.prevent="renoted ? undoRenote(appearNote) : boostVisibility($event.shiftKey)"
+					@mousedown.prevent="appearNote.isRenoted ? undoRenote(appearNote) : boostVisibility($event.shiftKey)"
 				>
 					<i class="ti ti-repeat"></i>
 					<p v-if="appearNote.renoteCount > 0" :class="$style.footerButtonCount">{{ number(appearNote.renoteCount) }}</p>
@@ -169,7 +169,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</article>
 </div>
 <div v-else-if="!hardMuted" :class="$style.muted" @click.stop="muted = false">
-	<SkMutedNote :muted="muted" :threadMuted="threadMuted" :note="appearNote"></SkMutedNote>
+	<SkMutedNote :muted="muted" :threadMuted="threadMuted" :noteMuted="noteMuted" :note="appearNote"></SkMutedNote>
 </div>
 <div v-else>
 	<!--
@@ -310,8 +310,7 @@ const selfNoteIds = computed(() => getSelfNoteIds(props.note));
 const isLong = shouldCollapsed(appearNote.value, urls.value);
 const collapsed = ref(prefer.s.expandLongNote && appearNote.value.cw == null && isLong ? false : appearNote.value.cw == null && isLong);
 const isDeleted = ref(false);
-const renoted = ref(false);
-const { muted, hardMuted, threadMuted } = checkMutes(appearNote, computed(() => props.withHardMute));
+const { muted, hardMuted, threadMuted, noteMuted } = checkMutes(appearNote, computed(() => props.withHardMute));
 const translation = ref<Misskey.entities.NotesTranslateResponse | false | null>(null);
 const translating = ref(false);
 const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && appearNote.value.user.instance);
@@ -334,7 +333,7 @@ const pleaseLoginContext = computed<OpenOnRemoteOptions>(() => ({
 
 const mergedCW = computed(() => computeMergedCw(appearNote.value));
 
-const renoteTooltip = computeRenoteTooltip(renoted);
+const renoteTooltip = computeRenoteTooltip(appearNote);
 
 let renoting = false;
 
@@ -349,7 +348,7 @@ const keymap = {
 	},
 	'q': () => {
 		if (renoteCollapsed.value) return;
-		if (canRenote.value && !renoted.value && !renoting) renote(prefer.s.visibilityOnBoost);
+		if (canRenote.value && !appearNote.value.isRenoted && !renoting) renote(prefer.s.visibilityOnBoost);
 	},
 	'm': () => {
 		if (renoteCollapsed.value) return;
@@ -459,16 +458,6 @@ if (!props.mock) {
 		});
 	});
 
-	if ($i) {
-		misskeyApi('notes/renotes', {
-			noteId: appearNote.value.id,
-			userId: $i.id,
-			limit: 1,
-		}).then((res) => {
-			renoted.value = res.length > 0;
-		});
-	}
-
 	if (appearNote.value.reactionAcceptance === 'likeOnly') {
 		useTooltip(reactButton, async (showing) => {
 			const reactions = await misskeyApiGet('notes/reactions', {
@@ -527,7 +516,7 @@ function renote(visibility: Visibility, localOnly: boolean = false) {
 				channelId: appearNote.value.channelId,
 			}).then(() => {
 				os.toast(i18n.ts.renoted);
-				renoted.value = true;
+				appearNote.value.isRenoted = true;
 			}).finally(() => { renoting = false; });
 		}
 	} else if (!appearNote.value.channel || appearNote.value.channel.allowRenoteToExternal) {
@@ -548,7 +537,7 @@ function renote(visibility: Visibility, localOnly: boolean = false) {
 				renoteId: appearNote.value.id,
 			}).then(() => {
 				os.toast(i18n.ts.renoted);
-				renoted.value = true;
+				appearNote.value.isRenoted = true;
 			}).finally(() => { renoting = false; });
 		}
 	}
@@ -727,7 +716,7 @@ function undoRenote(note) : void {
 		noteId: note.id,
 	});
 	os.toast(i18n.ts.rmboost);
-	renoted.value = false;
+	appearNote.value.isRenoted = false;
 
 	const el = renoteButton.value as HTMLElement | null | undefined;
 	if (el) {

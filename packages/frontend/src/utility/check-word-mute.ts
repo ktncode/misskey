@@ -22,7 +22,12 @@ export function checkMutes(noteToCheck: ComputedRef<Misskey.entities.Note>, with
 
 	const threadMuted = computed(() => {
 		if (!muteEnable.value) return false;
-		return noteToCheck.value.isMuting;
+		return noteToCheck.value.isMutingThread;
+	});
+
+	const noteMuted = computed(() => {
+		if (!muteEnable.value) return false;
+		return noteToCheck.value.isMutingNote;
 	});
 
 	const hardMuted = computed(() => {
@@ -30,7 +35,7 @@ export function checkMutes(noteToCheck: ComputedRef<Misskey.entities.Note>, with
 		return checkMute(noteToCheck.value, $i?.hardMutedWords, true);
 	});
 
-	return { muted, hardMuted, threadMuted };
+	return { muted, hardMuted, threadMuted, noteMuted };
 }
 
 export function checkMute(note: Misskey.entities.Note, mutes: undefined | null): false;

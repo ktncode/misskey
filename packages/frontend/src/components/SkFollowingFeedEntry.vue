@@ -18,8 +18,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkA>
 		</header>
 		<div>
-			<div v-if="muted || threadMuted" :class="[$style.text, $style.muted]">
-				<SkMutedNote :muted="muted" :threadMuted="threadMuted" :note="note"></SkMutedNote>
+			<div v-if="muted || threadMuted || noteMuted" :class="[$style.text, $style.muted]">
+				<SkMutedNote :muted="muted" :threadMuted="threadMuted" :noteMuted="noteMuted" :note="note"></SkMutedNote>
 			</div>
 			<Mfm v-else :class="$style.text" :text="getNoteSummary(note)" :isBlock="true" :plain="true" :nowrap="false" :isNote="true" nyaize="respect" :author="note.user"/>
 		</div>
@@ -50,7 +50,7 @@ defineEmits<{
 	(event: 'select', user: Misskey.entities.UserLite): void
 }>();
 
-const { muted, hardMuted, threadMuted } = checkMutes(computed(() => props.note));
+const { muted, hardMuted, threadMuted, noteMuted } = checkMutes(computed(() => props.note));
 </script>
 
 <style lang="scss" module>

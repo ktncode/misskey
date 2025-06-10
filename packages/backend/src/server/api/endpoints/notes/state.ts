@@ -8,6 +8,7 @@ import type { NotesRepository, NoteThreadMutingsRepository, NoteFavoritesReposit
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
 import { CacheService } from '@/core/CacheService.js';
+import { QueryService } from '@/core/QueryService.js';
 
 export const meta = {
 	tags: ['notes'],
@@ -24,6 +25,14 @@ export const meta = {
 				optional: false, nullable: false,
 			},
 			isMutedThread: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
+			isMutedNote: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
+			isRenoted: {
 				type: 'boolean',
 				optional: false, nullable: false,
 			},
@@ -58,23 +67,37 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private noteFavoritesRepository: NoteFavoritesRepository,
 
 		private readonly cacheService: CacheService,
+		private readonly queryService: QueryService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const note = await this.notesRepository.findOneByOrFail({ id: ps.noteId });
 
-			const [favorite, threadMuting] = await Promise.all([
+			const [favorite, threadMuting, noteMuting, renoted] = await Promise.all([
+				// favorite
 				this.noteFavoritesRepository.exists({
 					where: {
 						userId: me.id,
 						noteId: note.id,
 					},
 				}),
+				// treadMuting
 				this.cacheService.threadMutingsCache.fetch(me.id).then(ms => ms.has(note.threadId ?? note.id)),
+				// noteMuting
+				this.cacheService.noteMutingsCache.fetch(me.id).then(ms => ms.has(note.id)),
+				// renoted
+				this.notesRepository
+					.createQueryBuilder('note')
+					.andWhere({ renoteId: note.id, userId: me.id })
+					.andWhere(qb => this.queryService
+						.andIsRenote(qb, 'note'))
+					.getExists(),
 			]);
 
 			return {
 				isFavorited: favorite,
 				isMutedThread: threadMuting,
+				isMutedNote: noteMuting,
+				isRenoted: renoted,
 			};
 		});
 	}

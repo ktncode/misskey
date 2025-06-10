@@ -47,6 +47,7 @@ export class CacheService implements OnApplicationShutdown {
 	public userBlockedCache: QuantumKVCache<Set<string>>; // NOTE: 「被」Blockキャッシュ
 	public renoteMutingsCache: QuantumKVCache<Set<string>>;
 	public threadMutingsCache: QuantumKVCache<Set<string>>;
+	public noteMutingsCache: QuantumKVCache<Set<string>>;
 	public userFollowingsCache: QuantumKVCache<Map<string, Omit<MiFollowing, 'isFollowerHibernated'>>>;
 	public userFollowersCache: QuantumKVCache<Map<string, Omit<MiFollowing, 'isFollowerHibernated'>>>;
 	public hibernatedUserCache: QuantumKVCache<boolean>;
@@ -152,13 +153,27 @@ export class CacheService implements OnApplicationShutdown {
 		this.threadMutingsCache = new QuantumKVCache<Set<string>>(this.internalEventService, 'threadMutings', {
 			lifetime: 1000 * 60 * 30, // 30m
 			fetcher: muterId => this.noteThreadMutingsRepository
-				.find({ where: { userId: muterId }, select: { threadId: true } })
+				.find({ where: { userId: muterId, isPostMute: false }, select: { threadId: true } })
 				.then(ms => new Set(ms.map(m => m.threadId))),
 			bulkFetcher: muterIds => this.noteThreadMutingsRepository
 				.createQueryBuilder('muting')
 				.select('"muting"."userId"', 'userId')
 				.addSelect('array_agg("muting"."threadId")', 'threadIds')
-				.where({ userId: In(muterIds) })
+				.where({ userId: In(muterIds), isPostMute: false })
+				.getRawMany<{ userId: string, threadIds: string[] }>()
+				.then(ms => ms.map(m => [m.userId, new Set(m.threadIds)])),
+		});
+
+		this.noteMutingsCache = new QuantumKVCache<Set<string>>(this.internalEventService, 'noteMutings', {
+			lifetime: 1000 * 60 * 30, // 30m
+			fetcher: muterId => this.noteThreadMutingsRepository
+				.find({ where: { userId: muterId, isPostMute: true }, select: { threadId: true } })
+				.then(ms => new Set(ms.map(m => m.threadId))),
+			bulkFetcher: muterIds => this.noteThreadMutingsRepository
+				.createQueryBuilder('muting')
+				.select('"muting"."userId"', 'userId')
+				.addSelect('array_agg("muting"."threadId")', 'threadIds')
+				.where({ userId: In(muterIds), isPostMute: true })
 				.getRawMany<{ userId: string, threadIds: string[] }>()
 				.then(ms => ms.map(m => [m.userId, new Set(m.threadIds)])),
 		});
@@ -290,6 +305,8 @@ export class CacheService implements OnApplicationShutdown {
 								this.userFollowingsCache.delete(body.id),
 								this.userFollowersCache.delete(body.id),
 								this.hibernatedUserCache.delete(body.id),
+								this.threadMutingsCache.delete(body.id),
+								this.noteMutingsCache.delete(body.id),
 							]);
 						}
 					} else {
@@ -560,7 +577,11 @@ export class CacheService implements OnApplicationShutdown {
 		this.userBlockingCache.dispose();
 		this.userBlockedCache.dispose();
 		this.renoteMutingsCache.dispose();
+		this.threadMutingsCache.dispose();
+		this.noteMutingsCache.dispose();
 		this.userFollowingsCache.dispose();
+		this.userFollowersCache.dispose();
+		this.hibernatedUserCache.dispose();
 	}
 
 	@bindThis

@@ -20,9 +20,11 @@ export const meta = {
 
 	kind: 'write:account',
 
+	// Up to 10 calls, then 1/second
 	limit: {
-		duration: ms('1hour'),
-		max: 10,
+		type: 'bucket',
+		size: 10,
+		dripRate: 1000,
 	},
 
 	errors: {
@@ -38,6 +40,7 @@ export const paramDef = {
 	type: 'object',
 	properties: {
 		noteId: { type: 'string', format: 'misskey:id' },
+		noteOnly: { type: 'boolean', default: false },
 	},
 	required: ['noteId'],
 } as const;
@@ -71,13 +74,18 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			});
 			*/
 
+			const threadId = note.threadId ?? note.id;
 			await this.noteThreadMutingsRepository.insert({
 				id: this.idService.gen(),
-				threadId: note.threadId ?? note.id,
+				threadId: ps.noteOnly ? note.id : threadId,
 				userId: me.id,
+				isPostMute: ps.noteOnly,
 			});
 
-			await this.cacheService.threadMutingsCache.refresh(me.id);
+			await Promise.all([
+				this.cacheService.threadMutingsCache.refresh(me.id),
+				this.cacheService.noteMutingsCache.refresh(me.id),
+			]);
 		});
 	}
 }

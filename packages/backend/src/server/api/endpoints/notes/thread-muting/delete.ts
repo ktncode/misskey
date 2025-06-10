@@ -26,10 +26,11 @@ export const meta = {
 		},
 	},
 
-	// 10 calls per hour (match create)
+	// Up to 20 calls, then 2/second
 	limit: {
-		duration: 1000 * 60 * 60,
-		max: 10,
+		type: 'bucket',
+		size: 20,
+		dripRate: 2000,
 	},
 } as const;
 
@@ -37,6 +38,7 @@ export const paramDef = {
 	type: 'object',
 	properties: {
 		noteId: { type: 'string', format: 'misskey:id' },
+		noteOnly: { type: 'boolean', default: false },
 	},
 	required: ['noteId'],
 } as const;
@@ -56,12 +58,17 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw err;
 			});
 
+			const threadId = note.threadId ?? note.id;
 			await this.noteThreadMutingsRepository.delete({
-				threadId: note.threadId ?? note.id,
+				threadId: ps.noteOnly ? note.id : threadId,
 				userId: me.id,
+				isPostMute: ps.noteOnly,
 			});
 
-			await this.cacheService.threadMutingsCache.refresh(me.id);
+			await Promise.all([
+				this.cacheService.threadMutingsCache.refresh(me.id),
+				this.cacheService.noteMutingsCache.refresh(me.id),
+			]);
 		});
 	}
 }

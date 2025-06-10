@@ -4,7 +4,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<I18n v-if="threadMuted" :src="i18n.ts.userSaysSomethingInMutedThread" tag="small">
+<I18n v-if="noteMuted" :src="i18n.ts.userSaysSomethingInMutedNote" tag="small">
+	<template #name>
+		<MkUserName :user="note.user"/>
+	</template>
+</I18n>
+<I18n v-else-if="threadMuted" :src="i18n.ts.userSaysSomethingInMutedThread" tag="small">
 	<template #name>
 		<MkUserName :user="note.user"/>
 	</template>
@@ -40,11 +45,15 @@ import { computed } from 'vue';
 import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
 	muted: false | 'sensitiveMute' | string[];
-	threadMuted: boolean;
+	threadMuted?: boolean;
+	noteMuted?: boolean;
 	note: Misskey.entities.Note;
-}>();
+}>(), {
+	threadMuted: false,
+	noteMuted: false,
+});
 
 const mutedWords = computed(() => Array.isArray(props.muted)
 	? props.muted.join(', ')
