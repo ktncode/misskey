@@ -12,6 +12,12 @@ export const packedNoteSchema = {
 			format: 'id',
 			example: 'xxxxxxxxxx',
 		},
+		threadId: {
+			type: 'string',
+			optional: false, nullable: false,
+			format: 'id',
+			example: 'xxxxxxxxxx',
+		},
 		createdAt: {
 			type: 'string',
 			optional: false, nullable: false,

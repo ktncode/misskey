@@ -462,6 +462,7 @@ export class NoteEntityService implements OnModuleInit {
 
 		const packed: Packed<'Note'> = await awaitAll({
 			id: note.id,
+			threadId: note.threadId ?? note.id,
 			createdAt: this.idService.parse(note.id).date.toISOString(),
 			updatedAt: note.updatedAt ? note.updatedAt.toISOString() : undefined,
 			userId: note.userId,

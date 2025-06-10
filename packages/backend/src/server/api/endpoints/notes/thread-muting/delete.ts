@@ -8,6 +8,7 @@ import type { NoteThreadMutingsRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { DI } from '@/di-symbols.js';
+import { CacheService } from '@/core/CacheService.js';
 import { ApiError } from '../../../error.js';
 
 export const meta = {
@@ -47,6 +48,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private noteThreadMutingsRepository: NoteThreadMutingsRepository,
 
 		private getterService: GetterService,
+		private readonly cacheService: CacheService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const note = await this.getterService.getNote(ps.noteId).catch(err => {
@@ -58,6 +60,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				threadId: note.threadId ?? note.id,
 				userId: me.id,
 			});
+
+			await this.cacheService.threadMutingsCache.refresh(me.id);
 		});
 	}
 }

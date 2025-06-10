@@ -10,6 +10,7 @@ import { IdService } from '@/core/IdService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { DI } from '@/di-symbols.js';
+import { CacheService } from '@/core/CacheService.js';
 import { ApiError } from '../../../error.js';
 
 export const meta = {
@@ -52,6 +53,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 		private getterService: GetterService,
 		private idService: IdService,
+		private readonly cacheService: CacheService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const note = await this.getterService.getNote(ps.noteId).catch(err => {
@@ -59,6 +61,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw err;
 			});
 
+			/*
 			const mutedNotes = await this.notesRepository.find({
 				where: [{
 					id: note.threadId ?? note.id,
@@ -66,12 +69,15 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					threadId: note.threadId ?? note.id,
 				}],
 			});
+			*/
 
 			await this.noteThreadMutingsRepository.insert({
 				id: this.idService.gen(),
 				threadId: note.threadId ?? note.id,
 				userId: me.id,
 			});
+
+			await this.cacheService.threadMutingsCache.refresh(me.id);
 		});
 	}
 }

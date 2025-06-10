@@ -7,6 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository, NoteThreadMutingsRepository, NoteFavoritesRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
+import { CacheService } from '@/core/CacheService.js';
 
 export const meta = {
 	tags: ['notes'],
@@ -55,30 +56,25 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 		@Inject(DI.noteFavoritesRepository)
 		private noteFavoritesRepository: NoteFavoritesRepository,
+
+		private readonly cacheService: CacheService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const note = await this.notesRepository.findOneByOrFail({ id: ps.noteId });
 
 			const [favorite, threadMuting] = await Promise.all([
-				this.noteFavoritesRepository.count({
+				this.noteFavoritesRepository.exists({
 					where: {
 						userId: me.id,
 						noteId: note.id,
 					},
-					take: 1,
 				}),
-				this.noteThreadMutingsRepository.count({
-					where: {
-						userId: me.id,
-						threadId: note.threadId ?? note.id,
-					},
-					take: 1,
-				}),
+				this.cacheService.threadMutingsCache.fetch(me.id).then(ms => ms.has(note.threadId ?? note.id)),
 			]);
 
 			return {
-				isFavorited: favorite !== 0,
-				isMutedThread: threadMuting !== 0,
+				isFavorited: favorite,
+				isMutedThread: threadMuting,
 			};
 		});
 	}

@@ -4652,6 +4652,11 @@ export type components = {
        * @example xxxxxxxxxx
        */
       id: string;
+      /**
+       * Format: id
+       * @example xxxxxxxxxx
+       */
+      threadId: string;
       /** Format: date-time */
       createdAt: string;
       /** Format: date-time */

@@ -53,6 +53,10 @@ export default abstract class Channel {
 		return this.connection.userMutedInstances;
 	}
 
+	protected get userMutedThreads() {
+		return this.connection.userMutedThreads;
+	}
+
 	protected get followingChannels() {
 		return this.connection.followingChannels;
 	}
@@ -93,6 +97,9 @@ export default abstract class Channel {
 
 		// 流れてきたNoteがリノートをミュートしてるユーザが行ったもの
 		if (isRenotePacked(note) && !isQuotePacked(note) && this.userIdsWhoMeMutingRenotes.has(note.user.id)) return true;
+
+		// Muted thread
+		if (this.userMutedThreads.has(note.threadId)) return true;
 
 		// If it's a boost (pure renote) then we need to check the target as well
 		if (isPackedPureRenote(note) && note.renote && this.isNoteMutedOrBlocked(note.renote)) return true;

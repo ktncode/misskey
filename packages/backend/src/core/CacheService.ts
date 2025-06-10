@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In, IsNull } from 'typeorm';
-import type { BlockingsRepository, FollowingsRepository, MutingsRepository, RenoteMutingsRepository, MiUserProfile, UserProfilesRepository, UsersRepository, MiNote, MiFollowing } from '@/models/_.js';
+import type { BlockingsRepository, FollowingsRepository, MutingsRepository, RenoteMutingsRepository, MiUserProfile, UserProfilesRepository, UsersRepository, MiNote, MiFollowing, NoteThreadMutingsRepository } from '@/models/_.js';
 import { MemoryKVCache, RedisKVCache } from '@/misc/cache.js';
 import { QuantumKVCache } from '@/misc/QuantumKVCache.js';
 import type { MiLocalUser, MiUser } from '@/models/User.js';
@@ -46,6 +46,7 @@ export class CacheService implements OnApplicationShutdown {
 	public userBlockingCache: QuantumKVCache<Set<string>>;
 	public userBlockedCache: QuantumKVCache<Set<string>>; // NOTE: 「被」Blockキャッシュ
 	public renoteMutingsCache: QuantumKVCache<Set<string>>;
+	public threadMutingsCache: QuantumKVCache<Set<string>>;
 	public userFollowingsCache: QuantumKVCache<Map<string, Omit<MiFollowing, 'isFollowerHibernated'>>>;
 	public userFollowersCache: QuantumKVCache<Map<string, Omit<MiFollowing, 'isFollowerHibernated'>>>;
 	public hibernatedUserCache: QuantumKVCache<boolean>;
@@ -76,6 +77,9 @@ export class CacheService implements OnApplicationShutdown {
 
 		@Inject(DI.followingsRepository)
 		private followingsRepository: FollowingsRepository,
+
+		@Inject(DI.noteThreadMutingsRepository)
+		private readonly noteThreadMutingsRepository: NoteThreadMutingsRepository,
 
 		private userEntityService: UserEntityService,
 		private readonly internalEventService: InternalEventService,
@@ -143,6 +147,20 @@ export class CacheService implements OnApplicationShutdown {
 				.groupBy('muting.muterId')
 				.getRawMany<{ muterId: string, muteeIds: string[] }>()
 				.then(ms => ms.map(m => [m.muterId, new Set(m.muteeIds)])),
+		});
+
+		this.threadMutingsCache = new QuantumKVCache<Set<string>>(this.internalEventService, 'threadMutings', {
+			lifetime: 1000 * 60 * 30, // 30m
+			fetcher: muterId => this.noteThreadMutingsRepository
+				.find({ where: { userId: muterId }, select: { threadId: true } })
+				.then(ms => new Set(ms.map(m => m.threadId))),
+			bulkFetcher: muterIds => this.noteThreadMutingsRepository
+				.createQueryBuilder('muting')
+				.select('"muting"."userId"', 'userId')
+				.addSelect('array_agg("muting"."threadId")', 'threadIds')
+				.where({ userId: In(muterIds) })
+				.getRawMany<{ userId: string, threadIds: string[] }>()
+				.then(ms => ms.map(m => [m.userId, new Set(m.threadIds)])),
 		});
 
 		this.userFollowingsCache = new QuantumKVCache<Map<string, Omit<MiFollowing, 'isFollowerHibernated'>>>(this.internalEventService, 'userFollowings', {
