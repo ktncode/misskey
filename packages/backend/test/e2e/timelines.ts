@@ -21,7 +21,7 @@ async function genHost() {
 		id: hostname,
 		host: hostname,
 		firstRetrievedAt: new Date(),
-	}, [ 'id' ]);
+	}, ['id']);
 	return hostname;
 }
 

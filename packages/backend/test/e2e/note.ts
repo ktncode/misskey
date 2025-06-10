@@ -990,16 +990,19 @@ describe('Note', () => {
 	});
 
 	describe('notes/translate', () => {
+		// the types in misskey-js are wrong? this endpoints takes a
+		// `policies` object, but the generated types say it's a
+		// Record<string,never> ☹
 		beforeAll(async () => {
 			await api('admin/roles/update-default-policies', { policies: {
 				canUseTranslator: true,
-			}}, root);
+			} as unknown as Record<string, never> }, root);
 		});
 
 		afterAll(async () => {
 			await api('admin/roles/update-default-policies', { policies: {
 				canUseTranslator: false,
-			}}, root);
+			} as unknown as Record<string, never> }, root);
 		});
 
 		describe('翻訳機能の利用が許可されていない場合', () => {
