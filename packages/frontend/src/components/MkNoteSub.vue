@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div v-show="!isDeleted" v-if="!muted" ref="el" :class="[$style.root, { [$style.children]: depth > 1 }]">
+<div v-show="!isDeleted" v-if="!muted && !threadMuted" ref="el" :class="[$style.root, { [$style.children]: depth > 1 }]">
 	<div :class="$style.main">
 		<div v-if="note.channel" :class="$style.colorBar" :style="{ background: note.channel.color }"></div>
 		<MkAvatar :class="$style.avatar" :user="note.user" link preview/>
@@ -78,8 +78,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkA class="_link" :to="notePage(note)">{{ i18n.ts.continueThread }} <i class="ti ti-chevron-double-right"></i></MkA>
 	</div>
 </div>
-<div v-else :class="$style.muted" @click="muted = false">
-	<SkMutedNote :muted="muted" :note="appearNote"></SkMutedNote>
+<div v-else :class="$style.muted" @click.stop="muted = false">
+	<SkMutedNote :muted="muted" :threadMuted="threadMuted" :note="appearNote"></SkMutedNote>
 </div>
 </template>
 
@@ -172,7 +172,7 @@ async function removeReply(id: Misskey.entities.Note['id']) {
 	}
 }
 
-const { muted } = checkMutes(appearNote.value);
+const { muted, threadMuted } = checkMutes(appearNote);
 
 useNoteCapture({
 	rootEl: el,

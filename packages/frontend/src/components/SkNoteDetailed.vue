@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div
-	v-if="!muted"
+	v-if="!muted && !threadMuted"
 	v-show="!isDeleted"
 	ref="rootEl"
 	v-hotkey="keymap"
@@ -230,8 +230,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 	</div>
 </div>
-<div v-else class="_panel" :class="$style.muted" @click="muted = false">
-	<SkMutedNote :muted="muted" :note="appearNote"></SkMutedNote>
+<div v-else class="_panel" :class="$style.muted" @click.stop="muted = false">
+	<SkMutedNote :muted="muted" :threadMuted="threadMuted" :note="appearNote"></SkMutedNote>
 </div>
 </template>
 
@@ -359,7 +359,7 @@ const mergedCW = computed(() => computeMergedCw(appearNote.value));
 
 const renoteTooltip = computeRenoteTooltip(renoted);
 
-const { muted } = checkMutes(appearNote.value);
+const { muted, threadMuted } = checkMutes(appearNote);
 
 watch(() => props.expandAllCws, (expandAllCws) => {
 	if (expandAllCws !== showContent.value) showContent.value = expandAllCws;

@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div
-	v-if="!hardMuted && muted === false"
+	v-if="!hardMuted && muted === false && !threadMuted"
 	v-show="!isDeleted"
 	ref="rootEl"
 	v-hotkey="keymap"
@@ -168,8 +168,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 	</article>
 </div>
-<div v-else-if="!hardMuted" :class="$style.muted" @click="muted = false">
-	<SkMutedNote :muted="muted" :note="appearNote"></SkMutedNote>
+<div v-else-if="!hardMuted" :class="$style.muted" @click.stop="muted = false">
+	<SkMutedNote :muted="muted" :threadMuted="threadMuted" :note="appearNote"></SkMutedNote>
 </div>
 <div v-else>
 	<!--
@@ -311,7 +311,7 @@ const isLong = shouldCollapsed(appearNote.value, urls.value);
 const collapsed = ref(prefer.s.expandLongNote && appearNote.value.cw == null && isLong ? false : appearNote.value.cw == null && isLong);
 const isDeleted = ref(false);
 const renoted = ref(false);
-const { muted, hardMuted } = checkMutes(appearNote.value, props.withHardMute);
+const { muted, hardMuted, threadMuted } = checkMutes(appearNote, computed(() => props.withHardMute));
 const translation = ref<Misskey.entities.NotesTranslateResponse | false | null>(null);
 const translating = ref(false);
 const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && appearNote.value.user.instance);

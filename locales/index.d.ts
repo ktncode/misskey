@@ -11989,6 +11989,10 @@ export interface Locale extends ILocale {
      */
     "renoteMuted": string;
     /**
+     * {name} said something in a muted thread
+     */
+    "userSaysSomethingInMutedThread": ParameterizedString<"name">;
+    /**
      * Mark all media from user as NSFW
      */
     "markAsNSFW": string;
