@@ -197,7 +197,7 @@ export async function restoreFromCloudBackup() {
 		key: select.result,
 	});
 
-	if (_DEV_) console.log(profile);
+	if (_DEV_) console.debug(profile);
 
 	miLocalStorage.setItem('preferences', JSON.stringify(profile));
 	miLocalStorage.setItem('hidePreferencesRestoreSuggestion', 'true');

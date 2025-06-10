@@ -9,8 +9,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #empty><MkResult type="empty" :text="i18n.ts.noNotifications"/></template>
 
 		<template #default="{ items: notifications }">
-			<component
-				:is="prefer.s.animation ? TransitionGroup : 'div'" :class="[$style.notifications]"
+			<SkTransitionGroup
+				:class="[$style.notifications]"
 				:enterActiveClass="$style.transition_x_enterActive"
 				:leaveActiveClass="$style.transition_x_leaveActive"
 				:enterFromClass="$style.transition_x_enterFrom"
@@ -22,7 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<DynamicNote v-if="['reply', 'quote', 'mention'].includes(notification.type)" :class="$style.item" :note="notification.note" :withHardMute="true" :data-scroll-anchor="notification.id"/>
 					<XNotification v-else :class="$style.item" :notification="notification" :withTime="true" :full="true" :data-scroll-anchor="notification.id"/>
 				</div>
-			</component>
+			</SkTransitionGroup>
 		</template>
 	</MkPagination>
 </component>
@@ -39,6 +39,7 @@ import { useStream } from '@/stream.js';
 import { i18n } from '@/i18n.js';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 import { prefer } from '@/preferences.js';
+import SkTransitionGroup from '@/components/SkTransitionGroup.vue';
 
 const props = defineProps<{
 	excludeTypes?: typeof notificationTypes[number][];

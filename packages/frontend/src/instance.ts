@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { computed, reactive } from 'vue';
+import { computed, nextTick, reactive } from 'vue';
 import * as Misskey from 'misskey-js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { miLocalStorage } from '@/local-storage.js';
+import { $i } from '@/i';
 
 // TODO: 他のタブと永続化されたstateを同期
 
@@ -31,6 +32,8 @@ export const instance: Misskey.entities.MetaDetailed = reactive(cachedMeta ?? {}
 
 export const isEnabledUrlPreview = computed(() => instance.enableUrlPreview ?? true);
 
+export const policies = computed<Misskey.entities.RolePolicies>(() => $i?.policies ?? instance.policies);
+
 export async function fetchInstance(force = false): Promise<Misskey.entities.MetaDetailed> {
 	if (!force) {
 		const cachedAt = miLocalStorage.getItem('instanceCachedAt') ? parseInt(miLocalStorage.getItem('instanceCachedAt')!) : 0;
@@ -53,3 +56,8 @@ export async function fetchInstance(force = false): Promise<Misskey.entities.Met
 
 	return instance;
 }
+
+// instance export can be empty sometimes, which causes problems.
+await fetchInstance().catch(err => {
+	console.warn('Initial meta fetch failed:', err);
+});

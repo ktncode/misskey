@@ -28,7 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</div>
 			<MkReactionsViewer ref="reactionsViewer" :note="note"/>
-			<footer :class="$style.footer">
+			<footer :class="$style.footer" class="_gaps _h_gaps" tabindex="0" role="group" :aria-label="i18n.ts.noteFooterLabel">
 				<button class="_button" :class="$style.noteFooterButton" @click="reply()">
 					<i class="ph-arrow-u-up-left ph-bold ph-lg"></i>
 					<p v-if="note.repliesCount > 0" :class="$style.noteFooterButtonCount">{{ note.repliesCount }}</p>
@@ -70,7 +70,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<button v-if="prefer.s.showClipButtonInNoteFooter" ref="clipButton" :class="$style.noteFooterButton" class="_button" @click.stop="clip()">
 					<i class="ti ti-paperclip"></i>
 				</button>
-				<button v-if="prefer.s.showTranslationButtonInNoteFooter && $i?.policies.canUseTranslator && instance.translatorAvailable" ref="translationButton" class="_button" :class="$style.noteFooterButton" :disabled="translating || !!translation" @click.stop="translate()">
+				<button v-if="prefer.s.showTranslationButtonInNoteFooter && policies.canUseTranslator && instance.translatorAvailable" ref="translationButton" class="_button" :class="$style.noteFooterButton" :disabled="translating || !!translation" @click.stop="translate()">
 					<i class="ti ti-language-hiragana"></i>
 				</button>
 				<button ref="menuButton" class="_button" :class="$style.noteFooterButton" @click.stop="menu()">
@@ -121,7 +121,7 @@ import { boostMenuItems, computeRenoteTooltip } from '@/utility/boost-quote.js';
 import { prefer } from '@/preferences.js';
 import { useNoteCapture } from '@/use/use-note-capture.js';
 import SkMutedNote from '@/components/SkMutedNote.vue';
-import { instance } from '@/instance';
+import { instance, policies } from '@/instance';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -449,11 +449,11 @@ if (props.detail) {
 .footer {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: flex-start;
 	position: relative;
 	z-index: 1;
 	margin-top: 0.4em;
-	max-width: 400px;
+	overflow-x: auto;
 }
 
 .main {
@@ -556,14 +556,6 @@ if (props.detail) {
 	.line {
 		top: calc(23px + var(--MI-avatar));
 		left: calc(25px + .5 * var(--MI-avatar));
-	}
-}
-
-@container (max-width: 400px) {
-	.noteFooterButton {
-		&:not(:last-child) {
-			margin-right: 0.7em;
-		}
 	}
 }
 

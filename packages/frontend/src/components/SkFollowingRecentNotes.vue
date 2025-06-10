@@ -9,6 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #empty><MkResult type="empty" :text="i18n.ts.noNotes"/></template>
 
 		<template #default="{ items: notes }">
+			<!-- TODO replace with SkDateSeparatedList when merged -->
 			<MkDateSeparatedList v-slot="{ item: note }" :items="notes" :class="$style.panel" :noGap="true">
 				<SkFollowingFeedEntry :note="note" :class="props.selectedUserId == note.userId && $style.selected" @select="u => selectUser(u.id)"/>
 			</MkDateSeparatedList>

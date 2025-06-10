@@ -117,7 +117,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<MkPoll v-if="appearNote.poll" ref="pollViewer" :noteId="appearNote.id" :poll="appearNote.poll" :local="!appearNote.user.host" :class="$style.poll" :author="appearNote.user" :emojiUrls="appearNote.emojis"/>
 				<div v-if="isEnabledUrlPreview">
-					<MkUrlPreview v-for="url in urls" :key="url" :url="url" :compact="true" :detail="true" :showAsQuote="!appearNote.user.rejectQuotes" :skipNoteIds="selfNoteIds" style="margin-top: 6px;"/>
+					<SkUrlPreviewGroup :sourceNodes="nodes" :sourceNote="appearNote" :compact="true" :detail="true" :showAsQuote="!appearNote.user.rejectQuotes" :skipNoteIds="selfNoteIds" style="margin-top: 6px;" @click.stop/>
 				</div>
 				<div v-if="appearNote.renote" :class="$style.quote"><SkNoteSimple :note="appearNote.renote" :class="$style.quoteNote" :expandAllCws="props.expandAllCws"/></div>
 			</div>
@@ -132,7 +132,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkA>
 		</div>
 		<MkReactionsViewer v-if="appearNote.reactionAcceptance !== 'likeOnly'" ref="reactionsViewer" style="margin-top: 6px;" :note="appearNote"/>
-		<footer :class="$style.footer">
+		<footer :class="$style.footer" class="_gaps _h_gaps" tabindex="0" role="group" :aria-label="i18n.ts.noteFooterLabel">
 			<button class="_button" :class="$style.noteFooterButton" @click="reply()">
 				<i class="ti ti-arrow-back-up"></i>
 				<p v-if="appearNote.repliesCount > 0" :class="$style.noteFooterButtonCount">{{ number(appearNote.repliesCount) }}</p>
@@ -174,7 +174,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<button v-if="prefer.s.showClipButtonInNoteFooter" ref="clipButton" class="_button" :class="$style.noteFooterButton" @click.stop="clip()">
 				<i class="ti ti-paperclip"></i>
 			</button>
-			<button v-if="prefer.s.showTranslationButtonInNoteFooter && $i?.policies.canUseTranslator && instance.translatorAvailable" ref="translationButton" class="_button" :class="$style.noteFooterButton" :disabled="translating || !!translation" @click.stop="translate()">
+			<button v-if="prefer.s.showTranslationButtonInNoteFooter && policies.canUseTranslator && instance.translatorAvailable" ref="translationButton" class="_button" :class="$style.noteFooterButton" :disabled="translating || !!translation" @click.stop="translate()">
 				<i class="ti ti-language-hiragana"></i>
 			</button>
 			<button ref="menuButton" class="_button" :class="$style.noteFooterButton" @click.stop="showMenu()">
@@ -283,7 +283,7 @@ import MkPagination from '@/components/MkPagination.vue';
 import MkReactionIcon from '@/components/MkReactionIcon.vue';
 import MkButton from '@/components/MkButton.vue';
 import { boostMenuItems, computeRenoteTooltip } from '@/utility/boost-quote.js';
-import { instance, isEnabledUrlPreview } from '@/instance.js';
+import { instance, isEnabledUrlPreview, policies } from '@/instance.js';
 import { getAppearNote } from '@/utility/get-appear-note.js';
 import { prefer } from '@/preferences.js';
 import { getPluginHandlers } from '@/plugin.js';
@@ -291,7 +291,7 @@ import { DI } from '@/di.js';
 import SkMutedNote from '@/components/SkMutedNote.vue';
 import SkNoteTranslation from '@/components/SkNoteTranslation.vue';
 import { getSelfNoteIds } from '@/utility/get-self-note-ids.js';
-import { extractPreviewUrls } from '@/utility/extract-preview-urls';
+import SkUrlPreviewGroup from '@/components/SkUrlPreviewGroup.vue';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -345,8 +345,7 @@ const isDeleted = ref(false);
 const renoted = ref(false);
 const translation = ref<Misskey.entities.NotesTranslateResponse | false | null>(null);
 const translating = ref(false);
-const parsed = computed(() => appearNote.value.text ? mfm.parse(appearNote.value.text) : null);
-const urls = computed(() => parsed.value ? extractPreviewUrls(props.note, parsed.value) : null);
+const parsed = computed(() => appearNote.value.text ? mfm.parse(appearNote.value.text) : []);
 const selfNoteIds = computed(() => getSelfNoteIds(props.note));
 const animated = computed(() => parsed.value ? checkAnimationFromMfm(parsed.value) : null);
 const allowAnim = ref(prefer.s.advancedMfm && prefer.s.animatedMfm ? true : false);
@@ -394,7 +393,7 @@ const keymap = {
 		clip();
 	},
 	't': () => {
-		if (prefer.s.showTranslationButtonInNoteFooter && $i?.policies.canUseTranslator && instance.translatorAvailable) {
+		if (prefer.s.showTranslationButtonInNoteFooter && policies.value.canUseTranslator && instance.translatorAvailable) {
 			translate();
 		}
 	},
@@ -918,13 +917,13 @@ onUnmounted(() => {
 }
 
 .footer {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		position: relative;
-		z-index: 1;
-		margin-top: 0.4em;
-		max-width: 400px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	position: relative;
+	z-index: 1;
+	margin-top: 0.4em;
+	overflow-x: auto;
 }
 
 .replyTo {
@@ -1141,10 +1140,6 @@ onUnmounted(() => {
 	padding: 8px;
 	opacity: 0.7;
 
-	&:not(:last-child) {
-		margin-right: 1.5em;
-	}
-
 	&:hover {
 		color: var(--MI_THEME-fgHighlighted);
 	}
@@ -1234,14 +1229,6 @@ onUnmounted(() => {
 	}
 }
 
-@container (max-width: 350px) {
-	.noteFooterButton {
-		&:not(:last-child) {
-			margin-right: 0.1em;
-		}
-	}
-}
-
 @container (max-width: 300px) {
 	.root {
 		font-size: 0.825em;
@@ -1250,12 +1237,6 @@ onUnmounted(() => {
 	.noteHeaderAvatar {
 		width: 50px;
 		height: 50px;
-	}
-
-	.noteFooterButton {
-		&:not(:last-child) {
-			margin-right: 0.1em;
-		}
 	}
 }
 

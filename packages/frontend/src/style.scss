@@ -216,7 +216,9 @@ rt {
 
 	box-sizing: border-box;
 	container-type: inline-size;
+}
 
+._spacer > * {
 	/* 子に継承させない */
 	--MI_SPACER-w: initial;
 	--MI_SPACER-min: initial;
@@ -431,6 +433,14 @@ rt {
 	display: flex;
 	flex-direction: column;
 	gap: var(--MI-margin);
+}
+
+/**
+ * Use with _gaps, _gaps_m, or _gaps_s.
+ * Place the other class *first*!
+ */
+._h_gaps {
+	flex-direction: row;
 }
 
 ._buttons {
