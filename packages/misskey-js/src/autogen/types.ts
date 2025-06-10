@@ -4701,6 +4701,7 @@ export type components = {
             votes: number;
           }[];
       }) | null;
+      isMuting: boolean;
       emojis?: {
         [key: string]: string;
       };

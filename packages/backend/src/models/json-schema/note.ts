@@ -173,6 +173,10 @@ export const packedNoteSchema = {
 				},
 			},
 		},
+		isMuting: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 		emojis: {
 			type: 'object',
 			optional: true, nullable: false,

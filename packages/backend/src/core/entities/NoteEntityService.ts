@@ -422,6 +422,7 @@ export class NoteEntityService implements OnModuleInit {
 				pollVotes: Map<string, Map<string, MiPollVote[]>>;
 				channels: Map<string, MiChannel>;
 				notes: Map<string, MiNote>;
+				mutedThreads: Set<string>;
 			};
 		},
 	): Promise<Packed<'Note'>> {
@@ -460,9 +461,11 @@ export class NoteEntityService implements OnModuleInit {
 		const packedFiles = options?._hint_?.packedFiles;
 		const packedUsers = options?._hint_?.packedUsers;
 
+		const threadId = note.threadId ?? note.id;
+
 		const packed: Packed<'Note'> = await awaitAll({
 			id: note.id,
-			threadId: note.threadId ?? note.id,
+			threadId,
 			createdAt: this.idService.parse(note.id).date.toISOString(),
 			updatedAt: note.updatedAt ? note.updatedAt.toISOString() : undefined,
 			userId: note.userId,
@@ -502,6 +505,8 @@ export class NoteEntityService implements OnModuleInit {
 				poll: opts._hint_?.polls.get(note.id),
 				myVotes: opts._hint_?.pollVotes.get(note.id)?.get(note.userId),
 			}) : undefined,
+			isMuting: opts._hint_?.mutedThreads.has(threadId)
+				?? (meId != null && this.cacheService.threadMutingsCache.fetch(meId).then(ms => ms.has(threadId))),
 
 			...(meId && Object.keys(reactions).length > 0 ? {
 				myReaction: this.populateMyReaction({
@@ -649,7 +654,7 @@ export class NoteEntityService implements OnModuleInit {
 		const fileIds = new Set(targetNotes.flatMap(n => n.fileIds));
 		const mentionedUsers = new Set(targetNotes.flatMap(note => note.mentions));
 
-		const [{ bufferedReactions, myReactionsMap }, packedFiles, packedUsers, mentionHandles, userFollowings, userBlockers, polls, pollVotes, channels] = await Promise.all([
+		const [{ bufferedReactions, myReactionsMap }, packedFiles, packedUsers, mentionHandles, userFollowings, userBlockers, polls, pollVotes, channels, mutedThreads] = await Promise.all([
 			// bufferedReactions & myReactionsMap
 			this.getReactions(targetNotes, me),
 			// packedFiles
@@ -660,6 +665,7 @@ export class NoteEntityService implements OnModuleInit {
 			// mentionHandles
 			this.getUserHandles(Array.from(mentionedUsers)),
 			// userFollowings
+			// TODO this might be wrong
 			this.cacheService.userFollowingsCache.fetchMany(userIds).then(fs => new Map(fs)),
 			// userBlockers
 			this.cacheService.userBlockedCache.fetchMany(userIds).then(bs => new Map(bs)),
@@ -684,6 +690,8 @@ export class NoteEntityService implements OnModuleInit {
 				}, new Map<string, Map<string, MiPollVote[]>>)),
 			// channels
 			this.getChannels(targetNotes),
+			// mutedThreads
+			me ? this.cacheService.threadMutingsCache.fetch(me.id) : new Set<string>(),
 			// (not returned)
 			this.customEmojiService.prefetchEmojis(this.aggregateNoteEmojis(notes)),
 		]);
@@ -702,6 +710,7 @@ export class NoteEntityService implements OnModuleInit {
 				pollVotes,
 				channels,
 				notes: new Map(targetNotes.map(n => [n.id, n])),
+				mutedThreads,
 			},
 		})));
 	}
