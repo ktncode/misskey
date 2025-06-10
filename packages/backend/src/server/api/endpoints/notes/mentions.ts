@@ -77,17 +77,21 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 							))
 							.setParameters({ meIdAsList: [me.id] })
 						, 'source')
-						.innerJoin(MiNote, 'note', 'note.id = source.id');
+						.innerJoin(MiNote, 'note', 'note.id = source.id')
+						.innerJoinAndSelect('note.user', 'user')
+						.leftJoinAndSelect('note.reply', 'reply')
+						.leftJoinAndSelect('note.renote', 'renote')
+						.leftJoinAndSelect('reply.user', 'replyUser')
+						.leftJoinAndSelect('renote.user', 'renoteUser');
 
-					// Mentioned or visible users can always access
-					//this.queryService.generateVisibilityQuery(query, me);
+					this.queryService.generateVisibilityQuery(qb, me);
 					this.queryService.generateBlockedHostQueryForNote(qb);
-					this.queryService.generateSuspendedUserQueryForNote(query);
+					this.queryService.generateSuspendedUserQueryForNote(qb);
 					this.queryService.generateMutedUserQueryForNotes(qb, me);
 					this.queryService.generateMutedNoteThreadQuery(qb, me);
 					this.queryService.generateBlockedUserQueryForNotes(qb, me);
 					// A renote can't mention a user, so it will never appear here anyway.
-					//this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
+					//this.queryService.generateMutedUserRenotesQueryForNotes(qb, me);
 
 					if (ps.visibility) {
 						qb.andWhere('note.visibility = :visibility', { visibility: ps.visibility });
@@ -101,11 +105,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 					return qb;
 				}, 'source', 'source.id = note.id')
-				.innerJoinAndSelect('note.user', 'user')
-				.leftJoinAndSelect('note.reply', 'reply')
-				.leftJoinAndSelect('note.renote', 'renote')
-				.leftJoinAndSelect('reply.user', 'replyUser')
-				.leftJoinAndSelect('renote.user', 'renoteUser')
 				.limit(ps.limit);
 
 			const mentions = await query.getMany();

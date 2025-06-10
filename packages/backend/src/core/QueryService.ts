@@ -168,8 +168,10 @@ export class QueryService {
 					.orWhere(':meId = note.replyUserId')
 					// DM to me
 					.orWhere(':meIdAsList <@ note.visibleUserIds')
-					// Mentions me
-					.orWhere(':meIdAsList <@ note.mentions')
+					// Mentions me (and not a direct message)
+					.orWhere(new Brackets(qb =>
+						qb.andWhere(':meIdAsList <@ note.mentions')
+							.andWhere('note.visibility != \'specified\'')))
 					// Followers-only post
 					.orWhere(new Brackets(qb => this
 						.andFollowingUser(qb, ':meId', 'note.userId')
