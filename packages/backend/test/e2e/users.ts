@@ -56,6 +56,7 @@ describe('ユーザー', () => {
 			notesCount: user.notesCount,
 			isSilenced: user.isSilenced,
 			description: user.description,
+			attributionDomains: user.attributionDomains,
 
 			// BUG isAdmin/isModeratorはUserLiteではなくMeDetailedOnlyに含まれる。
 			isAdmin: undefined,
