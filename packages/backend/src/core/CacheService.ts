@@ -159,6 +159,7 @@ export class CacheService implements OnApplicationShutdown {
 				.createQueryBuilder('muting')
 				.select('"muting"."userId"', 'userId')
 				.addSelect('array_agg("muting"."threadId")', 'threadIds')
+				.groupBy('"muting"."userId"')
 				.where({ userId: In(muterIds), isPostMute: false })
 				.getRawMany<{ userId: string, threadIds: string[] }>()
 				.then(ms => ms.map(m => [m.userId, new Set(m.threadIds)])),
@@ -173,6 +174,7 @@ export class CacheService implements OnApplicationShutdown {
 				.createQueryBuilder('muting')
 				.select('"muting"."userId"', 'userId')
 				.addSelect('array_agg("muting"."threadId")', 'threadIds')
+				.groupBy('"muting"."userId"')
 				.where({ userId: In(muterIds), isPostMute: true })
 				.getRawMany<{ userId: string, threadIds: string[] }>()
 				.then(ms => ms.map(m => [m.userId, new Set(m.threadIds)])),
