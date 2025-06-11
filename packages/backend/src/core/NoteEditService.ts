@@ -833,14 +833,7 @@ export class NoteEditService implements OnApplicationShutdown {
 			// TODO: キャッシュ？
 			// eslint-disable-next-line prefer-const
 			let [followings, userListMemberships] = await Promise.all([
-				this.followingsRepository.find({
-					where: {
-						followeeId: user.id,
-						followerHost: IsNull(),
-						isFollowerHibernated: false,
-					},
-					select: ['followerId', 'withReplies'],
-				}),
+				this.cacheService.getNonHibernatedFollowers(user.id),
 				this.userListMembershipsRepository.find({
 					where: {
 						userId: user.id,
@@ -957,17 +950,19 @@ export class NoteEditService implements OnApplicationShutdown {
 		});
 
 		if (hibernatedUsers.length > 0) {
-			this.usersRepository.update({
-				id: In(hibernatedUsers.map(x => x.id)),
-			}, {
-				isHibernated: true,
-			});
-
-			this.followingsRepository.update({
-				followerId: In(hibernatedUsers.map(x => x.id)),
-			}, {
-				isFollowerHibernated: true,
-			});
+			await Promise.all([
+				this.usersRepository.update({
+					id: In(hibernatedUsers.map(x => x.id)),
+				}, {
+					isHibernated: true,
+				}),
+				this.followingsRepository.update({
+					followerId: In(hibernatedUsers.map(x => x.id)),
+				}, {
+					isFollowerHibernated: true,
+				}),
+				this.cacheService.hibernatedUserCache.setMany(hibernatedUsers.map(x => [x.id, true])),
+			]);
 		}
 	}
 

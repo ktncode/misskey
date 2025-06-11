@@ -16,6 +16,7 @@ import { bindThis } from '@/decorators.js';
 import { RelationshipJobData } from '@/queue/types.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { isSystemAccount } from '@/misc/is-system-account.js';
+import { CacheService } from '@/core/CacheService.js';
 
 @Injectable()
 export class UserSuspendService {
@@ -34,6 +35,7 @@ export class UserSuspendService {
 		private globalEventService: GlobalEventService,
 		private apRendererService: ApRendererService,
 		private moderationLogService: ModerationLogService,
+		private readonly cacheService: CacheService,
 	) {
 	}
 
@@ -143,12 +145,8 @@ export class UserSuspendService {
 
 	@bindThis
 	private async unFollowAll(follower: MiUser) {
-		const followings = await this.followingsRepository.find({
-			where: {
-				followerId: follower.id,
-				followeeId: Not(IsNull()),
-			},
-		});
+		const followings = await this.cacheService.userFollowingsCache.fetch(follower.id)
+			.then(fs => Array.from(fs.values()).filter(f => f.followeeHost != null));
 
 		const jobs: RelationshipJobData[] = [];
 		for (const following of followings) {
