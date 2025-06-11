@@ -328,7 +328,7 @@ function drawSlices(skipOptimizationChecks = false) {
 
 		// Debug
 		if (rowDif > 1 || rowDif < 0) {
-			debug_playpause();
+			//debug_playpause();
 			debug_w('Row diff', rowDif);
 		}
 
@@ -336,7 +336,6 @@ function drawSlices(skipOptimizationChecks = false) {
 		const rowDir = !isRowDirPos as unknown as number;
 		const norm = 1 - 2 * rowDir;
 		const offByOneFix = -1 * rowDir;
-		let drawnSlices = 0;
 
 		interface InteralToDraw {
 			p: number,
@@ -344,8 +343,10 @@ function drawSlices(skipOptimizationChecks = false) {
 		};
 		let toDraw: InteralToDraw[] = [];
 		let lowestRow = 0xFFFFFFFF;
+		let drawnSlices = 0;
+		let maxToDraw = 0;
 
-		debug_w('begin drawing.\n', 'isRowDirPos', isRowDirPos, 'rowDir', rowDir, 'norm', norm);
+		//debug_w('begin drawing.\n', 'isRowDirPos', isRowDirPos, 'rowDir', rowDir, 'norm', norm);
 
 		for (let i = 0; i < canvasSlice.length; i++) {
 			canvasSlice[i].data.slicePos = canvasSlice[i].data.slicePos - rowDif;
@@ -355,21 +356,19 @@ function drawSlices(skipOptimizationChecks = false) {
 			const abs_pos = Math.abs(canvasSlice[i].data.slicePos);
 			if (lowestRow > abs_pos) lowestRow = abs_pos;
 			toDraw[abs_pos] = { p: canvasSlice[i].data.slicePos, i: i };
-			//debug('Added to draw.', abs_pos);
+			maxToDraw++;
+			//debug_w('Added to draw.', abs_pos);
 		}
 
-		debug(lowestRow, norm);
-		console.table(toDraw);
-
-		toDraw.forEach((v, i) => {
-			debug('test print:', v, i);
-		});
+		//debug(lowestRow, norm);
+		//console.table(toDraw);
 
 		for (let i = toDraw.length - 1; i >= lowestRow; i += -1) {
-			//debug('fl:', i, toDraw[i]);
 			if (!toDraw[i]) continue;
 
-			canvasSlice[toDraw[i].i].data.slicePos = isRowDirPos ? (rowBuffer - rowDif) + drawnSlices : drawnSlices;
+			//debug('Before', canvasSlice[toDraw[i].i].data);
+
+			canvasSlice[toDraw[i].i].data.slicePos = isRowDirPos ? (rowBuffer - rowDif) + drawnSlices : maxToDraw + drawnSlices - 1;
 			canvasSlice[toDraw[i].i].data.position = canvasSlice[toDraw[i].i].data.position + rowBuffer * norm;
 
 			const curRow = offByOneFix + (row + (drawnSlices - rowDif)) + halfbuf * norm;
@@ -378,8 +377,17 @@ function drawSlices(skipOptimizationChecks = false) {
 			canvasSlice[toDraw[i].i].ref.style.transform = 'translateY(' + (canvasSlice[toDraw[i].i].data.offest + (canvasSlice[toDraw[i].i].data.position) * CHAR_HEIGHT + CHAR_HEIGHT) + 'px)';
 			drawRow(canvasSlice[toDraw[i].i].ctx, curRow, nbChannels, pattern);
 
-			canvasSlice[toDraw[i].i].ctx.fillStyle = isRowDirPos ? colours.foreground.fx : colours.foreground.operant; // Debug
-			canvasSlice[toDraw[i].i].ctx.fillStyle = (isRowDirPos && rowDif > 1) ? colours.foreground.instr : canvasSlice[toDraw[i].i].ctx.fillStyle;
+			/*
+			debug('fl:', i, toDraw[i], canvasSlice[toDraw[i].i].data, canvasSlice[toDraw[i].i].ctx.canvas,
+				'   ' +
+				i.toString() + ' ' +
+				curRow.toString() + ' ' +
+				canvasSlice[toDraw[i].i].ref.style.transform,
+			);
+			*/
+
+			//canvasSlice[toDraw[i].i].ctx.fillStyle = isRowDirPos ? colours.foreground.fx : colours.foreground.operant; // Debug
+			//canvasSlice[toDraw[i].i].ctx.fillStyle = (isRowDirPos && rowDif > 1) ? colours.foreground.instr : canvasSlice[toDraw[i].i].ctx.fillStyle;
 
 			// Debug text
 			/*
@@ -507,7 +515,7 @@ function display(skipOptimizationChecks = false) {
 
 	if (firstFrame) {
 		// Changing it to false should enable pattern display by default.
-		patternHide.value = true;
+		patternHide.value = false;
 		handleScrollBarEnable();
 		firstFrame = false;
 	}
@@ -631,7 +639,7 @@ onDeactivated(() => {
 		}
 
 		.patternShadowTop {
-			background: #00000080;
+			background: #00000000;
 			width: 100%;
 			height: calc( 50% - 14px );
 			translate: -50% -100%;
@@ -642,7 +650,7 @@ onDeactivated(() => {
 		}
 
 		.patternShadowBottom {
-			background: #00000080;
+			background: #00000000;
 			width: 100%;
 			height: calc( 50% - 12px );
 			translate: -50% 0;
