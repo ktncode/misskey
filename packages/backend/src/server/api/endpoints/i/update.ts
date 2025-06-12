@@ -34,6 +34,7 @@ import { verifyFieldLinks } from '@/misc/verify-field-link.js';
 import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
 import { notificationRecieveConfig } from '@/models/json-schema/user.js';
 import { userUnsignedFetchOptions } from '@/const.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import { ApiLoggerService } from '../../ApiLoggerService.js';
 import { ApiError } from '../../error.js';
 
@@ -263,9 +264,15 @@ export const paramDef = {
 			enum: userUnsignedFetchOptions,
 			nullable: false,
 		},
-		attributionDomains: { type: 'array', items: {
-			type: 'string',
-		} },
+		attributionDomains: {
+			type: 'array',
+			items: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 128,
+			},
+			maxItems: 32,
+		},
 	},
 } as const;
 
@@ -510,7 +517,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 					// Retrieve the old account
 					const knownAs = await this.remoteUserResolveService.resolveUser(username, host).catch((e) => {
-						this.apiLoggerService.logger.warn(`failed to resolve dstination user: ${e}`);
+						this.apiLoggerService.logger.warn(`failed to resolve destination user: ${renderInlineError(e)}`);
 						throw new ApiError(meta.errors.noSuchUser);
 					});
 					if (knownAs.id === _user.id) throw new ApiError(meta.errors.forbiddenToSetYourself);
@@ -610,7 +617,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const updatedProfile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
 
-			this.cacheService.userProfileCache.set(user.id, updatedProfile);
+			await this.cacheService.userProfileCache.set(user.id, updatedProfile);
 
 			// Publish meUpdated event
 			this.globalEventService.publishMainStream(user.id, 'meUpdated', iObj);

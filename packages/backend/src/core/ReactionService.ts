@@ -117,12 +117,12 @@ export class ReactionService {
 		if (note.userId !== user.id) {
 			const blocked = await this.userBlockingService.checkBlocked(note.userId, user.id);
 			if (blocked) {
-				throw new IdentifiableError('e70412a4-7197-4726-8e74-f3e0deb92aa7');
+				throw new IdentifiableError('e70412a4-7197-4726-8e74-f3e0deb92aa7', 'Note not accessible for you.');
 			}
 		}
 
 		// check visibility
-		if (!await this.noteEntityService.isVisibleForMe(note, user.id)) {
+		if (!await this.noteEntityService.isVisibleForMe(note, user.id, { me: user })) {
 			throw new IdentifiableError('68e9d2d1-48bf-42c2-b90a-b20e09fd3d48', 'Note not accessible for you.');
 		}
 
@@ -322,14 +322,14 @@ export class ReactionService {
 		});
 
 		if (exist == null) {
-			throw new IdentifiableError('60527ec9-b4cb-4a88-a6bd-32d3ad26817d', 'not reacted');
+			throw new IdentifiableError('60527ec9-b4cb-4a88-a6bd-32d3ad26817d', 'reaction does not exist');
 		}
 
 		// Delete reaction
 		const result = await this.noteReactionsRepository.delete(exist.id);
 
 		if (result.affected !== 1) {
-			throw new IdentifiableError('60527ec9-b4cb-4a88-a6bd-32d3ad26817d', 'not reacted');
+			throw new IdentifiableError('60527ec9-b4cb-4a88-a6bd-32d3ad26817d', 'reaction does not exist');
 		}
 
 		// Decrement reactions count

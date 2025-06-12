@@ -10,11 +10,12 @@ import type { SoundType } from '@/utility/sound.js';
 import type { Plugin } from '@/plugin.js';
 import type { DeviceKind } from '@/utility/device-kind.js';
 import type { DeckProfile } from '@/deck.js';
-import type { PreferencesDefinition } from './manager.js';
+import type { Pref, PreferencesDefinition } from './manager.js';
 import type { FollowingFeedState } from '@/types/following-feed.js';
 import { DEFAULT_DEVICE_KIND } from '@/utility/device-kind.js';
 import { searchEngineMap } from '@/utility/search-engine-map.js';
 import { defaultFollowingFeedState } from '@/types/following-feed.js';
+import { miLocalStorage } from '@/local-storage';
 
 /** サウンド設定 */
 export type SoundStore = {
@@ -484,25 +485,77 @@ export const PREF_DEF = {
 	// Null means "fall back to existing value from localStorage"
 	// For all of these preferences, "null" means fall back to existing value in localStorage.
 	fontSize: {
-		default: null as null | '0' | '1' | '2' | '3',
-	},
+		default: '0',
+		needsReload: true,
+		onSet: fontSize => {
+			if (fontSize !== '0') {
+				miLocalStorage.setItem('fontSize', fontSize);
+			} else {
+				miLocalStorage.removeItem('fontSize');
+			}
+		},
+	} as Pref<'0' | '1' | '2' | '3'>,
 	useSystemFont: {
-		default: null as null | boolean,
-	},
+		default: false,
+		needsReload: true,
+		onSet: useSystemFont => {
+			if (useSystemFont) {
+				miLocalStorage.setItem('useSystemFont', 't');
+			} else {
+				miLocalStorage.removeItem('useSystemFont');
+			}
+		},
+	} as Pref<boolean>,
 	cornerRadius: {
-		default: null as null | 'misskey' | 'sharkey',
-	},
+		default: 'sharkey',
+		needsReload: true,
+		onSet: cornerRadius => {
+			if (cornerRadius === 'sharkey') {
+				miLocalStorage.removeItem('cornerRadius');
+			} else {
+				miLocalStorage.setItem('cornerRadius', cornerRadius);
+			}
+		},
+	} as Pref<'misskey' | 'sharkey'>,
 	lang: {
-		default: null as null | string,
-	},
+		default: 'en-US',
+		needsReload: true,
+		onSet: lang => {
+			miLocalStorage.setItem('lang', lang);
+			miLocalStorage.removeItem('locale');
+			miLocalStorage.removeItem('localeVersion');
+		},
+	} as Pref<string>,
 	customCss: {
-		default: null as null | string,
-	},
+		default: '',
+		needsReload: true,
+		onSet: customCss => {
+			if (customCss) {
+				miLocalStorage.setItem('customCss', customCss);
+			} else {
+				miLocalStorage.removeItem('customCss');
+			}
+		},
+	} as Pref<string>,
 	neverShowDonationInfo: {
-		default: null as null | 'true',
-	},
+		default: false,
+		onSet: neverShowDonationInfo => {
+			if (neverShowDonationInfo) {
+				miLocalStorage.setItem('neverShowDonationInfo', 'true');
+			} else {
+				miLocalStorage.removeItem('neverShowDonationInfo');
+			}
+		},
+	} as Pref<boolean>,
 	neverShowLocalOnlyInfo: {
-		default: null as null | 'true',
-	},
+		default: false,
+		onSet: neverShowLocalOnlyInfo => {
+			if (neverShowLocalOnlyInfo) {
+				miLocalStorage.setItem('neverShowLocalOnlyInfo', 'true');
+			} else {
+				miLocalStorage.removeItem('neverShowLocalOnlyInfo');
+			}
+		},
+	} as Pref<boolean>,
 	//#endregion
 } satisfies PreferencesDefinition;

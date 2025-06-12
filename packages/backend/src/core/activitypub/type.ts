@@ -35,6 +35,7 @@ export interface IObject {
 	mediaType?: string;
 	url?: ApObject | string;
 	href?: string;
+	rel?: string | string[];
 	tag?: IObject | IObject[];
 	sensitive?: boolean;
 }
@@ -54,6 +55,16 @@ export interface IAnonymousObject extends IObject {
 export function isAnonymousObject(object: IObject): object is IAnonymousObject {
 	return object.id === undefined;
 }
+
+export interface ILink extends IObject {
+	'@context'?: string | string[] | Obj | Obj[];
+	type: 'Link' | 'Mention';
+	href: string;
+}
+
+export const isLink = (object: IObject): object is ILink =>
+	(getApType(object) === 'Link' || getApType(object) === 'Link') &&
+	typeof object.href === 'string';
 
 /**
  * Get array of ActivityStreams Objects id
@@ -75,14 +86,17 @@ export function getOneApId(value: ApObject): string {
 /**
  * Get ActivityStreams Object id
  */
-export function getApId(source: string | IObject | [string | IObject]): string {
-	const value = getNullableApId(source);
+export function getApId(value: string | IObject | [string | IObject], sourceForLogs?: string): string {
+	const id = getNullableApId(value);
 
-	if (value == null) {
-		throw new IdentifiableError('ad2dc287-75c1-44c4-839d-3d2e64576675', `invalid AP object ${value}: missing or invalid id`);
+	if (id == null) {
+		const message = sourceForLogs
+			? `invalid AP object ${value} (sent from ${sourceForLogs}): missing id`
+			: `invalid AP object ${value}: missing id`;
+		throw new IdentifiableError('ad2dc287-75c1-44c4-839d-3d2e64576675', message);
 	}
 
-	return value;
+	return id;
 }
 
 /**
@@ -201,6 +215,7 @@ export interface IPost extends IObject {
 	_misskey_content?: string;
 	quoteUrl?: string;
 	quoteUri?: string;
+	quote?: string;
 	updated?: string;
 }
 
@@ -303,9 +318,8 @@ export const isPropertyValue = (object: IObject): object is IApPropertyValue =>
 	'value' in object &&
 	typeof object.value === 'string';
 
-export interface IApMention extends IObject {
+export interface IApMention extends ILink {
 	type: 'Mention';
-	href: string;
 	name: string;
 }
 

@@ -21,7 +21,7 @@ import { ApDbResolverService } from '@/core/activitypub/ApDbResolverService.js';
 import { StatusError } from '@/misc/status-error.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
-import { JsonLdService } from '@/core/activitypub/JsonLdService.js';
+import { isSigned, JsonLdService } from '@/core/activitypub/JsonLdService.js';
 import { ApInboxService } from '@/core/activitypub/ApInboxService.js';
 import { bindThis } from '@/decorators.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
@@ -31,6 +31,8 @@ import { SkApInboxLog } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import { ApLogService, calculateDurationSince } from '@/core/ApLogService.js';
 import { UpdateInstanceQueue } from '@/core/UpdateInstanceQueue.js';
+import { isRetryableError } from '@/misc/is-retryable-error.js';
+import { renderInlineError } from '@/misc/render-inline-error.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type { InboxJobData } from '../types.js';
 
@@ -145,12 +147,11 @@ export class InboxProcessorService implements OnApplicationShutdown {
 				authUser = await this.apDbResolverService.getAuthUserFromApId(actorId);
 			} catch (err) {
 				// 対象が4xxならスキップ
-				if (err instanceof StatusError) {
-					if (!err.isRetryable) {
-						throw new Bull.UnrecoverableError(`skip: Ignored deleted actors on both ends ${actorId} - ${err.statusCode}`);
-					}
-					throw new Error(`Error in actor ${actorId} - ${err.statusCode}`);
+				if (!isRetryableError(err)) {
+					throw new Bull.UnrecoverableError(`skip: Ignored deleted actors on both ends ${actorId}`);
 				}
+
+				throw err;
 			}
 		}
 
@@ -178,8 +179,8 @@ export class InboxProcessorService implements OnApplicationShutdown {
 		// また、signatureのsignerは、activity.actorと一致する必要がある
 		if (!httpSignatureValidated || authUser.user.uri !== actorId) {
 			// 一致しなくても、でもLD-Signatureがありそうならそっちも見る
-			const ldSignature = activity.signature;
-			if (ldSignature) {
+			if (isSigned(activity)) {
+				const ldSignature = activity.signature;
 				if (ldSignature.type !== 'RsaSignature2017') {
 					throw new Bull.UnrecoverableError(`skip: unsupported LD-signature type ${ldSignature.type}`);
 				}
@@ -201,24 +202,21 @@ export class InboxProcessorService implements OnApplicationShutdown {
 					throw new Bull.UnrecoverableError('skip: LD-SignatureのユーザーはpublicKeyを持っていませんでした');
 				}
 
-				const jsonLd = this.jsonLdService.use();
-
 				// LD-Signature検証
-				const verified = await jsonLd.verifyRsaSignature2017(activity, authUser.key.keyPem).catch(() => false);
+				const verified = await this.jsonLdService.verifyRsaSignature2017(activity, authUser.key.keyPem).catch(() => false);
 				if (!verified) {
 					throw new Bull.UnrecoverableError('skip: LD-Signatureの検証に失敗しました');
 				}
 
 				// アクティビティを正規化
-				delete activity.signature;
+				const copy = { ...activity, signature: undefined };
 				try {
-					activity = await jsonLd.compact(activity) as IActivity;
+					activity = await this.jsonLdService.compact(copy) as IActivity;
 				} catch (e) {
 					throw new Bull.UnrecoverableError(`skip: failed to compact activity: ${e}`);
 				}
 				// TODO: 元のアクティビティと非互換な形に正規化される場合は転送をスキップする
 				// https://github.com/mastodon/mastodon/blob/664b0ca/app/services/activitypub/process_collection_service.rb#L24-L29
-				activity.signature = ldSignature;
 
 				// もう一度actorチェック
 				if (authUser.user.uri !== actorId) {
@@ -227,7 +225,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 
 				const ldHost = this.utilityService.extractDbHost(authUser.user.uri);
 				if (!this.utilityService.isFederationAllowedHost(ldHost)) {
-					throw new Bull.UnrecoverableError(`Blocked request: ${ldHost}`);
+					throw new Bull.UnrecoverableError(`skip: request host is blocked: ${ldHost}`);
 				}
 			} else {
 				throw new Bull.UnrecoverableError(`skip: http-signature verification failed and no LD-Signature. keyId=${signature.keyId}`);
@@ -300,16 +298,8 @@ export class InboxProcessorService implements OnApplicationShutdown {
 				}
 			}
 
-			if (e instanceof StatusError && !e.isRetryable) {
-				return `skip: permanent error ${e.statusCode}`;
-			}
-
-			if (e instanceof IdentifiableError && !e.isRetryable) {
-				if (e.message) {
-					return `skip: permanent error ${e.id}: ${e.message}`;
-				} else {
-					return `skip: permanent error ${e.id}`;
-				}
+			if (!isRetryableError(e)) {
+				return `skip: permanent error ${renderInlineError(e)}`;
 			}
 
 			throw e;

@@ -624,3 +624,7 @@ keepCwEnabled: "Enabled (copy CWs verbatim)"
 keepCwPrependRe: "Enabled (copy CW and prepend \"RE:\")"
 
 noteFooterLabel: "Note controls"
+
+rawUserDescription: "Packed user data in its raw form. Most of these fields are public and visible to all users."
+rawInfoDescription: "Extended user data in its raw form. These fields are private and can only be accessed by moderators."
+rawApDescription: "ActivityPub user data in its raw form. These fields are public and accessible to other instances."
