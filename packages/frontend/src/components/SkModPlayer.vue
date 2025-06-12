@@ -127,8 +127,8 @@ const player = ref(new ChiptuneJsPlayer(new ChiptuneJsConfig()));
 const maxRowNumbers = 0xFF;
 // Mainly used to hide race condition connected to canvas transfer to graphics buffer when software rendering.
 // Found that 2 is a good default but needs more testing.
-const overdraw = 0;
-const rowBuffer = 26 + overdraw;
+const overdraw = 2;
+const rowBuffer = 26 + (overdraw * 2);
 // It would be a great option for users to set themselves.
 const maxChannelLimit = 0xFF;
 let buffer = null;
@@ -204,6 +204,9 @@ function populateCanvasSlices () {
 }
 
 onMounted(() => {
+	// That 3 is a magic number for inline-grid re-alignment, if at any point sliceDisplay switches to grid remember to remove that 3.
+	if (sliceDisplay.value) sliceDisplay.value.style.top = -(overdraw * CHAR_HEIGHT + 3) + 'px';
+
 	player.value.load(url).then((result) => {
 		buffer = result;
 		try {
@@ -620,7 +623,6 @@ onDeactivated(() => {
 			position: relative;
 			background-color: black;
 			image-rendering: pixelated;
-			top: -3px;
 
 			.patternSlice {
 				image-rendering: pixelated;
