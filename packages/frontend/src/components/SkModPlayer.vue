@@ -43,21 +43,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-// Foreword anyone wanting to change anything, it's jank filled with hacks on top of jank.
-// Don't forget to autohide the pattern.
-
-/* Bugs
-
-	Bad index at line `canvasSlice[toDraw[i].i].data.slicePos = isRowDirPos ? (rowBuffer - rowDif) + drawnSlices : drawnSlices;`, itterator mess up?
-	Wild CSS tranforms
-
-*/
-
-// Also don't forget to remove this. Yes, I'm that lazy.
-const debug = console.debug;
-const debug_w = console.warn;
-const debug_playpause = playPause;
-
 import { ref, nextTick, watch, onDeactivated, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import type TDOMMatrix2DArray from 'happy-dom/lib/dom/dom-matrix/TDOMMatrix2DArray.js';
@@ -201,8 +186,6 @@ function populateCanvasSlices () {
 }
 
 onMounted(() => {
-	//if (sliceDisplay.value) sliceDisplay.value.style.top = -(overdraw * CHAR_HEIGHT) + 'px';
-
 	player.value.load(url).then((result) => {
 		buffer = result;
 		try {
@@ -318,12 +301,7 @@ function drawSlices(skipOptimizationChecks = false) {
 	if (pattern === lastPattern && !skipOptimizationChecks && row !== lastDrawnRow) {
 		let rowDif = row - lastDrawnRow;
 
-		// Debug
-		if (rowDif > 1 || rowDif < 0) {
-			//debug_playpause();
-			debug_w('Row diff', rowDif);
-		}
-
+		const startTime = performance.now();
 		const isRowDirPos = rowDif > 0;
 		const rowDir = !isRowDirPos as unknown as number;
 		const norm = 1 - 2 * rowDir;
@@ -338,27 +316,18 @@ function drawSlices(skipOptimizationChecks = false) {
 		let drawnSlices = 0;
 		let maxToDraw = 0;
 
-		//debug_w('begin drawing.\n', 'isRowDirPos', isRowDirPos, 'rowDir', rowDir, 'norm', norm);
-
 		for (let i = 0; i < canvasSlice.length; i++) {
 			canvasSlice[i].data.slicePos = canvasSlice[i].data.slicePos - rowDif;
-			//debug('i: ', i, 'slicepos:', canvasSlice[i].data.slicePos, 'row:', row, canvasSlice[i].ctx.canvas);
 			if (canvasSlice[i].data.slicePos > -1 && canvasSlice[i].data.slicePos < rowBuffer) continue;
 
 			const abs_pos = Math.abs(canvasSlice[i].data.slicePos);
 			if (lowestRow > abs_pos) lowestRow = abs_pos;
 			toDraw[abs_pos] = { p: canvasSlice[i].data.slicePos, i: i };
 			maxToDraw++;
-			//debug_w('Added to draw.', abs_pos);
 		}
-
-		//debug(lowestRow, norm);
-		//console.table(toDraw);
 
 		for (let i = toDraw.length - 1; i >= lowestRow; i += -1) {
 			if (!toDraw[i]) continue;
-
-			//debug('Before', canvasSlice[toDraw[i].i].data);
 
 			canvasSlice[toDraw[i].i].data.slicePos = isRowDirPos ? (rowBuffer - rowDif) + drawnSlices : maxToDraw + drawnSlices - 1;
 			canvasSlice[toDraw[i].i].data.position = canvasSlice[toDraw[i].i].data.position + rowBuffer * norm;
@@ -368,42 +337,16 @@ function drawSlices(skipOptimizationChecks = false) {
 			canvasSlice[toDraw[i].i].ctx.clearRect(0, 0, canvasSlice[toDraw[i].i].ref.width, canvasSlice[toDraw[i].i].ref.height);
 			canvasSlice[toDraw[i].i].ref.style.transform = 'translateY(' + (canvasSlice[toDraw[i].i].data.offest + (canvasSlice[toDraw[i].i].data.position) * CHAR_HEIGHT + CHAR_HEIGHT) + 'px)';
 			drawRow(canvasSlice[toDraw[i].i].ctx, curRow, nbChannels, pattern);
-
-			/*
-			debug('fl:', i, toDraw[i], canvasSlice[toDraw[i].i].data, canvasSlice[toDraw[i].i].ctx.canvas,
-				'   ' +
-				i.toString() + ' ' +
-				curRow.toString() + ' ' +
-				canvasSlice[toDraw[i].i].ref.style.transform,
-			);
-			*/
-
-			//canvasSlice[toDraw[i].i].ctx.fillStyle = isRowDirPos ? colours.foreground.fx : colours.foreground.operant; // Debug
-			//canvasSlice[toDraw[i].i].ctx.fillStyle = (isRowDirPos && rowDif > 1) ? colours.foreground.instr : canvasSlice[toDraw[i].i].ctx.fillStyle;
-
-			// Debug text
-			/*
-			canvasSlice[toDraw[i].i].ctx.fillText(
-				'   ' +
-				i.toString() + ' ' +
-				curRow.toString() + ' ' +
-				canvasSlice[toDraw[i].i].data.slicePos + ' ' +
-				canvasSlice[toDraw[i].i].data.position + ' ' +
-				canvasSlice[toDraw[i].i].data.offest + 'px ' +
-				canvasSlice[toDraw[i].i].ref.style.transform
-				, 0, ROW_OFFSET_Y);
-			*/
 			drawnSlices += norm;
 		}
 
-		if (drawnSlices === 0) { debug_w('No changed Slices, is this intentional?\nrow', row, 'pattern', pattern); }
+		patternTime.current = performance.now() - startTime;
+		if (patternTime.initial !== 0 && patternTime.current > patternTime.max) patternTime.max = patternTime.current;
+		else if (patternTime.initial === 0) patternTime.initial = patternTime.current;
 	} else {
 		if (patternTime.initial !== 0 && !alreadyHiddenOnce) {
 			const trackerTime = player.value.currentPlayingNode.getProcessTime();
 
-			//debug( initialDraw, averageDraw, player.value.getCurrentTempo(), player.value.getCurrentSpeed() );
-			debug( trackerTime, patternTime );
-			debug( patternTime.initial + trackerTime.max, trackerTime.max + patternTime.max );
 			if (patternTime.initial + trackerTime.max > MAX_TIME_SPENT && trackerTime.max + patternTime.max > MAX_TIME_PER_ROW) {
 				alreadyHiddenOnce = true;
 				togglePattern();
@@ -425,21 +368,6 @@ function drawSlices(skipOptimizationChecks = false) {
 			canvasSlice[i].data.pattern = pattern;
 			canvasSlice[i].ref.style.transform = 'translateY(' + (canvasSlice[i].data.offest) + 'px)';
 			canvasSlice[i].data.offest = canvasSlice[i].data.offest - CHAR_HEIGHT;
-
-			// Debug Text
-			/*
-			canvasSlice[i].ctx.fillStyle = colours.foreground.default;
-			canvasSlice[i].ctx.fillText(
-				'   ' +
-				i.toString() + ' ' +
-				curRow.toString() + ' ' +
-				canvasSlice[i].data.slicePos + ' ' +
-				canvasSlice[i].data.position + ' ' +
-				Math.trunc(curtime) + 'ms ' +
-				canvasSlice[i].data.offest + 'px ' +
-				'init'
-				, 0, ROW_OFFSET_Y);
-				*/
 		}
 	}
 
@@ -472,7 +400,7 @@ function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, p
 		op += part.substring(11, 13) + space.repeat( spacer + 1 );
 	}
 
-	//debug( 'seperators: ' + seperators + '\nnote: ' + note + '\ninstr: ' + instr + '\nvolume: ' + volume + '\nfx: ' + fx + '\nop: ' + op);
+	//console.debug( 'seperators: ' + seperators + '\nnote: ' + note + '\ninstr: ' + instr + '\nvolume: ' + volume + '\nfx: ' + fx + '\nop: ' + op);
 
 	ctx.drawImage( numberRowCanvas, 0, -(CHAR_HEIGHT * row) );
 
