@@ -125,10 +125,7 @@ let patternScrollSliderPos = ref(0);
 const player = ref(new ChiptuneJsPlayer(new ChiptuneJsConfig()));
 
 const maxRowNumbers = 0xFF;
-// Mainly used to hide race condition connected to canvas transfer to graphics buffer when software rendering.
-// Found that 2 is a good default but needs more testing.
-const overdraw = 2;
-const rowBuffer = 26 + (overdraw * 2);
+const rowBuffer = 26;
 // It would be a great option for users to set themselves.
 const maxChannelLimit = 0xFF;
 let buffer = null;
@@ -178,7 +175,7 @@ function populateCanvasSlices () {
 			let c = canvas as HTMLCanvasElement;
 			c.height = CHAR_HEIGHT;
 			c.width = sliceWidth;
-			let ctx = c.getContext('2d', { alpha: false, desynchronized: true }) as CanvasRenderingContext2D;
+			let ctx = c.getContext('2d', { alpha: false, desynchronized: false }) as CanvasRenderingContext2D;
 			ctx.font = '10px monospace';
 			ctx.imageSmoothingEnabled = false;
 
@@ -204,8 +201,7 @@ function populateCanvasSlices () {
 }
 
 onMounted(() => {
-	// That 3 is a magic number for inline-grid re-alignment, if at any point sliceDisplay switches to grid remember to remove that 3.
-	if (sliceDisplay.value) sliceDisplay.value.style.top = -(overdraw * CHAR_HEIGHT + 3) + 'px';
+	//if (sliceDisplay.value) sliceDisplay.value.style.top = -(overdraw * CHAR_HEIGHT) + 'px';
 
 	player.value.load(url).then((result) => {
 		buffer = result;
@@ -619,7 +615,7 @@ onDeactivated(() => {
 		}
 
 		.slice_display {
-			display: inline-grid;
+			display: grid;
 			position: relative;
 			background-color: black;
 			image-rendering: pixelated;
@@ -633,7 +629,7 @@ onDeactivated(() => {
 			background: #00000080;
 			width: 100%;
 			height: calc(50% - 14px);
-			translate: 0 -100%;
+			translate: -50% -100%;
 			top: calc(50% - 14px);
 			position: absolute;
 			pointer-events: none;
@@ -644,6 +640,7 @@ onDeactivated(() => {
 			background: #00000080;
 			width: 100%;
 			height: calc(50% - 27px);
+			translate: -50% 0;
 			top: calc(50% - 2px);
 			position: absolute;
 			pointer-events: none;
