@@ -1359,7 +1359,7 @@ defineExpose({
 	}
 
 	&.danger {
-		color: #ff2a2a;
+		color: var(--MI_THEME-warn);
 	}
 }
 
