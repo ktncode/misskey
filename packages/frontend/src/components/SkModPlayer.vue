@@ -266,16 +266,12 @@ function initSeek() {
 	isSeeking = true;
 }
 
-function performSeek() {
+function performSeek(forceUpate = false) {
 	const noNode = !player.value.currentPlayingNode;
-	if (noNode) {
-		player.value.play(buffer);
-	}
+	if (noNode) player.value.play(buffer);
 	player.value.seek(position.value);
-	display(true);
-	if (noNode) {
-		player.value.stop();
-	}
+	if (!patternHide.value || forceUpate) display(true);
+	if (noNode) player.value.stop();
 	isSeeking = false;
 }
 
@@ -298,14 +294,11 @@ function togglePattern() {
 
 	if (player.value.getRow() === 0 && player.value.getPattern() === 0) {
 		try {
-			player.value.play(buffer);
-			display(true);
+			performSeek(true);
 		} catch (err) {
 			console.warn(err);
 		}
 		player.value.stop();
-	} else {
-		display(true);
 	}
 }
 
@@ -515,7 +508,7 @@ function display(skipOptimizationChecks = false) {
 
 	if (firstFrame) {
 		// Changing it to false should enable pattern display by default.
-		patternHide.value = false;
+		patternHide.value = true;
 		handleScrollBarEnable();
 		firstFrame = false;
 	}
@@ -639,7 +632,7 @@ onDeactivated(() => {
 		}
 
 		.patternShadowTop {
-			background: #00000000;
+			background: #00000080;
 			width: 100%;
 			height: calc( 50% - 14px );
 			translate: -50% -100%;
@@ -650,7 +643,7 @@ onDeactivated(() => {
 		}
 
 		.patternShadowBottom {
-			background: #00000000;
+			background: #00000080;
 			width: 100%;
 			height: calc( 50% - 12px );
 			translate: -50% 0;
