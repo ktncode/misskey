@@ -606,11 +606,11 @@ export class NoteCreateService implements OnApplicationShutdown {
 		}
 
 		if (data.reply == null) {
-			// TODO: キャッシュ
-			this.followingsRepository.findBy({
-				followeeId: user.id,
-				notify: 'normal',
-			}).then(async followings => {
+			this.cacheService.userFollowersCache.fetch(user.id).then(async followingsMap => {
+				const followings = Array
+					.from(followingsMap.values())
+					.filter(f => f.notify === 'normal');
+
 				if (note.visibility !== 'specified') {
 					const isPureRenote = this.isRenote(data) && !this.isQuote(data) ? true : false;
 					for (const following of followings) {
@@ -948,14 +948,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			// TODO: キャッシュ？
 			// eslint-disable-next-line prefer-const
 			let [followings, userListMemberships] = await Promise.all([
-				this.followingsRepository.find({
-					where: {
-						followeeId: user.id,
-						followerHost: IsNull(),
-						isFollowerHibernated: false,
-					},
-					select: ['followerId', 'withReplies'],
-				}),
+				this.cacheService.getNonHibernatedFollowers(user.id),
 				this.userListMembershipsRepository.find({
 					where: {
 						userId: user.id,
@@ -1072,17 +1065,19 @@ export class NoteCreateService implements OnApplicationShutdown {
 		});
 
 		if (hibernatedUsers.length > 0) {
-			this.usersRepository.update({
-				id: In(hibernatedUsers.map(x => x.id)),
-			}, {
-				isHibernated: true,
-			});
-
-			this.followingsRepository.update({
-				followerId: In(hibernatedUsers.map(x => x.id)),
-			}, {
-				isFollowerHibernated: true,
-			});
+			await Promise.all([
+				this.usersRepository.update({
+					id: In(hibernatedUsers.map(x => x.id)),
+				}, {
+					isHibernated: true,
+				}),
+				this.followingsRepository.update({
+					followerId: In(hibernatedUsers.map(x => x.id)),
+				}, {
+					isFollowerHibernated: true,
+				}),
+				this.cacheService.hibernatedUserCache.setMany(hibernatedUsers.map(x => [x.id, true])),
+			]);
 		}
 	}
 
