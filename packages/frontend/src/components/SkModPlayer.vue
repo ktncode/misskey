@@ -573,7 +573,7 @@ onDeactivated(() => {
 .hide {
 	border-radius: var(--MI-radius-sm) !important;
 	background-color: black !important;
-	color: var(--MI_THEME-accentLighten) !important;
+	color: var(--MI_THEME-indicator) !important;
 	font-size: 12px !important;
 }
 
@@ -589,7 +589,7 @@ onDeactivated(() => {
 		position: absolute;
 		border-radius: var(--MI-radius-sm);
 		background-color: var(--MI_THEME-fg);
-		color: var(--MI_THEME-accentLighten);
+		color: var(--MI_THEME-indicator);
 		font-size: 14px;
 		opacity: .5;
 		padding: 3px 6px;
@@ -616,27 +616,23 @@ onDeactivated(() => {
 		}
 
 		.slice_display {
-			display: grid;
+			display: inline-grid;
 			position: relative;
 			background-color: black;
 			image-rendering: pixelated;
-			z-index: 0;
+			top: -3px;
 
 			.patternSlice {
-				position: relative;
-				background-color: black;
 				image-rendering: pixelated;
-				/*pointer-events: none;*/
-				z-index: 0;
 			}
 		}
 
 		.patternShadowTop {
 			background: #00000080;
 			width: 100%;
-			height: calc( 50% - 14px );
-			translate: -50% -100%;
-			top: calc( 50% - 14px );
+			height: calc(50% - 14px);
+			translate: 0 -100%;
+			top: calc(50% - 14px);
 			position: absolute;
 			pointer-events: none;
 			z-index: 2;
@@ -645,9 +641,8 @@ onDeactivated(() => {
 		.patternShadowBottom {
 			background: #00000080;
 			width: 100%;
-			height: calc( 50% - 12px );
-			translate: -50% 0;
-			top: calc( 50% - 1px );
+			height: calc(50% - 27px);
+			top: calc(50% - 2px);
 			position: absolute;
 			pointer-events: none;
 			z-index: 2;
@@ -743,7 +738,7 @@ onDeactivated(() => {
 				height: 100%;
 				width: 14px;
 				border-radius: 0;
-				background: var(--MI_THEME-accentLighten);
+				background: var(--MI_THEME-indicator);
 				cursor: pointer;
 				-webkit-appearance: none;
 				box-shadow: calc(-100vw - 14px) 0 0 100vw var(--MI_THEME-accent);
@@ -772,7 +767,7 @@ onDeactivated(() => {
 				height: 100%;
 				border-radius: 0;
 				width: 14px;
-				background: var(--MI_THEME-accentLighten);
+				background: var(--MI_THEME-indicator);
 				cursor: pointer;
 			}
 
@@ -805,7 +800,7 @@ onDeactivated(() => {
 				height: 100%;
 				width: 14px;
 				border-radius: 0;
-				background: var(--MI_THEME-accentLighten);
+				background: var(--MI_THEME-indicator);
 				cursor: pointer;
 			}
 
