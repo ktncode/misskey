@@ -960,9 +960,7 @@ export class ApRendererService {
 
 		const keypair = await this.userKeypairService.getUserKeypair(user.id);
 
-		const jsonLd = this.jsonLdService.use();
-		jsonLd.debug = false;
-		activity = await jsonLd.signRsaSignature2017(activity, keypair.privateKey, `${this.config.url}/users/${user.id}#main-key`);
+		activity = await this.jsonLdService.signRsaSignature2017(activity, keypair.privateKey, `${this.config.url}/users/${user.id}#main-key`);
 
 		return activity;
 	}
