@@ -713,22 +713,6 @@ export class ApNoteService {
 	private async getAttachments(note: IPost, actor: MiRemoteUser): Promise<{ files: MiDriveFile[], hasFileError: boolean }> {
 		const attachments = new Map<string, IApDocument & { url: string }>();
 
-		for (const attach of toArray(note.attachment)) {
-			if (hasUrl(attach)) {
-				attach.sensitive ??= note.sensitive;
-				attachments.set(attach.url, attach);
-			}
-		}
-
-		// Some software (Peertube) attaches a thumbnail under "icon" instead of "attachment"
-		const icon = getBestIcon(note);
-		if (icon) {
-			if (hasUrl(icon)) {
-				icon.sensitive ??= note.sensitive;
-				attachments.set(icon.url, icon);
-			}
-		}
-
 		// Extract inline media from HTML content.
 		// Don't use source.content, _misskey_content, or anything else because those aren't HTML.
 		const htmlContent = getContentByType(note, 'text/html', true);
@@ -755,6 +739,24 @@ export class ApNoteService {
 		// 		}
 		// 	}
 		// }
+
+		// Some software (Peertube) attaches a thumbnail under "icon" instead of "attachment"
+		const icon = getBestIcon(note);
+		if (icon) {
+			if (hasUrl(icon)) {
+				icon.sensitive ??= note.sensitive;
+				attachments.set(icon.url, icon);
+			}
+		}
+
+		// Populate AP attachments last, to overwrite any "fallback" elements that may have been inlined in HTML.
+		// AP attachments should be considered canonical.
+		for (const attach of toArray(note.attachment)) {
+			if (hasUrl(attach)) {
+				attach.sensitive ??= note.sensitive;
+				attachments.set(attach.url, attach);
+			}
+		}
 
 		// Resolve all files w/ concurrency 2.
 		// This prevents one big file from blocking the others.
