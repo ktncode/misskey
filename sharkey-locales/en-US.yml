@@ -530,6 +530,7 @@ translationFailed: "Failed to translate note. Please try again later or contact 
 
 _processErrors:
   quoteUnavailable: "Unable to process quote. This post may be missing context."
+  attachmentFailed: "One or more media attachments are unavailable and cannot be shown."
 
 authorizedFetchSection: "Authorized Fetch"
 authorizedFetchLabel: "Allow unsigned ActivityPub requests:"

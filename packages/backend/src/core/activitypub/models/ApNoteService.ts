@@ -6,6 +6,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import { UnrecoverableError } from 'bullmq';
+import promiseLimit from 'promise-limit';
 import { DI } from '@/di-symbols.js';
 import type { UsersRepository, PollsRepository, EmojisRepository, NotesRepository, MiMeta } from '@/models/_.js';
 import type { Config } from '@/config.js';
@@ -246,10 +247,15 @@ export class ApNoteService {
 			}
 		}
 
+		const processErrors: string[] = [];
+
 		// 添付ファイル
 		// Note: implementation moved to getAttachment function to avoid duplication.
 		// Please copy any upstream changes to that method! (It's in the bottom of this class)
-		const files = await this.getAttachments(note, actor);
+		const { files, hasFileError } = await this.getAttachments(note, actor);
+		if (hasFileError) {
+			processErrors.push('attachmentFailed');
+		}
 
 		// リプライ
 		const reply: MiNote | null = note.inReplyTo
@@ -270,7 +276,9 @@ export class ApNoteService {
 
 		// 引用
 		const quote = await this.getQuote(note, entryUri, resolver);
-		const processErrors = quote === null ? ['quoteUnavailable'] : null;
+		if (quote === null) {
+			processErrors.push('quoteUnavailable');
+		}
 
 		if (reply && reply.userHost == null && reply.localOnly) {
 			throw new IdentifiableError('12e23cec-edd9-442b-aa48-9c21f0c3b215', 'Cannot reply to local-only note');
@@ -314,7 +322,7 @@ export class ApNoteService {
 				files,
 				reply,
 				renote: quote ?? null,
-				processErrors,
+				processErrors: processErrors.length > 0 ? processErrors : null,
 				name: note.name,
 				cw,
 				text,
@@ -428,8 +436,13 @@ export class ApNoteService {
 			}
 		}
 
+		const processErrors: string[] = [];
+
 		// 添付ファイル
-		const files = await this.getAttachments(note, actor);
+		const { files, hasFileError } = await this.getAttachments(note, actor);
+		if (hasFileError) {
+			processErrors.push('attachmentFailed');
+		}
 
 		// リプライ
 		const reply: MiNote | null = note.inReplyTo
@@ -450,7 +463,9 @@ export class ApNoteService {
 
 		// 引用
 		const quote = await this.getQuote(note, entryUri, resolver);
-		const processErrors = quote === null ? ['quoteUnavailable'] : null;
+		if (quote === null) {
+			processErrors.push('quoteUnavailable');
+		}
 
 		if (quote && quote.userHost == null && quote.localOnly) {
 			throw new IdentifiableError('12e23cec-edd9-442b-aa48-9c21f0c3b215', 'Cannot quote a local-only note');
@@ -491,7 +506,7 @@ export class ApNoteService {
 				files,
 				reply,
 				renote: quote ?? null,
-				processErrors,
+				processErrors: processErrors.length > 0 ? processErrors : null,
 				name: note.name,
 				cw,
 				text,
@@ -694,24 +709,24 @@ export class ApNoteService {
 	/**
 	 * Extracts and saves all media attachments from the provided note.
 	 * Returns an array of all the created files.
-	 * TODO: suppress errors and set a processError entry instead.
-	 * TODO: run in parallel (with promiseLimit!)
 	 */
-	private async getAttachments(note: IPost, actor: MiRemoteUser): Promise<MiDriveFile[]> {
-		const files: MiDriveFile[] = [];
+	private async getAttachments(note: IPost, actor: MiRemoteUser): Promise<{ files: MiDriveFile[], hasFileError: boolean }> {
+		const attachments = new Map<string, IApDocument & { url: string }>();
 
 		for (const attach of toArray(note.attachment)) {
-			attach.sensitive ??= note.sensitive;
-			const file = await this.apImageService.resolveImage(actor, attach);
-			if (file) files.push(file);
+			if (hasUrl(attach)) {
+				attach.sensitive ??= note.sensitive;
+				attachments.set(attach.url, attach);
+			}
 		}
 
 		// Some software (Peertube) attaches a thumbnail under "icon" instead of "attachment"
 		const icon = getBestIcon(note);
 		if (icon) {
-			icon.sensitive ??= note.sensitive;
-			const file = await this.apImageService.resolveImage(actor, icon);
-			if (file) files.push(file);
+			if (hasUrl(icon)) {
+				icon.sensitive ??= note.sensitive;
+				attachments.set(icon.url, icon);
+			}
 		}
 
 		// Extract inline media from HTML content.
@@ -719,30 +734,68 @@ export class ApNoteService {
 		const htmlContent = getContentByType(note, 'text/html', true);
 		if (htmlContent) {
 			for (const attach of extractMediaFromHtml(htmlContent)) {
-				attach.sensitive ??= note.sensitive;
-				const file = await this.apImageService.resolveImage(actor, attach);
-				if (file) files.push(file);
+				if (hasUrl(attach)) {
+					attach.sensitive ??= note.sensitive;
+					attachments.set(attach.url, attach);
+				}
 			}
 		}
 
 		// Extract inline media from markdown content.
 		// TODO We first need to implement support for "!" prefix in sfm-js.
 		//  That will be implemented as part of https://activitypub.software/TransFem-org/Sharkey/-/issues/1105
-		// const markdownContent = getContentByType(note, 'text/markdown') || text;
+		// const markdownContent =
+		// 	getContentByType(note, 'text/x.misskeymarkdown') ??
+		// 	getContentByType(note, 'text/markdown');
 		// if (markdownContent) {
 		// 	for (const attach of extractMediaFromMarkdown(markdownContent)) {
-		// 		attach.sensitive ??= note.sensitive;
-		// 		const file = await this.apImageService.resolveImage(actor, attach);
-		// 		if (file) files.push(file);
+		// 		if (hasUrl(attach)) {
+		// 			attach.sensitive ??= note.sensitive;
+		// 			attachments.set(attach.url, attach);
+		// 		}
 		// 	}
 		// }
 
-		return files;
+		// Resolve all files w/ concurrency 2.
+		// This prevents one big file from blocking the others.
+		const limiter = promiseLimit<MiDriveFile | null>(2);
+		const results = await Promise
+			.all(Array
+				.from(attachments.values())
+				.map(attach => limiter(() => this
+					.resolveImage(actor, attach))));
+
+		// Process results
+		let hasFileError = false;
+		const files: MiDriveFile[] = [];
+		for (const result of results) {
+			if (result != null) {
+				files.push(result);
+			} else {
+				hasFileError = true;
+			}
+		}
+
+		return { files, hasFileError };
+	}
+
+	private async resolveImage(actor: MiRemoteUser, attachment: IApDocument & { url: string }): Promise<MiDriveFile | null> {
+		try {
+			return await this.apImageService.resolveImage(actor, attachment);
+		} catch (err) {
+			if (isRetryableError(err)) {
+				this.logger.warn(`Temporary failure to resolve attachment at ${attachment.url}: ${renderInlineError(err)}`);
+				throw err;
+			} else {
+				this.logger.warn(`Permanent failure to resolve attachment at ${attachment.url}: ${renderInlineError(err)}`);
+				return null;
+			}
+		}
 	}
 }
 
-function getBestIcon(note: IObject): IObject | null {
-	const icons: IObject[] = toArray(note.icon);
+function getBestIcon(note: IObject): IApDocument | null {
+	const icons: IApDocument[] = toArray(note.icon);
 	if (icons.length < 2) {
 		return icons[0] ?? null;
 	}
@@ -759,3 +812,7 @@ function getBestIcon(note: IObject): IObject | null {
 	}, null as IApDocument | null) ?? null;
 }
 
+// Need this to make TypeScript happy...
+function hasUrl<T extends IObject>(object: T): object is T & { url: string } {
+	return typeof(object.url) === 'string';
+}

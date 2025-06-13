@@ -12954,6 +12954,10 @@ export interface Locale extends ILocale {
          * Unable to process quote. This post may be missing context.
          */
         "quoteUnavailable": string;
+        /**
+         * One or more media attachments are unavailable and cannot be shown.
+         */
+        "attachmentFailed": string;
     };
     /**
      * Authorized Fetch
