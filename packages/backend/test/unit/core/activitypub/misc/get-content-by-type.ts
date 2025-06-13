@@ -7,7 +7,6 @@ import { getContentByType } from '@/core/activitypub/misc/get-content-by-type.js
 
 describe(getContentByType, () => {
 	describe('when permissive', () => {
-
 		it('should return source.content when it matches', () => {
 			const obj = {
 				source: {
