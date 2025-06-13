@@ -45,7 +45,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, nextTick, watch, onDeactivated, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
-import type TDOMMatrix2DArray from 'happy-dom/lib/dom/dom-matrix/TDOMMatrix2DArray.js';
 import { i18n } from '@/i18n.js';
 import { ChiptuneJsPlayer, ChiptuneJsConfig } from '@/utility/chiptune2.js';
 import { isTouchUsing } from '@/utility/touch.js';
