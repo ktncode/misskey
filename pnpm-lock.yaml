@@ -195,8 +195,8 @@ importers:
         specifier: 1.0.0
         version: 1.0.0
       cli-highlight:
-        specifier: npm:@transfem-org/cli-highlight@2.1.11
-        version: '@transfem-org/cli-highlight@2.1.11'
+        specifier: npm:@transfem-org/cli-highlight@2.1.12
+        version: '@transfem-org/cli-highlight@2.1.12'
       color-convert:
         specifier: 2.0.1
         version: 2.0.1
@@ -249,8 +249,8 @@ importers:
         specifier: 1.1.1
         version: 1.1.1
       htmlparser2:
-        specifier: 10.0.0
-        version: 10.0.0
+        specifier: 9.1.0
+        version: 9.1.0
       ioredis:
         specifier: 5.6.1
         version: 5.6.1
@@ -935,7 +935,7 @@ importers:
         version: 5.2.3(vite@6.3.3(@types/node@22.15.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3))(vue@3.5.14(typescript@5.8.3))
       '@vitest/coverage-v8':
         specifier: 3.1.2
-        version: 3.1.2(vitest@3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0)(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3))
+        version: 3.1.2(vitest@3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3))
       '@vue/compiler-core':
         specifier: 3.5.14
         version: 3.5.14
@@ -1037,7 +1037,7 @@ importers:
         version: 1.0.3
       vitest:
         specifier: 3.1.2
-        version: 3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0)(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)
+        version: 3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)
       vitest-fetch-mock:
         specifier: 0.4.5
         version: 0.4.5(vitest@3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3))
@@ -1137,7 +1137,7 @@ importers:
         version: 5.2.3(vite@6.3.3(@types/node@22.15.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3))(vue@3.5.14(typescript@5.8.3))
       '@vitest/coverage-v8':
         specifier: 3.1.2
-        version: 3.1.2(vitest@3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0)(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3))
+        version: 3.1.2(vitest@3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3))
       '@vue/compiler-sfc':
         specifier: 3.5.14
         version: 3.5.14
@@ -4008,8 +4008,8 @@ packages:
   '@tokenizer/token@0.3.0':
     resolution: {integrity: sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==}
 
-  '@transfem-org/cli-highlight@2.1.11':
-    resolution: {integrity: sha1-T9fOAxwtdWL8Fdiqjr+PL0WK3q4=, tarball: https://activitypub.software/api/v4/projects/229/packages/npm/@transfem-org/cli-highlight/-/@transfem-org/cli-highlight-2.1.11.tgz}
+  '@transfem-org/cli-highlight@2.1.12':
+    resolution: {integrity: sha1-LSVFMGgZU9oQlHSVb5XEzOG+yeQ=, tarball: https://activitypub.software/api/v4/projects/229/packages/npm/@transfem-org/cli-highlight/-/@transfem-org/cli-highlight-2.1.12.tgz}
     engines: {node: ^22.0.0}
 
   '@transfem-org/sfm-js@0.24.6':
@@ -6701,9 +6701,6 @@ packages:
   htmlescape@1.1.1:
     resolution: {integrity: sha512-eVcrzgbR4tim7c7soKQKtxa/kQM4TzjnlU83rcZ9bHU6t31ehfV7SktN6McWgwPWg+JYMA/O3qpGxBvFq1z2Jg==}
     engines: {node: '>=0.10'}
-
-  htmlparser2@10.0.0:
-    resolution: {integrity: sha512-TwAZM+zE5Tq3lrEHvOlvwgj1XLWQCtaaibSN11Q+gGBAS7Y1uZSWwXXRe4iF6OXnaq1riyQAPFOBtYc77Mxq0g==}
 
   htmlparser2@5.0.1:
     resolution: {integrity: sha512-vKZZra6CSe9qsJzh0BjBGXo8dvzNsq/oGvsjfRdOrrryfeD9UOBEEQdeoqCRmKZchF5h2zOBMQ6YuQ0uRUmdbQ==}
@@ -14155,12 +14152,12 @@ snapshots:
 
   '@tokenizer/token@0.3.0': {}
 
-  '@transfem-org/cli-highlight@2.1.11':
+  '@transfem-org/cli-highlight@2.1.12':
     dependencies:
       chalk: 5.4.1
       domhandler: 5.0.3
       highlight.js: 11.11.1
-      htmlparser2: 10.0.0
+      htmlparser2: 9.1.0
 
   '@transfem-org/sfm-js@0.24.6':
     dependencies:
@@ -14598,7 +14595,7 @@ snapshots:
       vite: 6.3.3(@types/node@22.15.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)
       vue: 3.5.14(typescript@5.8.3)
 
-  '@vitest/coverage-v8@3.1.2(vitest@3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0)(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3))':
+  '@vitest/coverage-v8@3.1.2(vitest@3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -14612,7 +14609,7 @@ snapshots:
       std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0)(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)
+      vitest: 3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)
     transitivePeerDependencies:
       - supports-color
 
@@ -17519,13 +17516,6 @@ snapshots:
   html-void-elements@3.0.0: {}
 
   htmlescape@1.1.1: {}
-
-  htmlparser2@10.0.0:
-    dependencies:
-      domelementtype: 2.3.0
-      domhandler: 5.0.3
-      domutils: 3.2.2
-      entities: 6.0.0
 
   htmlparser2@5.0.1:
     dependencies:
@@ -21710,9 +21700,9 @@ snapshots:
 
   vitest-fetch-mock@0.4.5(vitest@3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)):
     dependencies:
-      vitest: 3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0)(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)
+      vitest: 3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)
 
-  vitest@3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0)(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3):
+  vitest@3.1.2(@types/debug@4.1.12)(@types/node@22.15.2)(happy-dom@17.4.4)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3):
     dependencies:
       '@vitest/expect': 3.1.2
       '@vitest/mocker': 3.1.2(msw@2.7.5(@types/node@22.15.2)(typescript@5.8.3))(vite@6.3.3(@types/node@22.15.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3))
