@@ -5,6 +5,7 @@
 
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
+import { load as cheerio } from 'cheerio/slim';
 import { UnrecoverableError } from 'bullmq';
 import { DI } from '@/di-symbols.js';
 import type { UsersRepository, PollsRepository, EmojisRepository, NotesRepository, MiMeta } from '@/models/_.js';
@@ -41,6 +42,7 @@ import { ApQuestionService } from './ApQuestionService.js';
 import { ApImageService } from './ApImageService.js';
 import type { Resolver } from '../ApResolverService.js';
 import type { IObject, IPost } from '../type.js';
+import type { CheerioAPI } from 'cheerio/slim';
 
 @Injectable()
 export class ApNoteService {
@@ -265,6 +267,16 @@ export class ApNoteService {
 			if (file) files.push(file);
 		}
 
+		// Extract inline media from note content.
+		// Don't use source.content, _misskey_content, or anything else because those aren't HTML.
+		if (note.content) {
+			for (const attach of extractInlineMedia(note.content)) {
+				attach.sensitive ??= note.sensitive;
+				const file = await this.apImageService.resolveImage(actor, attach);
+				if (file) files.push(file);
+			}
+		}
+
 		// リプライ
 		const reply: MiNote | null = note.inReplyTo
 			? await this.resolveNote(note.inReplyTo, { resolver })
@@ -461,6 +473,16 @@ export class ApNoteService {
 			icon.sensitive ??= note.sensitive;
 			const file = await this.apImageService.resolveImage(actor, icon);
 			if (file) files.push(file);
+		}
+
+		// Extract inline media from note content.
+		// Don't use source.content, _misskey_content, or anything else because those aren't HTML.
+		if (note.content) {
+			for (const attach of extractInlineMedia(note.content)) {
+				attach.sensitive ??= note.sensitive;
+				const file = await this.apImageService.resolveImage(actor, attach);
+				if (file) files.push(file);
+			}
 		}
 
 		// リプライ
@@ -740,4 +762,74 @@ function getBestIcon(note: IObject): IObject | null {
 		if (i.height > best.height) return i;
 		return best;
 	}, null as IApDocument | null) ?? null;
+}
+
+function extractInlineMedia(html: string): IApDocument[] {
+	const $ = parseHtml(html);
+	if (!$) return [];
+
+	const attachments: IApDocument[] = [];
+
+	// <img> tags, including <picture> and <object> fallback elements
+	// https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img
+	$('img[src]')
+		.toArray()
+		.forEach(img => attachments.push({
+			type: 'Image',
+			url: img.attribs.src,
+			name: img.attribs.alt || img.attribs.title || null,
+		}));
+
+	// <object> tags
+	// https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/object
+	$('object[data]')
+		.toArray()
+		.forEach(object => attachments.push({
+			type: 'Document',
+			url: object.attribs.data,
+			name: object.attribs.alt || object.attribs.title || null,
+		}));
+
+	// <embed> tags
+	// https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/embed
+	$('embed[src]')
+		.toArray()
+		.forEach(embed => attachments.push({
+			type: 'Document',
+			url: embed.attribs.src,
+			name: embed.attribs.alt || embed.attribs.title || null,
+		}));
+
+	// <audio> tags
+	// https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/audio
+	$('audio[src]')
+		.toArray()
+		.forEach(audio => attachments.push({
+			type: 'Audio',
+			url: audio.attribs.src,
+			name: audio.attribs.alt || audio.attribs.title || null,
+		}));
+
+	// <video> tags
+	// https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/video
+	$('video[src]')
+		.toArray()
+		.forEach(audio => attachments.push({
+			type: 'Video',
+			url: audio.attribs.src,
+			name: audio.attribs.alt || audio.attribs.title || null,
+		}));
+
+	// TODO support <svg>? we will need to extract it directly from the HTML.
+
+	return attachments;
+}
+
+function parseHtml(html: string): CheerioAPI | null {
+	try {
+		return cheerio(html);
+	} catch {
+		// Don't worry about invalid HTML
+		return null;
+	}
 }
