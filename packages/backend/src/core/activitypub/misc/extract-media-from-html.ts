@@ -16,13 +16,13 @@ export function extractMediaFromHtml(html: string): IApDocument[] {
 	const $ = parseHtml(html);
 	if (!$) return [];
 
-	const attachments: IApDocument[] = [];
+	const attachments = new Map<string, IApDocument>();
 
 	// <img> tags, including <picture> and <object> fallback elements
 	// https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img
 	$('img[src]')
 		.toArray()
-		.forEach(img => attachments.push({
+		.forEach(img => attachments.set(img.attribs.src, {
 			type: 'Image',
 			url: img.attribs.src,
 			name: img.attribs.alt || img.attribs.title || null,
@@ -32,7 +32,7 @@ export function extractMediaFromHtml(html: string): IApDocument[] {
 	// https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/object
 	$('object[data]')
 		.toArray()
-		.forEach(object => attachments.push({
+		.forEach(object => attachments.set(object.attribs.data, {
 			type: 'Document',
 			url: object.attribs.data,
 			name: object.attribs.alt || object.attribs.title || null,
@@ -42,7 +42,7 @@ export function extractMediaFromHtml(html: string): IApDocument[] {
 	// https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/embed
 	$('embed[src]')
 		.toArray()
-		.forEach(embed => attachments.push({
+		.forEach(embed => attachments.set(embed.attribs.src, {
 			type: 'Document',
 			url: embed.attribs.src,
 			name: embed.attribs.alt || embed.attribs.title || null,
@@ -52,7 +52,7 @@ export function extractMediaFromHtml(html: string): IApDocument[] {
 	// https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/audio
 	$('audio[src]')
 		.toArray()
-		.forEach(audio => attachments.push({
+		.forEach(audio => attachments.set(audio.attribs.src, {
 			type: 'Audio',
 			url: audio.attribs.src,
 			name: audio.attribs.alt || audio.attribs.title || null,
@@ -62,7 +62,7 @@ export function extractMediaFromHtml(html: string): IApDocument[] {
 	// https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/video
 	$('video[src]')
 		.toArray()
-		.forEach(audio => attachments.push({
+		.forEach(audio => attachments.set(audio.attribs.src, {
 			type: 'Video',
 			url: audio.attribs.src,
 			name: audio.attribs.alt || audio.attribs.title || null,
@@ -70,7 +70,7 @@ export function extractMediaFromHtml(html: string): IApDocument[] {
 
 	// TODO support <svg>? We would need to extract it directly from the HTML and save to a temp file.
 
-	return attachments;
+	return Array.from(attachments.values());
 }
 
 function parseHtml(html: string): CheerioAPI | null {
