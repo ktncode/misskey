@@ -6,8 +6,9 @@
 import { createPublicKey, randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
-import * as mfm from '@transfem-org/sfm-js';
+import * as mfm from 'mfm-js';
 import { UnrecoverableError } from 'bullmq';
+import { Element, Text } from 'domhandler';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { MiPartialLocalUser, MiLocalUser, MiPartialRemoteUser, MiRemoteUser, MiUser } from '@/models/User.js';
@@ -475,16 +476,18 @@ export class ApRendererService {
 			// the claas name `quote-inline` is used in non-misskey clients for styling quote notes.
 			// For compatibility, the span part should be kept as possible.
 			apAppend.push((doc, body) => {
-				body.appendChild(doc.createElement('br'));
-				body.appendChild(doc.createElement('br'));
-				const span = doc.createElement('span');
-				span.className = 'quote-inline';
-				span.appendChild(doc.createTextNode('RE: '));
-				const link = doc.createElement('a');
-				link.setAttribute('href', quote);
-				link.textContent = quote;
-				span.appendChild(link);
-				body.appendChild(span);
+				body.childNodes.push(new Element('br', {}));
+				body.childNodes.push(new Element('br', {}));
+				const span = new Element('span', {
+					class: 'quote-inline',
+				});
+				span.childNodes.push(new Text('RE: '));
+				const link = new Element('a', {
+					href: quote,
+				});
+				link.childNodes.push(new Text(quote));
+				span.childNodes.push(link);
+				body.childNodes.push(span);
 			});
 		}
 
@@ -839,16 +842,18 @@ export class ApRendererService {
 			// the claas name `quote-inline` is used in non-misskey clients for styling quote notes.
 			// For compatibility, the span part should be kept as possible.
 			apAppend.push((doc, body) => {
-				body.appendChild(doc.createElement('br'));
-				body.appendChild(doc.createElement('br'));
-				const span = doc.createElement('span');
-				span.className = 'quote-inline';
-				span.appendChild(doc.createTextNode('RE: '));
-				const link = doc.createElement('a');
-				link.setAttribute('href', quote);
-				link.textContent = quote;
-				span.appendChild(link);
-				body.appendChild(span);
+				body.childNodes.push(new Element('br', {}));
+				body.childNodes.push(new Element('br', {}));
+				const span = new Element('span', {
+					class: 'quote-inline',
+				});
+				span.childNodes.push(new Text('RE: '));
+				const link = new Element('a', {
+					href: quote,
+				});
+				link.childNodes.push(new Text(quote));
+				span.childNodes.push(link);
+				body.childNodes.push(span);
 			});
 		}
 
