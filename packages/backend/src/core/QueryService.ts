@@ -164,17 +164,17 @@ export class QueryService {
 				qb
 					// My post
 					.orWhere(':meId = note.userId')
-					// Reply to me
-					.orWhere(':meId = note.replyUserId')
-					// DM to me
+					// Visible to me
 					.orWhere(':meIdAsList <@ note.visibleUserIds')
-					// Mentions me (and not a direct message)
-					.orWhere(new Brackets(qb =>
-						qb.andWhere(':meIdAsList <@ note.mentions')
-							.andWhere('note.visibility != \'specified\'')))
 					// Followers-only post
-					.orWhere(new Brackets(qb => this
-						.andFollowingUser(qb, ':meId', 'note.userId')
+					.orWhere(new Brackets(qb => qb
+						.andWhere(new Brackets(qbb => this
+							// Following author
+							.orFollowingUser(qbb, ':meId', 'note.userId')
+							// Mentions me
+							.orWhere(':meIdAsList <@ note.mentions')
+							// Reply to me
+							.orWhere(':meId = note.replyUserId')))
 						.andWhere('note.visibility = \'followers\'')));
 
 				q.setParameters({ meId: me.id, meIdAsList: [me.id] });

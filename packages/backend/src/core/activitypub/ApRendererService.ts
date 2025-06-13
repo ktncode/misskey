@@ -6,8 +6,9 @@
 import { createPublicKey, randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
-import * as mfm from '@transfem-org/sfm-js';
+import * as mfm from 'mfm-js';
 import { UnrecoverableError } from 'bullmq';
+import { Element, Text } from 'domhandler';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { MiPartialLocalUser, MiLocalUser, MiPartialRemoteUser, MiRemoteUser, MiUser } from '@/models/User.js';
@@ -34,7 +35,7 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { JsonLdService } from './JsonLdService.js';
 import { ApMfmService } from './ApMfmService.js';
 import { CONTEXT } from './misc/contexts.js';
-import { getApId, IOrderedCollection, IOrderedCollectionPage } from './type.js';
+import { getApId, ILink, IOrderedCollection, IOrderedCollectionPage } from './type.js';
 import type { IAccept, IActivity, IAdd, IAnnounce, IApDocument, IApEmoji, IApHashtag, IApImage, IApMention, IBlock, ICreate, IDelete, IFlag, IFollow, IKey, ILike, IMove, IObject, IPost, IQuestion, IReject, IRemove, ITombstone, IUndo, IUpdate } from './type.js';
 
 @Injectable()
@@ -419,7 +420,7 @@ export class ApRendererService {
 			inReplyTo = null;
 		}
 
-		let quote;
+		let quote: string | undefined = undefined;
 
 		if (note.renoteId) {
 			const renote = await this.notesRepository.findOneBy({ id: note.renoteId });
@@ -475,16 +476,18 @@ export class ApRendererService {
 			// the claas name `quote-inline` is used in non-misskey clients for styling quote notes.
 			// For compatibility, the span part should be kept as possible.
 			apAppend.push((doc, body) => {
-				body.appendChild(doc.createElement('br'));
-				body.appendChild(doc.createElement('br'));
-				const span = doc.createElement('span');
-				span.className = 'quote-inline';
-				span.appendChild(doc.createTextNode('RE: '));
-				const link = doc.createElement('a');
-				link.setAttribute('href', quote);
-				link.textContent = quote;
-				span.appendChild(link);
-				body.appendChild(span);
+				body.childNodes.push(new Element('br', {}));
+				body.childNodes.push(new Element('br', {}));
+				const span = new Element('span', {
+					class: 'quote-inline',
+				});
+				span.childNodes.push(new Text('RE: '));
+				const link = new Element('a', {
+					href: quote,
+				});
+				link.childNodes.push(new Text(quote));
+				span.childNodes.push(link);
+				body.childNodes.push(span);
 			});
 		}
 
@@ -500,11 +503,21 @@ export class ApRendererService {
 		const emojis = await this.getEmojis(note.emojis);
 		const apemojis = emojis.filter(emoji => !emoji.localOnly).map(emoji => this.renderEmoji(emoji));
 
-		const tag = [
+		const tag: IObject[] = [
 			...hashtagTags,
 			...mentionTags,
 			...apemojis,
 		];
+
+		// https://codeberg.org/fediverse/fep/src/branch/main/fep/e232/fep-e232.md
+		if (quote) {
+			tag.push({
+				type: 'Link',
+				mediaType: 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
+				rel: 'https://misskey-hub.net/ns#_misskey_quote',
+				href: quote,
+			} satisfies ILink);
+		}
 
 		const asPoll = poll ? {
 			type: 'Question',
@@ -537,6 +550,8 @@ export class ApRendererService {
 			_misskey_quote: quote,
 			quoteUrl: quote,
 			quoteUri: quote,
+			// https://codeberg.org/fediverse/fep/src/branch/main/fep/044f/fep-044f.md
+			quote: quote,
 			published: this.idService.parse(note.id).date.toISOString(),
 			to,
 			cc,
@@ -774,7 +789,7 @@ export class ApRendererService {
 			inReplyTo = null;
 		}
 
-		let quote;
+		let quote: string | undefined = undefined;
 
 		if (note.renoteId) {
 			const renote = await this.notesRepository.findOneBy({ id: note.renoteId });
@@ -827,16 +842,18 @@ export class ApRendererService {
 			// the claas name `quote-inline` is used in non-misskey clients for styling quote notes.
 			// For compatibility, the span part should be kept as possible.
 			apAppend.push((doc, body) => {
-				body.appendChild(doc.createElement('br'));
-				body.appendChild(doc.createElement('br'));
-				const span = doc.createElement('span');
-				span.className = 'quote-inline';
-				span.appendChild(doc.createTextNode('RE: '));
-				const link = doc.createElement('a');
-				link.setAttribute('href', quote);
-				link.textContent = quote;
-				span.appendChild(link);
-				body.appendChild(span);
+				body.childNodes.push(new Element('br', {}));
+				body.childNodes.push(new Element('br', {}));
+				const span = new Element('span', {
+					class: 'quote-inline',
+				});
+				span.childNodes.push(new Text('RE: '));
+				const link = new Element('a', {
+					href: quote,
+				});
+				link.childNodes.push(new Text(quote));
+				span.childNodes.push(link);
+				body.childNodes.push(span);
 			});
 		}
 
@@ -852,11 +869,21 @@ export class ApRendererService {
 		const emojis = await this.getEmojis(note.emojis);
 		const apemojis = emojis.filter(emoji => !emoji.localOnly).map(emoji => this.renderEmoji(emoji));
 
-		const tag = [
+		const tag: IObject[] = [
 			...hashtagTags,
 			...mentionTags,
 			...apemojis,
 		];
+
+		// https://codeberg.org/fediverse/fep/src/branch/main/fep/e232/fep-e232.md
+		if (quote) {
+			tag.push({
+				type: 'Link',
+				mediaType: 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
+				rel: 'https://misskey-hub.net/ns#_misskey_quote',
+				href: quote,
+			} satisfies ILink);
+		}
 
 		const asPoll = poll ? {
 			type: 'Question',
@@ -886,6 +913,8 @@ export class ApRendererService {
 			_misskey_quote: quote,
 			quoteUrl: quote,
 			quoteUri: quote,
+			// https://codeberg.org/fediverse/fep/src/branch/main/fep/044f/fep-044f.md
+			quote: quote,
 			published: this.idService.parse(note.id).date.toISOString(),
 			to,
 			cc,
@@ -936,9 +965,7 @@ export class ApRendererService {
 
 		const keypair = await this.userKeypairService.getUserKeypair(user.id);
 
-		const jsonLd = this.jsonLdService.use();
-		jsonLd.debug = false;
-		activity = await jsonLd.signRsaSignature2017(activity, keypair.privateKey, `${this.config.url}/users/${user.id}#main-key`);
+		activity = await this.jsonLdService.signRsaSignature2017(activity, keypair.privateKey, `${this.config.url}/users/${user.id}#main-key`);
 
 		return activity;
 	}
