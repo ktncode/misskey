@@ -714,9 +714,9 @@ export class ApNoteService {
 			if (file) files.push(file);
 		}
 
-		// Extract inline media from markdown content.
+		// Extract inline media from HTML content.
 		// Don't use source.content, _misskey_content, or anything else because those aren't HTML.
-		const htmlContent = getContentByType(note, 'text/html');
+		const htmlContent = getContentByType(note, 'text/html', true);
 		if (htmlContent) {
 			for (const attach of extractMediaFromHtml(htmlContent)) {
 				attach.sensitive ??= note.sensitive;
