@@ -73,8 +73,26 @@ async function main() {
 	}));
 
 	// Dying away...
+	process.on('disconnect', () => {
+		try {
+			logger.warn('IPC channel disconnected! The process may soon die.');
+		} catch {
+			console.warn('IPC channel disconnected! The process may soon die.');
+		}
+	});
+	process.on('beforeExit', code => {
+		try {
+			logger.warn(`Event loop died! Process will exit with code ${code}.`);
+		} catch {
+			console.warn(`Event loop died! Process will exit with code ${code}.`);
+		}
+	});
 	process.on('exit', code => {
-		logger.info(`The process is going to exit with code ${code}`);
+		try {
+			logger.info(`The process is going to exit with code ${code}`);
+		} catch {
+			console.info(`The process is going to exit with code ${code}`);
+		}
 	});
 	//#endregion
 
