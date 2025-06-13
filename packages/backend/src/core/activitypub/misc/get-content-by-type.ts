@@ -58,7 +58,7 @@ export function getContentByType(object: IPost | Record<string, unknown>, mimeTy
 			}
 
 			// Permissive match
-			if (permissive && mediaType.toLowerCase().includes(mimeType)) {
+			if (permissive && mediaType.toLowerCase().includes(mimeType.toLowerCase())) {
 				return true;
 			}
 		}
