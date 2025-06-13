@@ -329,6 +329,38 @@ export class MfmService {
 					break;
 				}
 
+				// Replace iframe with link so we can generate previews.
+				// We shouldn't normally see this, but federated blogging platforms (WordPress, MicroBlog.Pub) can send it.
+				case 'iframe': {
+					const txt: string | undefined = node.attribs.title || node.attribs.alt;
+					const href: string | undefined = node.attribs.src;
+					if (href) {
+						if (href.match(/[\s>]/)) {
+							if (txt) {
+								// href is invalid + has a label => render a psuedo-link
+								text += `${text} (${href})`;
+							} else {
+								// href is invalid + no label => render plain text
+								text += href;
+							}
+						} else {
+							if (txt) {
+								// href is valid + has a label => render a link
+								const label = txt
+									.replaceAll('[', '(')
+									.replaceAll(']', ')')
+									.replaceAll(/\r?\n/, ' ')
+									.replaceAll('`', '\'');
+								text += `[${label}](<${href}>)`;
+							} else {
+								// href is valid + no label => render a plain URL
+								text += `<${href}>`;
+							}
+						}
+					}
+					break;
+				}
+
 				default:	// includes inline elements
 				{
 					appendChildren(node.childNodes);
