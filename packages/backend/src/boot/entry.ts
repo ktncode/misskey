@@ -64,13 +64,13 @@ async function main() {
 	}
 
 	// Display detail of uncaught exception
-	process.on('uncaughtException', err => {
+	process.on('uncaughtExceptionMonitor', ((err, origin) => {
 		try {
-			logger.error('Uncaught exception:', err);
+			logger.error(`Uncaught exception (${origin}):`, err);
 		} catch {
-			console.error('Uncaught exception:', err);
+			console.error(`Uncaught exception (${origin}):`, err);
 		}
-	});
+	}));
 
 	// Dying away...
 	process.on('exit', code => {
