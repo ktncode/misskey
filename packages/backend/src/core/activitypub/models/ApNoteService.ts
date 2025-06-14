@@ -210,7 +210,9 @@ export class ApNoteService {
 		const cw = note.summary === '' ? null : note.summary;
 
 		// テキストのパース
-		let text = getContentByType(note, 'text/x.misskeymarkdown');
+		let text =
+			getContentByType(note, 'text/x.misskeymarkdown') ??
+			getContentByType(note, 'text/markdown');
 		if (text == null && typeof note.content === 'string') {
 			text = this.apMfmService.htmlToMfm(note.content, note.tag);
 		}
@@ -407,7 +409,9 @@ export class ApNoteService {
 		const cw = note.summary === '' ? null : note.summary;
 
 		// テキストのパース
-		let text = getContentByType(note, 'text/x.misskeymarkdown');
+		let text =
+			getContentByType(note, 'text/x.misskeymarkdown') ??
+			getContentByType(note, 'text/markdown');
 		if (text == null && typeof note.content === 'string') {
 			text = this.apMfmService.htmlToMfm(note.content, note.tag);
 		}
