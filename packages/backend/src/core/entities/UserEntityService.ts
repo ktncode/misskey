@@ -759,11 +759,8 @@ export class UserEntityService implements OnModuleInit {
 
 		const iAmModerator = await this.roleService.isModerator(me as MiUser);
 		const meId = me ? me.id : null;
-		const isMe = meId && _userIds.includes(meId);
 		const isDetailed = options && options.schema !== 'UserLite';
-		const isDetailedAndMe = isDetailed && isMe;
 		const isDetailedAndMod = isDetailed && iAmModerator;
-		const isDetailedAndNotMe = isDetailed && !isMe;
 
 		const userUris = new Set(_users
 			.flatMap(user => [user.uri, user.movedToUri])
