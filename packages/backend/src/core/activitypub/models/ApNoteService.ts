@@ -719,7 +719,6 @@ export class ApNoteService {
 		if (htmlContent) {
 			for (const attach of extractMediaFromHtml(htmlContent)) {
 				if (hasUrl(attach)) {
-					attach.sensitive ??= note.sensitive;
 					attachments.set(attach.url, attach);
 				}
 			}
@@ -744,7 +743,6 @@ export class ApNoteService {
 		const icon = getBestIcon(note);
 		if (icon) {
 			if (hasUrl(icon)) {
-				icon.sensitive ??= note.sensitive;
 				attachments.set(icon.url, icon);
 			}
 		}
@@ -753,7 +751,6 @@ export class ApNoteService {
 		// AP attachments should be considered canonical.
 		for (const attach of toArray(note.attachment)) {
 			if (hasUrl(attach)) {
-				attach.sensitive ??= note.sensitive;
 				attachments.set(attach.url, attach);
 			}
 		}
@@ -764,8 +761,10 @@ export class ApNoteService {
 		const results = await Promise
 			.all(Array
 				.from(attachments.values())
-				.map(attach => limiter(() => this
-					.resolveImage(actor, attach))));
+				.map(attach => limiter(async () => {
+					attach.sensitive ??= note.sensitive;
+					return await this.resolveImage(actor, attach);
+				})));
 
 		// Process results
 		let hasFileError = false;
