@@ -337,7 +337,7 @@ export class MfmService {
 					if (href) {
 						if (href.match(/[\s>]/)) {
 							if (txt) {
-								// href is invalid + has a label => render a psuedo-link
+								// href is invalid + has a label => render a pseudo-link
 								text += `${text} (${href})`;
 							} else {
 								// href is invalid + no label => render plain text
