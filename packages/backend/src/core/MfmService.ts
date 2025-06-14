@@ -72,12 +72,17 @@ export class MfmService {
 				return;
 			}
 
-			switch (node.tagName) {
-				case 'br': {
-					text += '\n';
-					break;
-				}
+			if (node.tagName === 'br') {
+				text += '\n';
+				return;
+			}
 
+			// Don't produce invalid empty MFM
+			if (node.childNodes.length < 1) {
+				return;
+			}
+
+			switch (node.tagName) {
 				case 'a': {
 					const txt = getText(node);
 					const rel = node.attribs.rel;
@@ -127,60 +132,48 @@ export class MfmService {
 				}
 
 				case 'h1': {
-					if (node.childNodes.length > 0) {
-						text += '**【';
-						appendChildren(node.childNodes);
-						text += '】**\n';
-					}
+					text += '**【';
+					appendChildren(node.childNodes);
+					text += '】**\n';
 					break;
 				}
 
 				case 'h2':
 				case 'h3': {
-					if (node.childNodes.length > 0) {
-						text += '**';
-						appendChildren(node.childNodes);
-						text += '**\n';
-					}
+					text += '**';
+					appendChildren(node.childNodes);
+					text += '**\n';
 					break;
 				}
 
 				case 'b':
 				case 'strong': {
-					if (node.childNodes.length > 0) {
-						text += '**';
-						appendChildren(node.childNodes);
-						text += '**';
-					}
+					text += '**';
+					appendChildren(node.childNodes);
+					text += '**';
 					break;
 				}
 
 				case 'small': {
-					if (node.childNodes.length > 0) {
-						text += '<small>';
-						appendChildren(node.childNodes);
-						text += '</small>';
-					}
+					text += '<small>';
+					appendChildren(node.childNodes);
+					text += '</small>';
 					break;
 				}
 
 				case 's':
 				case 'del': {
-					if (node.childNodes.length > 0) {
-						text += '~~';
-						appendChildren(node.childNodes);
-						text += '~~';
-					}
+					text += '~~';
+					appendChildren(node.childNodes);
+					text += '~~';
 					break;
 				}
 
 				case 'i':
 				case 'em': {
-					if (node.childNodes.length > 0) {
-						text += '<i>';
-						appendChildren(node.childNodes);
-						text += '</i>';
-					}
+					text += '<i>';
+					appendChildren(node.childNodes);
+					text += '</i>';
 					break;
 				}
 
@@ -235,11 +228,9 @@ export class MfmService {
 
 				// inline code (<code>)
 				case 'code': {
-					if (node.childNodes.length > 0) {
-						text += '`';
-						appendChildren(node.childNodes);
-						text += '`';
-					}
+					text += '`';
+					appendChildren(node.childNodes);
+					text += '`';
 					break;
 				}
 
@@ -256,10 +247,8 @@ export class MfmService {
 				case 'h4':
 				case 'h5':
 				case 'h6': {
-					if (node.childNodes.length > 0) {
-						text += '\n\n';
-						appendChildren(node.childNodes);
-					}
+					text += '\n\n';
+					appendChildren(node.childNodes);
 					break;
 				}
 
@@ -271,10 +260,8 @@ export class MfmService {
 				case 'li':
 				case 'dt':
 				case 'dd': {
-					if (node.childNodes.length > 0) {
-						text += '\n';
-						appendChildren(node.childNodes);
-					}
+					text += '\n';
+					appendChildren(node.childNodes);
 					break;
 				}
 
