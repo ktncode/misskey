@@ -13257,6 +13257,10 @@ export interface Locale extends ILocale {
      * ActivityPub user data in its raw form. These fields are public and accessible to other instances.
      */
     "rawApDescription": string;
+    /**
+     * Signup Reason
+     */
+    "signupReason": string;
 }
 declare const locales: {
     [lang: string]: Locale;
