@@ -89,20 +89,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</p>
 			<div v-show="mergedCW == null || showContent">
 				<span v-if="appearNote.isHidden" style="opacity: 0.5">({{ i18n.ts.private }})</span>
-				<MkA v-if="appearNote.replyId" :class="$style.noteReplyTarget" :to="`/notes/${appearNote.replyId}`"><i class="ph-arrow-bend-left-up ph-bold ph-lg"></i></MkA>
-				<Mfm
-					v-if="appearNote.text"
-					:parsedNodes="parsed"
-					:text="appearNote.text"
-					:author="appearNote.user"
-					:nyaize="'respect'"
-					:emojiUrls="appearNote.emojis"
-					:enableEmojiMenu="true"
-					:enableEmojiMenuReaction="true"
-					:isAnim="allowAnim"
-					:isBlock="true"
-					class="_selectable"
-				/>
+				<div>
+					<MkA v-if="appearNote.replyId" :class="$style.noteReplyTarget" :to="`/notes/${appearNote.replyId}`"><i class="ph-arrow-bend-left-up ph-bold ph-lg"></i></MkA>
+					<Mfm
+						v-if="appearNote.text"
+						:parsedNodes="parsed"
+						:text="appearNote.text"
+						:author="appearNote.user"
+						:nyaize="'respect'"
+						:emojiUrls="appearNote.emojis"
+						:enableEmojiMenu="true"
+						:enableEmojiMenuReaction="true"
+						:isAnim="allowAnim"
+						class="_selectable"
+					/>
+				</div>
 				<a v-if="appearNote.renote != null" :class="$style.rn">RN:</a>
 				<SkNoteTranslation :note="note" :translation="translation" :translating="translating"></SkNoteTranslation>
 				<MkButton v-if="!allowAnim && animated" :class="$style.playMFMButton" :small="true" @click="animatedMFM()" @click.stop><i class="ph-play ph-bold ph-lg "></i> {{ i18n.ts._animatedMFM.play }}</MkButton>
