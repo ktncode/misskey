@@ -72,17 +72,11 @@ export class MfmService {
 				return;
 			}
 
-			if (node.tagName === 'br') {
-				text += '\n';
-				return;
-			}
-
-			// Don't produce invalid empty MFM
-			if (node.childNodes.length < 1) {
-				return;
-			}
-
 			switch (node.tagName) {
+				case 'br': {
+					text += '\n';
+					return;
+				}
 				case 'a': {
 					const txt = getText(node);
 					const rel = node.attribs.rel;
@@ -128,9 +122,16 @@ export class MfmService {
 
 						text += generateLink();
 					}
-					break;
+					return;
 				}
+			}
 
+			// Don't produce invalid empty MFM
+			if (node.childNodes.length < 1) {
+				return;
+			}
+
+			switch (node.tagName) {
 				case 'h1': {
 					text += '**【';
 					appendChildren(node.childNodes);
