@@ -791,6 +791,10 @@ export class ActivityPubServerService {
 			reply.header('Access-Control-Allow-Origin', '*');
 			reply.header('Access-Control-Expose-Headers', 'Vary');
 
+			// Tell crawlers not to index AP endpoints.
+			// https://developers.google.com/search/docs/crawling-indexing/block-indexing
+			reply.header('X-Robots-Tag', 'noindex');
+
 			/* tell any caching proxy that they should not cache these
 				 responses: we wouldn't want the proxy to return a 403 to
 				 someone presenting a valid signature, or return a cached
