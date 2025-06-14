@@ -420,6 +420,11 @@ provide(DI.mfmEmojiReactCallback, (reaction) => {
 const tab = ref(props.initialTab);
 const reactionTabType = ref<string | null>(null);
 
+// Auto-select the first page of reactions
+watch(appearNote, n => {
+	reactionTabType.value ??= Object.keys(n.reactions)[0] ?? null;
+}, { immediate: true });
+
 const renotesPagination = computed<Paging>(() => ({
 	endpoint: 'notes/renotes',
 	limit: 10,
