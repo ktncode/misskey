@@ -448,6 +448,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 					makeNotesFollowersOnlyBefore: (person as any).makeNotesFollowersOnlyBefore ?? null,
 					makeNotesHiddenBefore: (person as any).makeNotesHiddenBefore ?? null,
 					emojis,
+					apType: person.type,
 					attributionDomains: Array.isArray(person.attributionDomains)
 						? person.attributionDomains
 							.filter((a: unknown) => typeof(a) === 'string' && a.length > 0 && a.length <= 128)
@@ -554,6 +555,15 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 	}
 
 	/**
+	 * Updates a remote user over Ap and returns the updated entity.
+	 */
+	@bindThis
+	public async refreshPerson(uri: string, resolver?: Resolver | null, hint?: IObject, movePreventUris?: string[]): Promise<MiRemoteUser> {
+		await this.updatePerson(uri, resolver, hint, movePreventUris);
+		return await this.cacheService.uriPersonCache.fetch(uri, () => this.usersRepository.findOneByOrFail({ uri })) as MiRemoteUser;
+	}
+
+	/**
 	 * Personの情報を更新します。
 	 * Misskeyに対象のPersonが登録されていなければ無視します。
 	 * もしアカウントの移行が確認された場合、アカウント移行処理を行います。
@@ -649,6 +659,7 @@ export class ApPersonService implements OnModuleInit, OnApplicationShutdown {
 			// We use "!== false" to handle incorrect types, missing / null values, and "default to true" logic.
 			hideOnlineStatus: person.hideOnlineStatus !== false,
 			isExplorable: person.discoverable !== false,
+			apType: person.type,
 			attributionDomains: Array.isArray(person.attributionDomains)
 				? person.attributionDomains
 					.filter((a: unknown) => typeof(a) === 'string' && a.length > 0 && a.length <= 128)

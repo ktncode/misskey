@@ -1,13 +1,14 @@
 /*
- * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-FileCopyrightText: hazelnoot and other Sharkey contributors
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { URL } from 'node:url';
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { RelayService } from '@/core/RelayService.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { RemoteUserResolveService } from '@/core/RemoteUserResolveService.js';
+import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { ApiError } from '../../../error.js';
 
 export const meta = {
@@ -18,43 +19,42 @@ export const meta = {
 	kind: 'write:admin:relays',
 
 	errors: {
-		invalidUrl: {
-			message: 'Invalid URL',
-			code: 'INVALID_URL',
-			id: 'fb8c92d3-d4e5-44e7-b3d4-800d5cef8b2c',
+		localActor: {
+			message: 'Actor is local',
+			code: 'LOCAL_ACTOR',
+			id: 'a6daf7fc-ea63-460f-858d-f99b083de92f',
 		},
-	},
-
-	res: {
-		type: 'object',
-		ref: 'MastodonRelay',
 	},
 } as const;
 
 export const paramDef = {
 	type: 'object',
 	properties: {
-		inbox: { type: 'string' },
+		actor: { type: 'string' },
 	},
-	required: ['inbox'],
+	required: ['actor'],
 } as const;
 
 @Injectable()
 export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
 	constructor(
-		private relayService: RelayService,
+		private readonly relayService: RelayService,
 		private readonly moderationLogService: ModerationLogService,
+		private readonly remoteUserResolveService: RemoteUserResolveService,
+		private readonly userEntityService: UserEntityService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			if (!URL.canParse(ps.inbox)) throw new ApiError(meta.errors.invalidUrl);
-			if (new URL(ps.inbox).protocol !== 'https:') throw new ApiError(meta.errors.invalidUrl);
+			const actor = await this.remoteUserResolveService.resolveUserByReference(ps.actor);
+			if (!this.userEntityService.isRemoteUser(actor)) {
+				throw new ApiError(meta.errors.localActor);
+			}
 
 			await this.moderationLogService.log(me, 'addRelay', {
-				type: 'Mastodon',
-				inbox: ps.inbox,
+				type: 'LitePub',
+				actor: actor.uri,
 			});
 
-			return await this.relayService.addMastodonRelay(ps.inbox);
+			await this.relayService.addLitePubRelay(actor);
 		});
 	}
 }

@@ -157,6 +157,8 @@ export const moderationLogTypes = [
 	'addRelay',
 	'removeRelay',
 	'updateProxyAccountDescription',
+	'acceptRelay',
+	'rejectRelay',
 ] as const;
 
 export type ModerationLogPayloads = {
@@ -523,10 +525,26 @@ export type ModerationLogPayloads = {
 		noteUserHost: string | null;
 	},
 	addRelay: {
+		type: 'Mastodon';
 		inbox: string;
+	} | {
+		type: 'LitePub';
+		actor: string;
 	},
 	removeRelay: {
+		type: 'Mastodon';
 		inbox: string;
+	} | {
+		type: 'LitePub';
+		actor: string;
+	},
+	acceptRelay: {
+		type: 'LitePub',
+		actor: string,
+	},
+	rejectRelay: {
+		type: 'LitePub',
+		actor: string,
 	},
 };
 

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-FileCopyrightText: hazelnoot and other Sharkey contributors
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
@@ -19,7 +19,7 @@ export const meta = {
 		optional: false, nullable: false,
 		items: {
 			type: 'object',
-			ref: 'MastodonRelay',
+			ref: 'LitePubRelay',
 		},
 	},
 } as const;
@@ -33,10 +33,10 @@ export const paramDef = {
 @Injectable()
 export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
 	constructor(
-		private relayService: RelayService,
+		private readonly relayService: RelayService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
-			return await this.relayService.listMastodonRelays();
+		super(meta, paramDef, async () => {
+			return await this.relayService.listLitePubRelays();
 		});
 	}
 }

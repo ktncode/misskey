@@ -303,13 +303,31 @@ type AdminQueueStatsResponse = operations['admin___queue___stats']['responses'][
 type AdminRejectQuotesRequest = operations['admin___reject-quotes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
+type AdminRelaysAcceptLitepubRequest = operations['admin___relays___accept-litepub']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type AdminRelaysAddLitepubRequest = operations['admin___relays___add-litepub']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
 type AdminRelaysAddRequest = operations['admin___relays___add']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type AdminRelaysAddResponse = operations['admin___relays___add']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
+type AdminRelaysHasPendingResponse = operations['admin___relays___has-pending']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type AdminRelaysListLitepubResponse = operations['admin___relays___list-litepub']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
 type AdminRelaysListResponse = operations['admin___relays___list']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type AdminRelaysRejectLitepubRequest = operations['admin___relays___reject-litepub']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type AdminRelaysRemoveLitepubRequest = operations['admin___relays___remove-litepub']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type AdminRelaysRemoveRequest = operations['admin___relays___remove']['requestBody']['content']['application/json'];
@@ -1577,10 +1595,16 @@ declare namespace entities {
         AdminQueueShowJobRequest,
         AdminQueueStatsResponse,
         AdminRejectQuotesRequest,
+        AdminRelaysAcceptLitepubRequest,
         AdminRelaysAddRequest,
         AdminRelaysAddResponse,
+        AdminRelaysAddLitepubRequest,
+        AdminRelaysHasPendingResponse,
         AdminRelaysListResponse,
+        AdminRelaysListLitepubResponse,
+        AdminRelaysRejectLitepubRequest,
         AdminRelaysRemoveRequest,
+        AdminRelaysRemoveLitepubRequest,
         AdminResetPasswordRequest,
         AdminResetPasswordResponse,
         AdminResolveAbuseUserReportRequest,
@@ -2206,7 +2230,9 @@ declare namespace entities {
         ChatMessageLiteForRoom,
         ChatRoom,
         ChatRoomInvitation,
-        ChatRoomMembership
+        ChatRoomMembership,
+        MastodonRelay,
+        LitePubRelay
     }
 }
 export { entities }
@@ -2782,6 +2808,12 @@ type IWebhooksTestRequest = operations['i___webhooks___test']['requestBody']['co
 type IWebhooksUpdateRequest = operations['i___webhooks___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
+type LitePubRelay = components['schemas']['LitePubRelay'];
+
+// @public (undocumented)
+type MastodonRelay = components['schemas']['MastodonRelay'];
+
+// @public (undocumented)
 type MeDetailed = components['schemas']['MeDetailed'];
 
 // @public (undocumented)
@@ -3045,10 +3077,16 @@ type ModerationLog = {
 } | {
     type: 'removeRelay';
     info: ModerationLogPayloads['removeRelay'];
+} | {
+    type: 'acceptRelay';
+    info: ModerationLogPayloads['acceptRelay'];
+} | {
+    type: 'rejectRelay';
+    info: ModerationLogPayloads['rejectRelay'];
 });
 
 // @public (undocumented)
-export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "approve", "decline", "unsuspend", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "setMandatoryCW", "setRemoteInstanceNSFW", "unsetRemoteInstanceNSFW", "suspendRemoteInstance", "unsuspendRemoteInstance", "rejectRemoteInstanceReports", "acceptRemoteInstanceReports", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetUserAvatar", "unsetUserBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom"];
+export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "approve", "decline", "unsuspend", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "setMandatoryCW", "setRemoteInstanceNSFW", "unsetRemoteInstanceNSFW", "suspendRemoteInstance", "unsuspendRemoteInstance", "rejectRemoteInstanceReports", "acceptRemoteInstanceReports", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetUserAvatar", "unsetUserBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom", "acceptQuotesUser", "rejectQuotesUser", "acceptQuotesInstance", "rejectQuotesInstance", "clearUserFiles", "nsfwUser", "unNsfwUser", "silenceUser", "unSilenceUser", "createAccount", "clearRemoteFiles", "clearOwnerlessFiles", "updateCustomEmojis", "importCustomEmojis", "clearInstanceFiles", "severFollowRelations", "createPromo", "addRelay", "removeRelay", "acceptRelay", "rejectRelay"];
 
 // @public (undocumented)
 type MuteCreateRequest = operations['mute___create']['requestBody']['content']['application/json'];

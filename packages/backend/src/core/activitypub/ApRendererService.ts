@@ -596,7 +596,7 @@ export class ApRendererService {
 		const keypair = await this.userKeypairService.getUserKeypair(user.id);
 
 		const person: any = {
-			type: isSystem ? 'Application' : user.isBot ? 'Service' : 'Person',
+			type: user.apType ?? (isSystem ? 'Application' : user.isBot ? 'Service' : 'Person'),
 			id,
 			inbox: `${id}/inbox`,
 			outbox: `${id}/outbox`,

@@ -253,6 +253,7 @@ export const isTombstone = (object: IObject): object is ITombstone =>
 	getApType(object) === 'Tombstone';
 
 export const validActor = ['Person', 'Service', 'Group', 'Organization', 'Application'];
+export type ValidActor = 'Person' | 'Service' | 'Group' | 'Organization' | 'Application';
 
 export const isActor = (object: IObject): object is IActor => {
 	const type = getApType(object);

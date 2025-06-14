@@ -90,10 +90,16 @@ import type {
 	AdminQueueShowJobRequest,
 	AdminQueueStatsResponse,
 	AdminRejectQuotesRequest,
+	AdminRelaysAcceptLitepubRequest,
 	AdminRelaysAddRequest,
 	AdminRelaysAddResponse,
+	AdminRelaysAddLitepubRequest,
+	AdminRelaysHasPendingResponse,
 	AdminRelaysListResponse,
+	AdminRelaysListLitepubResponse,
+	AdminRelaysRejectLitepubRequest,
 	AdminRelaysRemoveRequest,
+	AdminRelaysRemoveLitepubRequest,
 	AdminResetPasswordRequest,
 	AdminResetPasswordResponse,
 	AdminResolveAbuseUserReportRequest,
@@ -732,9 +738,15 @@ export type Endpoints = {
 	'admin/queue/show-job': { req: AdminQueueShowJobRequest; res: EmptyResponse };
 	'admin/queue/stats': { req: EmptyRequest; res: AdminQueueStatsResponse };
 	'admin/reject-quotes': { req: AdminRejectQuotesRequest; res: EmptyResponse };
+	'admin/relays/accept-litepub': { req: AdminRelaysAcceptLitepubRequest; res: EmptyResponse };
 	'admin/relays/add': { req: AdminRelaysAddRequest; res: AdminRelaysAddResponse };
+	'admin/relays/add-litepub': { req: AdminRelaysAddLitepubRequest; res: EmptyResponse };
+	'admin/relays/has-pending': { req: EmptyRequest; res: AdminRelaysHasPendingResponse };
 	'admin/relays/list': { req: EmptyRequest; res: AdminRelaysListResponse };
+	'admin/relays/list-litepub': { req: EmptyRequest; res: AdminRelaysListLitepubResponse };
+	'admin/relays/reject-litepub': { req: AdminRelaysRejectLitepubRequest; res: EmptyResponse };
 	'admin/relays/remove': { req: AdminRelaysRemoveRequest; res: EmptyResponse };
+	'admin/relays/remove-litepub': { req: AdminRelaysRemoveLitepubRequest; res: EmptyResponse };
 	'admin/reset-password': { req: AdminResetPasswordRequest; res: AdminResetPasswordResponse };
 	'admin/resolve-abuse-user-report': { req: AdminResolveAbuseUserReportRequest; res: EmptyResponse };
 	'admin/roles/assign': { req: AdminRolesAssignRequest; res: EmptyResponse };

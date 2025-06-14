@@ -8,7 +8,7 @@ import chalk from 'chalk';
 import { IsNull } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { UsersRepository } from '@/models/_.js';
-import type { MiLocalUser, MiRemoteUser } from '@/models/User.js';
+import type { MiLocalUser, MiRemoteUser, MiUser } from '@/models/User.js';
 import type { Config } from '@/config.js';
 import type Logger from '@/logger.js';
 import { UtilityService } from '@/core/UtilityService.js';
@@ -18,6 +18,8 @@ import { ApDbResolverService } from '@/core/activitypub/ApDbResolverService.js';
 import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
 import { bindThis } from '@/decorators.js';
 import { renderInlineError } from '@/misc/render-inline-error.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
+import * as Acct from '@/misc/acct.js';
 
 @Injectable()
 export class RemoteUserResolveService {
@@ -37,6 +39,20 @@ export class RemoteUserResolveService {
 		private apPersonService: ApPersonService,
 	) {
 		this.logger = this.remoteLoggerService.logger.createSubLogger('resolve-user');
+	}
+
+	@bindThis
+	public async resolveUserByReference(handleOrUri: string): Promise<MiUser> {
+		if (handleOrUri.startsWith('@')) {
+			const acct = Acct.parse(handleOrUri);
+			return await this.resolveUser(acct.username, acct.host);
+		}
+
+		if (handleOrUri.startsWith('https://')) {
+			return await this.apPersonService.resolvePerson(handleOrUri);
+		}
+
+		throw new IdentifiableError('2f808f19-08f3-416b-a58e-7eb4446cc441', 'user not found');
 	}
 
 	@bindThis

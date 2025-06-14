@@ -22,6 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					'importCustomEmojis',
 					'createPromo',
 					'addRelay',
+					'acceptRelay',
 				].includes(log.type),
 				[$style.logYellow]: [
 					'markSensitiveDriveFile',
@@ -39,6 +40,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					'silenceUser',
 					'unSilenceUser',
 					'updateCustomEmojis',
+					'rejectRelay',
 				].includes(log.type),
 				[$style.logRed]: [
 					'suspend',
@@ -128,8 +130,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<span v-else-if="log.type === 'clearInstanceFiles'">: {{ log.info.host }}</span>
 		<span v-else-if="log.type === 'severFollowRelations'">: {{ log.info.host }}</span>
 		<span v-else-if="log.type === 'createPromo'">: @{{ log.info.noteUserUsername }}{{ log.info.noteUserHost ? '@' + log.info.noteUserHost : '' }}</span>
-		<span v-else-if="log.type === 'addRelay'">: {{ log.info.inbox }}</span>
-		<span v-else-if="log.type === 'removeRelay'">: {{ log.info.inbox }}</span>
+		<span v-else-if="log.type === 'addRelay'">: {{ log.info.inbox ?? log.info.actor }}</span>
+		<span v-else-if="log.type === 'removeRelay'">: {{ log.info.inbox ?? log.info.actor }}</span>
+		<span v-else-if="log.type === 'acceptRelay'">: {{ log.info.actor }}</span>
+		<span v-else-if="log.type === 'rejectRelay'">: {{ log.info.actor }}</span>
 	</template>
 	<template #icon>
 		<i v-if="log.type === 'updateServerSettings'" class="ti ti-settings"></i>
@@ -312,10 +316,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<SkFetchNote :noteId="log.info.noteId"/>
 		</template>
 		<template v-else-if="log.type === 'addRelay'">
-			<div>{{ i18n.ts.inboxUrl }}: {{ log.info.inbox }}</div>
+			<div>{{ i18n.ts.type }}: {{ log.info.type }}</div>
+			<div v-if="log.info.inbox">{{ i18n.ts.inboxUrl }}: {{ log.info.inbox }}</div>
+			<div v-if="log.info.actor">{{ i18n.ts.actorUrl }}: {{ log.info.actor }}</div>
 		</template>
 		<template v-else-if="log.type === 'removeRelay'">
-			<div>{{ i18n.ts.inboxUrl }}: {{ log.info.inbox }}</div>
+			<div>{{ i18n.ts.type }}: {{ log.info.type }}</div>
+			<div v-if="log.info.inbox">{{ i18n.ts.inboxUrl }}: {{ log.info.inbox }}</div>
+			<div v-if="log.info.actor">{{ i18n.ts.actorUrl }}: {{ log.info.actor }}</div>
+		</template>
+		<template v-else-if="log.type === 'acceptRelay'">
+			<div>{{ i18n.ts.type }}: {{ log.info.type }}</div>
+			<div v-if="log.info.actor">{{ i18n.ts.actorUrl }}: {{ log.info.actor }}</div>
+		</template>
+		<template v-else-if="log.type === 'rejectRelay'">
+			<div>{{ i18n.ts.type }}: {{ log.info.type }}</div>
+			<div v-if="log.info.actor">{{ i18n.ts.actorUrl }}: {{ log.info.actor }}</div>
 		</template>
 		<template v-else-if="log.type === 'updateProxyAccountDescription'">
 			<div :class="$style.diff">

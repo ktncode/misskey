@@ -276,6 +276,12 @@ export type ModerationLog = {
 } | {
 	type: 'removeRelay';
 	info: ModerationLogPayloads['removeRelay'];
+} | {
+	type: 'acceptRelay';
+	info: ModerationLogPayloads['acceptRelay'];
+} | {
+	type: 'rejectRelay';
+	info: ModerationLogPayloads['rejectRelay'];
 });
 
 export type ServerStats = {

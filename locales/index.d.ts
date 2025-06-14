@@ -10116,6 +10116,10 @@ export interface Locale extends ILocale {
          * 拒否済み
          */
         "rejected": string;
+        /**
+         * None
+         */
+        "none": string;
     };
     "_notification": {
         /**
@@ -13257,6 +13261,46 @@ export interface Locale extends ILocale {
      * ActivityPub user data in its raw form. These fields are public and accessible to other instances.
      */
     "rawApDescription": string;
+    /**
+     * Mastodon Relays
+     */
+    "mastodonRelays": string;
+    /**
+     * Add Mastodon relay
+     */
+    "addMastodonRelay": string;
+    /**
+     * Add a Mastodon-style relay (connected by inbox URL)
+     */
+    "addMastodonRelayDesc": string;
+    /**
+     * LitePub Relays
+     */
+    "litePubRelays": string;
+    /**
+     * Add LitePub relay
+     */
+    "addLitePubRelay": string;
+    /**
+     * Add LitePub-style Relay (connected by actor URL or handle)
+     */
+    "addLitePubRelayDesc": string;
+    /**
+     * Actor URL
+     */
+    "actorUrl": string;
+    /**
+     * No connected relays.
+     */
+    "noRelays": string;
+    /**
+     * Disconnect
+     */
+    "disconnectRelay": string;
+    /**
+     * There are relays pending approval to connect.
+     */
+    "pendingRelayApprovals": string;
 }
 declare const locales: {
     [lang: string]: Locale;

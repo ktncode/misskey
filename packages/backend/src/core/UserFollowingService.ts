@@ -28,9 +28,12 @@ import type { Config } from '@/config.js';
 import { AccountMoveService } from '@/core/AccountMoveService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import type { ThinUser } from '@/queue/types.js';
+import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
+import { RELAY_ACTOR_USERNAME } from '@/const.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { InternalEventService } from '@/core/InternalEventService.js';
 import type Logger from '../logger.js';
+import { Resolver } from './activitypub/ApResolverService.js';
 
 type Local = MiLocalUser | {
 	id: MiLocalUser['id'];
@@ -43,7 +46,7 @@ type Remote = MiRemoteUser | {
 	uri: MiRemoteUser['uri'];
 	inbox: MiRemoteUser['inbox'];
 };
-type Both = Local | Remote;
+type Both = Local | Remote | MiUser;
 
 @Injectable()
 export class UserFollowingService implements OnModuleInit {
@@ -87,6 +90,7 @@ export class UserFollowingService implements OnModuleInit {
 		private accountMoveService: AccountMoveService,
 		private perUserFollowingChart: PerUserFollowingChart,
 		private instanceChart: InstanceChart,
+		private readonly apPersonService: ApPersonService,
 		private readonly internalEventService: InternalEventService,
 
 		loggerService: LoggerService,
@@ -108,10 +112,11 @@ export class UserFollowingService implements OnModuleInit {
 	public async follow(
 		_follower: ThinUser,
 		_followee: ThinUser,
-		{ requestId, silent = false, withReplies }: {
+		{ requestId, silent = false, withReplies, resolver }: {
 			requestId?: string,
 			silent?: boolean,
 			withReplies?: boolean,
+			resolver?: Resolver,
 		} = {},
 	): Promise<void> {
 		/**
@@ -125,6 +130,24 @@ export class UserFollowingService implements OnModuleInit {
 		if (this.userEntityService.isRemoteUser(follower) && this.userEntityService.isRemoteUser(followee)) {
 			// What?
 			throw new Error('Remote user cannot follow remote user.');
+		}
+
+		// Only "Application" actors can follow the relay actor.
+		if (this.userEntityService.isRemoteUser(follower) && isRelayActor(followee)) {
+			// Existing remote actors may not have a saved AP type
+			let apType = follower.apType;
+			if (apType === null) {
+				const updated = await this.apPersonService.refreshPerson(follower.uri, resolver);
+				apType = updated.apType;
+			}
+
+			// Reject any requests from non-system users.
+			// This is a *security requirement* to ensure that regular users can't connect a relay.
+			if (apType !== 'Application') {
+				const content = this.apRendererService.addContext(this.apRendererService.renderReject(this.apRendererService.renderFollow(follower, followee, requestId), followee));
+				this.queueService.deliver(followee, content, follower.inbox, false);
+				return;
+			}
 		}
 
 		// check blocking
@@ -610,13 +633,13 @@ export class UserFollowingService implements OnModuleInit {
 	@bindThis
 	public async rejectFollowRequest(user: Local, follower: Both): Promise<void> {
 		if (this.userEntityService.isRemoteUser(follower)) {
-			this.deliverReject(user, follower);
+			this.deliverReject(user, follower as Remote);
 		}
 
 		await this.removeFollowRequest(user, follower);
 
 		if (this.userEntityService.isLocalUser(follower)) {
-			this.publishUnfollow(user, follower);
+			this.publishUnfollow(user, follower as Local);
 		}
 	}
 
@@ -626,13 +649,13 @@ export class UserFollowingService implements OnModuleInit {
 	@bindThis
 	public async rejectFollow(user: Local, follower: Both): Promise<void> {
 		if (this.userEntityService.isRemoteUser(follower)) {
-			this.deliverReject(user, follower);
+			this.deliverReject(user, follower as Remote);
 		}
 
 		await this.removeFollow(user, follower);
 
 		if (this.userEntityService.isLocalUser(follower)) {
-			this.publishUnfollow(user, follower);
+			this.publishUnfollow(user, follower as Local);
 		}
 	}
 
@@ -734,4 +757,8 @@ export class UserFollowingService implements OnModuleInit {
 
 		return isFollowing && isFollowed;
 	}
+}
+
+function isRelayActor(user: MiUser & Both): user is MiLocalUser & Local {
+	return user.host === null && user.username === RELAY_ACTOR_USERNAME;
 }
