@@ -29,6 +29,7 @@ import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { isRetryableError } from '@/misc/is-retryable-error.js';
 import { renderInlineError } from '@/misc/render-inline-error.js';
 import { extractMediaFromHtml } from '@/core/activitypub/misc/extract-media-from-html.js';
+import { extractMediaFromMfm } from '@/core/activitypub/misc/extract-media-from-mfm.js';
 import { getContentByType } from '@/core/activitypub/misc/get-content-by-type.js';
 import { getOneApId, getApId, validPost, isEmoji, getApType, isApObject, isDocument, IApDocument, isLink } from '../type.js';
 import { ApLoggerService } from '../ApLoggerService.js';
@@ -724,20 +725,17 @@ export class ApNoteService {
 			}
 		}
 
-		// Extract inline media from markdown content.
-		// TODO We first need to implement support for "!" prefix in sfm-js.
-		//  That will be implemented as part of https://activitypub.software/TransFem-org/Sharkey/-/issues/1105
-		// const markdownContent =
-		// 	getContentByType(note, 'text/x.misskeymarkdown') ??
-		// 	getContentByType(note, 'text/markdown');
-		// if (markdownContent) {
-		// 	for (const attach of extractMediaFromMarkdown(markdownContent)) {
-		// 		if (hasUrl(attach)) {
-		// 			attach.sensitive ??= note.sensitive;
-		// 			attachments.set(attach.url, attach);
-		// 		}
-		// 	}
-		// }
+		// Extract inline media from MFM / markdown content.
+		const mfmContent =
+			getContentByType(note, 'text/x.misskeymarkdown') ??
+			getContentByType(note, 'text/markdown');
+		if (mfmContent) {
+			for (const attach of extractMediaFromMfm(mfmContent)) {
+				if (hasUrl(attach)) {
+					attachments.set(attach.url, attach);
+				}
+			}
+		}
 
 		// Some software (Peertube) attaches a thumbnail under "icon" instead of "attachment"
 		const icon = getBestIcon(note);
