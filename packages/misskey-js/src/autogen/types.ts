@@ -4246,6 +4246,10 @@ export type components = {
       /** Format: url */
       avatarUrl: string | null;
       avatarBlurhash: string | null;
+      /** @example Hi masters, I am Ai! */
+      description: string | null;
+      /** Format: date-time */
+      createdAt: string;
       avatarDecorations: {
           /** Format: id */
           id: string;
@@ -4304,8 +4308,6 @@ export type components = {
       movedTo: string | null;
       alsoKnownAs: string[] | null;
       /** Format: date-time */
-      createdAt: string;
-      /** Format: date-time */
       updatedAt: string | null;
       /** Format: date-time */
       lastFetchedAt: string | null;
@@ -4319,8 +4321,6 @@ export type components = {
       isSilenced: boolean;
       /** @example false */
       isSuspended: boolean;
-      /** @example Hi masters, I am Ai! */
-      description: string | null;
       location: string | null;
       /** @example 2018-03-12 */
       birthday: string | null;
@@ -11236,6 +11236,7 @@ export type operations = {
               remoteFollowing: number;
               remoteFollowers: number;
             };
+            signupReason: string | null;
           };
         };
       };
