@@ -75,9 +75,8 @@ export class MfmService {
 			switch (node.tagName) {
 				case 'br': {
 					text += '\n';
-					break;
+					return;
 				}
-
 				case 'a': {
 					const txt = getText(node);
 					const rel = node.attribs.rel;
@@ -123,9 +122,16 @@ export class MfmService {
 
 						text += generateLink();
 					}
-					break;
+					return;
 				}
+			}
 
+			// Don't produce invalid empty MFM
+			if (node.childNodes.length < 1) {
+				return;
+			}
+
+			switch (node.tagName) {
 				case 'h1': {
 					text += '**【';
 					appendChildren(node.childNodes);
