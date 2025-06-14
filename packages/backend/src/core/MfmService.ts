@@ -127,48 +127,60 @@ export class MfmService {
 				}
 
 				case 'h1': {
-					text += '**【';
-					appendChildren(node.childNodes);
-					text += '】**\n';
+					if (node.childNodes.length > 0) {
+						text += '**【';
+						appendChildren(node.childNodes);
+						text += '】**\n';
+					}
 					break;
 				}
 
 				case 'h2':
 				case 'h3': {
-					text += '**';
-					appendChildren(node.childNodes);
-					text += '**\n';
+					if (node.childNodes.length > 0) {
+						text += '**';
+						appendChildren(node.childNodes);
+						text += '**\n';
+					}
 					break;
 				}
 
 				case 'b':
 				case 'strong': {
-					text += '**';
-					appendChildren(node.childNodes);
-					text += '**';
+					if (node.childNodes.length > 0) {
+						text += '**';
+						appendChildren(node.childNodes);
+						text += '**';
+					}
 					break;
 				}
 
 				case 'small': {
-					text += '<small>';
-					appendChildren(node.childNodes);
-					text += '</small>';
+					if (node.childNodes.length > 0) {
+						text += '<small>';
+						appendChildren(node.childNodes);
+						text += '</small>';
+					}
 					break;
 				}
 
 				case 's':
 				case 'del': {
-					text += '~~';
-					appendChildren(node.childNodes);
-					text += '~~';
+					if (node.childNodes.length > 0) {
+						text += '~~';
+						appendChildren(node.childNodes);
+						text += '~~';
+					}
 					break;
 				}
 
 				case 'i':
 				case 'em': {
-					text += '<i>';
-					appendChildren(node.childNodes);
-					text += '</i>';
+					if (node.childNodes.length > 0) {
+						text += '<i>';
+						appendChildren(node.childNodes);
+						text += '</i>';
+					}
 					break;
 				}
 
@@ -223,9 +235,11 @@ export class MfmService {
 
 				// inline code (<code>)
 				case 'code': {
-					text += '`';
-					appendChildren(node.childNodes);
-					text += '`';
+					if (node.childNodes.length > 0) {
+						text += '`';
+						appendChildren(node.childNodes);
+						text += '`';
+					}
 					break;
 				}
 
@@ -242,8 +256,10 @@ export class MfmService {
 				case 'h4':
 				case 'h5':
 				case 'h6': {
-					text += '\n\n';
-					appendChildren(node.childNodes);
+					if (node.childNodes.length > 0) {
+						text += '\n\n';
+						appendChildren(node.childNodes);
+					}
 					break;
 				}
 
@@ -255,8 +271,10 @@ export class MfmService {
 				case 'li':
 				case 'dt':
 				case 'dd': {
-					text += '\n';
-					appendChildren(node.childNodes);
+					if (node.childNodes.length > 0) {
+						text += '\n';
+						appendChildren(node.childNodes);
+					}
 					break;
 				}
 
