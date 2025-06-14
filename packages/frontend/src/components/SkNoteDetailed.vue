@@ -108,7 +108,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 					:isBlock="true"
 					class="_selectable"
 				/>
-				<a v-if="appearNote.renote != null" :class="$style.rn">RN:</a>
 				<SkNoteTranslation :note="note" :translation="translation" :translating="translating"></SkNoteTranslation>
 				<MkButton v-if="!allowAnim && animated" :class="$style.playMFMButton" :small="true" @click="animatedMFM()" @click.stop><i class="ph-play ph-bold ph-lg "></i> {{ i18n.ts._animatedMFM.play }}</MkButton>
 				<MkButton v-else-if="!prefer.s.animatedMfm && allowAnim && animated" :class="$style.playMFMButton" :small="true" @click="animatedMFM()" @click.stop><i class="ph-stop ph-bold ph-lg "></i> {{ i18n.ts._animatedMFM.stop }}</MkButton>
