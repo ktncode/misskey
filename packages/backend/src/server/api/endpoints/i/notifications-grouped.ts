@@ -106,8 +106,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			// grouping
 			const groupedNotifications : MiGroupedNotification[] = [];
 			// keep track of where reaction / renote notifications are, by note id
-			const reactionIdxByNoteId = new Map();
-			const renoteIdxByNoteId = new Map();
+			const reactionIdxByNoteId = new Map<string, number>();
+			const renoteIdxByNoteId = new Map<string, number>();
 
 			// group notifications by type+note; notice that we don't try to
 			// split groups if they span a long stretch of time, because
@@ -130,7 +130,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						continue;
 					}
 
-					let prevReaction = groupedNotifications[reactionIdx];
+					let prevReaction = groupedNotifications[reactionIdx] as FilterUnionByProperty<MiGroupedNotification, 'type', 'reaction:grouped'> | FilterUnionByProperty<MiGroupedNotification, 'type', 'reaction'>;
 					// if the previous reaction is not a group, make it into one
 					if (prevReaction.type !== 'reaction:grouped') {
 						prevReaction = groupedNotifications[reactionIdx] = {
@@ -162,7 +162,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						continue;
 					}
 
-					let prevRenote = groupedNotifications[renoteIdx];
+					let prevRenote = groupedNotifications[renoteIdx] as FilterUnionByProperty<MiGroupedNotification, 'type', 'renote:grouped'> | FilterUnionByProperty<MiGroupedNotification, 'type', 'renote'>;
 					// if the previous renote is not a group, make it into one
 					if (prevRenote.type !== 'renote:grouped') {
 						prevRenote = groupedNotifications[renoteIdx] = {
