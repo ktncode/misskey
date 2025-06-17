@@ -732,10 +732,10 @@ export class NoteEntityService implements OnModuleInit {
 			// renotedNotes
 			me ? this.queryService
 				.andIsRenote(this.notesRepository.createQueryBuilder('note'), 'note')
-				.andWhere({ renoteId: In(noteIds), userId: me.id })
-				.select('note.id', 'id')
-				.getRawMany<{ id: string }>()
-				.then(ns => new Set(ns.map(n => n.id))) : new Set<string>(),
+				.andWhere({ userId: me.id, renoteId: In(noteIds) })
+				.select('note.renoteId', 'renoteId')
+				.getRawMany<{ renoteId: string }>()
+				.then(ns => new Set(ns.map(n => n.renoteId))) : new Set<string>(),
 			// (not returned)
 			this.customEmojiService.prefetchEmojis(this.aggregateNoteEmojis(notes)),
 		]);
