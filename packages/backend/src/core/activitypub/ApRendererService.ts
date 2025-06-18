@@ -1080,6 +1080,27 @@ export class ApRendererService {
 	}
 
 	@bindThis
+	public async renderNoteOrRenoteActivity(note: MiNote, user: MiUser, hint?: { renote?: MiNote | null }) {
+		if (note.localOnly) return null;
+
+		if (isPureRenote(note)) {
+			const renote = hint?.renote ?? note.renote ?? await this.notesRepository.findOneByOrFail({ id: note.renoteId });
+			const apAnnounce = this.renderAnnounce(renote.uri ?? `${this.config.url}/notes/${renote.id}`, note);
+			return this.addContext(apAnnounce);
+		}
+
+		const apNote = await this.renderNote(note, user, false);
+
+		if (note.updatedAt != null) {
+			const apUpdate = this.renderUpdate(apNote, user);
+			return this.addContext(apUpdate);
+		} else {
+			const apCreate = this.renderCreate(apNote, note);
+			return this.addContext(apCreate);
+		}
+	}
+
+	@bindThis
 	private async getEmojis(names: string[]): Promise<MiEmoji[]> {
 		if (names.length === 0) return [];
 
