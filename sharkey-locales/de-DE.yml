@@ -493,6 +493,9 @@ roleAutomatic: "automatisch"
 translationTimeoutLabel: "Zeitüberschreitung bei der Übersetzung"
 translationTimeoutCaption: "Zeitüberschreitung in Millisekunden für Übersetzungs-API-Anfragen."
 
+staffNotes: "Mitarbeiternotizen"
+instanceIconAlt: "Icon von {name}"
+
 followingPub: "Gefolgte (Pub)"
 followersSub: "Folgende (Sub)"
 wellKnownResources: "Well-known Ressourcen"
@@ -503,3 +506,16 @@ mediaSilenced: "Medien stummgeschaltet"
 verified: "Verifiziert"
 notVerified: "Nicht verifiziert"
 hibernated: "Im Ruhezustand"
+
+keepCwDescription: "Verwende beim Antworten auf eine Notiz mit einer Inhaltswarnung automatisch die selbe Warnung."
+keepCwDisabled: "Deaktiviert (Warnungen nicht kopieren)"
+keepCwEnabled: "Aktiviert (Warnungen wörtlich kopieren)"
+keepCwPrependRe: "Aktiviert (Warnung kopieren und \"RE:\" voranstellen)"
+
+noteFooterLabel: "Notizensteuerung"
+
+rawUserDescription: "Gepackte Benutzerdaten in ihrer Rohform. Die meisten dieser Felder sind öffentlich und für alle Benutzer sichtbar."
+rawInfoDescription: "Erweiterte Benutzerdaten in ihrer Rohform. Diese Felder sind privat und können nur von Moderatoren eingesehen werden."
+rawApDescription: "ActivityPub-Benutzerdaten in ihrer Rohform. Diese Felder sind öffentlich und für andere Instanzen zugänglich."
+
+signupReason: "Registrierungsgrund"
