@@ -545,7 +545,7 @@ export class ApRendererService {
 			attributedTo,
 			summary: summary ?? undefined,
 			content: content ?? undefined,
-			updated: note.updatedAt?.toISOString(),
+			updated: note.updatedAt?.toISOString() ?? undefined,
 			_misskey_content: text,
 			source: {
 				content: text,
