@@ -22,13 +22,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { watch, ref, computed } from 'vue';
+import { watch, ref, computed, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import { computeMergedCw } from '@@/js/compute-merged-cw.js';
 import MkNoteHeader from '@/components/MkNoteHeader.vue';
 import MkSubNoteContent from '@/components/MkSubNoteContent.vue';
 import MkCwButton from '@/components/MkCwButton.vue';
 import { prefer } from '@/preferences.js';
+import { getPluginHandlers } from '@/plugin.js';
+import { deepClone } from '@/utility/clone.js';
 
 const props = defineProps<{
 	note: Misskey.entities.Note;
@@ -39,6 +41,28 @@ const props = defineProps<{
 let showContent = ref(prefer.s.uncollapseCW);
 
 const mergedCW = computed(() => computeMergedCw(props.note));
+
+const note = ref(deepClone(props.note));
+
+// plugin
+const noteViewInterruptors = getPluginHandlers('note_view_interruptor');
+if (noteViewInterruptors.length > 0) {
+	onMounted(async () => {
+		let result: Misskey.entities.Note | null = deepClone(note.value);
+		for (const interruptor of noteViewInterruptors) {
+			try {
+				result = await interruptor.handler(result!) as Misskey.entities.Note | null;
+				if (result === null) {
+					isDeleted.value = true;
+					return;
+				}
+			} catch (err) {
+				console.error(err);
+			}
+		}
+		note.value = result as Misskey.entities.Note;
+	});
+}
 
 watch(() => props.expandAllCws, (expandAllCws) => {
 	if (expandAllCws !== showContent.value) showContent.value = expandAllCws;
