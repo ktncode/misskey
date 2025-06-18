@@ -57,8 +57,7 @@ describe('AbuseReportNotificationService', () => {
 
 	// --------------------------------------------------------------------------------------
 
-	const metaInitial = {} as MiMeta;
-	const meta = { ...metaInitial };
+	const meta = {} as MiMeta;
 
 	function updateMeta(newMeta: Partial<MiMeta>): void {
 		for (const key in meta) {
