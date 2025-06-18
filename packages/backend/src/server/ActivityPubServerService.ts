@@ -571,7 +571,7 @@ export class ActivityPubServerService {
 
 		const pinnedNotes = (await Promise.all(pinings.map(pining =>
 			this.notesRepository.findOneByOrFail({ id: pining.noteId }))))
-			.filter(note => !note.localOnly && ['public', 'home'].includes(note.visibility));
+			.filter(note => !note.localOnly && ['public', 'home'].includes(note.visibility) && !isPureRenote(note));
 
 		const renderedNotes = await Promise.all(pinnedNotes.map(note => this.apRendererService.renderNote(note, user)));
 
