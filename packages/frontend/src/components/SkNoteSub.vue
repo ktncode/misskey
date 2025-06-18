@@ -92,7 +92,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref, shallowRef, useTemplateRef, watch } from 'vue';
+import { computed, inject, onMounted, ref, shallowRef, useTemplateRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { computeMergedCw } from '@@/js/compute-merged-cw.js';
 import * as config from '@@/js/config.js';
@@ -123,6 +123,8 @@ import { useNoteCapture } from '@/use/use-note-capture.js';
 import SkMutedNote from '@/components/SkMutedNote.vue';
 import { instance, policies } from '@/instance';
 import { getAppearNote } from '@/utility/get-appear-note';
+import { getPluginHandlers } from '@/plugin.js';
+import { deepClone } from '@/utility/clone.js';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -172,6 +174,28 @@ const pleaseLoginContext = computed<OpenOnRemoteOptions>(() => ({
 }));
 
 const currentClip = inject<Ref<Misskey.entities.Clip> | null>('currentClip', null);
+
+const note = ref(deepClone(props.note));
+
+// plugin
+const noteViewInterruptors = getPluginHandlers('note_view_interruptor');
+if (noteViewInterruptors.length > 0) {
+	onMounted(async () => {
+		let result: Misskey.entities.Note | null = deepClone(note.value);
+		for (const interruptor of noteViewInterruptors) {
+			try {
+				result = await interruptor.handler(result!) as Misskey.entities.Note | null;
+				if (result === null) {
+					isDeleted.value = true;
+					return;
+				}
+			} catch (err) {
+				console.error(err);
+			}
+		}
+		note.value = result as Misskey.entities.Note;
+	});
+}
 
 async function addReplyTo(replyNote: Misskey.entities.Note) {
 	replies.value.unshift(replyNote);
