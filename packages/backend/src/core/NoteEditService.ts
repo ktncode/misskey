@@ -675,7 +675,7 @@ export class NoteEditService implements OnApplicationShutdown {
 			//#region AP deliver
 			if (!data.localOnly && this.userEntityService.isLocalUser(user)) {
 				trackTask(async () => {
-					const noteActivity = await this.renderNoteOrRenoteActivity(data, note, user);
+					const noteActivity = await this.apRendererService.renderNoteOrRenoteActivity(note, user, { renote: data.renote });
 					const dm = this.apDeliverManagerService.createDeliverManager(user, noteActivity);
 
 					// メンションされたリモートユーザーに配送
@@ -768,17 +768,6 @@ export class NoteEditService implements OnApplicationShutdown {
 			note.cw != null ||
 			note.poll != null ||
 			(note.files != null && note.files.length > 0);
-	}
-
-	@bindThis
-	private async renderNoteOrRenoteActivity(data: Option, note: MiNote, user: MiUser) {
-		if (data.localOnly) return null;
-
-		const content = this.isRenote(data) && !this.isQuote(data)
-			? this.apRendererService.renderAnnounce(data.renote.uri ? data.renote.uri : `${this.config.url}/notes/${data.renote.id}`, note)
-			: this.apRendererService.renderUpdate(await this.apRendererService.renderUpNote(note, user, false), user);
-
-		return this.apRendererService.addContext(content);
 	}
 
 	@bindThis
