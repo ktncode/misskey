@@ -12493,6 +12493,14 @@ export interface Locale extends ILocale {
          */
         "centerDescription": string;
         /**
+         * Unix Time
+         */
+        "unixtime": string;
+        /**
+         * Displays a timestamp in the viewer's current timezone.
+         */
+        "unixtimeDescription": string;
+        /**
          * Code (Inline)
          */
         "inlineCode": string;
@@ -13070,6 +13078,26 @@ export interface Locale extends ILocale {
      */
     "popularUsersLocal": ParameterizedString<"name">;
     /**
+     * Polls trending on {name}
+     */
+    "pollsOnLocal": ParameterizedString<"name">;
+    /**
+     * Polls trending on the global network
+     */
+    "pollsOnRemote": string;
+    /**
+     * Polls that have ended recently
+     */
+    "pollsExpired": string;
+    /**
+     * Trending polls are disabled on this instance.
+     */
+    "trendingPollsDisabled": string;
+    /**
+     * Please log in to view trending polls.
+     */
+    "trendingPollsDisabledLogIn": string;
+    /**
      * Silenced
      */
     "silenced": string;
@@ -13129,6 +13157,110 @@ export interface Locale extends ILocale {
      * Timeout in milliseconds for translation API requests.
      */
     "translationTimeoutCaption": string;
+    /**
+     * Staff notes
+     */
+    "staffNotes": string;
+    /**
+     * Icon of {name}
+     */
+    "instanceIconAlt": ParameterizedString<"name">;
+    /**
+     * Attribution Domains
+     */
+    "attributionDomains": string;
+    /**
+     * A list of domains whose content can be attributed to you on link previews, separated by new-line. Any subdomain will also be valid. The following needs to be on the webpage:
+     */
+    "attributionDomainsDescription": string;
+    /**
+     * Written by {user}
+     */
+    "writtenBy": ParameterizedString<"user">;
+    /**
+     * Following (Pub)
+     */
+    "followingPub": string;
+    /**
+     * Followers (Sub)
+     */
+    "followersSub": string;
+    /**
+     * Well-known resources
+     */
+    "wellKnownResources": string;
+    /**
+     * Last posted: {at}
+     */
+    "lastPosted": ParameterizedString<"at">;
+    /**
+     * NSFW
+     */
+    "nsfw": string;
+    /**
+     * Raw
+     */
+    "raw": string;
+    /**
+     * CW
+     */
+    "cw": string;
+    /**
+     * Media Silenced
+     */
+    "mediaSilenced": string;
+    /**
+     * Bubble
+     */
+    "bubble": string;
+    /**
+     * Verified
+     */
+    "verified": string;
+    /**
+     * Not Verified
+     */
+    "notVerified": string;
+    /**
+     * Hibernated
+     */
+    "hibernated": string;
+    /**
+     * When replying to a post with a Content Warning, automatically use the same CW for the reply.
+     */
+    "keepCwDescription": string;
+    /**
+     * Disabled (do not copy CWs)
+     */
+    "keepCwDisabled": string;
+    /**
+     * Enabled (copy CWs verbatim)
+     */
+    "keepCwEnabled": string;
+    /**
+     * Enabled (copy CW and prepend "RE:")
+     */
+    "keepCwPrependRe": string;
+    /**
+     * Note controls
+     */
+    "noteFooterLabel": string;
+    /**
+     * Packed user data in its raw form. Most of these fields are public and visible to all users.
+     */
+    "rawUserDescription": string;
+    /**
+     * Extended user data in its raw form. These fields are private and can only be accessed by moderators.
+     */
+    "rawInfoDescription": string;
+    /**
+     * ActivityPub user data in its raw form. These fields are public and accessible to other instances.
+     */
+    "rawApDescription": string;
+    /**
+     * Signup Reason
+     */
+    "signupReason": string;
 }
 declare const locales: {
     [lang: string]: Locale;
