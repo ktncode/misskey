@@ -4,7 +4,7 @@
  */
 
 import { setImmediate } from 'node:timers/promises';
-import * as mfm from '@transfem-org/sfm-js';
+import * as mfm from 'mfm-js';
 import { In, DataSource, IsNull, LessThan } from 'typeorm';
 import * as Redis from 'ioredis';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
@@ -296,7 +296,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 				case 'followers':
 					// 他人のfollowers noteはreject
 					if (data.renote.userId !== user.id) {
-						throw new Error('Renote target is not public or home');
+						throw new IdentifiableError('b6352a84-e5cd-4b05-a26c-63437a6b98ba', 'Renote target is not public or home');
 					}
 
 					// Renote対象がfollowersならfollowersにする
@@ -304,7 +304,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 					break;
 				case 'specified':
 					// specified / direct noteはreject
-					throw new Error('Renote target is not public or home');
+					throw new IdentifiableError('b6352a84-e5cd-4b05-a26c-63437a6b98ba', 'Renote target is not public or home');
 			}
 		}
 
@@ -317,7 +317,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 				if (data.renote.userId !== user.id) {
 					const blocked = await this.userBlockingService.checkBlocked(data.renote.userId, user.id);
 					if (blocked) {
-						throw new Error('blocked');
+						throw new IdentifiableError('b6352a84-e5cd-4b05-a26c-63437a6b98ba', 'Renote target is blocked');
 					}
 				}
 			}
@@ -489,10 +489,10 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 		// should really not happen, but better safe than sorry
 		if (data.reply?.id === insert.id) {
-			throw new Error('A note can\'t reply to itself');
+			throw new IdentifiableError('ea93b7c2-3d6c-4e10-946b-00d50b1a75cb', 'A note can\'t reply to itself');
 		}
 		if (data.renote?.id === insert.id) {
-			throw new Error('A note can\'t renote itself');
+			throw new IdentifiableError('ea93b7c2-3d6c-4e10-946b-00d50b1a75cb', 'A note can\'t renote itself');
 		}
 
 		if (data.uri != null) insert.uri = data.uri;
@@ -548,8 +548,6 @@ export class NoteCreateService implements OnApplicationShutdown {
 				err.name = 'duplicated';
 				throw err;
 			}
-
-			console.error(e);
 
 			throw e;
 		}
@@ -608,11 +606,11 @@ export class NoteCreateService implements OnApplicationShutdown {
 		}
 
 		if (data.reply == null) {
-			// TODO: キャッシュ
-			this.followingsRepository.findBy({
-				followeeId: user.id,
-				notify: 'normal',
-			}).then(async followings => {
+			this.cacheService.userFollowersCache.fetch(user.id).then(async followingsMap => {
+				const followings = Array
+					.from(followingsMap.values())
+					.filter(f => f.notify === 'normal');
+
 				if (note.visibility !== 'specified') {
 					const isPureRenote = this.isRenote(data) && !this.isQuote(data) ? true : false;
 					for (const following of followings) {
@@ -733,7 +731,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			//#region AP deliver
 			if (!data.localOnly && this.userEntityService.isLocalUser(user)) {
 				trackTask(async () => {
-					const noteActivity = await this.renderNoteOrRenoteActivity(data, note, user);
+					const noteActivity = await this.apRendererService.renderNoteOrRenoteActivity(note, user, { renote: data.renote });
 					const dm = this.apDeliverManagerService.createDeliverManager(user, noteActivity);
 
 					// メンションされたリモートユーザーに配送
@@ -877,17 +875,6 @@ export class NoteCreateService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	private async renderNoteOrRenoteActivity(data: Option, note: MiNote, user: MiUser) {
-		if (data.localOnly) return null;
-
-		const content = this.isRenote(data) && !this.isQuote(data)
-			? this.apRendererService.renderAnnounce(data.renote.uri ? data.renote.uri : `${this.config.url}/notes/${data.renote.id}`, note)
-			: this.apRendererService.renderCreate(await this.apRendererService.renderNote(note, user, false), note);
-
-		return this.apRendererService.addContext(content);
-	}
-
-	@bindThis
 	private index(note: MiNote) {
 		if (note.text == null && note.cw == null) return;
 
@@ -950,14 +937,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			// TODO: キャッシュ？
 			// eslint-disable-next-line prefer-const
 			let [followings, userListMemberships] = await Promise.all([
-				this.followingsRepository.find({
-					where: {
-						followeeId: user.id,
-						followerHost: IsNull(),
-						isFollowerHibernated: false,
-					},
-					select: ['followerId', 'withReplies'],
-				}),
+				this.cacheService.getNonHibernatedFollowers(user.id),
 				this.userListMembershipsRepository.find({
 					where: {
 						userId: user.id,
@@ -973,6 +953,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 			// TODO: あまりにも数が多いと redisPipeline.exec に失敗する(理由は不明)ため、3万件程度を目安に分割して実行するようにする
 			for (const following of followings) {
+				if (following.followerHost !== null) continue;
 				// 基本的にvisibleUserIdsには自身のidが含まれている前提であること
 				if (note.visibility === 'specified' && !note.visibleUserIds.some(v => v === following.followerId)) continue;
 
@@ -1074,17 +1055,19 @@ export class NoteCreateService implements OnApplicationShutdown {
 		});
 
 		if (hibernatedUsers.length > 0) {
-			this.usersRepository.update({
-				id: In(hibernatedUsers.map(x => x.id)),
-			}, {
-				isHibernated: true,
-			});
-
-			this.followingsRepository.update({
-				followerId: In(hibernatedUsers.map(x => x.id)),
-			}, {
-				isFollowerHibernated: true,
-			});
+			await Promise.all([
+				this.usersRepository.update({
+					id: In(hibernatedUsers.map(x => x.id)),
+				}, {
+					isHibernated: true,
+				}),
+				this.followingsRepository.update({
+					followerId: In(hibernatedUsers.map(x => x.id)),
+				}, {
+					isFollowerHibernated: true,
+				}),
+				this.cacheService.hibernatedUserCache.setMany(hibernatedUsers.map(x => [x.id, true])),
+			]);
 		}
 	}
 
