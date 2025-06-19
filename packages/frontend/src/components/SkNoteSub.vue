@@ -144,7 +144,9 @@ const props = withDefaults(defineProps<{
 	onDeleteCallback: undefined,
 });
 
-const appearNote = computed(() => getAppearNote(props.note));
+const note = ref(deepClone(props.note));
+
+const appearNote = computed(() => getAppearNote(note.value));
 
 const canRenote = computed(() => ['public', 'home'].includes(appearNote.value.visibility) || appearNote.value.userId === $i?.id);
 const hideLine = computed(() => props.detail);
@@ -175,8 +177,6 @@ const pleaseLoginContext = computed<OpenOnRemoteOptions>(() => ({
 
 const currentClip = inject<Ref<Misskey.entities.Clip> | null>('currentClip', null);
 
-const note = ref(deepClone(props.note));
-
 setupNoteViewInterruptors(note, isDeleted);
 
 async function addReplyTo(replyNote: Misskey.entities.Note) {
@@ -185,7 +185,7 @@ async function addReplyTo(replyNote: Misskey.entities.Note) {
 }
 
 async function removeReply(id: Misskey.entities.Note['id']) {
-	const replyIdx = replies.value.findIndex(note => note.id === id);
+	const replyIdx = replies.value.findIndex(reply => reply.id === id);
 	if (replyIdx >= 0) {
 		replies.value.splice(replyIdx, 1);
 		appearNote.value.repliesCount -= 1;
@@ -281,11 +281,11 @@ function like(): void {
 	}
 }
 
-function undoReact(note): void {
-	const oldReaction = note.myReaction;
+function undoReact(targetNote: Misskey.entities.Note): void {
+	const oldReaction = targetNote.myReaction;
 	if (!oldReaction) return;
 	misskeyApi('notes/reactions/delete', {
-		noteId: note.id,
+		noteId: targetNote.id,
 	});
 }
 

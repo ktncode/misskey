@@ -40,9 +40,9 @@ const props = defineProps<{
 
 let showContent = ref(prefer.s.uncollapseCW);
 
-const mergedCW = computed(() => computeMergedCw(props.note));
-
 const note = ref(deepClone(props.note));
+
+const mergedCW = computed(() => computeMergedCw(note.value));
 
 setupNoteViewInterruptors(note, null);
 
