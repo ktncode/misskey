@@ -20,7 +20,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<span :class="$style.patternShadowTop"></span>
 		<span :class="$style.patternShadowBottom"></span>
 		<div ref="sliceDisplay" :class="$style.slice_display">
-			<canvas v-for="slice in dummyArray" :key="slice.id" ref="canvasRefs" :class="$style.patternSlice"></canvas>
+			<canvas ref="sliceCanvas1" :class="$style.patternSlice"></canvas>
+			<canvas ref="sliceCanvas2" :class="$style.patternSlice"></canvas>
+			<canvas ref="sliceCanvas3" :class="$style.patternSlice"></canvas>
 		</div>
 	</div>
 	<div :class="$style.controls">
@@ -43,17 +45,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+const debug = console.debug;
+const debugw = console.warn;
+const debug_playPause = playPause;
+
 import { ref, nextTick, watch, onDeactivated, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
+import type { Ref } from 'vue';
 import { i18n } from '@/i18n.js';
 import { ChiptuneJsPlayer, ChiptuneJsConfig } from '@/utility/chiptune2.js';
 import { isTouchUsing } from '@/utility/touch.js';
 import { prefer } from '@/preferences.js';
 
 const colours = {
-	background: '#000000',
+	background: '#ffffff',
 	foreground: {
-		default: '#ffffff',
+		default: '#000000',
 		quarter: '#ffff00',
 		instr: '#80e0ff',
 		volume: '#80ff80',
@@ -72,25 +79,15 @@ const props = defineProps<{
 	module: Misskey.entities.DriveFile
 }>();
 
-interface DummyCanvas {
-	id: number;
-}
-
-interface CanvasData {
-	offscreen: boolean;
-	active: boolean;
-	pattern: number;
-	row: number;
-	position: number;
-	offest: number;
-	slicePos: number;
-}
-
-interface CanvasSlice {
-	data: CanvasData;
-	did: DummyCanvas;
-	ctx: CanvasRenderingContext2D;
-	ref: HTMLCanvasElement;
+interface CanvasDisplay {
+	ctx: CanvasRenderingContext2D,
+	html: HTMLCanvasElement,
+	drawn: { top: number, bottom: number, left: number, right: number },
+	range: { top: number, bottom: number },
+	vPos: number,
+	transform: { x: number, y: number },
+	drawStart: number,
+	channels: number,
 }
 
 const isSensitive = props.module.isSensitive;
@@ -101,6 +98,11 @@ let hide = ref((prefer.s.nsfw === 'force') ? true : isSensitive && (prefer.s.nsf
 let patternHide = ref(false);
 let playing = ref(false);
 let sliceDisplay = ref<HTMLDivElement>();
+let sliceCanvas1 = ref();
+let sliceCanvas2 = ref();
+let sliceCanvas3 = ref();
+let sliceWidth = 0;
+let sliceHeight = 0;
 let progress = ref<HTMLProgressElement>();
 let position = ref(0);
 let patternScrollSlider = ref<HTMLProgressElement>();
@@ -112,6 +114,7 @@ const maxRowNumbers = 0xFF;
 const rowBuffer = 26;
 // It would be a great option for users to set themselves.
 const maxChannelLimit = 0xFF;
+const halfbuf = Math.floor(rowBuffer / 2);
 let buffer = null;
 let isSeeking = false;
 let firstFrame = true;
@@ -119,15 +122,39 @@ let lastPattern = -1;
 let lastDrawnRow = -1;
 let numberRowCanvas = new OffscreenCanvas(2 * CHAR_WIDTH + 1, maxRowNumbers * CHAR_HEIGHT + 1);
 let alreadyHiddenOnce = false;
-let dummyArray: DummyCanvas[] = [];
-let patternTime = { 'current': 0, 'max': 0, 'initial': 0 };
-let canvasSlice: CanvasSlice[] = [];
-let canvasRefs = ref([]);
-let sliceWidth = 0;
+let slices: CanvasDisplay[] = [];
+
+const peft = {
+	startTime: 0,
+	patternTime: { current: 0, max: 0, initial: 0 },
+	start: function() {
+		this.startTime = performance.now();
+	},
+	end: function() {
+		this.patternTime.current = performance.now() - this.startTime;
+		if (this.patternTime.initial !== 0 && this.patternTime.current > this.patternTime.max) this.patternTime.max = this.patternTime.current;
+		else if (this.patternTime.initial === 0) this.patternTime.initial = this.patternTime.current;
+	},
+	asses: function() {
+		if (this.patternTime.initial !== 0 && !alreadyHiddenOnce) {
+			const trackerTime = player.value.currentPlayingNode.getProcessTime();
+
+			if (this.patternTime.initial + trackerTime.max > MAX_TIME_SPENT && trackerTime.max + this.patternTime.max > MAX_TIME_PER_ROW) {
+				alreadyHiddenOnce = true;
+				togglePattern();
+				return;
+			}
+		}
+
+		this.patternTime = { current: 0, max: 0, initial: 0 };
+	},
+};
 
 function bakeNumberRow() {
 	let ctx = numberRowCanvas.getContext('2d', { alpha: false }) as OffscreenCanvasRenderingContext2D;
 	ctx.font = '10px monospace';
+	ctx.fillStyle = colours.background;
+	ctx.fillRect( 0, 0, numberRowCanvas.width, numberRowCanvas.height );
 
 	for (let i = 0; i < maxRowNumbers; i++) {
 		let rowText = i.toString(16);
@@ -140,48 +167,43 @@ function bakeNumberRow() {
 	}
 }
 
-function populateCanvasSlices () {
-	if (dummyArray.length === 0) for (let i = 0; i < rowBuffer; i++) dummyArray.push({ id: i });
+function setupSlice(r: Ref, channels: number) {
+	let chtml = r.value as HTMLCanvasElement;
+	chtml.width = sliceWidth;
+	chtml.height = sliceHeight;
+	let slice: CanvasDisplay = {
+		ctx: chtml.getContext('2d', { alpha: false, desynchronized: false }) as CanvasRenderingContext2D,
+		html: chtml,
+		drawn: { top: 0, bottom: 0, left: 0, right: 0 },
+		range: { top: -0xFFFFFFFF, bottom: -0xFFFFFFFF },
+		vPos: -0xFFFFFFFF,
+		channels,
+		transform: { x: 0, y: 0 },
+		drawStart: 0,
+	};
+	slice.ctx.font = '10px monospace';
+	slice.ctx.imageSmoothingEnabled = false;
+	slices.push(slice);
+}
 
-	let nbChannels = 0;
-	if (player.value.currentPlayingNode) {
-		nbChannels = player.value.currentPlayingNode.nbChannels;
-		nbChannels = nbChannels > maxChannelLimit ? maxChannelLimit : nbChannels;
-	}
-	sliceWidth = 12 + 84 * nbChannels + 2;
-
-	// I don't want to know why
-	// I don't have to know why
-	// But vue forced my hand.
-	// For some forsaken reason I need two nested nextTick calls in order for everything to show up properly.
-	nextTick(() => nextTick(() => {
-		canvasRefs.value.forEach((canvas, i) => {
-			let c = canvas as HTMLCanvasElement;
-			c.height = CHAR_HEIGHT;
-			c.width = sliceWidth;
-			let ctx = c.getContext('2d', { alpha: false, desynchronized: false }) as CanvasRenderingContext2D;
-			ctx.font = '10px monospace';
-			ctx.imageSmoothingEnabled = false;
-
-			let cd: CanvasData = {
-				offscreen: false,
-				active: false,
-				pattern: -1,
-				row: -1,
-				position: i,
-				offest: 0,
-				slicePos: i,
-			};
-
-			canvasSlice[i] = {
-				data: cd,
-				did: dummyArray[i],
-				ctx: ctx,
-				ref: c,
-			};
+function setupCanvas() {
+	if (sliceCanvas1.value && sliceCanvas2.value && sliceCanvas3.value) {
+		let nbChannels = 0;
+		if (player.value.currentPlayingNode) {
+			nbChannels = player.value.currentPlayingNode.nbChannels;
+			nbChannels = nbChannels > maxChannelLimit ? maxChannelLimit : nbChannels;
+		}
+		sliceWidth = 12 + 84 * nbChannels + 2;
+		sliceHeight = halfbuf * CHAR_HEIGHT;
+		setupSlice(sliceCanvas1, nbChannels);
+		setupSlice(sliceCanvas2, nbChannels);
+		setupSlice(sliceCanvas3, nbChannels);
+	} else {
+		nextTick(() => {
+			debugw('Jumped to the next tick, is Vue ok?');
+			setupCanvas();
 		});
-		stop();
-	}));
+	}
 }
 
 onMounted(() => {
@@ -191,7 +213,8 @@ onMounted(() => {
 			player.value.play(buffer);
 			progress.value!.max = player.value.duration();
 			bakeNumberRow();
-			populateCanvasSlices();
+			//populateCanvasSlices();
+			setupCanvas();
 			display(true);
 		} catch (err) {
 			console.warn(err);
@@ -263,7 +286,6 @@ function toggleVisible() {
 		lastDrawnRow = -1;
 		nextTick(() => {
 			playPause();
-			populateCanvasSlices();
 		});
 	}
 	nextTick(() => { stop(hide.value); });
@@ -284,99 +306,113 @@ function togglePattern() {
 }
 
 function drawSlices(skipOptimizationChecks = false) {
-	const pattern = player.value.getPattern();
-	const row = player.value.getRow();
-	const halfbuf = Math.floor(rowBuffer / 2);
-
 	if (rowBuffer <= 0) {
-		lastDrawnRow = row;
-		lastPattern = pattern;
+		lastDrawnRow = player.value.getPattern();
+		lastPattern = player.value.getRow();
 		return;
 	}
 
-	let nbChannels = 0;
-	if (player.value.currentPlayingNode) nbChannels = player.value.currentPlayingNode.nbChannels;
+	const pattern = player.value.getPattern();
+	const row = player.value.getRow();
+	const lower = row + halfbuf;
+	const upper = row - halfbuf;
+	const newDisplayTanslalation = -row * CHAR_HEIGHT;
+	let curRow = row - halfbuf;
 
 	if (pattern === lastPattern && !skipOptimizationChecks && row !== lastDrawnRow) {
-		let rowDif = row - lastDrawnRow;
-
-		const startTime = performance.now();
+		const rowDif = row - lastDrawnRow;
 		const isRowDirPos = rowDif > 0;
 		const rowDir = !isRowDirPos as unknown as number;
+		const rowDirInv = 1 - 1 * rowDir;
 		const norm = 1 - 2 * rowDir;
-		const offByOneFix = -1 * rowDir;
+		const oneAndHalfBuf = halfbuf * 3;
 
-		interface InteralToDraw {
-			p: number,
-			i: number
-		};
-		let toDraw: InteralToDraw[] = [];
-		let lowestRow = 0xFFFFFFFF;
-		let drawnSlices = 0;
-		let maxToDraw = 0;
+		debug('rowDif', rowDif, 'rowDir', rowDir, 'norm', norm, 'isRowDirPos', isRowDirPos);
 
-		for (let i = 0; i < canvasSlice.length; i++) {
-			canvasSlice[i].data.slicePos = canvasSlice[i].data.slicePos - rowDif;
-			if (canvasSlice[i].data.slicePos > -1 && canvasSlice[i].data.slicePos < rowBuffer) continue;
+		slices.forEach((sli) => {
+			sli.vPos -= rowDif;
+			if (sli.vPos <= 0 || sli.vPos >= oneAndHalfBuf) {
+				sli.drawStart += oneAndHalfBuf * norm;
+				sli.vPos = oneAndHalfBuf * rowDirInv;
+				sli.transform.y += (oneAndHalfBuf * CHAR_HEIGHT) * norm;
+				sli.html.style.transform = 'translateY(' + sli.transform.y + 'px)';
+				sli.drawn = {
+					top: 0xFFFFFFFF,
+					bottom: -0xFFFFFFFF,
+					left: -0xFFFFFFFF,
+					right: -0xFFFFFFFF,
+				};
 
-			const abs_pos = Math.abs(canvasSlice[i].data.slicePos);
-			if (lowestRow > abs_pos) lowestRow = abs_pos;
-			toDraw[abs_pos] = { p: canvasSlice[i].data.slicePos, i: i };
-			maxToDraw++;
-		}
+				sli.ctx.fillStyle = colours.background;
+				sli.ctx.fillRect(0, 0, sliceWidth, sliceHeight);
+				sli.ctx.drawImage(numberRowCanvas, 0, -CHAR_HEIGHT * sli.drawStart);
 
-		for (let i = toDraw.length - 1; i >= lowestRow; i += -1) {
-			if (!toDraw[i]) continue;
-
-			canvasSlice[toDraw[i].i].data.slicePos = isRowDirPos ? (rowBuffer - rowDif) + drawnSlices : maxToDraw + drawnSlices - 1;
-			canvasSlice[toDraw[i].i].data.position = canvasSlice[toDraw[i].i].data.position + rowBuffer * norm;
-
-			const curRow = offByOneFix + (row + (drawnSlices - rowDif)) + halfbuf * norm;
-
-			canvasSlice[toDraw[i].i].ctx.clearRect(0, 0, canvasSlice[toDraw[i].i].ref.width, canvasSlice[toDraw[i].i].ref.height);
-			canvasSlice[toDraw[i].i].ref.style.transform = 'translateY(' + (canvasSlice[toDraw[i].i].data.offest + (canvasSlice[toDraw[i].i].data.position) * CHAR_HEIGHT + CHAR_HEIGHT) + 'px)';
-			drawRow(canvasSlice[toDraw[i].i].ctx, curRow, nbChannels, pattern);
-			drawnSlices += norm;
-		}
-
-		patternTime.current = performance.now() - startTime;
-		if (patternTime.initial !== 0 && patternTime.current > patternTime.max) patternTime.max = patternTime.current;
-		else if (patternTime.initial === 0) patternTime.initial = patternTime.current;
-	} else {
-		if (patternTime.initial !== 0 && !alreadyHiddenOnce) {
-			const trackerTime = player.value.currentPlayingNode.getProcessTime();
-
-			if (patternTime.initial + trackerTime.max > MAX_TIME_SPENT && trackerTime.max + patternTime.max > MAX_TIME_PER_ROW) {
-				alreadyHiddenOnce = true;
-				togglePattern();
-				return;
+				debug(sli);
 			}
-		}
+			let logqueue = [];
+			for (let i = 0; i < halfbuf; i++) {
+				const newRow = sli.drawStart + i;
 
-		patternTime = { 'current': 0, 'max': 0, 'initial': 0 };
+				let temp2 = function() {
+					return {
+						//'newRow > lower': newRow > lower,
+						//'newRow < upper': newRow < upper,
+						'sli.drawn.top < newRow': sli.drawn.top <= newRow,
+						'sli.drawn.bottom <= newRow': sli.drawn.bottom >= newRow,
+					};
+				};
+				let temp1 = function() {
+					let a = temp2();
+					//return a['newRow < upper'] || a['newRow > lower'] || a['sli.drawn.bottom <= newRow'] || a['sli.drawn.top < newRow'];
+					return a['sli.drawn.bottom <= newRow'] && a['sli.drawn.top < newRow'];
+				};
 
-		for (let i = 0; i < canvasSlice.length; i++) {
-			let curRow = row - halfbuf + i;
-			// just paint which slice, row and pushed row it is.
-			canvasSlice[i].ctx.clearRect(0, 0, canvasSlice[i].ref.width, canvasSlice[i].ref.height);
-			drawRow(canvasSlice[i].ctx, curRow, nbChannels, pattern);
-			canvasSlice[i].data.slicePos = i;
-			canvasSlice[i].data.position = 0;
-			canvasSlice[i].data.offest = row * CHAR_HEIGHT;
-			canvasSlice[i].data.row = row - halfbuf + i;
-			canvasSlice[i].data.pattern = pattern;
-			canvasSlice[i].ref.style.transform = 'translateY(' + (canvasSlice[i].data.offest) + 'px)';
-			canvasSlice[i].data.offest = canvasSlice[i].data.offest - CHAR_HEIGHT;
-		}
+				logqueue.push({ temp1: temp1(), temp2: temp2(), 'newRow': newRow, 'lower': lower, 'upper': upper, 'sli.drawn.top': sli.drawn.top, 'sli.drawn.bottom': sli.drawn.bottom });
+
+				if (temp1()) continue;
+				if (sli.drawn.top > newRow) sli.drawn.top = newRow;
+				if (sli.drawn.bottom <= newRow) sli.drawn.bottom = newRow;
+
+				drawRow(sli, newRow, pattern, (2 * CHAR_WIDTH), i * CHAR_HEIGHT + ROW_OFFSET_Y);
+			}
+			console.table(logqueue);
+		});
+		//debug_playPause();
+	} else {
+		slices.forEach((sli, i) => {
+			sli.drawStart = curRow;
+			sli.vPos = halfbuf * (i + 1);
+			sli.transform.y = -newDisplayTanslalation;
+			sli.html.style.transform = 'translateY(' + sli.transform.y + 'px)';
+			sli.drawn = {
+				top: 0xFFFFFFFF,
+				bottom: -0xFFFFFFFF,
+				left: -0xFFFFFFFF,
+				right: -0xFFFFFFFF,
+			};
+
+			sli.ctx.fillStyle = colours.background;
+			sli.ctx.fillRect(0, 0, sliceWidth, sliceHeight);
+			sli.ctx.drawImage(numberRowCanvas, 0, -CHAR_HEIGHT * curRow);
+
+			for (let itter = 0; itter < halfbuf; itter++) {
+				if (sli.drawn.top > curRow) sli.drawn.top = curRow;
+				if (sli.drawn.bottom <= curRow) sli.drawn.bottom = curRow;
+				drawRow(sli, curRow, pattern, (2 * CHAR_WIDTH), itter * CHAR_HEIGHT + ROW_OFFSET_Y);
+				curRow++;
+				if (curRow > lower) break;
+			}
+			debug(sli);
+		});
 	}
 
-	if (sliceDisplay.value) sliceDisplay.value.style.transform = 'translateY(' + ( -(row * CHAR_HEIGHT ) ) + 'px)';
+	if (sliceDisplay.value) sliceDisplay.value.style.transform = 'translateY(' + newDisplayTanslalation + 'px)';
 
 	lastDrawnRow = row;
 	lastPattern = pattern;
 }
 
-function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, pattern: number, drawX = (2 * CHAR_WIDTH), drawY = ROW_OFFSET_Y) {
+function drawRow(slice: CanvasDisplay, row: number, pattern: number, drawX = (2 * CHAR_WIDTH), drawY = ROW_OFFSET_Y) {
 	if (!player.value.currentPlayingNode) return false;
 	if (row < 0 || row > player.value.getPatternNumRows(pattern) - 1) return false;
 	const spacer = 11;
@@ -387,8 +423,7 @@ function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, p
 	let volume = '';
 	let fx = '';
 	let op = '';
-	for (let channel = 0; channel < channels; channel++) {
-		if (channel > maxChannelLimit) break;
+	for (let channel = 0; channel < slice.channels; channel++) {
 		const part = player.value.getPatternRowChannel(pattern, row, channel);
 
 		seperators += '|' + space.repeat( spacer + 2 );
@@ -401,25 +436,23 @@ function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, p
 
 	//console.debug( 'seperators: ' + seperators + '\nnote: ' + note + '\ninstr: ' + instr + '\nvolume: ' + volume + '\nfx: ' + fx + '\nop: ' + op);
 
-	ctx.drawImage( numberRowCanvas, 0, -(CHAR_HEIGHT * row) );
+	slice.ctx.fillStyle = colours.foreground.default;
+	slice.ctx.fillText(seperators, drawX, drawY);
 
-	ctx.fillStyle = colours.foreground.default;
-	ctx.fillText(seperators, drawX, drawY);
+	slice.ctx.fillStyle = colours.foreground.default;
+	slice.ctx.fillText(note, drawX + CHAR_WIDTH, drawY);
 
-	ctx.fillStyle = colours.foreground.default;
-	ctx.fillText(note, drawX + CHAR_WIDTH, drawY);
+	slice.ctx.fillStyle = colours.foreground.instr;
+	slice.ctx.fillText(instr, drawX + CHAR_WIDTH * 5, drawY);
 
-	ctx.fillStyle = colours.foreground.instr;
-	ctx.fillText(instr, drawX + CHAR_WIDTH * 5, drawY);
+	slice.ctx.fillStyle = colours.foreground.volume;
+	slice.ctx.fillText(volume, drawX + CHAR_WIDTH * 7, drawY);
 
-	ctx.fillStyle = colours.foreground.volume;
-	ctx.fillText(volume, drawX + CHAR_WIDTH * 7, drawY);
+	slice.ctx.fillStyle = colours.foreground.fx;
+	slice.ctx.fillText(fx, drawX + CHAR_WIDTH * 11, drawY);
 
-	ctx.fillStyle = colours.foreground.fx;
-	ctx.fillText(fx, drawX + CHAR_WIDTH * 11, drawY);
-
-	ctx.fillStyle = colours.foreground.operant;
-	ctx.fillText(op, drawX + CHAR_WIDTH * 12, drawY);
+	slice.ctx.fillStyle = colours.foreground.operant;
+	slice.ctx.fillText(op, drawX + CHAR_WIDTH * 12, drawY);
 
 	return true;
 }
@@ -434,7 +467,7 @@ function display(skipOptimizationChecks = false) {
 
 	if (firstFrame) {
 		// Changing it to false should enable pattern display by default.
-		patternHide.value = true;
+		patternHide.value = false;
 		handleScrollBarEnable();
 		firstFrame = false;
 	}
@@ -561,6 +594,7 @@ onDeactivated(() => {
 			position: absolute;
 			pointer-events: none;
 			z-index: 2;
+			display: none;
 		}
 
 		.patternShadowBottom {
@@ -572,6 +606,7 @@ onDeactivated(() => {
 			position: absolute;
 			pointer-events: none;
 			z-index: 2;
+			display: none;
 		}
 
 		.pattern_hide {
