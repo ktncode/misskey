@@ -530,6 +530,7 @@ translationFailed: "Failed to translate note. Please try again later or contact 
 
 _processErrors:
   quoteUnavailable: "Unable to process quote. This post may be missing context."
+  attachmentFailed: "One or more media attachments are unavailable and cannot be shown."
 
 authorizedFetchSection: "Authorized Fetch"
 authorizedFetchLabel: "Allow unsigned ActivityPub requests:"
@@ -628,3 +629,5 @@ noteFooterLabel: "Note controls"
 rawUserDescription: "Packed user data in its raw form. Most of these fields are public and visible to all users."
 rawInfoDescription: "Extended user data in its raw form. These fields are private and can only be accessed by moderators."
 rawApDescription: "ActivityPub user data in its raw form. These fields are public and accessible to other instances."
+
+signupReason: "Signup Reason"

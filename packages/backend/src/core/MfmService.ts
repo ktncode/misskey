@@ -75,9 +75,8 @@ export class MfmService {
 			switch (node.tagName) {
 				case 'br': {
 					text += '\n';
-					break;
+					return;
 				}
-
 				case 'a': {
 					const txt = getText(node);
 					const rel = node.attribs.rel;
@@ -123,9 +122,16 @@ export class MfmService {
 
 						text += generateLink();
 					}
-					break;
+					return;
 				}
+			}
 
+			// Don't produce invalid empty MFM
+			if (node.childNodes.length < 1) {
+				return;
+			}
+
+			switch (node.tagName) {
 				case 'h1': {
 					text += '**【';
 					appendChildren(node.childNodes);
@@ -325,6 +331,38 @@ export class MfmService {
 							nonRtNodes.push(child);
 						}
 						appendChildren(nonRtNodes);
+					}
+					break;
+				}
+
+				// Replace iframe with link so we can generate previews.
+				// We shouldn't normally see this, but federated blogging platforms (WordPress, MicroBlog.Pub) can send it.
+				case 'iframe': {
+					const txt: string | undefined = node.attribs.title || node.attribs.alt;
+					const href: string | undefined = node.attribs.src;
+					if (href) {
+						if (href.match(/[\s>]/)) {
+							if (txt) {
+								// href is invalid + has a label => render a pseudo-link
+								text += `${text} (${href})`;
+							} else {
+								// href is invalid + no label => render plain text
+								text += href;
+							}
+						} else {
+							if (txt) {
+								// href is valid + has a label => render a link
+								const label = txt
+									.replaceAll('[', '(')
+									.replaceAll(']', ')')
+									.replaceAll(/\r?\n/, ' ')
+									.replaceAll('`', '\'');
+								text += `[${label}](<${href}>)`;
+							} else {
+								// href is valid + no label => render a plain URL
+								text += `<${href}>`;
+							}
+						}
 					}
 					break;
 				}

@@ -4251,6 +4251,10 @@ export type components = {
       /** Format: url */
       avatarUrl: string | null;
       avatarBlurhash: string | null;
+      /** @example Hi masters, I am Ai! */
+      description: string | null;
+      /** Format: date-time */
+      createdAt: string;
       avatarDecorations: {
           /** Format: id */
           id: string;
@@ -11244,6 +11248,7 @@ export type operations = {
               remoteFollowing: number;
               remoteFollowers: number;
             };
+            signupReason: string | null;
           };
         };
       };
