@@ -985,7 +985,7 @@ describe('RoleService', () => {
 	});
 
 	describe('clone', () => {
-		test('clones an role', async () => {
+		test('clones a role', async () => {
 			const role = await createRole({
 				name: 'original role',
 				color: '#ff0000',
