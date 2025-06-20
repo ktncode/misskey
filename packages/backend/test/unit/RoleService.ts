@@ -1025,7 +1025,7 @@ describe('RoleService', () => {
 
 			expect(clonedRole).toBeDefined();
 			expect(clonedRole.id).not.toBe(role.id);
-			expect(clonedRole.name).toBe(`${role.name} (`);
+			expect(clonedRole.name.endsWith(' (cloned)')).toBeTruthy();
 			expect(clonedRole.name.length).toBe(256);
 		});
 	});

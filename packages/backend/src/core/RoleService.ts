@@ -739,11 +739,14 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 
 	@bindThis
 	public async clone(role: MiRole, moderator?: MiUser): Promise<MiRole> {
-		let newName = `${role.name} (cloned)`;
+		const suffix = ' (cloned)';
+		let newName = role.name;
 
-		if (newName.length > 256) {
-			newName = newName.slice(0, 256);
+		if (newName.length > 256 - suffix.length) {
+			newName = newName.slice(0, 256 - suffix.length);
 		}
+
+		newName += suffix;
 
 		return this.create({
 			...role,
