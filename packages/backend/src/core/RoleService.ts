@@ -742,9 +742,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const suffix = ' (cloned)';
 		let newName = role.name;
 
-		if (newName.length > 256 - suffix.length) {
-			newName = newName.slice(0, 256 - suffix.length);
-		}
+		newName = newName.slice(0, 256 - suffix.length);
 
 		newName += suffix;
 
