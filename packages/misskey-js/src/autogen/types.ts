@@ -711,6 +711,15 @@ export type paths = {
      */
     post: operations['admin___roles___assign'];
   };
+  '/admin/roles/clone': {
+    /**
+     * admin/roles/clone
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:roles*
+     */
+    post: operations['admin___roles___clone'];
+  };
   '/admin/roles/create': {
     /**
      * admin/roles/create
@@ -10352,6 +10361,60 @@ export type operations = {
       /** @description OK (without any results) */
       204: {
         content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/roles/clone
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:roles*
+   */
+  admin___roles___clone: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          roleId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['Role'];
+        };
       };
       /** @description Client error */
       400: {
