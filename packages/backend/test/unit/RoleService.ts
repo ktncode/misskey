@@ -1016,7 +1016,7 @@ describe('RoleService', () => {
 			}));
 		});
 
-		test('clones a roll with a too long name', async () => {
+		test('clones a role with a too long name', async () => {
 			const role = await createRole({
 				name: 'a'.repeat(254),
 			});
