@@ -11,7 +11,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { MiUser } from '@/models/User.js';
 import type { MiNote } from '@/models/Note.js';
-import type { UsersRepository, NotesRepository, FollowingsRepository, PollsRepository, PollVotesRepository, NoteReactionsRepository, ChannelsRepository, MiMeta, MiPollVote, MiPoll, MiChannel, MiFollowing } from '@/models/_.js';
+import type { UsersRepository, NotesRepository, FollowingsRepository, PollsRepository, PollVotesRepository, NoteReactionsRepository, ChannelsRepository, MiMeta, MiPollVote, MiPoll, MiChannel, MiFollowing, MiAccessToken } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { DebounceLoader } from '@/misc/loader.js';
 import { IdService } from '@/core/IdService.js';
@@ -406,6 +406,7 @@ export class NoteEntityService implements OnModuleInit {
 	public async pack(
 		src: MiNote['id'] | MiNote,
 		me?: { id: MiUser['id'] } | null | undefined,
+		token?: MiAccessToken | null,
 		options?: {
 			detail?: boolean;
 			skipHide?: boolean;
@@ -465,7 +466,8 @@ export class NoteEntityService implements OnModuleInit {
 			createdAt: this.idService.parse(note.id).date.toISOString(),
 			updatedAt: note.updatedAt ? note.updatedAt.toISOString() : undefined,
 			userId: note.userId,
-			user: packedUsers?.get(note.userId) ?? this.userEntityService.pack(note.user ?? note.userId, me),
+			// TODO pass token
+			user: packedUsers?.get(note.userId) ?? this.userEntityService.pack(note.user ?? note.userId, me, { token }),
 			text: text,
 			cw: note.cw,
 			visibility: note.visibility,
@@ -514,14 +516,14 @@ export class NoteEntityService implements OnModuleInit {
 				clippedCount: note.clippedCount,
 				processErrors: note.processErrors,
 
-				reply: note.replyId ? this.pack(note.reply ?? opts._hint_?.notes.get(note.replyId) ?? note.replyId, me, {
+				reply: note.replyId ? this.pack(note.reply ?? opts._hint_?.notes.get(note.replyId) ?? note.replyId, me, token, {
 					detail: false,
 					skipHide: opts.skipHide,
 					withReactionAndUserPairCache: opts.withReactionAndUserPairCache,
 					_hint_: options?._hint_,
 				}) : undefined,
 
-				renote: note.renoteId ? this.pack(note.renote ?? opts._hint_?.notes.get(note.renoteId) ?? note.renoteId, me, {
+				renote: note.renoteId ? this.pack(note.renote ?? opts._hint_?.notes.get(note.renoteId) ?? note.renoteId, me, token, {
 					detail: true,
 					skipHide: opts.skipHide,
 					withReactionAndUserPairCache: opts.withReactionAndUserPairCache,
@@ -546,6 +548,7 @@ export class NoteEntityService implements OnModuleInit {
 	public async packMany(
 		notes: MiNote[],
 		me?: { id: MiUser['id'] } | null | undefined,
+		token?: MiAccessToken | null,
 		options?: {
 			detail?: boolean;
 			skipHide?: boolean;
@@ -654,7 +657,7 @@ export class NoteEntityService implements OnModuleInit {
 			// packedFiles
 			this.driveFileEntityService.packManyByIdsMap(Array.from(fileIds)),
 			// packedUsers
-			this.userEntityService.packMany(users, me)
+			this.userEntityService.packMany(users, me, { token })
 				.then(users => new Map(users.map(u => [u.id, u]))),
 			// mentionHandles
 			this.getUserHandles(Array.from(mentionedUsers)),
@@ -687,7 +690,7 @@ export class NoteEntityService implements OnModuleInit {
 			this.customEmojiService.prefetchEmojis(this.aggregateNoteEmojis(notes)),
 		]);
 
-		return await Promise.all(notes.map(n => this.pack(n, me, {
+		return await Promise.all(notes.map(n => this.pack(n, me, token, {
 			...options,
 			_hint_: {
 				bufferedReactions,

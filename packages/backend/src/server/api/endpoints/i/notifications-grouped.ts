@@ -71,7 +71,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private notificationEntityService: NotificationEntityService,
 		private notificationService: NotificationService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, paramDef, async (ps, me, token) => {
 			const EXTRA_LIMIT = 100;
 
 			// includeTypes が空の場合はクエリしない
@@ -187,7 +187,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				(a, b) => a.id < b.id ? 1 : a.id > b.id ? -1 : 0,
 			);
 
-			return await this.notificationEntityService.packGroupedMany(groupedNotifications, me.id);
+			return await this.notificationEntityService.packGroupedMany(groupedNotifications, me.id, token);
 		});
 	}
 }

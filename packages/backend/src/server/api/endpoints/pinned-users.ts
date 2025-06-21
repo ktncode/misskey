@@ -51,13 +51,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, paramDef, async (ps, me, token) => {
 			const users = await Promise.all(this.serverSettings.pinnedUsers.map(acct => Acct.parse(acct)).map(acct => this.usersRepository.findOneBy({
 				usernameLower: acct.username.toLowerCase(),
 				host: acct.host ?? IsNull(),
 			})));
 
-			return await this.userEntityService.packMany(users.filter(x => x != null), me, { schema: 'UserDetailed' });
+			return await this.userEntityService.packMany(users.filter(x => x != null), me, { schema: 'UserDetailed', token });
 		});
 	}
 }

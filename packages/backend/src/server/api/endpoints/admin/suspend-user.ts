@@ -35,14 +35,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private userSuspendService: UserSuspendService,
 		private roleService: RoleService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, paramDef, async (ps, me, token) => {
 			const user = await this.usersRepository.findOneBy({ id: ps.userId });
 
 			if (user == null) {
 				throw new Error('user not found');
 			}
 
-			if (await this.roleService.isModerator(user)) {
+			if (await this.roleService.isModerator(user, token)) {
 				throw new Error('cannot suspend moderator account');
 			}
 
