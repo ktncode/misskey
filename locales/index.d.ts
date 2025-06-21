@@ -12266,6 +12266,10 @@ export interface Locale extends ILocale {
      */
     "collapseFiles": string;
     /**
+     * Clone
+     */
+    "clone": string;
+    /**
      * Uncollapse CWs on notes
      */
     "uncollapseCW": string;
@@ -13265,6 +13269,54 @@ export interface Locale extends ILocale {
      * Signup Reason
      */
     "signupReason": string;
+    /**
+     * Apps using this token will only have access to the functions listed below.
+     */
+    "permissionsDescription": string;
+    /**
+     * Shared account
+     */
+    "sharedAccount": string;
+    /**
+     * Shared access
+     */
+    "sharedAccess": string;
+    /**
+     * Any accounts listed here will be granted access to the token and may use it to access this account.
+     */
+    "sharedAccessDescription": string;
+    /**
+     * Share access
+     */
+    "addGrantee": string;
+    /**
+     * Remove access
+     */
+    "removeGrantee": string;
+    /**
+     * Login with shared access
+     */
+    "loginWithSharedAccess": string;
+    /**
+     * Login with granted access to a shared account
+     */
+    "loginWithSharedAccessDescription": string;
+    /**
+     * You have not been granted shared access to any accounts
+     */
+    "noSharedAccess": string;
+    /**
+     * Expand
+     */
+    "expand": string;
+    /**
+     * Collapse
+     */
+    "collapse": string;
+    /**
+     * Permissions
+     */
+    "permissions": string;
 }
 declare const locales: {
     [lang: string]: Locale;
