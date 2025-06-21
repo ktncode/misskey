@@ -4,7 +4,6 @@
  */
 
 export class UserDescriptionText1750541176036000 {
-    name = 'UserDescriptionText1750541176036000'
 	async up(queryRunner) {
 		await queryRunner.query(`ALTER TABLE "user_profile" ALTER COLUMN "description" TYPE TEXT USING NULL`);
 	}
