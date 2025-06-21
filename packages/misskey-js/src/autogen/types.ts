@@ -4578,6 +4578,7 @@ export type components = {
         }[];
       loggedInDays: number;
       policies: components['schemas']['RolePolicies'];
+      permissions: string[];
       /** @default false */
       twoFactorEnabled: boolean;
       /** @default false */
