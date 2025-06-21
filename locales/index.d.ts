@@ -13270,9 +13270,13 @@ export interface Locale extends ILocale {
      */
     "signupReason": string;
     /**
-     * Apps using this token will only have access to the functions listed below.
+     * Apps using this token will have no API access except for the functions listed below.
      */
     "permissionsDescription": string;
+    /**
+     * Apps using this token will have no administrative access except for the functions enabled below.
+     */
+    "adminPermissionsDescription": string;
     /**
      * Shared account
      */
