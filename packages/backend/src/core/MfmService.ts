@@ -345,7 +345,7 @@ export class MfmService {
 	}
 
 	@bindThis
-	public toHtml(nodes: mfm.MfmNode[] | null, mentionedRemoteUsers: IMentionedRemoteUsers = [], additionalAppenders: Appender[] = []) {
+	public toHtml(nodes: mfm.MfmNode[] | null, mentionedRemoteUsers: IMentionedRemoteUsers = [], additionalAppenders: Appender[] = [], addRelMe: bool = false) {
 		if (nodes == null) {
 			return null;
 		}
@@ -563,6 +563,10 @@ export class MfmService {
 				const a = new Element('a', {
 					href: node.props.url,
 				});
+				// when populating the field links in our ap actors, we want to add rel="me" so mastodon is happy.
+				if (addRelMe) {
+					a.attribs = {...a.attribs, rel: "me",}
+				}
 				a.childNodes.push(new Text(node.props.url));
 				return a;
 			},
