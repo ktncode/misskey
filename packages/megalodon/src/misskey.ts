@@ -405,6 +405,16 @@ export default class Misskey implements MegalodonInterface {
           limit: options.limit
         })
       }
+      if (options.max_id) {
+        params = Object.assign(params, {
+          untilId: options.max_id
+        })
+      }
+      if (options.since_id) {
+        params = Object.assign(params, {
+          sinceId: options.since_id
+        })
+      }
     }
     return this.client.post<Array<MisskeyAPI.Entity.Follower>>('/api/users/followers', params).then(res => {
       return Object.assign(res, {
@@ -431,6 +441,16 @@ export default class Misskey implements MegalodonInterface {
       if (options.limit) {
         params = Object.assign(params, {
           limit: options.limit
+        })
+      }
+      if (options.max_id) {
+        params = Object.assign(params, {
+          untilId: options.max_id
+        })
+      }
+      if (options.since_id) {
+        params = Object.assign(params, {
+          sinceId: options.since_id
         })
       }
     }
