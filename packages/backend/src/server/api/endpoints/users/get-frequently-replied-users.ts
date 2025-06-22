@@ -73,7 +73,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private userEntityService: UserEntityService,
 		private getterService: GetterService,
 	) {
-		super(meta, paramDef, async (ps, me, token) => {
+		super(meta, paramDef, async (ps, me) => {
 			// Lookup user
 			const user = await this.getterService.getUser(ps.userId).catch(err => {
 				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
@@ -127,10 +127,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const topRepliedUserIds = repliedUsersSorted.slice(0, ps.limit);
 
 			// Make replies object (includes weights)
-			const _userMap = await this.userEntityService.packMany(topRepliedUserIds, me, { schema: 'UserDetailed', token })
+			const _userMap = await this.userEntityService.packMany(topRepliedUserIds, me, { schema: 'UserDetailed' })
 				.then(users => new Map(users.map(u => [u.id, u])));
 			const repliesObj = await Promise.all(topRepliedUserIds.map(async (userId) => ({
-				user: _userMap.get(userId) ?? await this.userEntityService.pack(userId, me, { schema: 'UserDetailed', token }),
+				user: _userMap.get(userId) ?? await this.userEntityService.pack(userId, me, { schema: 'UserDetailed' }),
 				weight: repliedUsers[userId] / peak,
 			})));
 

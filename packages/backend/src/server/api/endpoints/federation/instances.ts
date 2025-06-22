@@ -84,7 +84,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private instanceEntityService: InstanceEntityService,
 		private metaService: MetaService,
 	) {
-		super(meta, paramDef, async (ps, me, token) => {
+		super(meta, paramDef, async (ps, me) => {
 			const query = this.instancesRepository.createQueryBuilder('instance');
 
 			switch (ps.sort) {
@@ -190,7 +190,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const instances = await query.limit(ps.limit).offset(ps.offset).getMany();
 
-			return await this.instanceEntityService.packMany(instances, me, token);
+			return await this.instanceEntityService.packMany(instances, me);
 		});
 	}
 }

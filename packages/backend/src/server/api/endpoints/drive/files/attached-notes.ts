@@ -70,11 +70,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private queryService: QueryService,
 		private roleService: RoleService,
 	) {
-		super(meta, paramDef, async (ps, me, token) => {
+		super(meta, paramDef, async (ps, me) => {
 			// Fetch file
 			const file = await this.driveFilesRepository.findOneBy({
 				id: ps.fileId,
-				userId: await this.roleService.isModerator(me, token) ? undefined : me.id,
+				userId: await this.roleService.isModerator(me) ? undefined : me.id,
 			});
 
 			if (file == null) {
@@ -98,7 +98,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const notes = await query.getMany();
 
-			return await this.noteEntityService.packMany(notes, me, token, {
+			return await this.noteEntityService.packMany(notes, me, {
 				detail: true,
 			});
 		});
