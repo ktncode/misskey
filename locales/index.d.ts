@@ -13265,6 +13265,10 @@ export interface Locale extends ILocale {
      * Signup Reason
      */
     "signupReason": string;
+    /**
+     * Hide ads
+     */
+    "hideAds": string;
 }
 declare const locales: {
     [lang: string]: Locale;

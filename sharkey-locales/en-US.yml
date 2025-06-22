@@ -632,3 +632,5 @@ rawInfoDescription: "Extended user data in its raw form. These fields are privat
 rawApDescription: "ActivityPub user data in its raw form. These fields are public and accessible to other instances."
 
 signupReason: "Signup Reason"
+
+hideAds: "Hide ads"
