@@ -888,8 +888,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkFolder>
 						</SearchMarker>
 
-						<SearchMarker :keywords="['ad', 'hide']">
-							<MkPreferenceContainer k="hideAds">
+						<SearchMarker :keywords="['ad', 'show', 'hide']">
+							<MkPreferenceContainer k="forceShowAds">
 								<MkSwitch v-model="hideAds" :disabled="$i.policies.canHideAds">
 									<template #label><SearchLabel>{{ i18n.ts.hideAds }}</SearchLabel></template>
 								</MkSwitch>
@@ -1063,7 +1063,9 @@ const lang = prefer.model('lang');
 const fontSize = prefer.model('fontSize');
 const useSystemFont = prefer.model('useSystemFont');
 const cornerRadius = prefer.model('cornerRadius');
-const hideAds = prefer.model('hideAds');
+
+// Inverted to map between "hide ads" and "force show ads"
+const hideAds = prefer.model('forceShowAds', x => !x, x => !x);
 
 watch([
 	hemisphere,
