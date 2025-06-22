@@ -4984,12 +4984,9 @@ export type components = {
       user: components['schemas']['UserLite'];
       /** Format: id */
       userId: string;
-      token: ({
-        id: string;
-        permission: string[];
-        /** @enum {string|null} */
-        rank: 'admin' | 'mod' | 'user';
-      }) | null;
+      permCount?: number;
+      /** @enum {string|null} */
+      rank?: 'admin' | 'mod' | 'user';
     }) | {
       /** Format: id */
       id: string;

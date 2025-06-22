@@ -151,7 +151,8 @@ export type MiNotification = {
 	id: string;
 	createdAt: string;
 	notifierId: MiUser['id'];
-	tokenId: MiAccessToken['id'];
+	permCount: number;
+	rank: 'user' | 'mod' | 'admin' | null;
 } | {
 	type: 'sharedAccessRevoked';
 	id: string;
