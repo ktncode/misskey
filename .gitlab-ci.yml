@@ -32,9 +32,12 @@ testCommit:
      - node_modules/
      - packages/*/node_modules/
   only:
-    - develop
-    - merge_requests
-    - stable
+    refs:
+      - develop
+      - merge_requests
+      - stable
+    variables:
+      - $SCHEDULE == null
 
 getImageTag:
   stage: deploy
@@ -58,9 +61,12 @@ getImageTag:
     reports:
       dotenv: build.env
   only:
-    - stable
-    - develop
-    - tags
+    refs:
+      - stable
+      - develop
+      - tags
+    variables:
+      - $SCHEDULE == null
 
 buildDocker:
   stage: deploy
@@ -83,9 +89,12 @@ buildDocker:
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --destination "${CI_REGISTRY_IMAGE}:${REGISTRY_PUSH_VERSION}-${ARCH}"
   only:
-    - stable
-    - develop
-    - tags
+    refs:
+      - stable
+      - develop
+      - tags
+    variables:
+      - $SCHEDULE == null
 
 mergeManifests:
   stage: deploy
@@ -110,6 +119,37 @@ mergeManifests:
       --template ${CI_REGISTRY_IMAGE}:${REGISTRY_PUSH_VERSION}-ARCH
       --target ${CI_REGISTRY_IMAGE}:${REGISTRY_PUSH_TAG}
   only:
-    - stable
-    - develop
-    - tags
+    refs:
+      - stable
+      - develop
+      - tags
+    variables:
+      - $SCHEDULE == null
+
+crowdin:upload:
+  stage: test
+  image: crowdin/cli
+  rules:
+    - if: $SCHEDULE == null && $CI_COMMIT_BRANCH == "develop"
+      changes:
+        - sharkey-locales/en-US.yml
+  script:
+    - crowdin upload sources
+
+crowdin:download:
+  stage: deploy
+  image: crowdin/cli
+  rules:
+    # we need to set a scheduled pipeline with the SCHEDULE variable set to true.
+    - if: $SCHEDULE == "true"
+  before_script:
+    - apk add git
+    - git config user.name "Crowdin CI"
+    - git config user.email "crowdin-ci@activitypub.software"
+    # we need CROWDIN_PAT set as a valid personal access token called 'crowdin'.
+    - git remote set-url --push origin "https://crowdin:${CROWDIN_PAT}@activitypub.software/TransFem.org/Sharkey.git"
+  script:
+    - crowdin download translations
+    - git add sharkey-locales/
+    - git commit -m "Crowdin Download"
+    - git push origin develop-i18n
