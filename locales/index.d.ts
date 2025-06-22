@@ -10346,6 +10346,18 @@ export interface Locale extends ILocale {
          * Scheduled Note was posted
          */
         "scheduledNotePosted": string;
+        /**
+         * Shared access granted
+         */
+        "sharedAccessGranted": string;
+        /**
+         * Shared access revoked
+         */
+        "sharedAccessRevoked": string;
+        /**
+         * Shared access login
+         */
+        "sharedAccessLogin": string;
     };
     "_deck": {
         /**
@@ -13346,7 +13358,39 @@ export interface Locale extends ILocale {
          * User
          */
         "user": string;
+        /**
+         * default
+         */
+        "default": string;
     };
+    /**
+     * Permissions: {num}
+     */
+    "permissionsLabel": ParameterizedString<"num">;
+    /**
+     * You have been granted shared access to {target} with {rank} rank and {perms} permissions.
+     */
+    "sharedAccessGranted": ParameterizedString<"target" | "rank" | "perms">;
+    /**
+     * Shared access to {target} has been revoked.
+     */
+    "sharedAccessRevoked": ParameterizedString<"target">;
+    /**
+     * {target} logged in via shared access.
+     */
+    "sharedAccessLogin": ParameterizedString<"target">;
+    /**
+     * Unique name to record the purpose of this access token
+     */
+    "accessTokenNameDescription": string;
+    /**
+     * Are you sure you want to revoke this token?
+     */
+    "confirmRevokeToken": string;
+    /**
+     * Are you sure you want to revoke this token? {num} shared other users will lose shared access.
+     */
+    "confirmRevokeSharedToken": ParameterizedString<"num">;
 }
 declare const locales: {
     [lang: string]: Locale;
