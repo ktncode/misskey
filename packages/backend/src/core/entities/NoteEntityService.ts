@@ -138,8 +138,20 @@ export class NoteEntityService implements OnModuleInit {
 	}
 
 	@bindThis
+	public async hideNotes(notes: Packed<'Note'>[], meId: string | null): Promise<void> {
+		const myFollowing = meId ? new Map(await this.cacheService.userFollowingsCache.fetch(meId)) : new Map<string, Omit<MiFollowing, 'isFollowerHibernated'>>();
+		const myBlockers = meId ? new Set(await this.cacheService.userBlockedCache.fetch(meId)) : new Set<string>();
+
+		// This shouldn't actually await, but we have to wrap it anyway because hideNote() is async
+		await Promise.all(notes.map(note => this.hideNote(note, meId, {
+			myFollowing,
+			myBlockers,
+		})));
+	}
+
+	@bindThis
 	public async hideNote(packedNote: Packed<'Note'>, meId: MiUser['id'] | null, hint?: {
-		myFollowing?: ReadonlyMap<string, unknown>,
+		myFollowing?: ReadonlyMap<string, Omit<MiFollowing, 'isFollowerHibernated'>> | ReadonlySet<string>,
 		myBlockers?: ReadonlySet<string>,
 	}): Promise<void> {
 		if (meId === packedNote.userId) return;
@@ -282,6 +294,152 @@ export class NoteEntityService implements OnModuleInit {
 	}
 
 	@bindThis
+	public async populateMyNoteMutings(notes: Packed<'Note'>[], meId: string): Promise<Set<string>> {
+		const mutedNotes = await this.cacheService.noteMutingsCache.fetch(meId);
+
+		const mutedIds = notes
+			.filter(note => mutedNotes.has(note.id))
+			.map(note => note.id);
+		return new Set(mutedIds);
+	}
+
+	@bindThis
+	public async populateMyTheadMutings(notes: Packed<'Note'>[], meId: string): Promise<Set<string>> {
+		const mutedThreads = await this.cacheService.threadMutingsCache.fetch(meId);
+
+		const mutedIds = notes
+			.filter(note => mutedThreads.has(note.threadId))
+			.map(note => note.id);
+		return new Set(mutedIds);
+	}
+
+	@bindThis
+	public async populateMyRenotes(notes: Packed<'Note'>[], meId: string, _hint_?: {
+		myRenotes: Map<string, boolean>;
+	}): Promise<Set<string>> {
+		const fetchedRenotes = new Set<string>();
+		const toFetch = new Set<string>();
+
+		if (_hint_) {
+			for (const note of notes) {
+				const fromHint = _hint_.myRenotes.get(note.id);
+
+				// null means we know there's no renote, so just skip it.
+				if (fromHint === false) continue;
+
+				if (fromHint) {
+					fetchedRenotes.add(note.id);
+				} else {
+					toFetch.add(note.id);
+				}
+			}
+		}
+
+		if (toFetch.size > 0) {
+			const fetched = await this.queryService
+				.andIsRenote(this.notesRepository.createQueryBuilder('note'), 'note')
+				.andWhere({
+					userId: meId,
+					renoteId: In(Array.from(toFetch)),
+				})
+				.select('note.renoteId', 'renoteId')
+				.getRawMany<{ renoteId: string }>();
+
+			for (const { renoteId } of fetched) {
+				fetchedRenotes.add(renoteId);
+			}
+		}
+
+		return fetchedRenotes;
+	}
+
+	@bindThis
+	public async populateMyFavorites(notes: Packed<'Note'>[], meId: string, _hint_?: {
+		myFavorites: Map<string, boolean>;
+	}): Promise<Set<string>> {
+		const fetchedFavorites = new Set<string>();
+		const toFetch = new Set<string>();
+
+		if (_hint_) {
+			for (const note of notes) {
+				const fromHint = _hint_.myFavorites.get(note.id);
+
+				// null means we know there's no favorite, so just skip it.
+				if (fromHint === false) continue;
+
+				if (fromHint) {
+					fetchedFavorites.add(note.id);
+				} else {
+					toFetch.add(note.id);
+				}
+			}
+		}
+
+		if (toFetch.size > 0) {
+			const fetched = await this.noteFavoritesRepository.find({
+				where: {
+					userId: meId,
+					noteId: In(Array.from(toFetch)),
+				},
+				select: {
+					noteId: true,
+				},
+			}) as { noteId: string }[];
+
+			for (const { noteId } of fetched) {
+				fetchedFavorites.add(noteId);
+			}
+		}
+
+		return fetchedFavorites;
+	}
+
+	@bindThis
+	public async populateMyReactions(notes: Packed<'Note'>[], meId: string, _hint_?: {
+		myReactions: Map<MiNote['id'], string | null>;
+	}): Promise<Map<string, string>> {
+		const fetchedReactions = new Map<string, string>();
+		const toFetch = new Set<string>();
+
+		if (_hint_) {
+			for (const note of notes) {
+				const fromHint = _hint_.myReactions.get(note.id);
+
+				// null means we know there's no reaction, so just skip it.
+				if (fromHint === null) continue;
+
+				if (fromHint) {
+					const converted = this.reactionService.convertLegacyReaction(fromHint);
+					fetchedReactions.set(note.id, converted);
+				} else if (Object.values(note.reactions).some(count => count > 0)) {
+					// Note has at least one reaction, so we need to fetch
+					toFetch.add(note.id);
+				}
+			}
+		}
+
+		if (toFetch.size > 0) {
+			const fetched = await this.noteReactionsRepository.find({
+				where: {
+					userId: meId,
+					noteId: In(Array.from(toFetch)),
+				},
+				select: {
+					noteId: true,
+					reaction: true,
+				},
+			});
+
+			for (const { noteId, reaction } of fetched) {
+				const converted = this.reactionService.convertLegacyReaction(reaction);
+				fetchedReactions.set(noteId, converted);
+			}
+		}
+
+		return fetchedReactions;
+	}
+
+	@bindThis
 	public async populateMyReaction(note: { id: MiNote['id']; reactions: MiNote['reactions']; reactionAndUserPairCache?: MiNote['reactionAndUserPairCache']; }, meId: MiUser['id'], _hint_?: {
 		myReactions: Map<MiNote['id'], string | null>;
 	}) {
@@ -312,9 +470,14 @@ export class NoteEntityService implements OnModuleInit {
 			return undefined;
 		}
 
-		const reaction = await this.noteReactionsRepository.findOneBy({
-			userId: meId,
-			noteId: note.id,
+		const reaction = await this.noteReactionsRepository.findOne({
+			where: {
+				userId: meId,
+				noteId: note.id,
+			},
+			select: {
+				reaction: true,
+			},
 		});
 
 		if (reaction) {

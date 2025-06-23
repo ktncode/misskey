@@ -10,7 +10,8 @@ import { isRenotePacked, isQuotePacked, isPackedPureRenote } from '@/misc/is-ren
 import type { Packed } from '@/misc/json-schema.js';
 import type { JsonObject, JsonValue } from '@/misc/json-value.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import type Connection from './Connection.js';
+import { deepClone } from '@/misc/clone.js';
+import type Connection from '@/server/api/stream/Connection.js';
 
 /**
  * Stream channel
@@ -116,24 +117,6 @@ export default abstract class Channel {
 		return false;
 	}
 
-	/**
-	 * This function modifies {@link note}, please make sure it has been shallow cloned.
-	 * See Dakkar's comment of {@link assignMyReaction} for more
-	 * @param note The note to change
-	 */
-	protected async hideNote(note: Packed<'Note'>): Promise<void> {
-		if (note.renote) {
-			await this.hideNote(note.renote);
-		}
-
-		if (note.reply) {
-			await this.hideNote(note.reply);
-		}
-
-		const meId = this.user?.id ?? null;
-		await this.noteEntityService.hideNote(note, meId);
-	}
-
 	constructor(id: string, connection: Connection, noteEntityService: NoteEntityService) {
 		this.id = id;
 		this.connection = connection;
@@ -160,37 +143,41 @@ export default abstract class Channel {
 
 	public onMessage?(type: string, body: JsonValue): void;
 
-	public async assignMyReaction(note: Packed<'Note'>): Promise<Packed<'Note'>> {
+	public async rePackNote(note: Packed<'Note'>): Promise<Packed<'Note'>> {
+		// If there's no user, then packing won't change anything.
+		// We can just re-use the original note.
+		if (!this.user) {
+			return note;
+		}
+
 		// StreamingApiServerService creates a single EventEmitter per server process,
 		// so a new note arriving from redis gets de-serialised once per server process,
 		// and then that single object is passed to all active channels on each connection.
 		// If we didn't clone the notes here, different connections would asynchronously write
 		// different values to the same object, resulting in a random value being sent to each frontend. -- Dakkar
-		const clonedNote = { ...note };
-		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
-			if (note.renote && Object.keys(note.renote.reactions).length > 0) {
-				const myReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-				if (myReaction) {
-					clonedNote.renote = { ...note.renote };
-					clonedNote.renote.myReaction = myReaction;
-				}
-			}
-			if (note.renote?.reply && Object.keys(note.renote.reply.reactions).length > 0) {
-				const myReaction = await this.noteEntityService.populateMyReaction(note.renote.reply, this.user.id);
-				if (myReaction) {
-					clonedNote.renote = { ...note.renote };
-					clonedNote.renote.reply = { ...note.renote.reply };
-					clonedNote.renote.reply.myReaction = myReaction;
-				}
-			}
-		}
-		if (this.user && note.reply && Object.keys(note.reply.reactions).length > 0) {
-			const myReaction = await this.noteEntityService.populateMyReaction(note.reply, this.user.id);
-			if (myReaction) {
-				clonedNote.reply = { ...note.reply };
-				clonedNote.reply.myReaction = myReaction;
-			}
-		}
+		const clonedNote = deepClone(note);
+		const notes = crawl(clonedNote);
+
+		// Hide notes before everything else, since this modifies fields that the other functions will check.
+		await this.noteEntityService.hideNotes(notes, this.user.id);
+
+		// TODO cache reaction/renote/favorite hints in the connection.
+		//   Those functions accept partial hints and will fetch anything else.
+
+		const [myReactions, myRenotes, myFavorites, myThreadMutings, myNoteMutings] = await Promise.all([
+			this.noteEntityService.populateMyReactions(notes, this.user.id),
+			this.noteEntityService.populateMyRenotes(notes, this.user.id),
+			this.noteEntityService.populateMyFavorites(notes, this.user.id),
+			this.noteEntityService.populateMyTheadMutings(notes, this.user.id),
+			this.noteEntityService.populateMyNoteMutings(notes, this.user.id),
+		]);
+
+		note.myReaction = myReactions.get(note.id) ?? null;
+		note.isRenoted = myRenotes.has(note.id);
+		note.isFavorited = myFavorites.has(note.id);
+		note.isMutingThread = myThreadMutings.has(note.id);
+		note.isMutingNote = myNoteMutings.has(note.id);
+
 		return clonedNote;
 	}
 }
@@ -201,3 +188,21 @@ export type MiChannelService<T extends boolean> = {
 	kind: T extends true ? string : string | null | undefined;
 	create: (id: string, connection: Connection) => Channel;
 };
+
+function crawl(note: Packed<'Note'>, into?: Packed<'Note'>[]): Packed<'Note'>[] {
+	into ??= [];
+
+	if (!into.includes(note)) {
+		into.push(note);
+	}
+
+	if (note.reply) {
+		crawl(note.reply, into);
+	}
+
+	if (note.renote) {
+		crawl(note.renote, into);
+	}
+
+	return into;
+}
