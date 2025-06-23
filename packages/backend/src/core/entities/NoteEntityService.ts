@@ -315,19 +315,14 @@ export class NoteEntityService implements OnModuleInit {
 
 	@bindThis
 	public async populateMyRenotes(notes: Packed<'Note'>[], meId: string, _hint_?: {
-		myRenotes: Map<string, boolean>;
+		myRenotes: Set<string>;
 	}): Promise<Set<string>> {
 		const fetchedRenotes = new Set<string>();
 		const toFetch = new Set<string>();
 
 		if (_hint_) {
 			for (const note of notes) {
-				const fromHint = _hint_.myRenotes.get(note.id);
-
-				// null means we know there's no renote, so just skip it.
-				if (fromHint === false) continue;
-
-				if (fromHint) {
+				if (_hint_.myRenotes.has(note.id)) {
 					fetchedRenotes.add(note.id);
 				} else {
 					toFetch.add(note.id);
@@ -355,19 +350,14 @@ export class NoteEntityService implements OnModuleInit {
 
 	@bindThis
 	public async populateMyFavorites(notes: Packed<'Note'>[], meId: string, _hint_?: {
-		myFavorites: Map<string, boolean>;
+		myFavorites: Set<string>;
 	}): Promise<Set<string>> {
 		const fetchedFavorites = new Set<string>();
 		const toFetch = new Set<string>();
 
 		if (_hint_) {
 			for (const note of notes) {
-				const fromHint = _hint_.myFavorites.get(note.id);
-
-				// null means we know there's no favorite, so just skip it.
-				if (fromHint === false) continue;
-
-				if (fromHint) {
+				if (_hint_.myFavorites.has(note.id)) {
 					fetchedFavorites.add(note.id);
 				} else {
 					toFetch.add(note.id);

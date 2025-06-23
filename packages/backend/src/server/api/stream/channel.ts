@@ -34,18 +34,35 @@ export default abstract class Channel {
 		return this.connection.userProfile;
 	}
 
+	protected get cacheService() {
+		return this.connection.cacheService;
+	}
+
+	/**
+	 * @deprecated use cacheService.userFollowingsCache to avoid stale data
+	 */
 	protected get following() {
 		return this.connection.following;
 	}
 
+	/**
+	 * TODO use onChange to keep these in sync?
+	 * @deprecated use cacheService.userMutingsCache to avoid stale data
+	 */
 	protected get userIdsWhoMeMuting() {
 		return this.connection.userIdsWhoMeMuting;
 	}
 
+	/**
+	 * @deprecated use cacheService.renoteMutingsCache to avoid stale data
+	 */
 	protected get userIdsWhoMeMutingRenotes() {
 		return this.connection.userIdsWhoMeMutingRenotes;
 	}
 
+	/**
+	 * @deprecated use cacheService.userBlockedCache to avoid stale data
+	 */
 	protected get userIdsWhoBlockingMe() {
 		return this.connection.userIdsWhoBlockingMe;
 	}
@@ -54,6 +71,9 @@ export default abstract class Channel {
 		return this.connection.userMutedInstances;
 	}
 
+	/**
+	 * @deprecated use cacheService.threadMutingsCache to avoid stale data
+	 */
 	protected get userMutedThreads() {
 		return this.connection.userMutedThreads;
 	}
@@ -64,6 +84,18 @@ export default abstract class Channel {
 
 	protected get subscriber() {
 		return this.connection.subscriber;
+	}
+
+	protected get myRecentReactions() {
+		return this.connection.myRecentReactions;
+	}
+
+	protected get myRecentRenotes() {
+		return this.connection.myRecentRenotes;
+	}
+
+	protected get myRecentFavorites() {
+		return this.connection.myRecentFavorites;
 	}
 
 	/**
@@ -161,13 +193,16 @@ export default abstract class Channel {
 		// Hide notes before everything else, since this modifies fields that the other functions will check.
 		await this.noteEntityService.hideNotes(notes, this.user.id);
 
-		// TODO cache reaction/renote/favorite hints in the connection.
-		//   Those functions accept partial hints and will fetch anything else.
-
 		const [myReactions, myRenotes, myFavorites, myThreadMutings, myNoteMutings] = await Promise.all([
-			this.noteEntityService.populateMyReactions(notes, this.user.id),
-			this.noteEntityService.populateMyRenotes(notes, this.user.id),
-			this.noteEntityService.populateMyFavorites(notes, this.user.id),
+			this.noteEntityService.populateMyReactions(notes, this.user.id, {
+				myReactions: this.myRecentReactions,
+			}),
+			this.noteEntityService.populateMyRenotes(notes, this.user.id, {
+				myRenotes: this.myRecentRenotes,
+			}),
+			this.noteEntityService.populateMyFavorites(notes, this.user.id, {
+				myFavorites: this.myRecentFavorites,
+			}),
 			this.noteEntityService.populateMyTheadMutings(notes, this.user.id),
 			this.noteEntityService.populateMyNoteMutings(notes, this.user.id),
 		]);

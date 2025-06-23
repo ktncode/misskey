@@ -10,13 +10,16 @@ import type { Packed } from '@/misc/json-schema.js';
 import type { NotificationService } from '@/core/NotificationService.js';
 import { bindThis } from '@/decorators.js';
 import { CacheService } from '@/core/CacheService.js';
-import { MiFollowing, MiUserProfile } from '@/models/_.js';
+import type { MiFollowing, MiUserProfile, NoteFavoritesRepository, NoteReactionsRepository, NotesRepository } from '@/models/_.js';
 import type { StreamEventEmitter, GlobalEvents } from '@/core/GlobalEventService.js';
 import { ChannelFollowingService } from '@/core/ChannelFollowingService.js';
 import { isJsonObject } from '@/misc/json-value.js';
 import type { JsonObject, JsonValue } from '@/misc/json-value.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import type Logger from '@/logger.js';
+import { Inject } from '@nestjs/common';
+import { DI } from '@/di-symbols.js';
+import { QueryService } from '@/core/QueryService.js';
 import type { ChannelsService } from './ChannelsService.js';
 import type { EventEmitter } from 'events';
 import type Channel from './channel.js';
@@ -43,14 +46,27 @@ export default class Connection {
 	public userIdsWhoMeMutingRenotes: Set<string> = new Set();
 	public userMutedInstances: Set<string> = new Set();
 	public userMutedThreads: Set<string> = new Set();
+	public myRecentReactions: Map<string, string> = new Map();
+	public myRecentRenotes: Set<string> = new Set();
+	public myRecentFavorites: Set<string> = new Set();
 	private fetchIntervalId: NodeJS.Timeout | null = null;
 	private closingConnection = false;
 	private logger: Logger;
 
 	constructor(
+		@Inject(DI.noteReactionsRepository)
+		private readonly noteReactionsRepository: NoteReactionsRepository,
+
+		@Inject(DI.notesRepository)
+		private readonly notesRepository: NotesRepository,
+
+		@Inject(DI.noteFavoritesRepository)
+		private readonly noteFavoritesRepository: NoteFavoritesRepository,
+
 		private channelsService: ChannelsService,
 		private notificationService: NotificationService,
-		private cacheService: CacheService,
+		public readonly cacheService: CacheService,
+		private readonly queryService: QueryService,
 		private channelFollowingService: ChannelFollowingService,
 		loggerService: LoggerService,
 
@@ -68,7 +84,7 @@ export default class Connection {
 	@bindThis
 	public async fetch() {
 		if (this.user == null) return;
-		const [userProfile, following, followingChannels, userIdsWhoMeMuting, userIdsWhoBlockingMe, userIdsWhoMeMutingRenotes, threadMutings] = await Promise.all([
+		const [userProfile, following, followingChannels, userIdsWhoMeMuting, userIdsWhoBlockingMe, userIdsWhoMeMutingRenotes, threadMutings, myRecentReactions, myRecentFavorites, myRecentRenotes] = await Promise.all([
 			this.cacheService.userProfileCache.fetch(this.user.id),
 			this.cacheService.userFollowingsCache.fetch(this.user.id),
 			this.channelFollowingService.userFollowingChannelsCache.fetch(this.user.id),
@@ -76,6 +92,25 @@ export default class Connection {
 			this.cacheService.userBlockedCache.fetch(this.user.id),
 			this.cacheService.renoteMutingsCache.fetch(this.user.id),
 			this.cacheService.threadMutingsCache.fetch(this.user.id),
+			this.noteReactionsRepository.find({
+				where: { userId: this.user.id },
+				select: { noteId: true, reaction: true },
+				order: { id: 'desc' },
+				take: 100,
+			}),
+			this.noteFavoritesRepository.find({
+				where: { userId: this.user.id },
+				select: { noteId: true },
+				order: { id: 'desc' },
+				take: 100,
+			}),
+			this.queryService
+				.andIsRenote(this.notesRepository.createQueryBuilder('note'), 'note')
+				.andWhere({ userId: this.user.id })
+				.orderBy({ id: 'DESC' })
+				.limit(100)
+				.select('note.renoteId', 'renoteId')
+				.getRawMany<{ renoteId: string }>(),
 		]);
 		this.userProfile = userProfile;
 		this.following = following;
@@ -85,6 +120,9 @@ export default class Connection {
 		this.userIdsWhoMeMutingRenotes = userIdsWhoMeMutingRenotes;
 		this.userMutedInstances = new Set(userProfile.mutedInstances);
 		this.userMutedThreads = threadMutings;
+		this.myRecentReactions = new Map(myRecentReactions.map(r => [r.noteId, r.reaction]));
+		this.myRecentFavorites = new Set(myRecentFavorites.map(f => f.noteId ));
+		this.myRecentRenotes = new Set(myRecentRenotes.map(r => r.renoteId ));
 	}
 
 	@bindThis
