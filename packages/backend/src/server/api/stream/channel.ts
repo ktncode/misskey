@@ -78,6 +78,13 @@ export default abstract class Channel {
 		return this.connection.userMutedThreads;
 	}
 
+	/**
+	 * @deprecated use cacheService.noteMutingsCache to avoid stale data
+	 */
+	protected get userMutedNotes() {
+		return this.connection.userMutedNotes;
+	}
+
 	protected get followingChannels() {
 		return this.connection.followingChannels;
 	}
@@ -134,6 +141,9 @@ export default abstract class Channel {
 		// Muted thread
 		if (this.userMutedThreads.has(note.threadId)) return true;
 
+		// Muted note
+		if (this.userMutedNotes.has(note.id)) return true;
+
 		// If it's a boost (pure renote) then we need to check the target as well
 		if (isPackedPureRenote(note) && note.renote && this.isNoteMutedOrBlocked(note.renote)) return true;
 
@@ -143,8 +153,6 @@ export default abstract class Channel {
 			if (this.user.id === note.userId) return false;
 			if (!this.following.has(note.userId)) return true;
 		}
-
-		// TODO muted threads
 
 		return false;
 	}

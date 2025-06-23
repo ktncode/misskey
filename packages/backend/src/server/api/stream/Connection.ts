@@ -46,6 +46,7 @@ export default class Connection {
 	public userIdsWhoMeMutingRenotes: Set<string> = new Set();
 	public userMutedInstances: Set<string> = new Set();
 	public userMutedThreads: Set<string> = new Set();
+	public userMutedNotes: Set<string> = new Set();
 	public myRecentReactions: Map<string, string> = new Map();
 	public myRecentRenotes: Set<string> = new Set();
 	public myRecentFavorites: Set<string> = new Set();
@@ -84,7 +85,7 @@ export default class Connection {
 	@bindThis
 	public async fetch() {
 		if (this.user == null) return;
-		const [userProfile, following, followingChannels, userIdsWhoMeMuting, userIdsWhoBlockingMe, userIdsWhoMeMutingRenotes, threadMutings, myRecentReactions, myRecentFavorites, myRecentRenotes] = await Promise.all([
+		const [userProfile, following, followingChannels, userIdsWhoMeMuting, userIdsWhoBlockingMe, userIdsWhoMeMutingRenotes, threadMutings, noteMutings, myRecentReactions, myRecentFavorites, myRecentRenotes] = await Promise.all([
 			this.cacheService.userProfileCache.fetch(this.user.id),
 			this.cacheService.userFollowingsCache.fetch(this.user.id),
 			this.channelFollowingService.userFollowingChannelsCache.fetch(this.user.id),
@@ -92,6 +93,7 @@ export default class Connection {
 			this.cacheService.userBlockedCache.fetch(this.user.id),
 			this.cacheService.renoteMutingsCache.fetch(this.user.id),
 			this.cacheService.threadMutingsCache.fetch(this.user.id),
+			this.cacheService.noteMutingsCache.fetch(this.user.id),
 			this.noteReactionsRepository.find({
 				where: { userId: this.user.id },
 				select: { noteId: true, reaction: true },
@@ -120,6 +122,7 @@ export default class Connection {
 		this.userIdsWhoMeMutingRenotes = userIdsWhoMeMutingRenotes;
 		this.userMutedInstances = new Set(userProfile.mutedInstances);
 		this.userMutedThreads = threadMutings;
+		this.userMutedNotes = noteMutings;
 		this.myRecentReactions = new Map(myRecentReactions.map(r => [r.noteId, r.reaction]));
 		this.myRecentFavorites = new Set(myRecentFavorites.map(f => f.noteId ));
 		this.myRecentRenotes = new Set(myRecentRenotes.map(r => r.renoteId ));
