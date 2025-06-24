@@ -27,18 +27,23 @@ export class RegistryApiService {
 	public async set(userId: MiUser['id'], domain: string | null, scope: string[], key: string, value: any) {
 		// TODO: 作成できるキーの数を制限する
 
-		await this.registryItemsRepository.upsert({
-			id: this.idService.gen(),
-			updatedAt: new Date(),
-			userId: userId,
-			domain: domain,
-			scope: scope,
-			key: key,
-			value: value,
-		}, {
-			conflictPaths: ['userId', 'key', 'scope', 'domain'],
-			upsertType: 'on-conflict-do-update',
-		});
+		await this.registryItemsRepository.createQueryBuilder('item')
+			.insert()
+			.values({
+				id: this.idService.gen(),
+				updatedAt: new Date(),
+				userId: userId,
+				domain: domain,
+				scope: scope,
+				key: key,
+				value: value,
+			})
+			.orUpdate(
+				['updatedAt', 'value'],
+				['userId', 'key', 'scope', 'domain'],
+				{ upsertType: 'on-conflict-do-update' }
+			)
+			.execute();
 
 		if (domain == null) {
 			// TODO: サードパーティアプリが傍受出来てしまうのでどうにかする
