@@ -17,8 +17,6 @@ import { isJsonObject } from '@/misc/json-value.js';
 import type { JsonObject, JsonValue } from '@/misc/json-value.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import type Logger from '@/logger.js';
-import { Inject } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import { QueryService } from '@/core/QueryService.js';
 import type { ChannelsService } from './ChannelsService.js';
 import type { EventEmitter } from 'events';
@@ -55,19 +53,13 @@ export default class Connection {
 	private logger: Logger;
 
 	constructor(
-		@Inject(DI.noteReactionsRepository)
 		private readonly noteReactionsRepository: NoteReactionsRepository,
-
-		@Inject(DI.notesRepository)
 		private readonly notesRepository: NotesRepository,
-
-		@Inject(DI.noteFavoritesRepository)
 		private readonly noteFavoritesRepository: NoteFavoritesRepository,
-
+		private readonly queryService: QueryService,
 		private channelsService: ChannelsService,
 		private notificationService: NotificationService,
 		public readonly cacheService: CacheService,
-		private readonly queryService: QueryService,
 		private channelFollowingService: ChannelFollowingService,
 		loggerService: LoggerService,
 
