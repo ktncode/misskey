@@ -12282,6 +12282,10 @@ export interface Locale extends ILocale {
      */
     "collapseFiles": string;
     /**
+     * Clone
+     */
+    "clone": string;
+    /**
      * Uncollapse CWs on notes
      */
     "uncollapseCW": string;
