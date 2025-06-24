@@ -35,9 +35,9 @@ export class CleanRemoteFilesProcessorService {
 	public async process(job: Bull.Job<CleanRemoteFilesJobData>): Promise<void> {
 		this.logger.info('Deleting cached remote files...');
 
-		const olderThanTimestamp = Date.now() - job.data.olderThanSeconds * 1000;
+		const olderThanTimestamp = Date.now() - (job.data.olderThanSeconds ?? 0) * 1000;
 		const olderThanDate = new Date(olderThanTimestamp);
-		const keepFilesInUse = job.data.keepFilesInUse;
+		const keepFilesInUse = job.data.keepFilesInUse ?? false;
 		let deletedCount = 0;
 		let cursor: MiDriveFile['id'] | null = null;
 		let errorCount = 0;
