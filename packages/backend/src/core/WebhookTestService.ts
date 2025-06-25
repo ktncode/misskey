@@ -437,10 +437,12 @@ export class WebhookTestService {
 	private async toPackedUserLite(user: MiUser, override?: Packed<'UserLite'>): Promise<Packed<'UserLite'>> {
 		return {
 			...user,
+			createdAt: this.idService.parse(user.id).date.toISOString(),
 			id: user.id,
 			name: user.name,
 			username: user.username,
 			host: user.host,
+			description: 'dummy user',
 			avatarUrl: user.avatarId == null ? null : user.avatarUrl,
 			avatarBlurhash: user.avatarId == null ? null : user.avatarBlurhash,
 			avatarDecorations: user.avatarDecorations.map(it => ({
@@ -451,8 +453,6 @@ export class WebhookTestService {
 				offsetX: it.offsetX,
 				offsetY: it.offsetY,
 			})),
-			createdAt: this.idService.parse(user.id).date.toISOString(),
-			description: '',
 			isBot: user.isBot,
 			isCat: user.isCat,
 			emojis: await this.customEmojiService.populateEmojis(user.emojis, user.host),
