@@ -63,6 +63,18 @@ describe('MfmService', () => {
 			const output = '<p><ruby><span><i>some</i> text</span><rp>(</rp><rt>ignore me</rt><rp>)</rp></ruby></p>';
 			assert.equal(mfmService.toHtml(mfm.parse(input)), output);
 		});
+
+		test('link', () => {
+			const input = 'https://sharkey.tld';
+			const output = '<p><a href="https://sharkey.tld">https://sharkey.tld</a></p>';
+			assert.equal(mfmService.toHtml(mfm.parse(input)), output);
+		});
+
+		test('profile field link', () => {
+			const input = 'https://sharkey.tld';
+			const output = '<p><a href="https://sharkey.tld" rel="me">https://sharkey.tld</a></p>';
+			assert.equal(mfmService.toHtml(mfm.parse(input), [], [], true), output);
+		});
 	});
 
 	describe('toMastoApiHtml', () => {
