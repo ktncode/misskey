@@ -63,8 +63,8 @@ export function build() {
 	const metaUrl = import.meta.url;
 	const sharkeyLocales = languages.reduce((a, c) => (a[c] = yaml.load(clean(fs.readFileSync(new URL(`../sharkey-locales/${c}.yml`, metaUrl), 'utf-8'))) || {}, a), {});
 	const misskeyLocales = languages.reduce((a, c) => (a[c] = yaml.load(clean(fs.readFileSync(new URL(`${c}.yml`, metaUrl), 'utf-8'))) || {}, a), {});
-	// merge sharkey and misskey's locales. the second argument (sharkey) overwrites the first argument (misskey).
-  const locales = merge(misskeyLocales, sharkeyLocales);
+	// merge sharkey and misskey's locales. the second argument (misskey) overwrites the first argument (sharkey).
+	const locales = merge(sharkeyLocales, misskeyLocales);
 
 	// 空文字列が入ることがあり、フォールバックが動作しなくなるのでプロパティごと消す
 	const removeEmpty = (obj) => {
