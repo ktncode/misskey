@@ -1411,7 +1411,7 @@ export interface Locale extends ILocale {
      */
     "circularReferenceFolder": string;
     /**
-     * このフォルダは空でないため、削除できません。
+     * Since this folder has other folders inside of it, it can not be deleted.
      */
     "hasChildFilesOrFolders": string;
     /**
