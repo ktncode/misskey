@@ -227,6 +227,7 @@ export class StreamingApiServerService {
 
 			this.#connections.set(connection, Date.now());
 
+			// TODO use collapsed queue
 			const userUpdateIntervalId = user ? setInterval(() => {
 				this.usersService.updateLastActiveDate(user);
 			}, 1000 * 60 * 5) : null;
@@ -263,13 +264,24 @@ export class StreamingApiServerService {
 	}
 
 	@bindThis
-	public detach(): Promise<void> {
+	public async detach(): Promise<void> {
 		if (this.#cleanConnectionsIntervalId) {
 			clearInterval(this.#cleanConnectionsIntervalId);
 			this.#cleanConnectionsIntervalId = null;
 		}
-		return new Promise((resolve) => {
-			this.#wss.close(() => resolve());
+
+		for (const connection of this.#connections.keys()) {
+			connection.close();
+		}
+
+		this.#connections.clear();
+		this.#connectionsByClient.clear();
+
+		await new Promise<void>((resolve, reject) => {
+			this.#wss.close(err => {
+				if (err) reject(err);
+				else resolve();
+			});
 		});
 	}
 }
