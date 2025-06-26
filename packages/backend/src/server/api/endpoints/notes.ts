@@ -110,7 +110,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const notes = await query.getMany();
 
-			return await this.noteEntityService.packMany(notes);
+			return await this.noteEntityService.packMany(notes, me);
 		});
 	}
 }
