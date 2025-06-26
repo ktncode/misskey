@@ -19,7 +19,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<span :class="$style.patternShadowTop"></span>
 		<span :class="$style.patternShadowBottom"></span>
-		<canvas ref="displayCanvas" :class="$style.pattern_canvas"></canvas>
+		<div ref="sliceDisplay" :class="$style.slice_display">
+			<canvas ref="sliceCanvas1" :class="$style.patternSlice"></canvas>
+			<canvas ref="sliceCanvas2" :class="$style.patternSlice"></canvas>
+			<canvas ref="sliceCanvas3" :class="$style.patternSlice"></canvas>
+		</div>
 	</div>
 	<div :class="$style.controls">
 		<input v-if="patternScrollSliderShow" ref="patternScrollSlider" v-model="patternScrollSliderPos" :class="$style.pattern_slider" type="range" min="0" max="100" step="0.01" style=""/>
@@ -41,17 +45,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+const debug = console.debug;
+const debugw = console.warn;
+const debug_playPause = playPause;
+
 import { ref, nextTick, watch, onDeactivated, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
+import type { Ref } from 'vue';
 import { i18n } from '@/i18n.js';
 import { ChiptuneJsPlayer, ChiptuneJsConfig } from '@/utility/chiptune2.js';
 import { isTouchUsing } from '@/utility/touch.js';
 import { prefer } from '@/preferences.js';
 
 const colours = {
-	background: '#000000',
+	background: '#ffffff',
 	foreground: {
-		default: '#ffffff',
+		default: '#000000',
 		quarter: '#ffff00',
 		instr: '#80e0ff',
 		volume: '#80ff80',
@@ -70,12 +79,30 @@ const props = defineProps<{
 	module: Misskey.entities.DriveFile
 }>();
 
+interface CanvasDisplay {
+	ctx: CanvasRenderingContext2D,
+	html: HTMLCanvasElement,
+	drawn: { top: number, bottom: number, left: number, right: number },
+	range: { top: number, bottom: number },
+	vPos: number,
+	transform: { x: number, y: number },
+	drawStart: number,
+	channels: number,
+}
+
 const isSensitive = props.module.isSensitive;
 const url = props.module.url;
 let hide = ref((prefer.s.nsfw === 'force') ? true : isSensitive && (prefer.s.nsfw !== 'ignore'));
+// Goto display function and set the default value there on the first frame.
+// Yes, this is my solution to a problem. That or have a constant kicking round doing nothing of note.
 let patternHide = ref(false);
 let playing = ref(false);
-let displayCanvas = ref<HTMLCanvasElement>();
+let sliceDisplay = ref<HTMLDivElement>();
+let sliceCanvas1 = ref();
+let sliceCanvas2 = ref();
+let sliceCanvas3 = ref();
+let sliceWidth = 0;
+let sliceHeight = 0;
 let progress = ref<HTMLProgressElement>();
 let position = ref(0);
 let patternScrollSlider = ref<HTMLProgressElement>();
@@ -85,6 +112,9 @@ const player = ref(new ChiptuneJsPlayer(new ChiptuneJsConfig()));
 
 const maxRowNumbers = 0xFF;
 const rowBuffer = 26;
+// It would be a great option for users to set themselves.
+const maxChannelLimit = 0xFF;
+const halfbuf = Math.floor(rowBuffer / 2);
 let buffer = null;
 let isSeeking = false;
 let firstFrame = true;
@@ -92,12 +122,39 @@ let lastPattern = -1;
 let lastDrawnRow = -1;
 let numberRowCanvas = new OffscreenCanvas(2 * CHAR_WIDTH + 1, maxRowNumbers * CHAR_HEIGHT + 1);
 let alreadyHiddenOnce = false;
-let alreadyDrawn = [false];
-let patternTime = { 'current': 0, 'max': 0, 'initial': 0 };
+let slices: CanvasDisplay[] = [];
+
+const peft = {
+	startTime: 0,
+	patternTime: { current: 0, max: 0, initial: 0 },
+	start: function() {
+		this.startTime = performance.now();
+	},
+	end: function() {
+		this.patternTime.current = performance.now() - this.startTime;
+		if (this.patternTime.initial !== 0 && this.patternTime.current > this.patternTime.max) this.patternTime.max = this.patternTime.current;
+		else if (this.patternTime.initial === 0) this.patternTime.initial = this.patternTime.current;
+	},
+	asses: function() {
+		if (this.patternTime.initial !== 0 && !alreadyHiddenOnce) {
+			const trackerTime = player.value.currentPlayingNode.getProcessTime();
+
+			if (this.patternTime.initial + trackerTime.max > MAX_TIME_SPENT && trackerTime.max + this.patternTime.max > MAX_TIME_PER_ROW) {
+				alreadyHiddenOnce = true;
+				togglePattern();
+				return;
+			}
+		}
+
+		this.patternTime = { current: 0, max: 0, initial: 0 };
+	},
+};
 
 function bakeNumberRow() {
 	let ctx = numberRowCanvas.getContext('2d', { alpha: false }) as OffscreenCanvasRenderingContext2D;
 	ctx.font = '10px monospace';
+	ctx.fillStyle = colours.background;
+	ctx.fillRect( 0, 0, numberRowCanvas.width, numberRowCanvas.height );
 
 	for (let i = 0; i < maxRowNumbers; i++) {
 		let rowText = i.toString(16);
@@ -110,6 +167,45 @@ function bakeNumberRow() {
 	}
 }
 
+function setupSlice(r: Ref, channels: number) {
+	let chtml = r.value as HTMLCanvasElement;
+	chtml.width = sliceWidth;
+	chtml.height = sliceHeight;
+	let slice: CanvasDisplay = {
+		ctx: chtml.getContext('2d', { alpha: false, desynchronized: false }) as CanvasRenderingContext2D,
+		html: chtml,
+		drawn: { top: 0, bottom: 0, left: 0, right: 0 },
+		range: { top: -0xFFFFFFFF, bottom: -0xFFFFFFFF },
+		vPos: -0xFFFFFFFF,
+		channels,
+		transform: { x: 0, y: 0 },
+		drawStart: 0,
+	};
+	slice.ctx.font = '10px monospace';
+	slice.ctx.imageSmoothingEnabled = false;
+	slices.push(slice);
+}
+
+function setupCanvas() {
+	if (sliceCanvas1.value && sliceCanvas2.value && sliceCanvas3.value) {
+		let nbChannels = 0;
+		if (player.value.currentPlayingNode) {
+			nbChannels = player.value.currentPlayingNode.nbChannels;
+			nbChannels = nbChannels > maxChannelLimit ? maxChannelLimit : nbChannels;
+		}
+		sliceWidth = 12 + 84 * nbChannels + 2;
+		sliceHeight = halfbuf * CHAR_HEIGHT;
+		setupSlice(sliceCanvas1, nbChannels);
+		setupSlice(sliceCanvas2, nbChannels);
+		setupSlice(sliceCanvas3, nbChannels);
+	} else {
+		nextTick(() => {
+			debugw('Jumped to the next tick, is Vue ok?');
+			setupCanvas();
+		});
+	}
+}
+
 onMounted(() => {
 	player.value.load(url).then((result) => {
 		buffer = result;
@@ -117,7 +213,9 @@ onMounted(() => {
 			player.value.play(buffer);
 			progress.value!.max = player.value.duration();
 			bakeNumberRow();
-			display();
+			//populateCanvasSlices();
+			setupCanvas();
+			display(true);
 		} catch (err) {
 			console.warn(err);
 		}
@@ -156,6 +254,8 @@ function stop(noDisplayUpdate = false) {
 	if (!noDisplayUpdate) {
 		try {
 			player.value.play(buffer);
+			lastDrawnRow = -1;
+			lastPattern = -1;
 			display(true);
 		} catch (err) {
 			console.warn(err);
@@ -170,16 +270,12 @@ function initSeek() {
 	isSeeking = true;
 }
 
-function performSeek() {
+function performSeek(forceUpate = false) {
 	const noNode = !player.value.currentPlayingNode;
-	if (noNode) {
-		player.value.play(buffer);
-	}
+	if (noNode) player.value.play(buffer);
 	player.value.seek(position.value);
-	display();
-	if (noNode) {
-		player.value.stop();
-	}
+	if (!patternHide.value || forceUpate) display(true);
+	if (noNode) player.value.stop();
 	isSeeking = false;
 }
 
@@ -188,6 +284,9 @@ function toggleVisible() {
 	if (!hide.value) {
 		lastPattern = -1;
 		lastDrawnRow = -1;
+		nextTick(() => {
+			playPause();
+		});
 	}
 	nextTick(() => { stop(hide.value); });
 }
@@ -198,131 +297,106 @@ function togglePattern() {
 
 	if (player.value.getRow() === 0 && player.value.getPattern() === 0) {
 		try {
-			player.value.play(buffer);
-			display(true);
+			performSeek(true);
 		} catch (err) {
 			console.warn(err);
 		}
 		player.value.stop();
-	} else {
-		display(true);
 	}
 }
 
-function drawPattern() {
-	if (!displayCanvas.value) return;
-	const canvas = displayCanvas.value;
+function drawSlices(skipOptimizationChecks = false) {
+	if (rowBuffer <= 0) {
+		lastDrawnRow = player.value.getPattern();
+		lastPattern = player.value.getRow();
+		return;
+	}
 
-	const startTime = performance.now();
 	const pattern = player.value.getPattern();
-	const nbRows = player.value.getPatternNumRows(pattern);
 	const row = player.value.getRow();
-	const halfbuf = rowBuffer / 2;
-	const minRow = row - halfbuf;
-	const maxRow = row + halfbuf;
+	const lower = row + halfbuf;
+	const upper = row - halfbuf;
+	const newDisplayTanslalation = -row * CHAR_HEIGHT;
+	let curRow = row - halfbuf;
 
-	let rowDif = 0;
+	if (pattern === lastPattern && !skipOptimizationChecks && row !== lastDrawnRow) {
+		const rowDif = row - lastDrawnRow;
+		const isRowDirPos = rowDif > 0;
+		const rowDir = !isRowDirPos as unknown as number;
+		const rowDirInv = 1 - 1 * rowDir;
+		const norm = 1 - 2 * rowDir;
+		const oneAndHalfBuf = halfbuf * 3;
 
-	let nbChannels = 0;
-	if (player.value.currentPlayingNode) {
-		nbChannels = player.value.currentPlayingNode.nbChannels;
-	}
-	if (pattern === lastPattern) {
-		rowDif = row - lastDrawnRow;
-	} else {
-		if (patternTime.initial !== 0 && !alreadyHiddenOnce) {
-			const trackerTime = player.value.currentPlayingNode.getProcessTime();
+		//debug('rowDif', rowDif, 'rowDir', rowDir, 'norm', norm, 'isRowDirPos', isRowDirPos);
 
-			if (patternTime.initial + trackerTime.max > MAX_TIME_SPENT && trackerTime.max + patternTime.max > MAX_TIME_PER_ROW) {
-				alreadyHiddenOnce = true;
-				togglePattern();
-				return;
+		slices.forEach((sli) => {
+			sli.vPos -= rowDif;
+			if (sli.vPos <= 0 || sli.vPos >= oneAndHalfBuf) {
+				sli.drawStart += oneAndHalfBuf * norm;
+				sli.vPos = oneAndHalfBuf * rowDirInv;
+				sli.transform.y += (oneAndHalfBuf * CHAR_HEIGHT) * norm;
+				sli.html.style.transform = 'translateY(' + sli.transform.y + 'px)';
+				sli.drawn = {
+					top: 0xFFFFFFFF,
+					bottom: -0xFFFFFFFF,
+					left: -0xFFFFFFFF,
+					right: -0xFFFFFFFF,
+				};
+
+				sli.ctx.fillStyle = colours.background;
+				sli.ctx.fillRect(0, 0, sliceWidth, sliceHeight);
+				sli.ctx.drawImage(numberRowCanvas, 0, -CHAR_HEIGHT * sli.drawStart);
+
+				//debug(sli);
 			}
-		}
+			for (let i = 0; i < halfbuf; i++) {
+				const newRow = sli.drawStart + i;
 
-		patternTime = { 'current': 0, 'max': 0, 'initial': 0 };
-		alreadyDrawn = [];
-		if (canvas.width !== (12 + 84 * nbChannels + 2)) canvas.width = 12 + 84 * nbChannels + 2;
-		if (canvas.height !== (12 * nbRows)) canvas.height = 12 * nbRows;
+				if (sli.drawn.bottom >= newRow && sli.drawn.top <= newRow || newRow < upper || newRow < upper) continue;
+				if (sli.drawn.top > newRow) sli.drawn.top = newRow;
+				if (sli.drawn.bottom <= newRow) sli.drawn.bottom = newRow;
+
+				drawRow(sli, newRow, pattern, (2 * CHAR_WIDTH), i * CHAR_HEIGHT + ROW_OFFSET_Y);
+			}
+		});
+		//debug_playPause();
+	} else {
+		slices.forEach((sli, i) => {
+			sli.drawStart = curRow;
+			sli.vPos = halfbuf * (i + 1);
+			sli.transform.y = -newDisplayTanslalation;
+			sli.html.style.transform = 'translateY(' + sli.transform.y + 'px)';
+			sli.drawn = {
+				top: 0xFFFFFFFF,
+				bottom: -0xFFFFFFFF,
+				left: -0xFFFFFFFF,
+				right: -0xFFFFFFFF,
+			};
+
+			sli.ctx.fillStyle = colours.background;
+			sli.ctx.fillRect(0, 0, sliceWidth, sliceHeight);
+			sli.ctx.drawImage(numberRowCanvas, 0, -CHAR_HEIGHT * curRow);
+
+			for (let itter = 0; itter < halfbuf; itter++) {
+				if (sli.drawn.top > curRow) sli.drawn.top = curRow;
+				if (sli.drawn.bottom <= curRow) sli.drawn.bottom = curRow;
+				drawRow(sli, curRow, pattern, (2 * CHAR_WIDTH), itter * CHAR_HEIGHT + ROW_OFFSET_Y);
+				curRow++;
+				if (curRow > lower) break;
+			}
+			//debug(sli);
+		});
 	}
 
-	const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true }) as CanvasRenderingContext2D;
-	if (ctx.font !== '10px monospace') ctx.font = '10px monospace';
-	ctx.imageSmoothingEnabled = false;
-	if (pattern !== lastPattern) {
-		ctx.fillStyle = colours.background;
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
-		ctx.drawImage( numberRowCanvas, 0, 0 );
-	}
-
-	ctx.fillStyle = colours.foreground.default;
-	for (let rowOffset = minRow + rowDif; rowOffset < maxRow + rowDif; rowOffset++) {
-		const rowToDraw = rowOffset - rowDif;
-
-		if (alreadyDrawn[rowToDraw] === true) continue;
-
-		if (rowToDraw >= 0 && rowToDraw < nbRows) {
-			const baseOffset = 2 * CHAR_WIDTH;
-			const baseRowOffset = ROW_OFFSET_Y + rowToDraw * CHAR_HEIGHT;
-			let done = drawRow(ctx, rowToDraw, nbChannels, pattern, baseOffset, baseRowOffset);
-
-			alreadyDrawn[rowToDraw] = done;
-		}
-	}
+	if (sliceDisplay.value) sliceDisplay.value.style.transform = 'translateY(' + newDisplayTanslalation + 'px)';
 
 	lastDrawnRow = row;
 	lastPattern = pattern;
-
-	patternTime.current = performance.now() - startTime;
-	if (patternTime.initial !== 0 && patternTime.current > patternTime.max) patternTime.max = patternTime.current;
-	else if (patternTime.initial === 0) patternTime.initial = patternTime.current;
 }
 
-function drawPetternPreview() {
-	if (!displayCanvas.value) return;
-	const canvas = displayCanvas.value;
-
-	const pattern = player.value.getPattern();
-	const nbRows = player.value.getPatternNumRows(pattern);
-	const row = player.value.getRow();
-	const halfbuf = rowBuffer / 2;
-	alreadyDrawn = [];
-
-	let nbChannels = 0;
-	if (player.value.currentPlayingNode) {
-		nbChannels = player.value.currentPlayingNode.nbChannels;
-	}
-	if (canvas.width !== (12 + 84 * nbChannels + 2)) canvas.width = 12 + 84 * nbChannels + 2;
-	if (canvas.height !== (12 * rowBuffer)) canvas.height = 12 * rowBuffer;
-
-	const ctx = canvas.getContext('2d', { alpha: false }) as CanvasRenderingContext2D;
-	ctx.font = '10px monospace';
-	ctx.imageSmoothingEnabled = false;
-	ctx.fillStyle = colours.background;
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	ctx.drawImage( numberRowCanvas, 0, (halfbuf - row) * CHAR_HEIGHT );
-
-	for (let rowOffset = 0; rowOffset < rowBuffer; rowOffset++) {
-		const rowToDraw = rowOffset + row - halfbuf;
-
-		if (rowToDraw >= 0 && rowToDraw < nbRows) {
-			const baseOffset = 2 * CHAR_WIDTH;
-			const baseRowOffset = ROW_OFFSET_Y + rowOffset * CHAR_HEIGHT;
-			drawRow(ctx, rowToDraw, nbChannels, pattern, baseOffset, baseRowOffset);
-		} else if (rowToDraw >= 0) {
-			const baseRowOffset = ROW_OFFSET_Y + rowOffset * CHAR_HEIGHT;
-			ctx.fillStyle = colours.background;
-			ctx.fillRect(0, baseRowOffset - CHAR_HEIGHT, CHAR_WIDTH * 2, baseRowOffset);
-		}
-	}
-
-	lastPattern = -1;
-	lastDrawnRow = -1;
-}
-
-function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, pattern: number, drawX = (2 * CHAR_WIDTH), drawY = ROW_OFFSET_Y) {
+function drawRow(slice: CanvasDisplay, row: number, pattern: number, drawX = (2 * CHAR_WIDTH), drawY = ROW_OFFSET_Y) {
 	if (!player.value.currentPlayingNode) return false;
-	if (alreadyDrawn[row]) return true;
+	if (row < 0 || row > player.value.getPatternNumRows(pattern) - 1) return false;
 	const spacer = 11;
 	const space = ' ';
 	let seperators = '';
@@ -331,7 +405,7 @@ function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, p
 	let volume = '';
 	let fx = '';
 	let op = '';
-	for (let channel = 0; channel < channels; channel++) {
+	for (let channel = 0; channel < slice.channels; channel++) {
 		const part = player.value.getPatternRowChannel(pattern, row, channel);
 
 		seperators += '|' + space.repeat( spacer + 2 );
@@ -342,29 +416,34 @@ function drawRow(ctx: CanvasRenderingContext2D, row: number, channels: number, p
 		op += part.substring(11, 13) + space.repeat( spacer + 1 );
 	}
 
-	ctx.fillStyle = colours.foreground.default;
-	ctx.fillText(seperators, drawX, drawY);
+	//console.debug( 'seperators: ' + seperators + '\nnote: ' + note + '\ninstr: ' + instr + '\nvolume: ' + volume + '\nfx: ' + fx + '\nop: ' + op);
 
-	ctx.fillStyle = colours.foreground.default;
-	ctx.fillText(note, drawX + CHAR_WIDTH, drawY);
+	//slice.ctx.fillStyle = '#ff00ff88';
+	//slice.ctx.fillRect(0, drawY - CHAR_HEIGHT, 512, CHAR_HEIGHT);
 
-	ctx.fillStyle = colours.foreground.instr;
-	ctx.fillText(instr, drawX + CHAR_WIDTH * 5, drawY);
+	slice.ctx.fillStyle = colours.foreground.default;
+	slice.ctx.fillText(seperators, drawX, drawY);
 
-	ctx.fillStyle = colours.foreground.volume;
-	ctx.fillText(volume, drawX + CHAR_WIDTH * 7, drawY);
+	slice.ctx.fillStyle = colours.foreground.default;
+	slice.ctx.fillText(note, drawX + CHAR_WIDTH, drawY);
 
-	ctx.fillStyle = colours.foreground.fx;
-	ctx.fillText(fx, drawX + CHAR_WIDTH * 11, drawY);
+	slice.ctx.fillStyle = colours.foreground.instr;
+	slice.ctx.fillText(instr, drawX + CHAR_WIDTH * 5, drawY);
 
-	ctx.fillStyle = colours.foreground.operant;
-	ctx.fillText(op, drawX + CHAR_WIDTH * 12, drawY);
+	slice.ctx.fillStyle = colours.foreground.volume;
+	slice.ctx.fillText(volume, drawX + CHAR_WIDTH * 7, drawY);
+
+	slice.ctx.fillStyle = colours.foreground.fx;
+	slice.ctx.fillText(fx, drawX + CHAR_WIDTH * 11, drawY);
+
+	slice.ctx.fillStyle = colours.foreground.operant;
+	slice.ctx.fillText(op, drawX + CHAR_WIDTH * 12, drawY);
 
 	return true;
 }
 
 function display(skipOptimizationChecks = false) {
-	if (!displayCanvas.value || !displayCanvas.value.parentElement) {
+	if (!sliceDisplay.value || !sliceDisplay.value.parentElement) {
 		stop();
 		return;
 	}
@@ -373,7 +452,7 @@ function display(skipOptimizationChecks = false) {
 
 	if (firstFrame) {
 		// Changing it to false should enable pattern display by default.
-		patternHide.value = true;
+		patternHide.value = false;
 		handleScrollBarEnable();
 		firstFrame = false;
 	}
@@ -383,11 +462,7 @@ function display(skipOptimizationChecks = false) {
 
 	if ( row === lastDrawnRow && pattern === lastPattern && !skipOptimizationChecks) return;
 
-	// Size vs speed
-	if (patternHide.value) drawPetternPreview();
-	else drawPattern();
-
-	displayCanvas.value.style.top = !patternHide.value ? 'calc( 50% - ' + (row * CHAR_HEIGHT) + 'px )' : '0%';
+	drawSlices(skipOptimizationChecks);
 }
 
 let suppressScrollSliderWatcher = false;
@@ -396,10 +471,10 @@ function scrollHandler() {
 	suppressScrollSliderWatcher = true;
 
 	if (!patternScrollSlider.value) return;
-	if (!displayCanvas.value) return;
-	if (!displayCanvas.value.parentElement) return;
+	if (!sliceDisplay.value) return;
+	if (!sliceDisplay.value.parentElement) return;
 
-	patternScrollSliderPos.value = (displayCanvas.value.parentElement.scrollLeft) / (displayCanvas.value.width - displayCanvas.value.parentElement.offsetWidth) * 100;
+	patternScrollSliderPos.value = (sliceDisplay.value.parentElement.scrollLeft) / (sliceWidth - sliceDisplay.value.parentElement.offsetWidth) * 100;
 	patternScrollSlider.value.style.opacity = '1';
 }
 
@@ -414,21 +489,21 @@ function handleScrollBarEnable() {
 	patternScrollSliderShow.value = (!patternHide.value && !isTouchUsing);
 	if (patternScrollSliderShow.value !== true) return;
 
-	if (!displayCanvas.value) return;
-	if (!displayCanvas.value.parentElement) return;
+	if (!sliceDisplay.value) return;
+	if (!sliceDisplay.value.parentElement) return;
 	if (firstFrame) {
-		patternScrollSliderShow.value = (12 + 84 * player.value.getPatternNumRows(player.value.getPattern()) + 2 > displayCanvas.value.parentElement.offsetWidth);
+		patternScrollSliderShow.value = (12 + 84 * player.value.getPatternNumRows(player.value.getPattern()) + 2 > sliceDisplay.value.parentElement.offsetWidth);
 	} else {
-		patternScrollSliderShow.value = (displayCanvas.value.width > displayCanvas.value.parentElement.offsetWidth);
+		patternScrollSliderShow.value = (sliceWidth > sliceDisplay.value.parentElement.offsetWidth);
 	}
 }
 
 watch(patternScrollSliderPos, () => {
 	if (suppressScrollSliderWatcher) return;
-	if (!displayCanvas.value) return;
-	if (!displayCanvas.value.parentElement) return;
+	if (!sliceDisplay.value) return;
+	if (!sliceDisplay.value.parentElement) return;
 
-	displayCanvas.value.parentElement.scrollLeft = (displayCanvas.value.width - displayCanvas.value.parentElement.offsetWidth) * patternScrollSliderPos.value / 100;
+	sliceDisplay.value.parentElement.scrollLeft = (sliceWidth - sliceDisplay.value.parentElement.offsetWidth) * patternScrollSliderPos.value / 100;
 });
 
 onDeactivated(() => {
@@ -442,7 +517,7 @@ onDeactivated(() => {
 .hide {
 	border-radius: var(--MI-radius-sm) !important;
 	background-color: black !important;
-	color: var(--MI_THEME-accentLighten) !important;
+	color: var(--MI_THEME-indicator) !important;
 	font-size: 12px !important;
 }
 
@@ -458,7 +533,7 @@ onDeactivated(() => {
 		position: absolute;
 		border-radius: var(--MI-radius-sm);
 		background-color: var(--MI_THEME-fg);
-		color: var(--MI_THEME-accentLighten);
+		color: var(--MI_THEME-indicator);
 		font-size: 14px;
 		opacity: .5;
 		padding: 3px 6px;
@@ -484,33 +559,39 @@ onDeactivated(() => {
 			display: none;
 		}
 
-		.pattern_canvas {
+		.slice_display {
+			display: grid;
 			position: relative;
 			background-color: black;
 			image-rendering: pixelated;
-			pointer-events: none;
-			z-index: 0;
+
+			.patternSlice {
+				image-rendering: pixelated;
+			}
 		}
 
 		.patternShadowTop {
 			background: #00000080;
 			width: 100%;
-			height: calc( 50% - 14px );
-			translate: 0 -100%;
-			top: calc( 50% - 14px );
+			height: calc(50% - 14px);
+			translate: -50% -100%;
+			top: calc(50% - 14px);
 			position: absolute;
 			pointer-events: none;
 			z-index: 2;
+			display: none;
 		}
 
 		.patternShadowBottom {
 			background: #00000080;
 			width: 100%;
-			height: calc( 50% - 12px );
-			top: calc( 50% - 1px );
+			height: calc(50% - 27px);
+			translate: -50% 0;
+			top: calc(50% - 2px);
 			position: absolute;
 			pointer-events: none;
 			z-index: 2;
+			display: none;
 		}
 
 		.pattern_hide {
@@ -603,7 +684,7 @@ onDeactivated(() => {
 				height: 100%;
 				width: 14px;
 				border-radius: 0;
-				background: var(--MI_THEME-accentLighten);
+				background: var(--MI_THEME-indicator);
 				cursor: pointer;
 				-webkit-appearance: none;
 				box-shadow: calc(-100vw - 14px) 0 0 100vw var(--MI_THEME-accent);
@@ -632,7 +713,7 @@ onDeactivated(() => {
 				height: 100%;
 				border-radius: 0;
 				width: 14px;
-				background: var(--MI_THEME-accentLighten);
+				background: var(--MI_THEME-indicator);
 				cursor: pointer;
 			}
 
@@ -665,7 +746,7 @@ onDeactivated(() => {
 				height: 100%;
 				width: 14px;
 				border-radius: 0;
-				background: var(--MI_THEME-accentLighten);
+				background: var(--MI_THEME-indicator);
 				cursor: pointer;
 			}
 
