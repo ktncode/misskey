@@ -201,10 +201,12 @@ export class StreamingApiServerService {
 
 		const globalEv = new EventEmitter();
 
-		this.redisForSub.on('message', (_: string, data: string) => {
+		const onRedis = (_: string, data: string) => {
 			const parsed = JSON.parse(data);
 			globalEv.emit('message', parsed);
-		});
+		};
+
+		this.redisForSub.on('message', onRedis);
 
 		this.#wss.on('connection', async (connection: WebSocket.WebSocket, request: http.IncomingMessage, ctx: {
 			stream: MainStreamConnection,
@@ -225,6 +227,7 @@ export class StreamingApiServerService {
 
 			this.#connections.set(connection, Date.now());
 
+			// TODO use collapsed queue
 			const userUpdateIntervalId = user ? setInterval(() => {
 				this.usersService.updateLastActiveDate(user);
 			}, 1000 * 60 * 5) : null;
@@ -235,6 +238,7 @@ export class StreamingApiServerService {
 			connection.once('close', () => {
 				ev.removeAllListeners();
 				stream.dispose();
+				this.redisForSub.off('message', onRedis);
 				globalEv.off('message', onRedisMessage);
 				this.#connections.delete(connection);
 				if (userUpdateIntervalId) clearInterval(userUpdateIntervalId);
@@ -260,13 +264,24 @@ export class StreamingApiServerService {
 	}
 
 	@bindThis
-	public detach(): Promise<void> {
+	public async detach(): Promise<void> {
 		if (this.#cleanConnectionsIntervalId) {
 			clearInterval(this.#cleanConnectionsIntervalId);
 			this.#cleanConnectionsIntervalId = null;
 		}
-		return new Promise((resolve) => {
-			this.#wss.close(() => resolve());
+
+		for (const connection of this.#connections.keys()) {
+			connection.close();
+		}
+
+		this.#connections.clear();
+		this.#connectionsByClient.clear();
+
+		await new Promise<void>((resolve, reject) => {
+			this.#wss.close(err => {
+				if (err) reject(err);
+				else resolve();
+			});
 		});
 	}
 }
