@@ -327,7 +327,7 @@ function drawSlices(skipOptimizationChecks = false) {
 		const norm = 1 - 2 * rowDir;
 		const oneAndHalfBuf = halfbuf * 3;
 
-		debug('rowDif', rowDif, 'rowDir', rowDir, 'norm', norm, 'isRowDirPos', isRowDirPos);
+		//debug('rowDif', rowDif, 'rowDir', rowDir, 'norm', norm, 'isRowDirPos', isRowDirPos);
 
 		slices.forEach((sli) => {
 			sli.vPos -= rowDif;
@@ -347,35 +347,17 @@ function drawSlices(skipOptimizationChecks = false) {
 				sli.ctx.fillRect(0, 0, sliceWidth, sliceHeight);
 				sli.ctx.drawImage(numberRowCanvas, 0, -CHAR_HEIGHT * sli.drawStart);
 
-				debug(sli);
+				//debug(sli);
 			}
-			let logqueue = [];
 			for (let i = 0; i < halfbuf; i++) {
 				const newRow = sli.drawStart + i;
 
-				let temp2 = function() {
-					return {
-						//'newRow > lower': newRow > lower,
-						//'newRow < upper': newRow < upper,
-						'sli.drawn.top < newRow': sli.drawn.top <= newRow,
-						'sli.drawn.bottom <= newRow': sli.drawn.bottom >= newRow,
-					};
-				};
-				let temp1 = function() {
-					let a = temp2();
-					//return a['newRow < upper'] || a['newRow > lower'] || a['sli.drawn.bottom <= newRow'] || a['sli.drawn.top < newRow'];
-					return a['sli.drawn.bottom <= newRow'] && a['sli.drawn.top < newRow'];
-				};
-
-				logqueue.push({ temp1: temp1(), temp2: temp2(), 'newRow': newRow, 'lower': lower, 'upper': upper, 'sli.drawn.top': sli.drawn.top, 'sli.drawn.bottom': sli.drawn.bottom });
-
-				if (temp1()) continue;
+				if (sli.drawn.bottom >= newRow && sli.drawn.top <= newRow || newRow < upper || newRow < upper) continue;
 				if (sli.drawn.top > newRow) sli.drawn.top = newRow;
 				if (sli.drawn.bottom <= newRow) sli.drawn.bottom = newRow;
 
 				drawRow(sli, newRow, pattern, (2 * CHAR_WIDTH), i * CHAR_HEIGHT + ROW_OFFSET_Y);
 			}
-			console.table(logqueue);
 		});
 		//debug_playPause();
 	} else {
@@ -402,7 +384,7 @@ function drawSlices(skipOptimizationChecks = false) {
 				curRow++;
 				if (curRow > lower) break;
 			}
-			debug(sli);
+			//debug(sli);
 		});
 	}
 
@@ -435,6 +417,9 @@ function drawRow(slice: CanvasDisplay, row: number, pattern: number, drawX = (2 
 	}
 
 	//console.debug( 'seperators: ' + seperators + '\nnote: ' + note + '\ninstr: ' + instr + '\nvolume: ' + volume + '\nfx: ' + fx + '\nop: ' + op);
+
+	//slice.ctx.fillStyle = '#ff00ff88';
+	//slice.ctx.fillRect(0, drawY - CHAR_HEIGHT, 512, CHAR_HEIGHT);
 
 	slice.ctx.fillStyle = colours.foreground.default;
 	slice.ctx.fillText(seperators, drawX, drawY);
