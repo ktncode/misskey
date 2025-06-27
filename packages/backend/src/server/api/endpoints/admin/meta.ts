@@ -449,6 +449,10 @@ export const meta = {
 				type: 'number',
 				optional: false, nullable: false,
 			},
+			translatorType: {
+				type: 'string',
+				optional: false, nullable: false,
+			},
 			deeplAuthKey: {
 				type: 'string',
 				optional: false, nullable: true,
@@ -732,6 +736,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				objectStorageSetPublicRead: instance.objectStorageSetPublicRead,
 				objectStorageS3ForcePathStyle: instance.objectStorageS3ForcePathStyle,
 				translationTimeout: instance.translationTimeout,
+				translatorType: instance.translatorType,
 				deeplAuthKey: instance.deeplAuthKey,
 				deeplIsPro: instance.deeplIsPro,
 				deeplFreeMode: instance.deeplFreeMode,

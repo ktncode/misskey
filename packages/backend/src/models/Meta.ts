@@ -388,6 +388,13 @@ export class MiMeta {
 	})
 	public translationTimeout: number;
 
+	@Column('enum', {
+		enum: ['none', 'deepl', 'libre', 'google'],
+		default: 'none',
+		comment: 'Translation service type',
+	})
+	public translatorType: 'none' | 'deepl' | 'libre' | 'google';
+
 	@Column('varchar', {
 		length: 1024,
 		nullable: true,

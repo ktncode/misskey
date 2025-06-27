@@ -9255,6 +9255,7 @@ export type operations = {
             notesPerOneAd: number;
             backgroundImageUrl: string | null;
             translationTimeout: number;
+            translatorType: string;
             deeplAuthKey: string | null;
             deeplIsPro: boolean;
             deeplFreeMode: boolean;
@@ -12177,6 +12178,8 @@ export type operations = {
           maintainerEmail?: string | null;
           langs?: string[];
           translationTimeout?: number;
+          /** @enum {string} */
+          translatorType?: 'none' | 'deepl' | 'libre' | 'google';
           deeplAuthKey?: string | null;
           deeplIsPro?: boolean;
           deeplFreeMode?: boolean;

@@ -5,6 +5,7 @@
 
 import { URLSearchParams } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
+import { translate as googleTranslate } from '@vitalets/google-translate-api';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
@@ -102,7 +103,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const canDeeplFree = this.serverSettings.deeplFreeMode && !!this.serverSettings.deeplFreeInstance;
 			const canDeepl = !!this.serverSettings.deeplAuthKey || canDeeplFree;
 			const canLibre = !!this.serverSettings.libreTranslateURL;
-			if (!canDeepl && !canLibre) throw new ApiError(meta.errors.unavailable);
+			const canGoogle = this.serverSettings.translatorType === 'google';
+			
+			if (this.serverSettings.translatorType === 'none' || 
+				(this.serverSettings.translatorType === 'deepl' && !canDeepl) ||
+				(this.serverSettings.translatorType === 'libre' && !canLibre) ||
+				(this.serverSettings.translatorType === 'google' && !canGoogle)) {
+				throw new ApiError(meta.errors.unavailable);
+			}
 
 			let targetLang = ps.targetLang;
 			if (targetLang.includes('-')) targetLang = targetLang.split('-')[0];
@@ -127,8 +135,28 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			// Ignore deeplFreeInstance unless deeplFreeMode is set
 			const deeplFreeInstance = this.serverSettings.deeplFreeMode ? this.serverSettings.deeplFreeInstance : null;
 
+			// Google Translate handling
+			if (this.serverSettings.translatorType === 'google') {
+				const result = await googleTranslate(note.text, { to: targetLang });
+				
+				// Google Translateのレスポンスから言語情報を取得（rawレスポンスの構造を安全に処理）
+				let sourceLang = 'unknown';
+				try {
+					if (result.raw && Array.isArray(result.raw) && result.raw[0] && Array.isArray(result.raw[0]) && result.raw[0][2]) {
+						sourceLang = result.raw[0][2];
+					}
+				} catch {
+					// 言語検出に失敗した場合はunknownのまま
+				}
+				
+				return {
+					sourceLang,
+					text: result.text,
+				};
+			}
+
 			// DeepL/DeepLX handling
-			if (this.serverSettings.deeplAuthKey || deeplFreeInstance) {
+			if (this.serverSettings.translatorType === 'deepl') {
 				const params = new URLSearchParams();
 				if (this.serverSettings.deeplAuthKey) params.append('auth_key', this.serverSettings.deeplAuthKey);
 				params.append('text', note.text);
@@ -178,7 +206,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			// LibreTranslate handling
-			if (this.serverSettings.libreTranslateURL) {
+			if (this.serverSettings.translatorType === 'libre' && this.serverSettings.libreTranslateURL) {
 				const res = await this.httpRequestService.send(this.serverSettings.libreTranslateURL, {
 					method: 'POST',
 					headers: {

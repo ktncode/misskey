@@ -90,6 +90,7 @@
 		"@simplewebauthn/server": "12.0.0",
 		"@sinonjs/fake-timers": "11.3.1",
 		"@smithy/node-http-handler": "2.5.0",
+		"@vitalets/google-translate-api": "9.2.1",
 		"mfm-js": "npm:@transfem-org/sfm-js@0.24.6",
 		"@twemoji/parser": "15.1.1",
 		"accepts": "1.3.8",

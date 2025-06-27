@@ -104,6 +104,7 @@ export const paramDef = {
 			},
 		},
 		translationTimeout: { type: 'number' },
+		translatorType: { type: 'string', enum: ['none', 'deepl', 'libre', 'google'] },
 		deeplAuthKey: { type: 'string', nullable: true },
 		deeplIsPro: { type: 'boolean' },
 		deeplFreeMode: { type: 'boolean' },
@@ -563,6 +564,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.translationTimeout !== undefined) {
 				set.translationTimeout = ps.translationTimeout;
+			}
+
+			if (ps.translatorType !== undefined) {
+				set.translatorType = ps.translatorType;
 			}
 
 			if (ps.deeplAuthKey !== undefined) {
