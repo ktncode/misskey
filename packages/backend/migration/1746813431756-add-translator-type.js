@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Kotone <git@ktn.works>
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 export class AddTranslatorType1746813431756 {
 	name = 'AddTranslatorType1746813431756'
 
