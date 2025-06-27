@@ -442,7 +442,7 @@ export const PREF_DEF = {
 		default: null as string | null,
 	},
 	noteDesign: {
-		default: 'sharkey' as 'sharkey' | 'misskey',
+		default: 'misskey' as 'sharkey' | 'misskey',
 	},
 	notificationClickable: {
 		default: false,
@@ -507,7 +507,7 @@ export const PREF_DEF = {
 		},
 	} as Pref<boolean>,
 	cornerRadius: {
-		default: 'sharkey',
+		default: 'misskey',
 		needsReload: true,
 		onSet: cornerRadius => {
 			if (cornerRadius === 'sharkey') {
