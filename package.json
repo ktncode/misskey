@@ -1,10 +1,10 @@
 {
-	"name": "sharkey",
-	"version": "2025.4.3",
-	"codename": "shonk",
+	"name": "misskey",
+	"version": "2025.4.1-ktn.1",
+	"codename": "wind",
 	"repository": {
 		"type": "git",
-		"url": "https://activitypub.software/TransFem-org/Sharkey.git"
+		"url": "https://github.com/ktncode/misskey.git"
 	},
 	"packageManager": "pnpm@9.6.0",
 	"workspaces": [
