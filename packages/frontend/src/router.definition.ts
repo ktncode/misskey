@@ -204,8 +204,8 @@ export const ROUTE_DEF = [{
 	path: '/contact',
 	component: page(() => import('@/pages/contact.vue')),
 }, {
-	path: '/about-sharkey',
-	component: page(() => import('@/pages/about-sharkey.vue')),
+	path: '/about-misskey',
+	component: page(() => import('@/pages/about-misskey.vue')),
 }, {
 	path: '/invite',
 	name: 'invite',
