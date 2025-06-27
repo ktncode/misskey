@@ -10,6 +10,5900 @@ export interface ILocale {
 }
 export interface Locale extends ILocale {
     /**
+     * ようこそ！Misskeyは、オープンソースの分散型マイクロブログサービスです。
+     * 「ノート」を作成して、いま起こっていることを共有したり、あなたについて皆に発信しよう📡
+     * 「リアクション」機能で、皆のノートに素早く反応を追加することもできます👍
+     * 新しい世界を探検しよう🚀
+     */
+    "introMisskey": string;
+    /**
+     * {name}は、オープンソースのプラットフォーム<b>Misskey</b>のサーバーのひとつです。
+     */
+    "poweredByMisskeyDescription": ParameterizedString<"name">;
+    /**
+     * {user}がリノート
+     */
+    "renotedBy": ParameterizedString<"user">;
+    /**
+     * Approvals
+     */
+    "approvals": string;
+    /**
+     * リノートのリンクをコピー
+     */
+    "copyLinkRenote": string;
+    /**
+     * このノートを削除してもう一度編集しますか？このノートへのリアクション、リノート、返信も全て削除されます。
+     */
+    "deleteAndEditConfirm": string;
+    /**
+     * Open remote profile
+     */
+    "openRemoteProfile": string;
+    /**
+     * Link to external site warning exclusion list
+     */
+    "trustedLinkUrlPatterns": string;
+    /**
+     * Separate with spaces for an AND condition or with line breaks for an OR condition. Using surrounding keywords with slashes will turn them into a regular expression. If you write only the domain name, it will be a backward match.
+     */
+    "trustedLinkUrlPatternsDescription": string;
+    /**
+     * Mutuals
+     */
+    "mutuals": string;
+    /**
+     * Private account
+     */
+    "isLocked": string;
+    /**
+     * Administrator
+     */
+    "isAdmin": string;
+    /**
+     * Bot user
+     */
+    "isBot": string;
+    /**
+     * Open
+     */
+    "open": string;
+    /**
+     * Destination address
+     */
+    "emailDestination": string;
+    /**
+     * Date
+     */
+    "date": string;
+    /**
+     * リノート
+     */
+    "renote": string;
+    /**
+     * リノート解除
+     */
+    "unrenote": string;
+    /**
+     * Boost (hold Shift for visibility menu)
+     */
+    "renoteShift": string;
+    /**
+     * リノートしました。
+     */
+    "renoted": string;
+    /**
+     * Quoted.
+     */
+    "quoted": string;
+    /**
+     * Unboosted.
+     */
+    "rmboost": string;
+    /**
+     * {name} にリノートしました。
+     */
+    "renotedToX": ParameterizedString<"name">;
+    /**
+     * この投稿はリノートできません。
+     */
+    "cantRenote": string;
+    /**
+     * リノートをリノートすることはできません。
+     */
+    "cantReRenote": string;
+    /**
+     * チャンネル内リノート
+     */
+    "inChannelRenote": string;
+    /**
+     * Muted
+     */
+    "muted": string;
+    /**
+     * リノートをミュート
+     */
+    "renoteMute": string;
+    /**
+     * Boosts muted
+     */
+    "renoteMuted": string;
+    /**
+     * リノートのミュートを解除
+     */
+    "renoteUnmute": string;
+    /**
+     * Mark all media from user as NSFW
+     */
+    "markAsNSFW": string;
+    /**
+     * Mark as NSFW
+     */
+    "markInstanceAsNSFW": string;
+    /**
+     * Are you sure that you want to mark all media from this account as NSFW?
+     */
+    "nsfwConfirm": string;
+    /**
+     * Are you sure that you want to unmark all media from this account as NSFW?
+     */
+    "unNsfwConfirm": string;
+    /**
+     * Are you sure that you want to approve this account?
+     */
+    "approveConfirm": string;
+    /**
+     * このアカウントがプログラムによって運用される場合は、このフラグをオンにします。オンにすると、反応の連鎖を防ぐためのフラグとして他の開発者に役立ったり、Misskeyのシステム上での扱いがBotに合ったものになります。
+     */
+    "flagAsBotDescription": string;
+    /**
+     * Speak as a cat
+     */
+    "flagSpeakAsCat": string;
+    /**
+     * Your posts will get nyanified when in cat mode. If this isn't working, then please check that you dont have 'Disable cat speak' on under General/Note Display
+     */
+    "flagSpeakAsCatDescription": string;
+    /**
+     * リモートで続行
+     */
+    "continueOnRemote": string;
+    /**
+     * Misskey Hubからサーバーを選択
+     */
+    "chooseServerOnMisskeyHub": string;
+    /**
+     * サーバーをメディアサイレンス
+     */
+    "mediaSilenceThisInstance": string;
+    /**
+     * Reject reports from this instance
+     */
+    "rejectReports": string;
+    /**
+     * Strip quote posts from this instance
+     */
+    "rejectQuotesInstance": string;
+    /**
+     * Strip quote posts from this user
+     */
+    "rejectQuotesRemoteUser": string;
+    /**
+     * Block quote posts from this user
+     */
+    "rejectQuotesLocalUser": string;
+    /**
+     * Are you sure you wish to strip quote posts?
+     */
+    "rejectQuotesConfirm": string;
+    /**
+     * Are you sure you wish to allow quote posts?
+     */
+    "allowQuotesConfirm": string;
+    /**
+     * サイレンスしたいサーバーのホストを改行で区切って設定します。サイレンスされたサーバーに所属するアカウントはすべて「サイレンス」として扱われ、フォローがすべてリクエストになります。ブロックしたインスタンスには影響しません。
+     */
+    "silencedInstancesDescription": string;
+    /**
+     * メディアサイレンスしたサーバー
+     */
+    "mediaSilencedInstances": string;
+    /**
+     * メディアサイレンスしたいサーバーのホストを改行で区切って設定します。メディアサイレンスされたサーバーに所属するアカウントによるファイルはすべてセンシティブとして扱われ、カスタム絵文字が使用できないようになります。ブロックしたインスタンスには影響しません。
+     */
+    "mediaSilencedInstancesDescription": string;
+    /**
+     * Misskeyのインストールが完了しました！管理者アカウントを作成しましょう。
+     */
+    "intro": string;
+    /**
+     * This host is blocked implicitly because a base domain is blocked. To unblock this host, first unblock the base domain(s).
+     */
+    "blockedByBase": string;
+    /**
+     * This host is silenced implicitly because a base domain is silenced. To un-silence this host, first un-silence the base domain(s).
+     */
+    "silencedByBase": string;
+    /**
+     * This host's media is silenced implicitly because a base domain's media is silenced. To un-silence this host, first un-silence the base domain(s).
+     */
+    "mediaSilencedByBase": string;
+    /**
+     * Search drive
+     */
+    "driveSearchbarPlaceholder": string;
+    /**
+     * ファイルが選択されていません
+     */
+    "fileNotSelected": string;
+    /**
+     * Background
+     */
+    "background": string;
+    /**
+     * ユーザー名を改行で区切って指定します
+     */
+    "antennaUsersDescription": string;
+    /**
+     * Misskeyについて
+     */
+    "aboutMisskey": string;
+    /**
+     * Show content for all replies
+     */
+    "expandAllCws": string;
+    /**
+     * Hide content for all replies
+     */
+    "collapseAllCws": string;
+    /**
+     * クリップボードのテキストが長いです。テキストファイルとして添付しますか？
+     */
+    "attachAsFileQuestion": string;
+    /**
+     * 続行するには、お使いのサーバーに移動するか、このサーバーに登録・ログインする必要があります
+     */
+    "signinOrContinueOnRemote": string;
+    /**
+     * Don't use drawer-style menus
+     */
+    "disableDrawer": string;
+    /**
+     * ノートのリアクション数を表示する
+     */
+    "showReactionsCount": string;
+    /**
+     * Corner roundness
+     */
+    "cornerRadius": string;
+    /**
+     * Warn you when you forget to put alt text
+     */
+    "warnForMissingAltText": string;
+    /**
+     * DeepLX無料モード
+     */
+    "deeplFreeMode": string;
+    /**
+     * DeepLXサーバーを使用して無料でDeepL翻訳を利用します。APIキーは不要です。
+     */
+    "deeplFreeModeDescription": string;
+    /**
+     * Misskeyがアクティブな時のみサウンドを出力する
+     */
+    "useSoundOnlyWhenActive": string;
+    /**
+     * スクラッチパッドは、AiScriptの実験環境を提供します。Misskeyと対話するコードの記述、実行、結果の確認ができます。
+     */
+    "scratchpadDescription": string;
+    /**
+     * Deletion of all files queued
+     */
+    "deleteAllFilesQueued": string;
+    /**
+     * This is a system account
+     */
+    "systemAccountTitle": string;
+    /**
+     * This account is created and managed automatically by the system, and cannot be logged into.
+     */
+    "systemAccountDescription": string;
+    /**
+     * post is hidden by a filter
+     */
+    "postFiltered": string;
+    /**
+     * Enable favicon notification dot
+     */
+    "enableFaviconNotificationDot": string;
+    /**
+     * Check if the notification dot works on your instance
+     */
+    "verifyNotificationDotWorkingButton": string;
+    /**
+     * Unfortunately, this instance does not support the notification dot feature at this time.
+     */
+    "notificationDotNotWorking": string;
+    /**
+     * The notification dot is functioning properly on this instance.
+     */
+    "notificationDotWorking": string;
+    /**
+     * If the notification dot doesn't work, ask an admin to check our documentation {link}
+     */
+    "notificationDotNotWorkingAdvice": ParameterizedString<"link">;
+    /**
+     * リノートを通報
+     */
+    "reportAbuseRenote": string;
+    /**
+     * Forward report to remote instance
+     */
+    "forwardReport": string;
+    /**
+     * Instead of your account, an anonymous system account will be displayed as reporter at the remote instance.
+     */
+    "forwardReportIsAnonymous": string;
+    /**
+     * Mark report as resolved
+     */
+    "abuseMarkAsResolved": string;
+    /**
+     * Sharkey specific changes are translated in its own {link}.
+     */
+    "i18nInfoSharkey": ParameterizedString<"link">;
+    /**
+     * リノートした数
+     */
+    "renotesCount": string;
+    /**
+     * リノートされた数
+     */
+    "renotedCount": string;
+    /**
+     * Show instance ticker on replies
+     */
+    "showTickerOnReplies": string;
+    /**
+     * Disable cat speak
+     */
+    "disableCatSpeak": string;
+    /**
+     * Search Engine For Search MFM
+     */
+    "searchEngine": string;
+    /**
+     * Other
+     */
+    "searchEngineOther": string;
+    /**
+     * The custom URI must be input in the format like "https://www.google.com/search?q=\{query}" or "https://www.google.com/search?q=%s".
+     */
+    "searchEngineCustomURIDescription": string;
+    /**
+     * Custom URI
+     */
+    "searchEngineCusomURI": string;
+    /**
+     * Make public notes not indexable
+     */
+    "makeIndexable": string;
+    /**
+     * Stop note search from indexing your public notes.
+     */
+    "makeIndexableDescription": string;
+    /**
+     * Enable RSS feed
+     */
+    "enableRss": string;
+    /**
+     * Generate an RSS feed containing your basic profile details and public notes. Users can subscribe to the feed without a follow request or approval.
+     */
+    "enableRssDescription": string;
+    /**
+     * オンにすると、問題が発生したときにエラーの詳細情報がMisskeyに共有され、ソフトウェアの品質向上に役立てることができます。エラー情報には、OSのバージョン、ブラウザの種類、行動履歴などが含まれます。
+     */
+    "sendErrorReportsDescription": string;
+    /**
+     * 問い合わせ先URLが設定されていません。
+     */
+    "noInquiryUrlWarning": string;
+    /**
+     * Misskeyが更新されました！
+     */
+    "misskeyUpdated": string;
+    /**
+     * サーバー上であなたのアカウントを一意に識別するための名前。アルファベット(a~z, A~Z)、数字(0~9)、およびアンダーバー(_)が使用できます。ユーザー名は後から変更することは出来ません。
+     */
+    "usernameInfo": string;
+    /**
+     * Require approval for new users
+     */
+    "approvalRequiredForSignup": string;
+    /**
+     * Confirm your vote for "{choice}"?
+     * 　You can choose more options after confirmation.
+     */
+    "voteConfirmMulti": ParameterizedString<"choice">;
+    /**
+     * There are users awaiting approval.
+     */
+    "pendingUserApprovals": string;
+    /**
+     * Approve
+     */
+    "approveAccount": string;
+    /**
+     * Deny & Delete
+     */
+    "denyAccount": string;
+    /**
+     * Approved
+     */
+    "approved": string;
+    /**
+     * Not Approved
+     */
+    "notApproved": string;
+    /**
+     * Approval Status
+     */
+    "approvalStatus": string;
+    /**
+     * Number of replies in a thread
+     */
+    "numberOfReplies": string;
+    /**
+     * Increasing this number will display more replies. Setting this too high can cause replies to be cramped and unreadable.
+     */
+    "numberOfRepliesDescription": string;
+    /**
+     * Boost Settings
+     */
+    "boostSettings": string;
+    /**
+     * Show Visibility Selector
+     */
+    "showVisibilitySelectorOnBoost": string;
+    /**
+     * Shows the visiblity selector if enabled when clicking boost, if disabled it will use the default visiblity defined below and the selector will not show up.
+     */
+    "showVisibilitySelectorOnBoostDescription": string;
+    /**
+     * Default boost visibility
+     */
+    "visibilityOnBoost": string;
+    /**
+     * Default like emoji
+     */
+    "defaultLike": string;
+    /**
+     * Misskeyを気に入っていただけましたか？
+     */
+    "didYouLikeMisskey": string;
+    /**
+     * Misskeyは{host}が使用している無料のソフトウェアです。これからも開発を続けられるように、ぜひ寄付をお願いします！
+     */
+    "pleaseDonate": ParameterizedString<"host">;
+    /**
+     * You can also support {host} directly by donating to your instance administration.
+     */
+    "pleaseDonateInstance": ParameterizedString<"host">;
+    /**
+     * Cancel
+     */
+    "thisPostIsMissingAltTextCancel": string;
+    /**
+     * Post anyway
+     */
+    "thisPostIsMissingAltTextIgnore": string;
+    /**
+     * One of the files attached to this post is missing alt text. Please ensure all the attachments have alt text.
+     */
+    "thisPostIsMissingAltText": string;
+    /**
+     * リノートのスマート省略
+     */
+    "collapseRenotes": string;
+    /**
+     * リアクションやリノートをしたことがあるノートをたたんで表示します。
+     */
+    "collapseRenotesDescription": string;
+    /**
+     * Collapse notes replied to
+     */
+    "collapseNotesRepliedTo": string;
+    /**
+     * Collapse files
+     */
+    "collapseFiles": string;
+    /**
+     * Uncollapse CWs on notes
+     */
+    "uncollapseCW": string;
+    /**
+     * Always expand long notes
+     */
+    "expandLongNote": string;
+    /**
+     * Load conversation on replies
+     */
+    "autoloadConversation": string;
+    /**
+     * This instance is only accepting users who specify a reason for registration.
+     */
+    "approvalRequiredToRegister": string;
+    /**
+     * リアクションの最大横幅を制限し、縮小して表示する
+     */
+    "limitWidthOfReaction": string;
+    /**
+     * Cat friend :3
+     */
+    "oneko": string;
+    /**
+     * リノート一覧
+     */
+    "renotesList": string;
+    /**
+     * 照会しますか？
+     */
+    "lookupConfirm": string;
+    /**
+     * ハッシュタグのページを開きますか？
+     */
+    "openTagPageConfirm": string;
+    /**
+     * This will irreversibly delete this account. Proceed?
+     */
+    "deleteThisAccountConfirm": string;
+    /**
+     * ホスト指定
+     */
+    "specifyHost": string;
+    /**
+     * Misskeyへ
+     */
+    "goToMisskey": string;
+    /**
+     * Enable Achievements
+     */
+    "enableAchievements": string;
+    /**
+     * Turning this off will disable the achievement system
+     */
+    "turnOffAchievements": string;
+    /**
+     * Populate Hashtags with Bots
+     */
+    "enableBotTrending": string;
+    /**
+     * Turning this off will stop Bots from populating Hashtags
+     */
+    "turnOffBotTrending": string;
+    /**
+     * 返信
+     */
+    "replies": string;
+    /**
+     * リノート
+     */
+    "renotes": string;
+    /**
+     * Click to open notes
+     */
+    "clickToOpen": string;
+    /**
+     * Show bots in timeline
+     */
+    "showBots": string;
+    /**
+     * リノートを表示
+     */
+    "showRenotes": string;
+    /**
+     * ソースコードはまだ提供されていません。この問題の修正について管理者に問い合わせてください。
+     */
+    "sourceCodeIsNotYetProvided": string;
+    /**
+     * ソースコードが公開されているリポジトリがある場合、そのURLを記入します。Misskeyを現状のまま（ソースコードにいかなる変更も加えずに）使用している場合は https://github.com/misskey-dev/misskey と記入します。
+     */
+    "repositoryUrlDescription": string;
+    /**
+     * Donate
+     */
+    "donation": string;
+    /**
+     * Donation URL
+     */
+    "donationUrl": string;
+    /**
+     * Show Below Avatar
+     */
+    "showBelowAvatar": string;
+    /**
+     * 季節に応じた画面の演出
+     */
+    "seasonalScreenEffect": string;
+    /**
+     * 説明文はありません
+     */
+    "noDescription": string;
+    /**
+     * センシティブなメディアです。表示しますか？
+     */
+    "sensitiveMediaRevealConfirm": string;
+    /**
+     * Break following relationships
+     */
+    "severAllFollowRelations": string;
+    /**
+     * Really break all follow relationships? This is irreversible! This will break {followingCount} following and {followersCount} follower relations on {instanceName}!
+     */
+    "severAllFollowRelationsConfirm": ParameterizedString<"followingCount" | "followersCount" | "instanceName">;
+    /**
+     * Severing all follow relations with {host} queued.
+     */
+    "severAllFollowRelationsQueued": ParameterizedString<"host">;
+    /**
+     * Pending follow requests
+     */
+    "pendingFollowRequests": string;
+    /**
+     * Are you sure you want to cancel your follow request?
+     */
+    "undoFollowRequestConfirm": string;
+    /**
+     * Show quotes
+     */
+    "showQuotes": string;
+    /**
+     * Show replies
+     */
+    "showReplies": string;
+    /**
+     * Show non-public
+     */
+    "showNonPublicNotes": string;
+    /**
+     * Allow clicking on pop-up notifications
+     */
+    "allowClickingNotifications": string;
+    /**
+     * Pinned
+     */
+    "pinnedOnly": string;
+    /**
+     * Blocking you
+     */
+    "blockingYou": string;
+    /**
+     * Show warning when opening external URLs
+     */
+    "warnExternalUrl": string;
+    /**
+     * Flash
+     */
+    "flash": string;
+    /**
+     * Files removed
+     */
+    "filesRemoved": string;
+    /**
+     * File imported
+     */
+    "fileImported": string;
+    /**
+     * Failed to load note
+     */
+    "cannotLoadNote": string;
+    "_flash": {
+        /**
+         * Flash Content Hidden
+         */
+        "contentHidden": string;
+        /**
+         * Powered by Ruffle.
+         */
+        "poweredByRuffle": string;
+        /**
+         * Always be wary of arbitrary code execution!
+         */
+        "arbitraryCodeExecutionWarning": string;
+        /**
+         * Flash Content Failed To Load:
+         */
+        "failedToLoad": string;
+        /**
+         * Flash Content Is Loading
+         */
+        "isLoading": string;
+        /**
+         * Loading Ruffle player
+         */
+        "loadingRufflePlayer": string;
+        /**
+         * Loading Flash file
+         */
+        "loadingFlashFile": string;
+        /**
+         * raw.esm.sh could not be accessed, meaning this instance's Content Security Policy is likely out of date. Please contact your instance administrators.
+         */
+        "cspError": string;
+    };
+    "_delivery": {
+        /**
+         * 配信停止
+         */
+        "stop": string;
+        /**
+         * 配信再開
+         */
+        "resume": string;
+        /**
+         * 配信状態
+         */
+        "status": string;
+        "_type": {
+            /**
+             * 配信中
+             */
+            "none": string;
+            /**
+             * 手動停止中
+             */
+            "manuallySuspended": string;
+            /**
+             * サーバー削除のため停止中
+             */
+            "goneSuspended": string;
+            /**
+             * サーバー応答なしのため停止中
+             */
+            "autoSuspendedForNotResponding": string;
+        };
+    };
+    "_initialAccountSetting": {
+        /**
+         * このまま{name}(Misskey)の使い方についてのチュートリアルに進むこともできますが、ここで中断してすぐに使い始めることもできます。
+         */
+        "youCanContinueTutorial": ParameterizedString<"name">;
+        /**
+         * アカウントの作成が完了しました！
+         */
+        "accountCreated": string;
+        /**
+         * さっそくアカウントの初期設定を行いましょう。
+         */
+        "letsStartAccountSetup": string;
+        /**
+         * まずはあなたのプロフィールを設定しましょう。
+         */
+        "letsFillYourProfile": string;
+        /**
+         * プロフィール設定
+         */
+        "profileSetting": string;
+        /**
+         * プライバシー設定
+         */
+        "privacySetting": string;
+        /**
+         * これらの設定は後から変更できます。
+         */
+        "theseSettingsCanEditLater": string;
+        /**
+         * この他にも様々な設定を「設定」ページから行えます。ぜひ後で確認してみてください。
+         */
+        "youCanEditMoreSettingsInSettingsPageLater": string;
+        /**
+         * タイムラインを構築するため、気になるユーザーをフォローしてみましょう。
+         */
+        "followUsers": string;
+        /**
+         * プッシュ通知を有効にすると{name}の通知をお使いのデバイスで受け取ることができます。
+         */
+        "pushNotificationDescription": ParameterizedString<"name">;
+        /**
+         * 初期設定が完了しました！
+         */
+        "initialAccountSettingCompleted": string;
+        /**
+         * {name}をお楽しみください！
+         */
+        "haveFun": ParameterizedString<"name">;
+        /**
+         * チュートリアルを開始
+         */
+        "startTutorial": string;
+        /**
+         * 初期設定をスキップしますか？
+         */
+        "skipAreYouSure": string;
+        /**
+         * 初期設定をあとでやり直しますか？
+         */
+        "laterAreYouSure": string;
+    };
+    "_initialTutorial": {
+        "_landing": {
+            /**
+             * ここでは、Misskeyの基本的な使い方や機能を確認できます。
+             */
+            "description": string;
+            /**
+             * チュートリアルへようこそ
+             */
+            "title": string;
+        };
+        "_note": {
+            /**
+             * Misskeyでの投稿は「ノート」と呼びます。ノートはタイムラインに時系列で並んでいて、リアルタイムで更新されていきます。
+             */
+            "description": string;
+            /**
+             * ノートって何？
+             */
+            "title": string;
+            /**
+             * 返信することができます。返信に対しての返信も可能で、スレッドのように会話を続けることもできます。
+             */
+            "reply": string;
+            /**
+             * そのノートを自分のタイムラインに流して共有することができます。テキストを追加して引用することも可能です。
+             */
+            "renote": string;
+            /**
+             * リアクションをつけることができます。詳しくは次のページで解説します。
+             */
+            "reaction": string;
+            /**
+             * ノートの詳細を表示したり、リンクをコピーしたりなどの様々な操作が行えます。
+             */
+            "menu": string;
+        };
+        "_reaction": {
+            /**
+             * リアクションは、ノートの「＋」ボタンをクリックするとつけられます。試しにこのサンプルのノートにリアクションをつけてみてください！
+             */
+            "letsTryReacting": string;
+            /**
+             * 「ー」ボタンを押すとリアクションを取り消すことができます。
+             */
+            "reactDone": string;
+            /**
+             * リアクションって何？
+             */
+            "title": string;
+            /**
+             * ノートには「リアクション」をつけることができます。「いいね」では伝わらないニュアンスも、リアクションで簡単・気軽に表現できます。
+             */
+            "description": string;
+            /**
+             * リアクションをつけると先に進めるようになります。
+             */
+            "reactToContinue": string;
+            /**
+             * あなたのノートが誰かにリアクションされると、リアルタイムで通知を受け取ります。
+             */
+            "reactNotification": string;
+        };
+        "_timeline": {
+            /**
+             * Misskeyには、使い方に応じて複数のタイムラインが用意されています（サーバーによってはいずれかが無効になっていることがあります）。
+             */
+            "description1": string;
+            /**
+             * You can view notes from connected servers picked by your admins.
+             */
+            "bubble": string;
+            /**
+             * タイムラインのしくみ
+             */
+            "title": string;
+            /**
+             * あなたがフォローしているアカウントの投稿を見られます。
+             */
+            "home": string;
+            /**
+             * このサーバーにいるユーザー全員の投稿を見られます。
+             */
+            "local": string;
+            /**
+             * ホームタイムラインとローカルタイムラインの投稿が両方表示されます。
+             */
+            "social": string;
+            /**
+             * 接続している他のすべてのサーバーからの投稿を見られます。
+             */
+            "global": string;
+            /**
+             * それぞれのタイムラインは、画面上部でいつでも切り替えられます。
+             */
+            "description2": string;
+            /**
+             * その他にも、リストタイムラインやチャンネルタイムラインなどがあります。詳しくは{link}をご覧ください。
+             */
+            "description3": ParameterizedString<"link">;
+        };
+        "_postNote": {
+            /**
+             * Misskeyにノートを投稿する際には、様々なオプションの設定が可能です。投稿フォームはこのようになっています。
+             */
+            "description1": string;
+            "_visibility": {
+                /**
+                 * ホームタイムラインのみに公開。フォロワー・プロフィールを見に来た人・リノートから、他のユーザーも見ることができます。
+                 */
+                "home": string;
+                /**
+                 * フォロワーにのみ公開。本人以外がリノートすることはできず、またフォロワー以外は閲覧できません。
+                 */
+                "followers": string;
+                /**
+                 * ノートを表示できる相手を制限できます。
+                 */
+                "description": string;
+                /**
+                 * すべてのユーザーに公開。
+                 */
+                "public": string;
+                /**
+                 * 指定したユーザーにのみ公開され、また相手に通知が入ります。ダイレクトメッセージのかわりにお使いいただけます。
+                 */
+                "direct": string;
+                /**
+                 * 機密情報は送信する際は注意してください。
+                 */
+                "doNotSendConfidencialOnDirect1": string;
+                /**
+                 * 送信先のサーバーの管理者は投稿内容を見ることが可能なので、信頼できないサーバーのユーザーにダイレクト投稿を送信する場合は、機密情報の扱いに注意が必要です。
+                 */
+                "doNotSendConfidencialOnDirect2": string;
+                /**
+                 * 他のサーバーに投稿を連合しません。上記の公開範囲に関わらず、他のサーバーのユーザーは、この設定がついたノートを直接閲覧することができなくなります。
+                 */
+                "localOnly": string;
+            };
+            /**
+             * ノートの投稿設定
+             */
+            "title": string;
+            "_cw": {
+                /**
+                 * 内容を隠す（CW）
+                 */
+                "title": string;
+                /**
+                 * 本文のかわりに「注釈」に書いた内容が表示されます。「もっと見る」を押すと本文が表示されます。
+                 */
+                "description": string;
+                "_exampleNote": {
+                    /**
+                     * 飯テロ注意
+                     */
+                    "cw": string;
+                    /**
+                     * チョコのかかったドーナツを食べました🍩😋
+                     */
+                    "note": string;
+                };
+                /**
+                 * サーバーのガイドラインにより必要とされるノートに指定したり、ネタバレ投稿やセンシティブな文章を自主規制したりするときに使います。
+                 */
+                "useCases": string;
+            };
+        };
+        "_done": {
+            /**
+             * チュートリアルは終了です🎉
+             */
+            "title": string;
+            /**
+             * ここで紹介した機能はほんの一部にすぎません。Misskeyの使い方をより詳しく知るには、{link}をご覧ください。
+             */
+            "description": ParameterizedString<"link">;
+        };
+        /**
+         * チュートリアルを見る
+         */
+        "launchTutorial": string;
+        /**
+         * チュートリアル
+         */
+        "title": string;
+        /**
+         * よくできました
+         */
+        "wellDone": string;
+        /**
+         * チュートリアルを終了しますか？
+         */
+        "skipAreYouSure": string;
+        "_howToMakeAttachmentsSensitive": {
+            /**
+             * 添付ファイルをセンシティブにするには？
+             */
+            "title": string;
+            /**
+             * サーバーのガイドラインにより必要とされる際や、そのまま見れる状態にしておくべきではない添付ファイルには、「センシティブ」設定を付けます。
+             */
+            "description": string;
+            /**
+             * 試しに、このフォームに添付された画像をセンシティブにしてみてください！
+             */
+            "tryThisFile": string;
+            "_exampleNote": {
+                /**
+                 * 納豆のフタ開けるのミスったわね…
+                 */
+                "note": string;
+            };
+            /**
+             * 添付ファイルをセンシティブにする際は、そのファイルをクリックしてメニューを開き、「センシティブとして設定」をクリックします。
+             */
+            "method": string;
+            /**
+             * ファイルを添付する際は、サーバーのガイドラインに従ってセンシティブを適切に設定してください。
+             */
+            "sensitiveSucceeded": string;
+            /**
+             * 画像をセンシティブに設定すると先に進めるようになります。
+             */
+            "doItToContinue": string;
+        };
+    };
+    "_timelineDescription": {
+        /**
+         * In the Bubble timeline, you can see notes from connected servers picked by your admins.
+         */
+        "bubble": string;
+        /**
+         * ホームタイムラインでは、あなたがフォローしているアカウントの投稿を見られます。
+         */
+        "home": string;
+        /**
+         * ローカルタイムラインでは、このサーバーにいるユーザー全員の投稿を見られます。
+         */
+        "local": string;
+        /**
+         * ソーシャルタイムラインには、ホームタイムラインとローカルタイムラインの投稿が両方表示されます。
+         */
+        "social": string;
+        /**
+         * グローバルタイムラインでは、接続している他のすべてのサーバーからの投稿を見られます。
+         */
+        "global": string;
+    };
+    "_serverSettings": {
+        /**
+         * Logo URL
+         */
+        "sidebarLogoUrl": string;
+        /**
+         * Specifies the logo to use instead of the regular icon in high definition, dynamic-width scenarios.
+         */
+        "sidebarLogoDescription": string;
+        /**
+         * E.g. In the sidebar, to visitors and in the "About" page.
+         */
+        "sidebarLogoUsageExample": string;
+        /**
+         * 問い合わせ先URL
+         */
+        "inquiryUrl": string;
+        /**
+         * サーバー運営者へのお問い合わせフォームのURLや、運営者の連絡先等が記載されたWebページのURLを指定します。
+         */
+        "inquiryUrlDescription": string;
+        /**
+         * アイコン画像のURL
+         */
+        "iconUrl": string;
+        /**
+         * {host}がアプリとして表示される際のアイコンを指定します。
+         */
+        "appIconDescription": ParameterizedString<"host">;
+        /**
+         * 例: PWAや、スマートフォンのホーム画面にブックマークとして追加された時など
+         */
+        "appIconUsageExample": string;
+        /**
+         * 円形もしくは角丸にクロップされる場合があるため、塗り潰された余白のある背景を持つことが推奨されます。
+         */
+        "appIconStyleRecommendation": string;
+        /**
+         * 解像度は必ず{resolution}である必要があります。
+         */
+        "appIconResolutionMustBe": ParameterizedString<"resolution">;
+        /**
+         * manifest.jsonのオーバーライド
+         */
+        "manifestJsonOverride": string;
+        /**
+         * 略称
+         */
+        "shortName": string;
+        /**
+         * サーバーの正式名称が長い場合に、代わりに表示することのできる略称や通称。
+         */
+        "shortNameDescription": string;
+        /**
+         * 有効にすると、各種タイムラインを取得する際のパフォーマンスが大幅に向上し、データベースへの負荷を軽減することが可能です。ただし、Redisのメモリ使用量は増加します。サーバーのメモリ容量が少ない場合、または動作が不安定な場合は無効にすることができます。
+         */
+        "fanoutTimelineDescription": string;
+        /**
+         * データベースへのフォールバック
+         */
+        "fanoutTimelineDbFallback": string;
+        /**
+         * 有効にすると、タイムラインがキャッシュされていない場合にDBへ追加で問い合わせを行うフォールバック処理を行います。無効にすると、フォールバック処理を行わないことでさらにサーバーの負荷を軽減することができますが、タイムラインが取得できる範囲に制限が生じます。
+         */
+        "fanoutTimelineDbFallbackDescription": string;
+        /**
+         * 有効にすると、リアクション作成時のパフォーマンスが大幅に向上し、データベースへの負荷を軽減することが可能です。ただし、Redisのメモリ使用量は増加します。
+         */
+        "reactionsBufferingDescription": string;
+        /**
+         * アカウントの作成をオープンにする
+         */
+        "openRegistration": string;
+        /**
+         * 登録を開放することはリスクが伴います。サーバーを常に監視し、トラブルが発生した際にすぐに対応できる体制がある場合のみオンにすることを推奨します。
+         */
+        "openRegistrationWarning": string;
+        /**
+         * 一定期間モデレーターのアクティビティが検出されなかった場合、スパム防止のためこの設定は自動でオフになります。
+         */
+        "thisSettingWillAutomaticallyOffWhenModeratorsInactive": string;
+    };
+    "_accountMigration": {
+        /**
+         * 新しいアカウントへ移行します。
+         * 　・フォロワーが新しいアカウントを自動でフォローします
+         * 　・このアカウントからのフォローは全て解除されます
+         * 　・このアカウントではノートの作成などができなくなります
+         *
+         * フォロワーの移行は自動ですが、フォローの移行は手動で行う必要があります。移行前にこのアカウントでフォローエクスポートし、移行後すぐに移行先アカウントでインポートを行なってください。
+         * リスト・ミュート・ブロックについても同様ですので、手動で移行する必要があります。
+         *
+         * （この説明はこのサーバー（Misskey v13.12.0以降）の仕様です。Mastodonなどの他のActivityPubソフトウェアでは挙動が異なる場合があります。）
+         */
+        "moveAccountDescription": string;
+        /**
+         * 別のアカウントからこのアカウントに移行
+         */
+        "moveFrom": string;
+        /**
+         * 別のアカウントへエイリアスを作成
+         */
+        "moveFromSub": string;
+        /**
+         * 移行元のアカウント #{n}
+         */
+        "moveFromLabel": ParameterizedString<"n">;
+        /**
+         * 別のアカウントからこのアカウントに移行したい場合、ここでエイリアスを作成しておく必要があります。
+         * 移行元のアカウントをこのように入力してください: @username@server.example.com
+         * 削除するには、入力欄を空にして保存します（非推奨）。
+         */
+        "moveFromDescription": string;
+        /**
+         * このアカウントを新しいアカウントへ移行
+         */
+        "moveTo": string;
+        /**
+         * 移行先のアカウント:
+         */
+        "moveToLabel": string;
+        /**
+         * アカウントを移行すると、取り消すことはできません。
+         */
+        "moveCannotBeUndone": string;
+        /**
+         * アカウントの移行には、まずは移行先のアカウントでこのアカウントに対しエイリアスを作成します。
+         * エイリアス作成後、移行先のアカウントを次のように入力してください: @username@server.example.com
+         */
+        "moveAccountHowTo": string;
+        /**
+         * 移行する
+         */
+        "startMigration": string;
+        /**
+         * 本当にこのアカウントを {account} に移行しますか？一度移行すると取り消せず、二度とこのアカウントを元の状態で使用できなくなります。
+         */
+        "migrationConfirm": ParameterizedString<"account">;
+        /**
+         *
+         * アカウントは移行されています。
+         * 移行を取り消すことはできません。
+         */
+        "movedAndCannotBeUndone": string;
+        /**
+         * このアカウントからのフォロー解除は移行操作から24時間後に実行されます。
+         * このアカウントのフォロー・フォロワー数は0になっています。フォロワーの解除はされないため、あなたのフォロワーはこのアカウントのフォロワー向け投稿を引き続き閲覧できます。
+         */
+        "postMigrationNote": string;
+        /**
+         * 移行先のアカウント:
+         */
+        "movedTo": string;
+    };
+    "_achievements": {
+        "_types": {
+            "_notes1": {
+                /**
+                 * just setting up my msky
+                 */
+                "title": string;
+                /**
+                 * 良いMisskeyライフを！
+                 */
+                "flavor": string;
+                /**
+                 * 初めてノートを投稿した
+                 */
+                "description": string;
+            };
+            "_login1000": {
+                /**
+                 * Misskeyを使ってくれてありがとう！
+                 */
+                "flavor": string;
+                /**
+                 * ノートマスターⅢ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が1,000日
+                 */
+                "description": string;
+            };
+            "_iLoveMisskey": {
+                /**
+                 * I Love Misskey
+                 */
+                "title": string;
+                /**
+                 * "I ❤ #Misskey"を投稿した
+                 */
+                "description": string;
+                /**
+                 * Misskeyを使ってくださりありがとうございます！ by 開発チーム
+                 */
+                "flavor": string;
+            };
+            "_client30min": {
+                /**
+                 * クライアントを起動してから30分以上経過した
+                 */
+                "description": string;
+                /**
+                 * ひとやすみ
+                 */
+                "title": string;
+            };
+            "_client60min": {
+                /**
+                 * Misskeyの見すぎ
+                 */
+                "title": string;
+                /**
+                 * クライアントを起動してから60分以上経過した
+                 */
+                "description": string;
+            };
+            "_brainDiver": {
+                /**
+                 * Misskey-Misskey La-Tu-Ma
+                 */
+                "flavor": string;
+                /**
+                 * Brain Diver
+                 */
+                "title": string;
+                /**
+                 * Brain Diverへのリンクを投稿した
+                 */
+                "description": string;
+            };
+            "_tutorialCompleted": {
+                /**
+                 * Misskey初心者講座 修了証
+                 */
+                "title": string;
+                /**
+                 * チュートリアルを完了した
+                 */
+                "description": string;
+            };
+            "_notes10": {
+                /**
+                 * いくつかのノート
+                 */
+                "title": string;
+                /**
+                 * ノートを10回投稿した
+                 */
+                "description": string;
+            };
+            "_notes100": {
+                /**
+                 * たくさんのノート
+                 */
+                "title": string;
+                /**
+                 * ノートを100回投稿した
+                 */
+                "description": string;
+            };
+            "_notes500": {
+                /**
+                 * ノートまみれ
+                 */
+                "title": string;
+                /**
+                 * ノートを500回投稿した
+                 */
+                "description": string;
+            };
+            "_notes1000": {
+                /**
+                 * ノートの山
+                 */
+                "title": string;
+                /**
+                 * ノートを1,000回投稿した
+                 */
+                "description": string;
+            };
+            "_notes5000": {
+                /**
+                 * 湧き出るノート
+                 */
+                "title": string;
+                /**
+                 * ノートを5,000回投稿した
+                 */
+                "description": string;
+            };
+            "_notes10000": {
+                /**
+                 * スーパーノート
+                 */
+                "title": string;
+                /**
+                 * ノートを10,000回投稿した
+                 */
+                "description": string;
+            };
+            "_notes20000": {
+                /**
+                 * ニードモアノート
+                 */
+                "title": string;
+                /**
+                 * ノートを20,000回投稿した
+                 */
+                "description": string;
+            };
+            "_notes30000": {
+                /**
+                 * ノートノートノート
+                 */
+                "title": string;
+                /**
+                 * ノートを30,000回投稿した
+                 */
+                "description": string;
+            };
+            "_notes40000": {
+                /**
+                 * ノート工場
+                 */
+                "title": string;
+                /**
+                 * ノートを40,000回投稿した
+                 */
+                "description": string;
+            };
+            "_notes50000": {
+                /**
+                 * ノートの惑星
+                 */
+                "title": string;
+                /**
+                 * ノートを50,000回投稿した
+                 */
+                "description": string;
+            };
+            "_notes60000": {
+                /**
+                 * ノートクエーサー
+                 */
+                "title": string;
+                /**
+                 * ノートを60,000回投稿した
+                 */
+                "description": string;
+            };
+            "_notes70000": {
+                /**
+                 * ブラックノートホール
+                 */
+                "title": string;
+                /**
+                 * ノートを70,000回投稿した
+                 */
+                "description": string;
+            };
+            "_notes80000": {
+                /**
+                 * ノートギャラクシー
+                 */
+                "title": string;
+                /**
+                 * ノートを80,000回投稿した
+                 */
+                "description": string;
+            };
+            "_notes90000": {
+                /**
+                 * ノートバース
+                 */
+                "title": string;
+                /**
+                 * ノートを90,000回投稿した
+                 */
+                "description": string;
+            };
+            "_notes100000": {
+                /**
+                 * ALL YOUR NOTE ARE BELONG TO US
+                 */
+                "title": string;
+                /**
+                 * ノートを100,000回投稿した
+                 */
+                "description": string;
+                /**
+                 * そんなに書くことある？
+                 */
+                "flavor": string;
+            };
+            "_login3": {
+                /**
+                 * ビギナーⅠ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が3日
+                 */
+                "description": string;
+                /**
+                 * 今日からね僕は ミスキストってことで
+                 */
+                "flavor": string;
+            };
+            "_login7": {
+                /**
+                 * ビギナーⅡ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が7日
+                 */
+                "description": string;
+                /**
+                 * 慣れてきましたか？
+                 */
+                "flavor": string;
+            };
+            "_login15": {
+                /**
+                 * ビギナーⅢ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が15日
+                 */
+                "description": string;
+            };
+            "_login30": {
+                /**
+                 * ミスキストⅠ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が30日
+                 */
+                "description": string;
+            };
+            "_login60": {
+                /**
+                 * ミスキストⅡ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が60日
+                 */
+                "description": string;
+            };
+            "_login100": {
+                /**
+                 * ミスキストⅢ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が100日
+                 */
+                "description": string;
+                /**
+                 * そのユーザー、ミスキストにつき
+                 */
+                "flavor": string;
+            };
+            "_login200": {
+                /**
+                 * 常連Ⅰ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が200日
+                 */
+                "description": string;
+            };
+            "_login300": {
+                /**
+                 * 常連Ⅱ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が300日
+                 */
+                "description": string;
+            };
+            "_login400": {
+                /**
+                 * 常連Ⅲ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が400日
+                 */
+                "description": string;
+            };
+            "_login500": {
+                /**
+                 * ベテランⅠ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が500日
+                 */
+                "description": string;
+                /**
+                 * 諸君、私はノートが好きだ
+                 */
+                "flavor": string;
+            };
+            "_login600": {
+                /**
+                 * ベテランⅡ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が600日
+                 */
+                "description": string;
+            };
+            "_login700": {
+                /**
+                 * ベテランⅢ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が700日
+                 */
+                "description": string;
+            };
+            "_login800": {
+                /**
+                 * ノートマスターⅠ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が800日
+                 */
+                "description": string;
+            };
+            "_login900": {
+                /**
+                 * ノートマスターⅡ
+                 */
+                "title": string;
+                /**
+                 * 通算ログイン日数が900日
+                 */
+                "description": string;
+            };
+            "_noteClipped1": {
+                /**
+                 * クリップせずにはいられないな
+                 */
+                "title": string;
+                /**
+                 * 初めてノートをクリップした
+                 */
+                "description": string;
+            };
+            "_noteFavorited1": {
+                /**
+                 * 星をみるひと
+                 */
+                "title": string;
+                /**
+                 * 初めてノートをお気に入りに登録した
+                 */
+                "description": string;
+            };
+            "_myNoteFavorited1": {
+                /**
+                 * 星が欲しい
+                 */
+                "title": string;
+                /**
+                 * 自分のノートが他の人からお気に入りに登録された
+                 */
+                "description": string;
+            };
+            "_profileFilled": {
+                /**
+                 * 準備万端
+                 */
+                "title": string;
+                /**
+                 * プロフィール設定を行った
+                 */
+                "description": string;
+            };
+            "_markedAsCat": {
+                /**
+                 * 吾輩は猫である
+                 */
+                "title": string;
+                /**
+                 * アカウントをCatとして設定した
+                 */
+                "description": string;
+                /**
+                 * 名前はまだない。
+                 */
+                "flavor": string;
+            };
+            "_following1": {
+                /**
+                 * はじめてのフォロー
+                 */
+                "title": string;
+                /**
+                 * 初めてフォローした
+                 */
+                "description": string;
+            };
+            "_following10": {
+                /**
+                 * ついてく、ついてく
+                 */
+                "title": string;
+                /**
+                 * フォローが10人を超した
+                 */
+                "description": string;
+            };
+            "_following50": {
+                /**
+                 * 友達たくさん
+                 */
+                "title": string;
+                /**
+                 * フォローが50人を超した
+                 */
+                "description": string;
+            };
+            "_following100": {
+                /**
+                 * 友達100人
+                 */
+                "title": string;
+                /**
+                 * フォローが100人を超した
+                 */
+                "description": string;
+            };
+            "_following300": {
+                /**
+                 * 友達過多
+                 */
+                "title": string;
+                /**
+                 * フォローが300人を超した
+                 */
+                "description": string;
+            };
+            "_followers1": {
+                /**
+                 * はじめてのフォロワー
+                 */
+                "title": string;
+                /**
+                 * 初めてフォローされた
+                 */
+                "description": string;
+            };
+            "_followers10": {
+                /**
+                 * フォローミー！
+                 */
+                "title": string;
+                /**
+                 * フォロワーが10人を超した
+                 */
+                "description": string;
+            };
+            "_followers50": {
+                /**
+                 * ぞろぞろ
+                 */
+                "title": string;
+                /**
+                 * フォロワーが50人を超した
+                 */
+                "description": string;
+            };
+            "_followers100": {
+                /**
+                 * 人気者
+                 */
+                "title": string;
+                /**
+                 * フォロワーが100人を超した
+                 */
+                "description": string;
+            };
+            "_followers300": {
+                /**
+                 * 一列でお並びください
+                 */
+                "title": string;
+                /**
+                 * フォロワーが300人を超した
+                 */
+                "description": string;
+            };
+            "_followers500": {
+                /**
+                 * 基地局
+                 */
+                "title": string;
+                /**
+                 * フォロワーが500人を超した
+                 */
+                "description": string;
+            };
+            "_followers1000": {
+                /**
+                 * インフルエンサー
+                 */
+                "title": string;
+                /**
+                 * フォロワーが1,000人を超した
+                 */
+                "description": string;
+            };
+            "_collectAchievements30": {
+                /**
+                 * 実績コレクター
+                 */
+                "title": string;
+                /**
+                 * 実績を30個以上獲得した
+                 */
+                "description": string;
+            };
+            "_viewAchievements3min": {
+                /**
+                 * 実績好き
+                 */
+                "title": string;
+                /**
+                 * 実績一覧を3分以上眺め続けた
+                 */
+                "description": string;
+            };
+            "_foundTreasure": {
+                /**
+                 * 宝探し
+                 */
+                "title": string;
+                /**
+                 * 隠されたお宝を発見した
+                 */
+                "description": string;
+            };
+            "_noteDeletedWithin1min": {
+                /**
+                 * いまのなし
+                 */
+                "title": string;
+                /**
+                 * 投稿してから1分以内にその投稿を削除した
+                 */
+                "description": string;
+            };
+            "_postedAtLateNight": {
+                /**
+                 * 夜行性
+                 */
+                "title": string;
+                /**
+                 * 深夜にノートを投稿した
+                 */
+                "description": string;
+                /**
+                 * そろそろ寝よう。
+                 */
+                "flavor": string;
+            };
+            "_postedAt0min0sec": {
+                /**
+                 * 時報
+                 */
+                "title": string;
+                /**
+                 * 0分0秒にノートを投稿した
+                 */
+                "description": string;
+                /**
+                 * ポッ ポッ ポッ ピーン
+                 */
+                "flavor": string;
+            };
+            "_selfQuote": {
+                /**
+                 * 自己言及
+                 */
+                "title": string;
+                /**
+                 * 自分のノートを引用した
+                 */
+                "description": string;
+            };
+            "_htl20npm": {
+                /**
+                 * 流れるTL
+                 */
+                "title": string;
+                /**
+                 * ホームタイムラインの流速が20npmを越す
+                 */
+                "description": string;
+            };
+            "_viewInstanceChart": {
+                /**
+                 * アナリスト
+                 */
+                "title": string;
+                /**
+                 * サーバーのチャートを表示した
+                 */
+                "description": string;
+            };
+            "_outputHelloWorldOnScratchpad": {
+                /**
+                 * Hello, world!
+                 */
+                "title": string;
+                /**
+                 * スクラッチパッドで hello world を出力した
+                 */
+                "description": string;
+            };
+            "_open3windows": {
+                /**
+                 * マルチウィンドウ
+                 */
+                "title": string;
+                /**
+                 * ウィンドウを3つ以上開いた状態にした
+                 */
+                "description": string;
+            };
+            "_driveFolderCircularReference": {
+                /**
+                 * 循環参照
+                 */
+                "title": string;
+                /**
+                 * ドライブのフォルダを再帰的な入れ子にしようとした
+                 */
+                "description": string;
+            };
+            "_reactWithoutRead": {
+                /**
+                 * ちゃんと読んだ？
+                 */
+                "title": string;
+                /**
+                 * 100文字以上のテキストを含むノートに投稿されてから3秒以内にリアクションした
+                 */
+                "description": string;
+            };
+            "_clickedClickHere": {
+                /**
+                 * ここをクリック
+                 */
+                "title": string;
+                /**
+                 * ここをクリックした
+                 */
+                "description": string;
+            };
+            "_justPlainLucky": {
+                /**
+                 * 単なるラッキー
+                 */
+                "title": string;
+                /**
+                 * 10秒ごとに0.005%の確率で獲得
+                 */
+                "description": string;
+            };
+            "_setNameToSyuilo": {
+                /**
+                 * 神様コンプレックス
+                 */
+                "title": string;
+                /**
+                 * 名前を syuilo に設定した
+                 */
+                "description": string;
+            };
+            "_passedSinceAccountCreated1": {
+                /**
+                 * 一周年
+                 */
+                "title": string;
+                /**
+                 * アカウント作成から1年経過した
+                 */
+                "description": string;
+            };
+            "_passedSinceAccountCreated2": {
+                /**
+                 * 二周年
+                 */
+                "title": string;
+                /**
+                 * アカウント作成から2年経過した
+                 */
+                "description": string;
+            };
+            "_passedSinceAccountCreated3": {
+                /**
+                 * 三周年
+                 */
+                "title": string;
+                /**
+                 * アカウント作成から3年経過した
+                 */
+                "description": string;
+            };
+            "_loggedInOnBirthday": {
+                /**
+                 * ハッピーバースデー
+                 */
+                "title": string;
+                /**
+                 * 誕生日にログインした
+                 */
+                "description": string;
+            };
+            "_loggedInOnNewYearsDay": {
+                /**
+                 * あけましておめでとうございます
+                 */
+                "title": string;
+                /**
+                 * 元日にログインした
+                 */
+                "description": string;
+                /**
+                 * 今年も弊サーバーをよろしくお願いします
+                 */
+                "flavor": string;
+            };
+            "_cookieClicked": {
+                /**
+                 * クッキーをクリックするゲーム
+                 */
+                "title": string;
+                /**
+                 * クッキーをクリックした
+                 */
+                "description": string;
+                /**
+                 * ソフト間違ってない？
+                 */
+                "flavor": string;
+            };
+            "_smashTestNotificationButton": {
+                /**
+                 * テスト過剰
+                 */
+                "title": string;
+                /**
+                 * 通知のテストをごく短時間のうちに連続して行った
+                 */
+                "description": string;
+            };
+            "_bubbleGameExplodingHead": {
+                /**
+                 * 🤯
+                 */
+                "title": string;
+                /**
+                 * バブルゲームで最も大きいモノを出した
+                 */
+                "description": string;
+            };
+            "_bubbleGameDoubleExplodingHead": {
+                /**
+                 * ダブル🤯
+                 */
+                "title": string;
+                /**
+                 * バブルゲームで最も大きいモノを2つ同時に出した
+                 */
+                "description": string;
+                /**
+                 * これくらいの　おべんとばこに　🤯　🤯　ちょっとつめて
+                 */
+                "flavor": string;
+            };
+        };
+        /**
+         * 獲得日時
+         */
+        "earnedAt": string;
+    };
+    "_role": {
+        "_options": {
+            /**
+             * Can view the bubble timeline
+             */
+            "btlAvailable": string;
+            /**
+             * Can import notes
+             */
+            "canImportNotes": string;
+            /**
+             * アイコンとバナーの更新を許可
+             */
+            "canUpdateBioMedia": string;
+            /**
+             * Maximum number of scheduled notes
+             */
+            "scheduleNoteMax": string;
+            /**
+             * Can appear in trending notes / users
+             */
+            "canTrend": string;
+            /**
+             * グローバルタイムラインの閲覧
+             */
+            "gtlAvailable": string;
+            /**
+             * ローカルタイムラインの閲覧
+             */
+            "ltlAvailable": string;
+            /**
+             * パブリック投稿の許可
+             */
+            "canPublicNote": string;
+            /**
+             * ノート内の最大メンション数
+             */
+            "mentionMax": string;
+            /**
+             * サーバー招待コードの発行
+             */
+            "canInvite": string;
+            /**
+             * 招待コードの作成可能数
+             */
+            "inviteLimit": string;
+            /**
+             * 招待コードの発行間隔
+             */
+            "inviteLimitCycle": string;
+            /**
+             * 招待コードの有効期限
+             */
+            "inviteExpirationTime": string;
+            /**
+             * カスタム絵文字の管理
+             */
+            "canManageCustomEmojis": string;
+            /**
+             * アバターデコレーションの管理
+             */
+            "canManageAvatarDecorations": string;
+            /**
+             * ドライブ容量
+             */
+            "driveCapacity": string;
+            /**
+             * アップロード可能な最大ファイルサイズ
+             */
+            "maxFileSize": string;
+            /**
+             * ファイルにNSFWを常に付与
+             */
+            "alwaysMarkNsfw": string;
+            /**
+             * ノートのピン留めの最大数
+             */
+            "pinMax": string;
+            /**
+             * アンテナの作成可能数
+             */
+            "antennaMax": string;
+            /**
+             * ワードミュートの最大文字数
+             */
+            "wordMuteMax": string;
+            /**
+             * Webhookの作成可能数
+             */
+            "webhookMax": string;
+            /**
+             * クリップの作成可能数
+             */
+            "clipMax": string;
+            /**
+             * クリップ内のノートの最大数
+             */
+            "noteEachClipsMax": string;
+            /**
+             * ユーザーリストの作成可能数
+             */
+            "userListMax": string;
+            /**
+             * ユーザーリスト内のユーザーの最大数
+             */
+            "userEachUserListsMax": string;
+            /**
+             * レートリミット
+             */
+            "rateLimitFactor": string;
+            /**
+             * 小さいほど制限が緩和され、大きいほど制限が強化されます。
+             */
+            "descriptionOfRateLimitFactor": string;
+            /**
+             * 広告の非表示
+             */
+            "canHideAds": string;
+            /**
+             * ノート検索の利用
+             */
+            "canSearchNotes": string;
+            /**
+             * 翻訳機能の利用
+             */
+            "canUseTranslator": string;
+            /**
+             * アイコンデコレーションの最大取付個数
+             */
+            "avatarDecorationLimit": string;
+            /**
+             * アンテナのインポートを許可
+             */
+            "canImportAntennas": string;
+            /**
+             * ブロックのインポートを許可
+             */
+            "canImportBlocking": string;
+            /**
+             * フォローのインポートを許可
+             */
+            "canImportFollowing": string;
+            /**
+             * ミュートのインポートを許可
+             */
+            "canImportMuting": string;
+            /**
+             * リストのインポートを許可
+             */
+            "canImportUserLists": string;
+            /**
+             * チャットを許可
+             */
+            "chatAvailability": string;
+        };
+        "_condition": {
+            /**
+             * 鍵アカウントユーザー
+             */
+            "isLocked": string;
+            /**
+             * 「アカウントを見つけやすくする」が有効なユーザー
+             */
+            "isExplorable": string;
+            /**
+             * Is from a specific instance
+             */
+            "isFromInstance": string;
+            /**
+             * Hostname (case-insensitive)
+             */
+            "isFromInstanceHost": string;
+            /**
+             * Match subdomains
+             */
+            "isFromInstanceSubdomains": string;
+            /**
+             * User is from a bubble instance
+             */
+            "fromBubbleInstance": string;
+            /**
+             * Has X or fewer local followers
+             */
+            "localFollowersLessThanOrEq": string;
+            /**
+             * Has X or more local followers
+             */
+            "localFollowersMoreThanOrEq": string;
+            /**
+             * Follows X or fewer local accounts
+             */
+            "localFollowingLessThanOrEq": string;
+            /**
+             * Follows X or more local accounts
+             */
+            "localFollowingMoreThanOrEq": string;
+            /**
+             * Has X or fewer remote followers
+             */
+            "remoteFollowersLessThanOrEq": string;
+            /**
+             * Has X or more remote followers
+             */
+            "remoteFollowersMoreThanOrEq": string;
+            /**
+             * Follows X or fewer remote accounts
+             */
+            "remoteFollowingLessThanOrEq": string;
+            /**
+             * Follows X or more remote accounts
+             */
+            "remoteFollowingMoreThanOrEq": string;
+            /**
+             * マニュアルロールにアサイン済み
+             */
+            "roleAssignedTo": string;
+            /**
+             * ローカルユーザー
+             */
+            "isLocal": string;
+            /**
+             * リモートユーザー
+             */
+            "isRemote": string;
+            /**
+             * 猫ユーザー
+             */
+            "isCat": string;
+            /**
+             * botユーザー
+             */
+            "isBot": string;
+            /**
+             * サスペンド済みユーザー
+             */
+            "isSuspended": string;
+            /**
+             * アカウント作成から～以内
+             */
+            "createdLessThan": string;
+            /**
+             * アカウント作成から～経過
+             */
+            "createdMoreThan": string;
+            /**
+             * フォロワー数が～以下
+             */
+            "followersLessThanOrEq": string;
+            /**
+             * フォロワー数が～以上
+             */
+            "followersMoreThanOrEq": string;
+            /**
+             * フォロー数が～以下
+             */
+            "followingLessThanOrEq": string;
+            /**
+             * フォロー数が～以上
+             */
+            "followingMoreThanOrEq": string;
+            /**
+             * 投稿数が～以下
+             */
+            "notesLessThanOrEq": string;
+            /**
+             * 投稿数が～以上
+             */
+            "notesMoreThanOrEq": string;
+            /**
+             * ～かつ～
+             */
+            "and": string;
+            /**
+             * ～または～
+             */
+            "or": string;
+            /**
+             * ～ではない
+             */
+            "not": string;
+        };
+        /**
+         * This condition may be incorrect for remote users.
+         */
+        "remoteDataWarning": string;
+        /**
+         * ロールの作成
+         */
+        "new": string;
+        /**
+         * ロールの編集
+         */
+        "edit": string;
+        /**
+         * ロール名
+         */
+        "name": string;
+        /**
+         * ロールの説明
+         */
+        "description": string;
+        /**
+         * ロールの権限
+         */
+        "permission": string;
+        /**
+         * <b>モデレーター</b>は基本的なモデレーションに関する操作を行えます。
+         * <b>管理者</b>はサーバーの全ての設定を変更できます。
+         */
+        "descriptionOfPermission": string;
+        /**
+         * アサイン
+         */
+        "assignTarget": string;
+        /**
+         * <b>マニュアル</b>は誰がこのロールに含まれるかを手動で管理します。
+         * <b>コンディショナル</b>は条件を設定し、それに合致するユーザーが自動で含まれるようになります。
+         */
+        "descriptionOfAssignTarget": string;
+        /**
+         * マニュアル
+         */
+        "manual": string;
+        /**
+         * マニュアルロール
+         */
+        "manualRoles": string;
+        /**
+         * コンディショナル
+         */
+        "conditional": string;
+        /**
+         * コンディショナルロール
+         */
+        "conditionalRoles": string;
+        /**
+         * 条件
+         */
+        "condition": string;
+        /**
+         * これはコンディショナルロールです。
+         */
+        "isConditionalRole": string;
+        /**
+         * 公開ロール
+         */
+        "isPublic": string;
+        /**
+         * ユーザーのプロフィールでこのロールが表示されます。
+         */
+        "descriptionOfIsPublic": string;
+        /**
+         * オプション
+         */
+        "options": string;
+        /**
+         * ポリシー
+         */
+        "policies": string;
+        /**
+         * ベースロール
+         */
+        "baseRole": string;
+        /**
+         * ベースロールの値を使用
+         */
+        "useBaseValue": string;
+        /**
+         * アサインするロールを選択
+         */
+        "chooseRoleToAssign": string;
+        /**
+         * アイコン画像のURL
+         */
+        "iconUrl": string;
+        /**
+         * バッジとして表示
+         */
+        "asBadge": string;
+        /**
+         * オンにすると、ユーザー名の横にロールのアイコンが表示されます。
+         */
+        "descriptionOfAsBadge": string;
+        /**
+         * ユーザーを見つけやすくする
+         */
+        "isExplorable": string;
+        /**
+         * オンにすると、「みつける」でメンバー一覧が公開されるほか、ロールのタイムラインが利用可能になります。
+         */
+        "descriptionOfIsExplorable": string;
+        /**
+         * 表示順
+         */
+        "displayOrder": string;
+        /**
+         * 数値が大きいほどUI上で先頭に表示されます。
+         */
+        "descriptionOfDisplayOrder": string;
+        /**
+         * アサイン状態を移行先アカウントにも引き継ぐ
+         */
+        "preserveAssignmentOnMoveAccount": string;
+        /**
+         * オンにすると、このロールが付与されたアカウントが移行された際に、移行先アカウントにもこのロールが引き継がれるようになります。
+         */
+        "preserveAssignmentOnMoveAccount_description": string;
+        /**
+         * モデレーターのメンバー編集を許可
+         */
+        "canEditMembersByModerator": string;
+        /**
+         * オンにすると、管理者に加えてモデレーターもこのロールへユーザーをアサイン/アサイン解除できるようになります。オフにすると管理者のみが行えます。
+         */
+        "descriptionOfCanEditMembersByModerator": string;
+        /**
+         * 優先度
+         */
+        "priority": string;
+        "_priority": {
+            /**
+             * 低
+             */
+            "low": string;
+            /**
+             * 中
+             */
+            "middle": string;
+            /**
+             * 高
+             */
+            "high": string;
+        };
+    };
+    "_emailUnavailable": {
+        /**
+         * このメールアドレスでは登録できません
+         */
+        "banned": string;
+        /**
+         * 既に使用されています
+         */
+        "used": string;
+        /**
+         * 形式が正しくありません
+         */
+        "format": string;
+        /**
+         * 恒久的に使用可能なアドレスではありません
+         */
+        "disposable": string;
+        /**
+         * 正しいメールサーバーではありません
+         */
+        "mx": string;
+        /**
+         * メールサーバーが応答しません
+         */
+        "smtp": string;
+    };
+    "_signup": {
+        /**
+         * Your account has been created and is awaiting approval.
+         */
+        "approvalPending": string;
+        /**
+         * Please enter a reason as to why you want to join the instance.
+         */
+        "reasonInfo": string;
+        /**
+         * ほとんど完了です
+         */
+        "almostThere": string;
+        /**
+         * あなたが使っているメールアドレスを入力してください。メールアドレスが公開されることはありません。
+         */
+        "emailAddressInfo": string;
+        /**
+         * 入力されたメールアドレス({email})宛に確認のメールが送信されました。メールに記載されたリンクにアクセスすると、アカウントの作成が完了します。メールに記載されているリンクの有効期限は30分です。
+         */
+        "emailSent": ParameterizedString<"email">;
+    };
+    "_aboutMisskey": {
+        /**
+         * Misskeyはsyuiloによって2014年から開発されている、オープンソースのソフトウェアです。
+         */
+        "about": string;
+        /**
+         * オリジナル
+         */
+        "original": string;
+        /**
+         * Sharkey original
+         */
+        "original_sharkey": string;
+        /**
+         * {name}はオリジナルのMisskeyを改変したバージョンを使用しています。
+         */
+        "thisIsModifiedVersion": ParameterizedString<"name">;
+        /**
+         * Misskeyを翻訳
+         */
+        "translation": string;
+        /**
+         * Donate to Sharkey
+         */
+        "donate_sharkey": string;
+        /**
+         * Testers
+         */
+        "testers": string;
+        /**
+         * Misskey Contributors
+         */
+        "misskeyContributors": string;
+        /**
+         * Our lovely Sponsors
+         */
+        "ourLovelySponsors": string;
+        /**
+         * コントリビューター
+         */
+        "contributors": string;
+        /**
+         * 全てのコントリビューター
+         */
+        "allContributors": string;
+        /**
+         * ソースコード
+         */
+        "source": string;
+        /**
+         * Misskeyに寄付
+         */
+        "donate": string;
+        /**
+         * 他にも多くの方が支援してくれています。ありがとうございます🥰
+         */
+        "morePatrons": string;
+        /**
+         * 支援者
+         */
+        "patrons": string;
+        /**
+         * プロジェクトメンバー
+         */
+        "projectMembers": string;
+    };
+    "_serverDisconnectedBehavior": {
+        /**
+         * Disable warning
+         */
+        "disabled": string;
+        /**
+         * 自動でリロード
+         */
+        "reload": string;
+        /**
+         * ダイアログで警告
+         */
+        "dialog": string;
+        /**
+         * 控えめに警告
+         */
+        "quiet": string;
+    };
+    "_channel": {
+        /**
+         * チャンネル外へのリノートと引用リノートを許可する
+         */
+        "allowRenoteToExternal": string;
+        /**
+         * チャンネルを作成
+         */
+        "create": string;
+        /**
+         * チャンネルを編集
+         */
+        "edit": string;
+        /**
+         * バナーを設定
+         */
+        "setBanner": string;
+        /**
+         * バナーを削除
+         */
+        "removeBanner": string;
+        /**
+         * トレンド
+         */
+        "featured": string;
+        /**
+         * 管理中
+         */
+        "owned": string;
+        /**
+         * フォロー中
+         */
+        "following": string;
+        /**
+         * {n}人が参加中
+         */
+        "usersCount": ParameterizedString<"n">;
+        /**
+         * {n}投稿があります
+         */
+        "notesCount": ParameterizedString<"n">;
+        /**
+         * 名前と説明
+         */
+        "nameAndDescription": string;
+        /**
+         * 名前のみ
+         */
+        "nameOnly": string;
+    };
+    "_instanceMute": {
+        /**
+         * ミュートしたサーバーのユーザーへの返信を含めて、設定したサーバーの全てのノートとRenoteをミュートします。
+         */
+        "instanceMuteDescription": string;
+        /**
+         * 改行で区切って設定します
+         */
+        "instanceMuteDescription2": string;
+        /**
+         * 設定したサーバーのノートを隠します。
+         */
+        "title": string;
+        /**
+         * ミュートするサーバー
+         */
+        "heading": string;
+    };
+    "_theme": {
+        "keys": {
+            /**
+             * リノート
+             */
+            "renote": string;
+            /**
+             * アクセント
+             */
+            "accent": string;
+            /**
+             * 背景
+             */
+            "bg": string;
+            /**
+             * 文字
+             */
+            "fg": string;
+            /**
+             * フォーカス
+             */
+            "focus": string;
+            /**
+             * インジケーター
+             */
+            "indicator": string;
+            /**
+             * パネル
+             */
+            "panel": string;
+            /**
+             * 影
+             */
+            "shadow": string;
+            /**
+             * ヘッダー
+             */
+            "header": string;
+            /**
+             * ナビゲーションバーの背景
+             */
+            "navBg": string;
+            /**
+             * ナビゲーションバーの文字
+             */
+            "navFg": string;
+            /**
+             * ナビゲーションバー文字(アクティブ)
+             */
+            "navActive": string;
+            /**
+             * ナビゲーションバーのインジケーター
+             */
+            "navIndicator": string;
+            /**
+             * リンク
+             */
+            "link": string;
+            /**
+             * ハッシュタグ
+             */
+            "hashtag": string;
+            /**
+             * メンション
+             */
+            "mention": string;
+            /**
+             * あなた宛てメンション
+             */
+            "mentionMe": string;
+            /**
+             * モーダルの背景
+             */
+            "modalBg": string;
+            /**
+             * 分割線
+             */
+            "divider": string;
+            /**
+             * スクロールバーの取っ手
+             */
+            "scrollbarHandle": string;
+            /**
+             * スクロールバーの取っ手（ホバー)
+             */
+            "scrollbarHandleHover": string;
+            /**
+             * 日付ラベルの文字
+             */
+            "dateLabelFg": string;
+            /**
+             * 情報の背景
+             */
+            "infoBg": string;
+            /**
+             * 情報の文字
+             */
+            "infoFg": string;
+            /**
+             * 警告の背景
+             */
+            "infoWarnBg": string;
+            /**
+             * 警告の文字
+             */
+            "infoWarnFg": string;
+            /**
+             * 通知トーストの背景
+             */
+            "toastBg": string;
+            /**
+             * 通知トーストの文字
+             */
+            "toastFg": string;
+            /**
+             * ボタンの背景
+             */
+            "buttonBg": string;
+            /**
+             * ボタンの背景 (ホバー)
+             */
+            "buttonHoverBg": string;
+            /**
+             * 入力ボックスの縁取り
+             */
+            "inputBorder": string;
+            /**
+             * ドライブフォルダーの背景
+             */
+            "driveFolderBg": string;
+            /**
+             * バッジ
+             */
+            "badge": string;
+            /**
+             * チャットの背景
+             */
+            "messageBg": string;
+            /**
+             * 強調された文字
+             */
+            "fgHighlighted": string;
+        };
+        /**
+         * テーマを探す
+         */
+        "explore": string;
+        /**
+         * テーマのインストール
+         */
+        "install": string;
+        /**
+         * テーマの管理
+         */
+        "manage": string;
+        /**
+         * テーマコード
+         */
+        "code": string;
+        /**
+         * 説明
+         */
+        "description": string;
+        /**
+         * {name}をインストールしました
+         */
+        "installed": ParameterizedString<"name">;
+        /**
+         * インストールされたテーマ
+         */
+        "installedThemes": string;
+        /**
+         * 標準のテーマ
+         */
+        "builtinThemes": string;
+        /**
+         * サーバーのテーマ
+         */
+        "instanceTheme": string;
+        /**
+         * そのテーマは既にインストールされています
+         */
+        "alreadyInstalled": string;
+        /**
+         * テーマの形式が間違っています
+         */
+        "invalid": string;
+        /**
+         * テーマを作る
+         */
+        "make": string;
+        /**
+         * ベース
+         */
+        "base": string;
+        /**
+         * 定数を追加
+         */
+        "addConstant": string;
+        /**
+         * 定数
+         */
+        "constant": string;
+        /**
+         * デフォルト値
+         */
+        "defaultValue": string;
+        /**
+         * 色
+         */
+        "color": string;
+        /**
+         * プロパティを参照
+         */
+        "refProp": string;
+        /**
+         * 定数を参照
+         */
+        "refConst": string;
+        /**
+         * キー
+         */
+        "key": string;
+        /**
+         * 関数
+         */
+        "func": string;
+        /**
+         * 関数の種類
+         */
+        "funcKind": string;
+        /**
+         * 引数
+         */
+        "argument": string;
+        /**
+         * 元にするプロパティの名前
+         */
+        "basedProp": string;
+        /**
+         * 不透明度
+         */
+        "alpha": string;
+        /**
+         * 暗さ
+         */
+        "darken": string;
+        /**
+         * 明るさ
+         */
+        "lighten": string;
+        /**
+         * 定数名を入力してください
+         */
+        "inputConstantName": string;
+        /**
+         * ここにテーマコードを貼り付けて、エディターにインポートできます
+         */
+        "importInfo": string;
+        /**
+         * 定数 {const} を削除しても良いですか？
+         */
+        "deleteConstantConfirm": ParameterizedString<"const">;
+    };
+    "_soundSettings": {
+        /**
+         * 長い音声を使用するとMisskeyの使用に支障をきたす可能性があります。それでも続行しますか？
+         */
+        "driveFileDurationWarnDescription": string;
+        /**
+         * 音声が読み込めませんでした。設定を変更してください
+         */
+        "driveFileError": string;
+        /**
+         * ドライブの音声を使用
+         */
+        "driveFile": string;
+        /**
+         * ドライブのファイルを選択してください
+         */
+        "driveFileWarn": string;
+        /**
+         * このファイルは対応していません
+         */
+        "driveFileTypeWarn": string;
+        /**
+         * 音声ファイルを選択してください
+         */
+        "driveFileTypeWarnDescription": string;
+        /**
+         * 音声が長すぎます
+         */
+        "driveFileDurationWarn": string;
+    };
+    "_2fa": {
+        /**
+         * 詳細なガイドはこちら
+         */
+        "moreDetailedGuideHere": string;
+        /**
+         * 既に設定は完了しています。
+         */
+        "alreadyRegistered": string;
+        /**
+         * 認証アプリの設定を開始
+         */
+        "registerTOTP": string;
+        /**
+         * まず、{a}や{b}などの認証アプリをお使いのデバイスにインストールします。
+         */
+        "step1": ParameterizedString<"a" | "b">;
+        /**
+         * 次に、表示されているQRコードをアプリでスキャンするか、ボタンをクリックして端末上でアプリを開きます。
+         */
+        "step2": string;
+        /**
+         * デスクトップアプリを使用する場合は次のURIを入力します
+         */
+        "step2Uri": string;
+        /**
+         * 確認コードを入力
+         */
+        "step3Title": string;
+        /**
+         * アプリに表示されている確認コード（トークン）を入力します。
+         */
+        "step3": string;
+        /**
+         * 設定が完了しました
+         */
+        "setupCompleted": string;
+        /**
+         * これからログインするときも、同じようにコードを入力します。
+         */
+        "step4": string;
+        /**
+         * お使いのブラウザはセキュリティキーに対応していません。
+         */
+        "securityKeyNotSupported": string;
+        /**
+         * セキュリティキー・パスキーを登録するには、まず認証アプリの設定を行なってください。
+         */
+        "registerTOTPBeforeKey": string;
+        /**
+         * FIDO2をサポートするハードウェアセキュリティキー、端末の生体認証やPINロック、パスキーといった、WebAuthn由来の鍵を登録します。
+         */
+        "securityKeyInfo": string;
+        /**
+         * セキュリティキー・パスキーを登録する
+         */
+        "registerSecurityKey": string;
+        /**
+         * キーの名前を入力
+         */
+        "securityKeyName": string;
+        /**
+         * ブラウザの指示に従い、セキュリティキーやパスキーを登録してください
+         */
+        "tapSecurityKey": string;
+        /**
+         * セキュリティキーを削除
+         */
+        "removeKey": string;
+        /**
+         * {name}を削除しますか？
+         */
+        "removeKeyConfirm": ParameterizedString<"name">;
+        /**
+         * セキュリティキーが登録されている場合、認証アプリの設定は解除できません。
+         */
+        "whyTOTPOnlyRenew": string;
+        /**
+         * 認証アプリを再設定
+         */
+        "renewTOTP": string;
+        /**
+         * 今までの認証アプリの確認コードおよびバックアップコードは使用できなくなります
+         */
+        "renewTOTPConfirm": string;
+        /**
+         * 再設定する
+         */
+        "renewTOTPOk": string;
+        /**
+         * やめておく
+         */
+        "renewTOTPCancel": string;
+        /**
+         * このウィザードを閉じる前に、以下のバックアップコードを確認してください。
+         */
+        "checkBackupCodesBeforeCloseThisWizard": string;
+        /**
+         * バックアップコード
+         */
+        "backupCodes": string;
+        /**
+         * 認証アプリが使用できなくなった場合、以下のバックアップコードを使ってアカウントにアクセスできます。これらのコードは必ず安全な場所に保管してください。各コードは一回だけ使用できます。
+         */
+        "backupCodesDescription": string;
+        /**
+         * バックアップコードが使用されました。認証アプリが使えなくなっている場合、なるべく早く認証アプリを再設定してください。
+         */
+        "backupCodeUsedWarning": string;
+        /**
+         * バックアップコードが全て使用されました。認証アプリを利用できない場合、これ以上アカウントにアクセスできなくなります。認証アプリを再登録してください。
+         */
+        "backupCodesExhaustedWarning": string;
+    };
+    "_widgets": {
+        /**
+         * Search
+         */
+        "search": string;
+        /**
+         * プロフィール
+         */
+        "profile": string;
+        /**
+         * サーバー情報
+         */
+        "instanceInfo": string;
+        /**
+         * 付箋
+         */
+        "memo": string;
+        /**
+         * 通知
+         */
+        "notifications": string;
+        /**
+         * タイムライン
+         */
+        "timeline": string;
+        /**
+         * カレンダー
+         */
+        "calendar": string;
+        /**
+         * トレンド
+         */
+        "trends": string;
+        /**
+         * 時計
+         */
+        "clock": string;
+        /**
+         * RSSリーダー
+         */
+        "rss": string;
+        /**
+         * RSSティッカー
+         */
+        "rssTicker": string;
+        /**
+         * アクティビティ
+         */
+        "activity": string;
+        /**
+         * フォト
+         */
+        "photos": string;
+        /**
+         * デジタル時計
+         */
+        "digitalClock": string;
+        /**
+         * UNIX時計
+         */
+        "unixClock": string;
+        /**
+         * 連合
+         */
+        "federation": string;
+        /**
+         * サーバークラウド
+         */
+        "instanceCloud": string;
+        /**
+         * 投稿フォーム
+         */
+        "postForm": string;
+        /**
+         * スライドショー
+         */
+        "slideshow": string;
+        /**
+         * ボタン
+         */
+        "button": string;
+        /**
+         * オンラインユーザー
+         */
+        "onlineUsers": string;
+        /**
+         * ジョブキュー
+         */
+        "jobQueue": string;
+        /**
+         * サーバーメトリクス
+         */
+        "serverMetric": string;
+        /**
+         * AiScriptコンソール
+         */
+        "aiscript": string;
+        /**
+         * AiScript App
+         */
+        "aiscriptApp": string;
+        /**
+         * 藍
+         */
+        "aichan": string;
+        /**
+         * ユーザーリスト
+         */
+        "userList": string;
+        "_userList": {
+            /**
+             * リストを選択
+             */
+            "chooseList": string;
+        };
+        /**
+         * クリッカー
+         */
+        "clicker": string;
+        /**
+         * 今日誕生日のユーザー
+         */
+        "birthdayFollowings": string;
+        /**
+         * チャット
+         */
+        "chat": string;
+    };
+    "_poll": {
+        /**
+         * Multiple choices
+         */
+        "multiple": string;
+        /**
+         * 選択肢は最低2つ必要です
+         */
+        "noOnlyOneChoice": string;
+        /**
+         * 選択肢{n}
+         */
+        "choiceN": ParameterizedString<"n">;
+        /**
+         * これ以上追加できません
+         */
+        "noMore": string;
+        /**
+         * 複数回答可
+         */
+        "canMultipleVote": string;
+        /**
+         * 期限
+         */
+        "expiration": string;
+        /**
+         * 無期限
+         */
+        "infinite": string;
+        /**
+         * 日時指定
+         */
+        "at": string;
+        /**
+         * 経過指定
+         */
+        "after": string;
+        /**
+         * 期日
+         */
+        "deadlineDate": string;
+        /**
+         * 時間
+         */
+        "deadlineTime": string;
+        /**
+         * 期間
+         */
+        "duration": string;
+        /**
+         * {n}票
+         */
+        "votesCount": ParameterizedString<"n">;
+        /**
+         * 計{n}票
+         */
+        "totalVotes": ParameterizedString<"n">;
+        /**
+         * 投票する
+         */
+        "vote": string;
+        /**
+         * 結果を見る
+         */
+        "showResult": string;
+        /**
+         * 投票済み
+         */
+        "voted": string;
+        /**
+         * 終了済み
+         */
+        "closed": string;
+        /**
+         * 終了まであと{d}日{h}時間
+         */
+        "remainingDays": ParameterizedString<"d" | "h">;
+        /**
+         * 終了まであと{h}時間{m}分
+         */
+        "remainingHours": ParameterizedString<"h" | "m">;
+        /**
+         * 終了まであと{m}分{s}秒
+         */
+        "remainingMinutes": ParameterizedString<"m" | "s">;
+        /**
+         * 終了まであと{s}秒
+         */
+        "remainingSeconds": ParameterizedString<"s">;
+    };
+    "_profile": {
+        /**
+         * Update avatar
+         */
+        "updateAvatar": string;
+        /**
+         * Remove avatar
+         */
+        "removeAvatar": string;
+        /**
+         * Update banner
+         */
+        "updateBanner": string;
+        /**
+         * Remove banner
+         */
+        "removeBanner": string;
+        /**
+         * Change background
+         */
+        "changeBackground": string;
+        /**
+         * Update background
+         */
+        "updateBackground": string;
+        /**
+         * Remove background
+         */
+        "removeBackground": string;
+        /**
+         * ListenBrainz username
+         */
+        "listenbrainz": string;
+        /**
+         * 名前
+         */
+        "name": string;
+        /**
+         * ユーザー名
+         */
+        "username": string;
+        /**
+         * 自己紹介
+         */
+        "description": string;
+        /**
+         * ハッシュタグを含めることができます。
+         */
+        "youCanIncludeHashtags": string;
+        /**
+         * 追加情報
+         */
+        "metadata": string;
+        /**
+         * 追加情報を編集
+         */
+        "metadataEdit": string;
+        /**
+         * プロフィールに表として追加情報を表示することができます。
+         */
+        "metadataDescription": string;
+        /**
+         * ラベル
+         */
+        "metadataLabel": string;
+        /**
+         * 内容
+         */
+        "metadataContent": string;
+        /**
+         * アイコン画像を変更
+         */
+        "changeAvatar": string;
+        /**
+         * バナー画像を変更
+         */
+        "changeBanner": string;
+        /**
+         * 内容にURLを設定すると、リンク先のWebサイトに自分のプロフィールへのリンクが含まれている場合に所有者確認済みアイコンを表示させることができます。
+         */
+        "verifiedLinkDescription": string;
+        /**
+         * 最大{max}つまでデコレーションを付けられます。
+         */
+        "avatarDecorationMax": ParameterizedString<"max">;
+        /**
+         * フォローされた時のメッセージ
+         */
+        "followedMessage": string;
+        /**
+         * フォローされた時に相手に表示する短いメッセージを設定できます。
+         */
+        "followedMessageDescription": string;
+        /**
+         * フォローを承認制にしている場合、フォローリクエストを許可した時に表示されます。
+         */
+        "followedMessageDescriptionForLockedAccount": string;
+    };
+    "_timelines": {
+        /**
+         * Bubble
+         */
+        "bubble": string;
+        /**
+         * ホーム
+         */
+        "home": string;
+        /**
+         * ローカル
+         */
+        "local": string;
+        /**
+         * ソーシャル
+         */
+        "social": string;
+        /**
+         * グローバル
+         */
+        "global": string;
+    };
+    "_pages": {
+        "blocks": {
+            /**
+             * このブロックは廃止されています。今後は{play}を利用してください。
+             */
+            "dynamicDescription": ParameterizedString<"play">;
+            /**
+             * テキスト
+             */
+            "text": string;
+            /**
+             * テキストエリア
+             */
+            "textarea": string;
+            /**
+             * セクション
+             */
+            "section": string;
+            /**
+             * 画像
+             */
+            "image": string;
+            /**
+             * ボタン
+             */
+            "button": string;
+            /**
+             * 動的ブロック
+             */
+            "dynamic": string;
+            /**
+             * ノート埋め込み
+             */
+            "note": string;
+            "_note": {
+                /**
+                 * ノートID
+                 */
+                "id": string;
+                /**
+                 * ノートURLをペーストして設定することもできます。
+                 */
+                "idDescription": string;
+                /**
+                 * 詳細な表示
+                 */
+                "detailed": string;
+            };
+        };
+        /**
+         * ページの作成
+         */
+        "newPage": string;
+        /**
+         * ページの編集
+         */
+        "editPage": string;
+        /**
+         * ソースを表示中
+         */
+        "readPage": string;
+        /**
+         * ページ設定
+         */
+        "pageSetting": string;
+        /**
+         * 指定されたページURLは既に存在しています
+         */
+        "nameAlreadyExists": string;
+        /**
+         * 不正なページURLです
+         */
+        "invalidNameTitle": string;
+        /**
+         * 空白でないか確認してください
+         */
+        "invalidNameText": string;
+        /**
+         * このページを編集
+         */
+        "editThisPage": string;
+        /**
+         * ソースを表示
+         */
+        "viewSource": string;
+        /**
+         * ページを見る
+         */
+        "viewPage": string;
+        /**
+         * いいね
+         */
+        "like": string;
+        /**
+         * いいね解除
+         */
+        "unlike": string;
+        /**
+         * 自分のページ
+         */
+        "my": string;
+        /**
+         * いいねしたページ
+         */
+        "liked": string;
+        /**
+         * 人気
+         */
+        "featured": string;
+        /**
+         * インスペクター
+         */
+        "inspector": string;
+        /**
+         * コンテンツ
+         */
+        "contents": string;
+        /**
+         * ページブロック
+         */
+        "content": string;
+        /**
+         * 変数
+         */
+        "variables": string;
+        /**
+         * タイトル
+         */
+        "title": string;
+        /**
+         * ページURL
+         */
+        "url": string;
+        /**
+         * ページの要約
+         */
+        "summary": string;
+        /**
+         * 中央寄せ
+         */
+        "alignCenter": string;
+        /**
+         * ピン留めされているときにタイトルを非表示
+         */
+        "hideTitleWhenPinned": string;
+        /**
+         * フォント
+         */
+        "font": string;
+        /**
+         * セリフ
+         */
+        "fontSerif": string;
+        /**
+         * サンセリフ
+         */
+        "fontSansSerif": string;
+        /**
+         * アイキャッチ画像を設定
+         */
+        "eyeCatchingImageSet": string;
+        /**
+         * アイキャッチ画像を削除
+         */
+        "eyeCatchingImageRemove": string;
+        /**
+         * ブロックを追加
+         */
+        "chooseBlock": string;
+        /**
+         * セクションタイトルを入力
+         */
+        "enterSectionTitle": string;
+        /**
+         * 種類を選択
+         */
+        "selectType": string;
+        /**
+         * コンテンツ
+         */
+        "contentBlocks": string;
+        /**
+         * 入力
+         */
+        "inputBlocks": string;
+        /**
+         * 特殊
+         */
+        "specialBlocks": string;
+    };
+    "_notification": {
+        /**
+         * {name}がリノートしました
+         */
+        "youRenoted": ParameterizedString<"name">;
+        /**
+         * {n}人がリノートしました
+         */
+        "renotedBySomeUsers": ParameterizedString<"n">;
+        /**
+         * Note got edited
+         */
+        "edited": string;
+        /**
+         * Posting scheduled note failed
+         */
+        "scheduledNoteFailed": string;
+        /**
+         * Scheduled Note was posted
+         */
+        "scheduledNotePosted": string;
+        "_types": {
+            /**
+             * リノート
+             */
+            "renote": string;
+            /**
+             * Edits
+             */
+            "edited": string;
+            /**
+             * Posting scheduled note failed
+             */
+            "scheduledNoteFailed": string;
+            /**
+             * Scheduled note was posted
+             */
+            "scheduledNotePosted": string;
+            /**
+             * すべて
+             */
+            "all": string;
+            /**
+             * ユーザーの新規投稿
+             */
+            "note": string;
+            /**
+             * フォロー
+             */
+            "follow": string;
+            /**
+             * メンション
+             */
+            "mention": string;
+            /**
+             * リプライ
+             */
+            "reply": string;
+            /**
+             * 引用
+             */
+            "quote": string;
+            /**
+             * リアクション
+             */
+            "reaction": string;
+            /**
+             * アンケートが終了
+             */
+            "pollEnded": string;
+            /**
+             * フォロー申請を受け取った
+             */
+            "receiveFollowRequest": string;
+            /**
+             * フォローが受理された
+             */
+            "followRequestAccepted": string;
+            /**
+             * ロールが付与された
+             */
+            "roleAssigned": string;
+            /**
+             * チャットルームへ招待された
+             */
+            "chatRoomInvitationReceived": string;
+            /**
+             * 実績の獲得
+             */
+            "achievementEarned": string;
+            /**
+             * エクスポートが完了した
+             */
+            "exportCompleted": string;
+            /**
+             * ログイン
+             */
+            "login": string;
+            /**
+             * アクセストークンの作成
+             */
+            "createToken": string;
+            /**
+             * 通知のテスト
+             */
+            "test": string;
+            /**
+             * 連携アプリからの通知
+             */
+            "app": string;
+        };
+        "_actions": {
+            /**
+             * リノート
+             */
+            "renote": string;
+            /**
+             * フォローバック
+             */
+            "followBack": string;
+            /**
+             * 返信
+             */
+            "reply": string;
+        };
+        /**
+         * ファイルがアップロードされました
+         */
+        "fileUploaded": string;
+        /**
+         * {name}からのメンション
+         */
+        "youGotMention": ParameterizedString<"name">;
+        /**
+         * {name}からのリプライ
+         */
+        "youGotReply": ParameterizedString<"name">;
+        /**
+         * {name}による引用
+         */
+        "youGotQuote": ParameterizedString<"name">;
+        /**
+         * フォローされました
+         */
+        "youWereFollowed": string;
+        /**
+         * フォローリクエストが来ました
+         */
+        "youReceivedFollowRequest": string;
+        /**
+         * フォローリクエストが承認されました
+         */
+        "yourFollowRequestAccepted": string;
+        /**
+         * アンケートの結果が出ました
+         */
+        "pollEnded": string;
+        /**
+         * 新しい投稿
+         */
+        "newNote": string;
+        /**
+         * アンテナ {name}
+         */
+        "unreadAntennaNote": ParameterizedString<"name">;
+        /**
+         * ロールが付与されました
+         */
+        "roleAssigned": string;
+        /**
+         * チャットルームへ招待されました
+         */
+        "chatRoomInvitationReceived": string;
+        /**
+         * プッシュ通知の更新をしました
+         */
+        "emptyPushNotificationMessage": string;
+        /**
+         * 実績を獲得
+         */
+        "achievementEarned": string;
+        /**
+         * 通知テスト
+         */
+        "testNotification": string;
+        /**
+         * 通知の表示を確かめる
+         */
+        "checkNotificationBehavior": string;
+        /**
+         * テスト通知を送信する
+         */
+        "sendTestNotification": string;
+        /**
+         * 通知はこのように表示されます
+         */
+        "notificationWillBeDisplayedLikeThis": string;
+        /**
+         * {n}人がリアクションしました
+         */
+        "reactedBySomeUsers": ParameterizedString<"n">;
+        /**
+         * {n}人がいいねしました
+         */
+        "likedBySomeUsers": ParameterizedString<"n">;
+        /**
+         * {n}人にフォローされました
+         */
+        "followedBySomeUsers": ParameterizedString<"n">;
+        /**
+         * 通知の履歴をリセットする
+         */
+        "flushNotification": string;
+        /**
+         * {x}のエクスポートが完了しました
+         */
+        "exportOfXCompleted": ParameterizedString<"x">;
+        /**
+         * ログインがありました
+         */
+        "login": string;
+        /**
+         * アクセストークンが作成されました
+         */
+        "createToken": string;
+        /**
+         * 心当たりがない場合は「{text}」を通じてアクセストークンを削除してください。
+         */
+        "createTokenDescription": ParameterizedString<"text">;
+    };
+    "_webhookSettings": {
+        "_events": {
+            /**
+             * Renoteされたとき
+             */
+            "renote": string;
+            /**
+             * フォローしたとき
+             */
+            "follow": string;
+            /**
+             * フォローされたとき
+             */
+            "followed": string;
+            /**
+             * ノートを投稿したとき
+             */
+            "note": string;
+            /**
+             * 返信されたとき
+             */
+            "reply": string;
+            /**
+             * リアクションがあったとき
+             */
+            "reaction": string;
+            /**
+             * メンションされたとき
+             */
+            "mention": string;
+        };
+        "_systemEvents": {
+            /**
+             * ユーザーからの通報を処理したとき
+             */
+            "abuseReportResolved": string;
+            /**
+             * ユーザーから通報があったとき
+             */
+            "abuseReport": string;
+            /**
+             * ユーザーが作成されたとき
+             */
+            "userCreated": string;
+            /**
+             * モデレーターが一定期間非アクティブになったとき
+             */
+            "inactiveModeratorsWarning": string;
+            /**
+             * モデレーターが一定期間非アクティブだったため、システムにより招待制へと変更されたとき
+             */
+            "inactiveModeratorsInvitationOnlyChanged": string;
+        };
+        /**
+         * Webhookを作成
+         */
+        "createWebhook": string;
+        /**
+         * Webhookを編集
+         */
+        "modifyWebhook": string;
+        /**
+         * 名前
+         */
+        "name": string;
+        /**
+         * シークレット
+         */
+        "secret": string;
+        /**
+         * トリガー
+         */
+        "trigger": string;
+        /**
+         * 有効
+         */
+        "active": string;
+        /**
+         * Webhookを削除しますか？
+         */
+        "deleteConfirm": string;
+        /**
+         * スイッチの右にあるボタンをクリックするとダミーのデータを使用したテスト用Webhookを送信できます。
+         */
+        "testRemarks": string;
+    };
+    "_abuseReport": {
+        "_notificationRecipient": {
+            "_recipientType": {
+                "_captions": {
+                    /**
+                     * モデレーター権限を持つユーザーのメールアドレスに通知を送ります(通報を受けた時のみ)
+                     */
+                    "mail": string;
+                    /**
+                     * 指定したSystemWebhookに通知を送ります(通報を受けた時と通報を解決した時にそれぞれ発信)
+                     */
+                    "webhook": string;
+                };
+                /**
+                 * メール
+                 */
+                "mail": string;
+                /**
+                 * Webhook
+                 */
+                "webhook": string;
+            };
+            /**
+             * 通報の通知先を追加
+             */
+            "createRecipient": string;
+            /**
+             * 通報の通知先を編集
+             */
+            "modifyRecipient": string;
+            /**
+             * 通知先の種類
+             */
+            "recipientType": string;
+            /**
+             * キーワード
+             */
+            "keywords": string;
+            /**
+             * 通知先ユーザー
+             */
+            "notifiedUser": string;
+            /**
+             * 使用するWebhook
+             */
+            "notifiedWebhook": string;
+            /**
+             * 通知先を削除しますか？
+             */
+            "deleteConfirm": string;
+        };
+    };
+    "_moderationLogTypes": {
+        /**
+         * Approved
+         */
+        "approve": string;
+        /**
+         * Declined
+         */
+        "decline": string;
+        /**
+         * Set content warning for user
+         */
+        "setMandatoryCW": string;
+        /**
+         * Set remote instance as NSFW
+         */
+        "setRemoteInstanceNSFW": string;
+        /**
+         * Unset remote instance as NSFW
+         */
+        "unsetRemoteInstanceNSFW": string;
+        /**
+         * Rejected reports from remote instance
+         */
+        "rejectRemoteInstanceReports": string;
+        /**
+         * Accepted reports from remote instance
+         */
+        "acceptRemoteInstanceReports": string;
+        /**
+         * Blocked/Stripped quote posts from user
+         */
+        "rejectQuotesUser": string;
+        /**
+         * Allowed quote posts from user
+         */
+        "allowQuotesUser": string;
+        /**
+         * Cleared a user's drive files
+         */
+        "clearUserFiles": string;
+        /**
+         * Marked user as NSFW
+         */
+        "nsfwUser": string;
+        /**
+         * Un-marked user as NSFW
+         */
+        "unNsfwUser": string;
+        /**
+         * Silenced user
+         */
+        "silenceUser": string;
+        /**
+         * Un-silenced user
+         */
+        "unSilenceUser": string;
+        /**
+         * Created an account
+         */
+        "createAccount": string;
+        /**
+         * Cleared remote drive files
+         */
+        "clearRemoteFiles": string;
+        /**
+         * Cleared owner-less drive files
+         */
+        "clearOwnerlessFiles": string;
+        /**
+         * Updated custom emojis
+         */
+        "updateCustomEmojis": string;
+        /**
+         * Imported custom emojis
+         */
+        "importCustomEmojis": string;
+        /**
+         * Cleared an instance's drive files
+         */
+        "clearInstanceFiles": string;
+        /**
+         * Severed follow relations with an instance
+         */
+        "severFollowRelations": string;
+        /**
+         * Created a note promo
+         */
+        "createPromo": string;
+        /**
+         * Added a relay
+         */
+        "addRelay": string;
+        /**
+         * Removed a relay
+         */
+        "removeRelay": string;
+        /**
+         * ロールを作成
+         */
+        "createRole": string;
+        /**
+         * ロールを削除
+         */
+        "deleteRole": string;
+        /**
+         * ロールを更新
+         */
+        "updateRole": string;
+        /**
+         * ロールへアサイン
+         */
+        "assignRole": string;
+        /**
+         * ロールのアサイン解除
+         */
+        "unassignRole": string;
+        /**
+         * 凍結
+         */
+        "suspend": string;
+        /**
+         * 凍結解除
+         */
+        "unsuspend": string;
+        /**
+         * カスタム絵文字追加
+         */
+        "addCustomEmoji": string;
+        /**
+         * カスタム絵文字更新
+         */
+        "updateCustomEmoji": string;
+        /**
+         * カスタム絵文字削除
+         */
+        "deleteCustomEmoji": string;
+        /**
+         * サーバー設定更新
+         */
+        "updateServerSettings": string;
+        /**
+         * ユーザーのモデレーションノート更新
+         */
+        "updateUserNote": string;
+        /**
+         * ファイルを削除
+         */
+        "deleteDriveFile": string;
+        /**
+         * ノートを削除
+         */
+        "deleteNote": string;
+        /**
+         * 全体のお知らせを作成
+         */
+        "createGlobalAnnouncement": string;
+        /**
+         * ユーザーへお知らせを作成
+         */
+        "createUserAnnouncement": string;
+        /**
+         * 全体のお知らせを更新
+         */
+        "updateGlobalAnnouncement": string;
+        /**
+         * ユーザーのお知らせを更新
+         */
+        "updateUserAnnouncement": string;
+        /**
+         * 全体のお知らせを削除
+         */
+        "deleteGlobalAnnouncement": string;
+        /**
+         * ユーザーのお知らせを削除
+         */
+        "deleteUserAnnouncement": string;
+        /**
+         * パスワードをリセット
+         */
+        "resetPassword": string;
+        /**
+         * リモートサーバーを停止
+         */
+        "suspendRemoteInstance": string;
+        /**
+         * リモートサーバーを再開
+         */
+        "unsuspendRemoteInstance": string;
+        /**
+         * リモートサーバーのモデレーションノート更新
+         */
+        "updateRemoteInstanceNote": string;
+        /**
+         * ファイルをセンシティブ付与
+         */
+        "markSensitiveDriveFile": string;
+        /**
+         * ファイルをセンシティブ解除
+         */
+        "unmarkSensitiveDriveFile": string;
+        /**
+         * 通報を解決
+         */
+        "resolveAbuseReport": string;
+        /**
+         * 通報を転送
+         */
+        "forwardAbuseReport": string;
+        /**
+         * 通報のモデレーションノート更新
+         */
+        "updateAbuseReportNote": string;
+        /**
+         * 招待コードを作成
+         */
+        "createInvitation": string;
+        /**
+         * 広告を作成
+         */
+        "createAd": string;
+        /**
+         * 広告を削除
+         */
+        "deleteAd": string;
+        /**
+         * 広告を更新
+         */
+        "updateAd": string;
+        /**
+         * アイコンデコレーションを作成
+         */
+        "createAvatarDecoration": string;
+        /**
+         * アイコンデコレーションを更新
+         */
+        "updateAvatarDecoration": string;
+        /**
+         * アイコンデコレーションを削除
+         */
+        "deleteAvatarDecoration": string;
+        /**
+         * ユーザーのアイコンを解除
+         */
+        "unsetUserAvatar": string;
+        /**
+         * ユーザーのバナーを解除
+         */
+        "unsetUserBanner": string;
+        /**
+         * SystemWebhookを作成
+         */
+        "createSystemWebhook": string;
+        /**
+         * SystemWebhookを更新
+         */
+        "updateSystemWebhook": string;
+        /**
+         * SystemWebhookを削除
+         */
+        "deleteSystemWebhook": string;
+        /**
+         * 通報の通知先を作成
+         */
+        "createAbuseReportNotificationRecipient": string;
+        /**
+         * 通報の通知先を更新
+         */
+        "updateAbuseReportNotificationRecipient": string;
+        /**
+         * 通報の通知先を削除
+         */
+        "deleteAbuseReportNotificationRecipient": string;
+        /**
+         * アカウントを削除
+         */
+        "deleteAccount": string;
+        /**
+         * ページを削除
+         */
+        "deletePage": string;
+        /**
+         * Playを削除
+         */
+        "deleteFlash": string;
+        /**
+         * ギャラリーの投稿を削除
+         */
+        "deleteGalleryPost": string;
+        /**
+         * チャットルームを削除
+         */
+        "deleteChatRoom": string;
+        /**
+         * プロキシアカウントの説明を更新
+         */
+        "updateProxyAccountDescription": string;
+    };
+    "_mfm": {
+        /**
+         * This is not a widespread feature, it may not display properly on most other fedi software, including other Misskey forks
+         */
+        "uncommonFeature": string;
+        /**
+         * MFM is a markup language used on Misskey, Sharkey, Firefish, Akkoma, and more that can be used in many places. Here you can view a list of all available MFM syntax.
+         */
+        "intro": string;
+        /**
+         * Sharkey expands the world of the Fediverse
+         */
+        "dummy": string;
+        /**
+         * Mention
+         */
+        "mention": string;
+        /**
+         * You can specify a user by using an At-Symbol and a username.
+         */
+        "mentionDescription": string;
+        /**
+         * Hashtag
+         */
+        "hashtag": string;
+        /**
+         * You can specify a hashtag using a number sign and text.
+         */
+        "hashtagDescription": string;
+        /**
+         * URL
+         */
+        "url": string;
+        /**
+         * URLs can be displayed.
+         */
+        "urlDescription": string;
+        /**
+         * Link
+         */
+        "link": string;
+        /**
+         * Specific parts of text can be displayed as a URL.
+         */
+        "linkDescription": string;
+        /**
+         * Bold
+         */
+        "bold": string;
+        /**
+         * Highlights letters by making them thicker.
+         */
+        "boldDescription": string;
+        /**
+         * Small
+         */
+        "small": string;
+        /**
+         * Displays content small and thin.
+         */
+        "smallDescription": string;
+        /**
+         * Center
+         */
+        "center": string;
+        /**
+         * Displays content centered.
+         */
+        "centerDescription": string;
+        /**
+         * Unix Time
+         */
+        "unixtime": string;
+        /**
+         * Displays a timestamp in the viewer's current timezone.
+         */
+        "unixtimeDescription": string;
+        /**
+         * Code (Inline)
+         */
+        "inlineCode": string;
+        /**
+         * Displays inline syntax highlighting for (program) code.
+         */
+        "inlineCodeDescription": string;
+        /**
+         * Code (Block)
+         */
+        "blockCode": string;
+        /**
+         * Displays syntax highlighting for multi-line (program) code in a block.
+         */
+        "blockCodeDescription": string;
+        /**
+         * Math (Inline)
+         */
+        "inlineMath": string;
+        /**
+         * Display math formulas (KaTeX) in-line
+         */
+        "inlineMathDescription": string;
+        /**
+         * Math (Block)
+         */
+        "blockMath": string;
+        /**
+         * Display math formulas (KaTeX) in a block
+         */
+        "blockMathDescription": string;
+        /**
+         * Quote
+         */
+        "quote": string;
+        /**
+         * Displays content as a quote.
+         */
+        "quoteDescription": string;
+        /**
+         * Custom Emoji
+         */
+        "emoji": string;
+        /**
+         * By surrounding a custom emoji name with colons, custom emoji can be displayed.
+         */
+        "emojiDescription": string;
+        /**
+         * Search
+         */
+        "search": string;
+        /**
+         * Displays a search box with pre-entered text.
+         */
+        "searchDescription": string;
+        /**
+         * Flip
+         */
+        "flip": string;
+        /**
+         * Flips content horizontally or vertically.
+         */
+        "flipDescription": string;
+        /**
+         * Animation (Jelly)
+         */
+        "jelly": string;
+        /**
+         * Gives content a jelly-like animation.
+         */
+        "jellyDescription": string;
+        /**
+         * Animation (Tada)
+         */
+        "tada": string;
+        /**
+         * Gives content a "Tada!"-like animation.
+         */
+        "tadaDescription": string;
+        /**
+         * Animation (Jump)
+         */
+        "jump": string;
+        /**
+         * Gives content a jumping animation.
+         */
+        "jumpDescription": string;
+        /**
+         * Animation (Bounce)
+         */
+        "bounce": string;
+        /**
+         * Gives content a bouncy animation.
+         */
+        "bounceDescription": string;
+        /**
+         * Animation (Shake)
+         */
+        "shake": string;
+        /**
+         * Gives content a shaking animation.
+         */
+        "shakeDescription": string;
+        /**
+         * Animation (Twitch)
+         */
+        "twitch": string;
+        /**
+         * Gives content a strongly twitching animation.
+         */
+        "twitchDescription": string;
+        /**
+         * Animation (Spin)
+         */
+        "spin": string;
+        /**
+         * Gives content a spinning animation.
+         */
+        "spinDescription": string;
+        /**
+         * Big
+         */
+        "x2": string;
+        /**
+         * Displays content bigger.
+         */
+        "x2Description": string;
+        /**
+         * Very big
+         */
+        "x3": string;
+        /**
+         * Displays content even bigger.
+         */
+        "x3Description": string;
+        /**
+         * Unbelievably big
+         */
+        "x4": string;
+        /**
+         * Displays content even bigger than bigger than big.
+         */
+        "x4Description": string;
+        /**
+         * Blur
+         */
+        "blur": string;
+        /**
+         * Blurs content. It will be displayed clearly when hovered over.
+         */
+        "blurDescription": string;
+        /**
+         * Font
+         */
+        "font": string;
+        /**
+         * Sets the font to display content in.
+         */
+        "fontDescription": string;
+        /**
+         * Rainbow
+         */
+        "rainbow": string;
+        /**
+         * Makes the content appear in rainbow colors.
+         */
+        "rainbowDescription": string;
+        /**
+         * Sparkle
+         */
+        "sparkle": string;
+        /**
+         * Gives content a sparkling particle effect.
+         */
+        "sparkleDescription": string;
+        /**
+         * Rotate
+         */
+        "rotate": string;
+        /**
+         * Turns content by a specified angle.
+         */
+        "rotateDescription": string;
+        /**
+         * Position
+         */
+        "position": string;
+        /**
+         * Move content by a specified amount.
+         */
+        "positionDescription": string;
+        /**
+         * Crop
+         */
+        "crop": string;
+        /**
+         * Crop content.
+         */
+        "cropDescription": string;
+        /**
+         * Follow Mouse
+         */
+        "followMouse": string;
+        /**
+         * Content will follow the mouse. On mobile it will follow wherever the user taps.
+         */
+        "followMouseDescription": string;
+        /**
+         * Scale
+         */
+        "scale": string;
+        /**
+         * Scale content by a specified amount.
+         */
+        "scaleDescription": string;
+        /**
+         * Foreground color
+         */
+        "foreground": string;
+        /**
+         * Change the foreground color of text.
+         */
+        "foregroundDescription": string;
+        /**
+         * Fade
+         */
+        "fade": string;
+        /**
+         * Fade text in and out.
+         */
+        "fadeDescription": string;
+        /**
+         * Background color
+         */
+        "background": string;
+        /**
+         * Change the background color of text.
+         */
+        "backgroundDescription": string;
+        /**
+         * Border
+         */
+        "border": string;
+        /**
+         * Draw a border around the content.
+         */
+        "borderDescription": string;
+        /**
+         * Plain
+         */
+        "plain": string;
+        /**
+         * Deactivates the effects of all MFM contained within this MFM effect.
+         */
+        "plainDescription": string;
+    };
+    "_animatedMFM": {
+        /**
+         * Play MFM Animation
+         */
+        "play": string;
+        /**
+         * Stop MFM Animation
+         */
+        "stop": string;
+        "_alert": {
+            /**
+             * Animated MFMs could include flashing lights and fast moving text/emojis.
+             */
+            "text": string;
+            /**
+             * Animate
+             */
+            "confirm": string;
+        };
+    };
+    "_dataRequest": {
+        /**
+         * Request Data
+         */
+        "title": string;
+        /**
+         * Data requests are only possible every 3 days.
+         */
+        "warn": string;
+        /**
+         * Once the data is ready to download, an email will be sent to the email address registered to this account.
+         */
+        "text": string;
+        /**
+         * Request
+         */
+        "button": string;
+    };
+    "_dataSaver": {
+        "_avatar": {
+            /**
+             * アイコン画像のアニメーションが停止します。アニメーション画像は通常の画像よりファイルサイズが大きいことがあるので、データ通信量をさらに削減できます。
+             */
+            "description": string;
+            /**
+             * アイコン画像のアニメーションを無効化
+             */
+            "title": string;
+        };
+        "_media": {
+            /**
+             * メディアの読み込みを無効化
+             */
+            "title": string;
+            /**
+             * 画像・動画が自動で読み込まれるのを防止します。隠れている画像・動画はタップすると読み込まれます。
+             */
+            "description": string;
+        };
+        "_urlPreview": {
+            /**
+             * URLプレビューのサムネイルを非表示
+             */
+            "title": string;
+            /**
+             * URLプレビューのサムネイル画像が読み込まれなくなります。
+             */
+            "description": string;
+        };
+        "_code": {
+            /**
+             * コードハイライトを非表示
+             */
+            "title": string;
+            /**
+             * MFMなどでコードハイライト記法が使われている場合、タップするまで読み込まれなくなります。コードハイライトではハイライトする言語ごとにその定義ファイルを読み込む必要がありますが、それらが自動で読み込まれなくなるため、通信量の削減が見込めます。
+             */
+            "description": string;
+        };
+    };
+    "_urlPreviewSetting": {
+        /**
+         * プレビュー取得の所要時間がこの値を超えた場合、プレビューは生成されません。
+         */
+        "timeoutDescription": string;
+        /**
+         * Content-Lengthが取得できた場合のみプレビューを生成
+         */
+        "requireContentLength": string;
+        /**
+         * プレビューを生成するプロキシのエンドポイント
+         */
+        "summaryProxy": string;
+        /**
+         * Misskey本体ではなく、サマリープロキシを使用してプレビューを生成します。
+         */
+        "summaryProxyDescription": string;
+        /**
+         * プロキシには下記パラメータがクエリ文字列として連携されます。プロキシ側がこれらをサポートしない場合、設定値は無視されます。
+         */
+        "summaryProxyDescription2": string;
+        /**
+         * URLプレビューの設定
+         */
+        "title": string;
+        /**
+         * URLプレビューを有効にする
+         */
+        "enable": string;
+        /**
+         * プレビュー取得時のタイムアウト(ms)
+         */
+        "timeout": string;
+        /**
+         * Content-Lengthの最大値(byte)
+         */
+        "maximumContentLength": string;
+        /**
+         * Content-Lengthがこの値を超えた場合、プレビューは生成されません。
+         */
+        "maximumContentLengthDescription": string;
+        /**
+         * 相手サーバがContent-Lengthを返さない場合、プレビューは生成されません。
+         */
+        "requireContentLengthDescription": string;
+        /**
+         * User-Agent
+         */
+        "userAgent": string;
+        /**
+         * プレビュー取得時に使用されるUser-Agentを設定します。空欄の場合、デフォルトのUser-Agentが使用されます。
+         */
+        "userAgentDescription": string;
+    };
+    "_externalNavigationWarning": {
+        /**
+         * Navigate to an external site
+         */
+        "title": string;
+        /**
+         * Leave {host} and go to an external site
+         */
+        "description": ParameterizedString<"host">;
+        /**
+         * Trust this domain on this device in the future
+         */
+        "trustThisDomain": string;
+    };
+    /**
+     * Remote followers may have incomplete or outdated activity
+     */
+    "remoteFollowersWarning": string;
+    "_auth": {
+        /**
+         * Allowed
+         */
+        "allowed": string;
+        /**
+         * アプリへのアクセス許可
+         */
+        "shareAccessTitle": string;
+        /**
+         * 「{name}」がアカウントにアクセスすることを許可しますか？
+         */
+        "shareAccess": ParameterizedString<"name">;
+        /**
+         * アカウントへのアクセスを許可しますか？
+         */
+        "shareAccessAsk": string;
+        /**
+         * {name}は次の権限を要求しています
+         */
+        "permission": ParameterizedString<"name">;
+        /**
+         * このアプリは次の権限を要求しています
+         */
+        "permissionAsk": string;
+        /**
+         * アプリケーションに戻ってやっていってください
+         */
+        "pleaseGoBack": string;
+        /**
+         * アプリケーションに戻っています
+         */
+        "callback": string;
+        /**
+         * アクセスを許可しました
+         */
+        "accepted": string;
+        /**
+         * アクセスを拒否しました
+         */
+        "denied": string;
+        /**
+         * 以下のユーザーとして操作しています
+         */
+        "scopeUser": string;
+        /**
+         * アプリケーションにアクセス許可を与えるには、ログインが必要です。
+         */
+        "pleaseLogin": string;
+        /**
+         * アクセスを許可すると、自動で以下のURLに遷移します
+         */
+        "byClickingYouWillBeRedirectedToThisUrl": string;
+    };
+    "_announcement": {
+        /**
+         * New
+         */
+        "new": string;
+        /**
+         * 既存ユーザーのみ
+         */
+        "forExistingUsers": string;
+        /**
+         * 有効にすると、このお知らせ作成時点で存在するユーザーにのみお知らせが表示されます。無効にすると、このお知らせ作成後にアカウントを作成したユーザーにもお知らせが表示されます。
+         */
+        "forExistingUsersDescription": string;
+        /**
+         * 既読にするのに確認が必要
+         */
+        "needConfirmationToRead": string;
+        /**
+         * 有効にすると、このお知らせを既読にする際に確認ダイアログが表示されます。また、一括既読操作の対象になりません。
+         */
+        "needConfirmationToReadDescription": string;
+        /**
+         * お知らせを終了
+         */
+        "end": string;
+        /**
+         * アクティブなお知らせが多いため、UXが低下する可能性があります。終了したお知らせはアーカイブすることを検討してください。
+         */
+        "tooManyActiveAnnouncementDescription": string;
+        /**
+         * 既読にしますか？
+         */
+        "readConfirmTitle": string;
+        /**
+         * 「{title}」の内容を読み、既読にします。
+         */
+        "readConfirmText": ParameterizedString<"title">;
+        /**
+         * 特に新規ユーザーのUXを損ねる可能性が高いため、常時掲示するための情報ではなく、即時性が求められる情報の掲示のためにお知らせを使用することを推奨します。
+         */
+        "shouldNotBeUsedToPresentPermanentInfo": string;
+        /**
+         * ダイアログ形式のお知らせが同時に2つ以上ある場合、UXに悪影響を及ぼす可能性が非常に高いため、使用は慎重に行うことを推奨します。
+         */
+        "dialogAnnouncementUxWarn": string;
+        /**
+         * 非通知
+         */
+        "silence": string;
+        /**
+         * オンにすると、このお知らせは通知されず、既読にする必要もなくなります。
+         */
+        "silenceDescription": string;
+    };
+    "_deck": {
+        "_columns": {
+            /**
+             * Following
+             */
+            "following": string;
+            /**
+             * メイン
+             */
+            "main": string;
+            /**
+             * ウィジェット
+             */
+            "widgets": string;
+            /**
+             * 通知
+             */
+            "notifications": string;
+            /**
+             * タイムライン
+             */
+            "tl": string;
+            /**
+             * アンテナ
+             */
+            "antenna": string;
+            /**
+             * リスト
+             */
+            "list": string;
+            /**
+             * チャンネル
+             */
+            "channel": string;
+            /**
+             * あなた宛て
+             */
+            "mentions": string;
+            /**
+             * ダイレクト
+             */
+            "direct": string;
+            /**
+             * ロールタイムライン
+             */
+            "roleTimeline": string;
+            /**
+             * チャット
+             */
+            "chat": string;
+        };
+        /**
+         * 常にメインカラムを表示
+         */
+        "alwaysShowMainColumn": string;
+        /**
+         * カラムの寄せ
+         */
+        "columnAlign": string;
+        /**
+         * カラム間のマージン
+         */
+        "columnGap": string;
+        /**
+         * デッキメニューの位置
+         */
+        "deckMenuPosition": string;
+        /**
+         * ナビゲーションバーの位置
+         */
+        "navbarPosition": string;
+        /**
+         * カラムを追加
+         */
+        "addColumn": string;
+        /**
+         * 新着ノート通知の設定
+         */
+        "newNoteNotificationSettings": string;
+        /**
+         * カラムの設定
+         */
+        "configureColumn": string;
+        /**
+         * 左に移動
+         */
+        "swapLeft": string;
+        /**
+         * 右に移動
+         */
+        "swapRight": string;
+        /**
+         * 上に移動
+         */
+        "swapUp": string;
+        /**
+         * 下に移動
+         */
+        "swapDown": string;
+        /**
+         * 左にスタック
+         */
+        "stackLeft": string;
+        /**
+         * 右に出す
+         */
+        "popRight": string;
+        /**
+         * プロファイル
+         */
+        "profile": string;
+        /**
+         * 新規プロファイル
+         */
+        "newProfile": string;
+        /**
+         * プロファイルを削除
+         */
+        "deleteProfile": string;
+        /**
+         * カラムを組み合わせて自分だけのインターフェイスを作りましょう！
+         */
+        "introduction": string;
+        /**
+         * カラムを追加するには、画面の + をクリックします。
+         */
+        "introduction2": string;
+        /**
+         * カラムのメニューから、「ウィジェットの編集」を選択してウィジェットを追加してください
+         */
+        "widgetsIntroduction": string;
+        /**
+         * 非ルートページは簡易UIで表示
+         */
+        "useSimpleUiForNonRootPages": string;
+        /**
+         * 「幅を自動調整」が有効の場合、これが幅の最小値となります
+         */
+        "usedAsMinWidthWhenFlexible": string;
+        /**
+         * 幅を自動調整
+         */
+        "flexible": string;
+        /**
+         * プロファイル情報のデバイス間同期を有効にする
+         */
+        "enableSyncBetweenDevicesForProfiles": string;
+    };
+    /**
+     * Select a follow relationship...
+     */
+    "selectFollowRelationship": string;
+    /**
+     * Schedule a note
+     */
+    "schedulePost": string;
+    /**
+     * List of scheduled notes
+     */
+    "schedulePostList": string;
+    /**
+     * Post on
+     */
+    "postOn": string;
+    /**
+     * Scheduled Notes
+     */
+    "scheduledNotes": string;
+    "_permissions": {
+        /**
+         * Approve new users
+         */
+        "write:admin:approve-user": string;
+        /**
+         * Decline new users
+         */
+        "write:admin:decline-user": string;
+        /**
+         * Mark users as NSFW
+         */
+        "write:admin:nsfw-user": string;
+        /**
+         * Mark users as not NSFW
+         */
+        "write:admin:unnsfw-user": string;
+        /**
+         * Apply mandatory CW on users
+         */
+        "write:admin:cw-user": string;
+        /**
+         * Silence users
+         */
+        "write:admin:silence-user": string;
+        /**
+         * Un-silence users
+         */
+        "write:admin:unsilence-user": string;
+        /**
+         * Allow/Prohibit quote posts from a user
+         */
+        "write:admin:reject-quotes": string;
+        /**
+         * View your list of scheduled notes
+         */
+        "read:notes-schedule": string;
+        /**
+         * Compose or delete scheduled notes
+         */
+        "write:notes-schedule": string;
+        /**
+         * アカウントの情報を見る
+         */
+        "read:account": string;
+        /**
+         * アカウントの情報を変更する
+         */
+        "write:account": string;
+        /**
+         * ブロックを見る
+         */
+        "read:blocks": string;
+        /**
+         * ブロックを操作する
+         */
+        "write:blocks": string;
+        /**
+         * ドライブを見る
+         */
+        "read:drive": string;
+        /**
+         * ドライブを操作する
+         */
+        "write:drive": string;
+        /**
+         * お気に入りを見る
+         */
+        "read:favorites": string;
+        /**
+         * お気に入りを操作する
+         */
+        "write:favorites": string;
+        /**
+         * フォローの情報を見る
+         */
+        "read:following": string;
+        /**
+         * フォロー・フォロー解除する
+         */
+        "write:following": string;
+        /**
+         * チャットを見る
+         */
+        "read:messaging": string;
+        /**
+         * チャットを操作する
+         */
+        "write:messaging": string;
+        /**
+         * ミュートを見る
+         */
+        "read:mutes": string;
+        /**
+         * ミュートを操作する
+         */
+        "write:mutes": string;
+        /**
+         * ノートを作成・削除する
+         */
+        "write:notes": string;
+        /**
+         * 通知を見る
+         */
+        "read:notifications": string;
+        /**
+         * 通知を操作する
+         */
+        "write:notifications": string;
+        /**
+         * リアクションを見る
+         */
+        "read:reactions": string;
+        /**
+         * リアクションを操作する
+         */
+        "write:reactions": string;
+        /**
+         * 投票する
+         */
+        "write:votes": string;
+        /**
+         * ページを見る
+         */
+        "read:pages": string;
+        /**
+         * ページを操作する
+         */
+        "write:pages": string;
+        /**
+         * ページのいいねを見る
+         */
+        "read:page-likes": string;
+        /**
+         * ページのいいねを操作する
+         */
+        "write:page-likes": string;
+        /**
+         * ユーザーグループを見る
+         */
+        "read:user-groups": string;
+        /**
+         * ユーザーグループを操作する
+         */
+        "write:user-groups": string;
+        /**
+         * チャンネルを見る
+         */
+        "read:channels": string;
+        /**
+         * チャンネルを操作する
+         */
+        "write:channels": string;
+        /**
+         * ギャラリーを見る
+         */
+        "read:gallery": string;
+        /**
+         * ギャラリーを操作する
+         */
+        "write:gallery": string;
+        /**
+         * ギャラリーのいいねを見る
+         */
+        "read:gallery-likes": string;
+        /**
+         * ギャラリーのいいねを操作する
+         */
+        "write:gallery-likes": string;
+        /**
+         * Playを見る
+         */
+        "read:flash": string;
+        /**
+         * Playを操作する
+         */
+        "write:flash": string;
+        /**
+         * Playのいいねを見る
+         */
+        "read:flash-likes": string;
+        /**
+         * Playのいいねを操作する
+         */
+        "write:flash-likes": string;
+        /**
+         * ユーザーからの通報を見る
+         */
+        "read:admin:abuse-user-reports": string;
+        /**
+         * ユーザーアカウントを削除する
+         */
+        "write:admin:delete-account": string;
+        /**
+         * ユーザーのすべてのファイルを削除する
+         */
+        "write:admin:delete-all-files-of-a-user": string;
+        /**
+         * データベースインデックスに関する情報を見る
+         */
+        "read:admin:index-stats": string;
+        /**
+         * データベーステーブルに関する情報を見る
+         */
+        "read:admin:table-stats": string;
+        /**
+         * ユーザーのIPアドレスを見る
+         */
+        "read:admin:user-ips": string;
+        /**
+         * インスタンスのメタデータを見る
+         */
+        "read:admin:meta": string;
+        /**
+         * ユーザーのパスワードをリセットする
+         */
+        "write:admin:reset-password": string;
+        /**
+         * ユーザーからの通報を解決する
+         */
+        "write:admin:resolve-abuse-user-report": string;
+        /**
+         * メールを送る
+         */
+        "write:admin:send-email": string;
+        /**
+         * サーバーの情報を見る
+         */
+        "read:admin:server-info": string;
+        /**
+         * モデレーションログを見る
+         */
+        "read:admin:show-moderation-log": string;
+        /**
+         * ユーザーのプライベートな情報を見る
+         */
+        "read:admin:show-user": string;
+        /**
+         * ユーザーを凍結する
+         */
+        "write:admin:suspend-user": string;
+        /**
+         * ユーザーのアバターを削除する
+         */
+        "write:admin:unset-user-avatar": string;
+        /**
+         * ユーザーのバーナーを削除する
+         */
+        "write:admin:unset-user-banner": string;
+        /**
+         * ユーザーの凍結を解除する
+         */
+        "write:admin:unsuspend-user": string;
+        /**
+         * インスタンスのメタデータを操作する
+         */
+        "write:admin:meta": string;
+        /**
+         * モデレーションノートを操作する
+         */
+        "write:admin:user-note": string;
+        /**
+         * ロールを操作する
+         */
+        "write:admin:roles": string;
+        /**
+         * ロールを見る
+         */
+        "read:admin:roles": string;
+        /**
+         * リレーを操作する
+         */
+        "write:admin:relays": string;
+        /**
+         * リレーを見る
+         */
+        "read:admin:relays": string;
+        /**
+         * 招待コードを操作する
+         */
+        "write:admin:invite-codes": string;
+        /**
+         * 招待コードを見る
+         */
+        "read:admin:invite-codes": string;
+        /**
+         * お知らせを操作する
+         */
+        "write:admin:announcements": string;
+        /**
+         * お知らせを見る
+         */
+        "read:admin:announcements": string;
+        /**
+         * アバターデコレーションを操作する
+         */
+        "write:admin:avatar-decorations": string;
+        /**
+         * アバターデコレーションを見る
+         */
+        "read:admin:avatar-decorations": string;
+        /**
+         * 連合に関する情報を操作する
+         */
+        "write:admin:federation": string;
+        /**
+         * ユーザーアカウントを操作する
+         */
+        "write:admin:account": string;
+        /**
+         * ユーザーに関する情報を見る
+         */
+        "read:admin:account": string;
+        /**
+         * 絵文字を操作する
+         */
+        "write:admin:emoji": string;
+        /**
+         * 絵文字を見る
+         */
+        "read:admin:emoji": string;
+        /**
+         * ジョブキューを操作する
+         */
+        "write:admin:queue": string;
+        /**
+         * ジョブキューに関する情報を見る
+         */
+        "read:admin:queue": string;
+        /**
+         * プロモーションノートを操作する
+         */
+        "write:admin:promo": string;
+        /**
+         * ユーザーのドライブを操作する
+         */
+        "write:admin:drive": string;
+        /**
+         * ユーザーのドライブの関する情報を見る
+         */
+        "read:admin:drive": string;
+        /**
+         * 管理者用のWebsocket APIを使う
+         */
+        "read:admin:stream": string;
+        /**
+         * 広告を操作する
+         */
+        "write:admin:ad": string;
+        /**
+         * 広告を見る
+         */
+        "read:admin:ad": string;
+        /**
+         * 招待コードを作成する
+         */
+        "write:invite-codes": string;
+        /**
+         * 招待コードを取得する
+         */
+        "read:invite-codes": string;
+        /**
+         * クリップのいいねを操作する
+         */
+        "write:clip-favorite": string;
+        /**
+         * クリップのいいねを見る
+         */
+        "read:clip-favorite": string;
+        /**
+         * 連合に関する情報を取得する
+         */
+        "read:federation": string;
+        /**
+         * 違反を報告する
+         */
+        "write:report-abuse": string;
+        /**
+         * チャットを操作する
+         */
+        "write:chat": string;
+        /**
+         * チャットを閲覧する
+         */
+        "read:chat": string;
+    };
+    /**
+     * Custom robots.txt
+     */
+    "robotsTxt": string;
+    /**
+     * Adding entries here will override the default robots.txt packaged with Sharkey.
+     */
+    "robotsTxtDescription": string;
+    /**
+     * Default content warning for new posts
+     */
+    "defaultCW": string;
+    /**
+     * The value here will be auto-filled as the content warning for all new posts and replies.
+     */
+    "defaultCWDescription": string;
+    /**
+     * Automatic CW priority
+     */
+    "defaultCWPriority": string;
+    /**
+     * Select preferred action when default CW and keep CW settings are both enabled at the same time.
+     */
+    "defaultCWPriorityDescription": string;
+    "_defaultCWPriority": {
+        /**
+         * Use Default (use the default CW, ignoring the inherited CW)
+         */
+        "default": string;
+        /**
+         * Use Parent (use the inherited CW, ignoring the default CW)
+         */
+        "parent": string;
+        /**
+         * Use Default, then Parent (use the default CW, and append the inherited CW)
+         */
+        "defaultParent": string;
+        /**
+         * Use Parent, then Default (use the inherited CW, and append the default CW)
+         */
+        "parentDefault": string;
+    };
+    /**
+     * Generate Keys
+     */
+    "genKeys": string;
+    "_genKeysDialog": {
+        /**
+         * Are you sure that you want to generate new keys? This will stop push notifications for all users who have already enabled them.
+         */
+        "text": string;
+        /**
+         * Generate new keys
+         */
+        "title": string;
+    };
+    "_noteSearch": {
+        /**
+         * Sort by newest to oldest
+         */
+        "newestToOldest": string;
+        /**
+         * File Type
+         */
+        "fileType": string;
+        "_fileType": {
+            /**
+             * None
+             */
+            "none": string;
+            /**
+             * Images
+             */
+            "image": string;
+            /**
+             * Videos
+             */
+            "video": string;
+            /**
+             * Audio
+             */
+            "audio": string;
+            /**
+             * Module
+             */
+            "module": string;
+            /**
+             * Flash
+             */
+            "flash": string;
+        };
+    };
+    /**
+     * ID
+     */
+    "id": string;
+    /**
+     * Force content warning
+     */
+    "mandatoryCW": string;
+    /**
+     * Applies a content warning to all posts created by this user. If the post already has a CW, then this is appended to the end.
+     */
+    "mandatoryCWDescription": string;
+    /**
+     * Fetch linked note
+     */
+    "fetchLinkedNote": string;
+    /**
+     * Add "Translate" to note action menu
+     */
+    "showTranslationButtonInNoteFooter": string;
+    /**
+     * Failed to translate note. Please try again later or contact an administrator for assistance.
+     */
+    "translationFailed": string;
+    "_processErrors": {
+        /**
+         * Unable to process quote. This post may be missing context.
+         */
+        "quoteUnavailable": string;
+    };
+    /**
+     * Authorized Fetch
+     */
+    "authorizedFetchSection": string;
+    /**
+     * Allow unsigned ActivityPub requests:
+     */
+    "authorizedFetchLabel": string;
+    /**
+     * This setting controls the behavior when a remote instance or user attempts to access your content without verifying their identity. If disabled, any remote user can access your profile and posts - even one who has been blocked or defederated.
+     */
+    "authorizedFetchDescription": string;
+    "_authorizedFetchValue": {
+        /**
+         * Never
+         */
+        "never": string;
+        /**
+         * Always
+         */
+        "always": string;
+        /**
+         * Only for essential metadata
+         */
+        "essential": string;
+        /**
+         * Use staff recommendation
+         */
+        "staff": string;
+    };
+    "_authorizedFetchValueDescription": {
+        /**
+         * Block all unsigned requests. Improves privacy and makes blocks more effective, but is not compatible with some very old or uncommon instance software.
+         */
+        "never": string;
+        /**
+         * Allow all unsigned requests. Provides the greatest compatibility with other instances, but reduces privacy and weakens blocks.
+         */
+        "always": string;
+        /**
+         * Allow some limited unsigned requests. Provides a hybrid between "Never" and "Always" by exposing only the minimum profile metadata that is required for federation with older software.
+         */
+        "essential": string;
+        /**
+         * Use the default value of "{value}" recommended by the instance staff.
+         */
+        "staff": ParameterizedString<"value">;
+    };
+    /**
+     * The configuration property 'checkActivityPubGetSignature' has been deprecated and replaced with the new Authorized Fetch setting. Please remove it from your configuration file.
+     */
+    "authorizedFetchLegacyWarning": string;
+    "_followRequest": {
+        /**
+         * 受け取った申請
+         */
+        "recieved": string;
+        /**
+         * 送った申請
+         */
+        "sent": string;
+    };
+    /**
+     * Deleted
+     */
+    "deleted": string;
+    /**
+     * Enable the proxy account.
+     */
+    "enableProxyAccount": string;
+    /**
+     * If disabled, then the proxy account will not be used. User lists will only include notes from local or followed users.
+     */
+    "enableProxyAccountDescription": string;
+    "_confirmPollEdit": {
+        /**
+         * Are you sure you want to edit this poll
+         */
+        "title": string;
+        /**
+         * Editing this poll will cause it to lose all previous votes
+         */
+        "text": string;
+    };
+    /**
+     * Test patterns
+     */
+    "wordMuteTestLabel": string;
+    /**
+     * Enter some text here to test your word patterns. The matched words, if any, will be displayed below.
+     */
+    "wordMuteTestDescription": string;
+    /**
+     * Test
+     */
+    "wordMuteTestTest": string;
+    /**
+     * Matched words: {words}
+     */
+    "wordMuteTestMatch": ParameterizedString<"words">;
+    /**
+     * No results yet, enter some text and click "Test" to check it.
+     */
+    "wordMuteTestNoResults": string;
+    /**
+     * Text does not match any patterns.
+     */
+    "wordMuteTestNoMatch": string;
+    /**
+     * All word mutes are *case-sensitive* and match on any substring, including part of a longer word or name. You can use regular expressions for more precise control.
+     */
+    "wordMuteWarning": string;
+    /**
+     * Bubble timeline
+     */
+    "bubbleTimeline": string;
+    /**
+     * Choose which instances should be displayed in the bubble.
+     */
+    "bubbleTimelineDescription": string;
+    /**
+     * Note: the bubble timeline is hidden by default, and must be enabled via roles.
+     */
+    "bubbleTimelineMustBeEnabled": string;
+    /**
+     * Users popular on the global network
+     */
+    "popularUsersGlobal": string;
+    /**
+     * Users popular on {name}
+     */
+    "popularUsersLocal": ParameterizedString<"name">;
+    /**
+     * Polls trending on {name}
+     */
+    "pollsOnLocal": ParameterizedString<"name">;
+    /**
+     * Polls trending on the global network
+     */
+    "pollsOnRemote": string;
+    /**
+     * Polls that have ended recently
+     */
+    "pollsExpired": string;
+    /**
+     * Trending polls are disabled on this instance.
+     */
+    "trendingPollsDisabled": string;
+    /**
+     * Please log in to view trending polls.
+     */
+    "trendingPollsDisabledLogIn": string;
+    /**
+     * Silenced
+     */
+    "silenced": string;
+    /**
+     * Total followers
+     */
+    "totalFollowers": string;
+    /**
+     * Total following
+     */
+    "totalFollowing": string;
+    /**
+     * Local followers
+     */
+    "localFollowers": string;
+    /**
+     * Local following
+     */
+    "localFollowing": string;
+    /**
+     * Remote followers
+     */
+    "remoteFollowers": string;
+    /**
+     * Remote following
+     */
+    "remoteFollowing": string;
+    /**
+     * リモートユーザー情報の更新
+     */
+    "updateRemoteUser": string;
+    /**
+     * Activity Pub
+     */
+    "activityPub": string;
+    /**
+     * IP
+     */
+    "ip": string;
+    /**
+     * The date is when IP address was first used.
+     */
+    "ipTip": string;
+    /**
+     * Period
+     */
+    "rolePeriod": string;
+    /**
+     * Assigned
+     */
+    "roleAssigned": string;
+    /**
+     * automatic
+     */
+    "roleAutomatic": string;
+    /**
+     * 翻訳タイムアウト
+     */
+    "translationTimeoutLabel": string;
+    /**
+     * 翻訳APIリクエストのタイムアウト時間（ミリ秒）
+     */
+    "translationTimeoutCaption": string;
+    /**
+     * Staff notes
+     */
+    "staffNotes": string;
+    /**
+     * Icon of {name}
+     */
+    "instanceIconAlt": ParameterizedString<"name">;
+    /**
+     * Attribution Domains
+     */
+    "attributionDomains": string;
+    /**
+     * A list of domains whose content can be attributed to you on link previews, separated by new-line. Any subdomain will also be valid. The following needs to be on the webpage:
+     */
+    "attributionDomainsDescription": string;
+    /**
+     * Written by {user}
+     */
+    "writtenBy": ParameterizedString<"user">;
+    /**
+     * Following (Pub)
+     */
+    "followingPub": string;
+    /**
+     * Followers (Sub)
+     */
+    "followersSub": string;
+    /**
+     * Well-known resources
+     */
+    "wellKnownResources": string;
+    /**
+     * Last posted: {at}
+     */
+    "lastPosted": ParameterizedString<"at">;
+    /**
+     * NSFW
+     */
+    "nsfw": string;
+    /**
+     * Raw
+     */
+    "raw": string;
+    /**
+     * CW
+     */
+    "cw": string;
+    /**
+     * Media Silenced
+     */
+    "mediaSilenced": string;
+    /**
+     * Bubble
+     */
+    "bubble": string;
+    /**
+     * Verified
+     */
+    "verified": string;
+    /**
+     * Not Verified
+     */
+    "notVerified": string;
+    /**
+     * Hibernated
+     */
+    "hibernated": string;
+    /**
+     * When replying to a post with a Content Warning, automatically use the same CW for the reply.
+     */
+    "keepCwDescription": string;
+    /**
+     * Disabled (do not copy CWs)
+     */
+    "keepCwDisabled": string;
+    /**
+     * Enabled (copy CWs verbatim)
+     */
+    "keepCwEnabled": string;
+    /**
+     * Enabled (copy CW and prepend "RE:")
+     */
+    "keepCwPrependRe": string;
+    /**
+     * Note controls
+     */
+    "noteFooterLabel": string;
+    /**
+     * Packed user data in its raw form. Most of these fields are public and visible to all users.
+     */
+    "rawUserDescription": string;
+    /**
+     * Extended user data in its raw form. These fields are private and can only be accessed by moderators.
+     */
+    "rawInfoDescription": string;
+    /**
+     * ActivityPub user data in its raw form. These fields are public and accessible to other instances.
+     */
+    "rawApDescription": string;
+    /**
+     * Signup Reason
+     */
+    "signupReason": string;
+    /**
      * 日本語
      */
     "_lang_": string;
@@ -17,17 +5911,6 @@ export interface Locale extends ILocale {
      * ノートでつながるネットワーク
      */
     "headlineMisskey": string;
-    /**
-     * Welcome! Sharkey is an open source, decentralized microblogging service.
-     * Create "notes" to share your thoughts with everyone around you. 📡
-     * With "reactions", you can also quickly express your feelings about everyone's notes. 👍
-     * Let's explore a new world! 🚀
-     */
-    "introMisskey": string;
-    /**
-     * {name} is one of the services powered by the open source platform <b>Sharkey</b> which is based on Misskey (referred to as a "Misskey instance").
-     */
-    "poweredByMisskeyDescription": ParameterizedString<"name">;
     /**
      * {month}月 {day}日
      */
@@ -94,10 +5977,6 @@ export interface Locale extends ILocale {
      * ユーザー名を入力
      */
     "enterUsername": string;
-    /**
-     * Boosted by {user}
-     */
-    "renotedBy": ParameterizedString<"user">;
     /**
      * ノートはありません
      */
@@ -219,10 +6098,6 @@ export interface Locale extends ILocale {
      */
     "copyRemoteLink": string;
     /**
-     * Copy boost link
-     */
-    "copyLinkRenote": string;
-    /**
      * 削除
      */
     "delete": string;
@@ -230,10 +6105,6 @@ export interface Locale extends ILocale {
      * 削除して編集
      */
     "deleteAndEdit": string;
-    /**
-     * Are you sure you want to redraft this note? This means you will lose all reactions, boosts, and replies to it.
-     */
-    "deleteAndEditConfirm": string;
     /**
      * リストに追加
      */
@@ -463,37 +6334,9 @@ export interface Locale extends ILocale {
      */
     "enterEmoji": string;
     /**
-     * Boost
-     */
-    "renote": string;
-    /**
-     * Remove boost
-     */
-    "unrenote": string;
-    /**
-     * Boosted.
-     */
-    "renoted": string;
-    /**
-     * Boosted to {name}
-     */
-    "renotedToX": ParameterizedString<"name">;
-    /**
-     * This post can't be boosted.
-     */
-    "cantRenote": string;
-    /**
-     * A boost can't be boosted.
-     */
-    "cantReRenote": string;
-    /**
      * 引用
      */
     "quote": string;
-    /**
-     * Channel-only Boost
-     */
-    "inChannelRenote": string;
     /**
      * チャンネル内引用
      */
@@ -598,14 +6441,6 @@ export interface Locale extends ILocale {
      * ミュート解除
      */
     "unmute": string;
-    /**
-     * Mute Boosts
-     */
-    "renoteMute": string;
-    /**
-     * Unmute Boosts
-     */
-    "renoteUnmute": string;
     /**
      * ブロック
      */
@@ -727,10 +6562,6 @@ export interface Locale extends ILocale {
      */
     "flagAsBot": string;
     /**
-     * Enable this option if this account is controlled by a program. If enabled, it will act as a flag for other developers to prevent endless interaction chains with other bots and adjust Sharkey's internal systems to treat this account as a bot.
-     */
-    "flagAsBotDescription": string;
-    /**
      * にゃああああああああああああああ！！！！！！！！！！！！
      */
     "flagAsCat": string;
@@ -766,14 +6597,6 @@ export interface Locale extends ILocale {
      * リモートで表示
      */
     "showOnRemote": string;
-    /**
-     * Continue on remote instance
-     */
-    "continueOnRemote": string;
-    /**
-     * Choose a instance from Misskey Hub
-     */
-    "chooseServerOnMisskeyHub": string;
     /**
      * サーバーのドメインを直接指定
      */
@@ -887,10 +6710,6 @@ export interface Locale extends ILocale {
      */
     "silenceThisInstance": string;
     /**
-     * Silence media from this instance
-     */
-    "mediaSilenceThisInstance": string;
-    /**
      * 操作
      */
     "operations": string;
@@ -971,18 +6790,6 @@ export interface Locale extends ILocale {
      */
     "silencedInstances": string;
     /**
-     * List the host names of the instances that you want to silence, separated by a new line. All accounts belonging to the listed instances will be treated as silenced, and can only make follow requests, and cannot mention local accounts if not followed. This will not affect the blocked instances.
-     */
-    "silencedInstancesDescription": string;
-    /**
-     * Media-silenced instances
-     */
-    "mediaSilencedInstances": string;
-    /**
-     * List the host names of the instances that you want to media-silence, separated by a new line. All accounts belonging to the listed instances will be treated as sensitive, and can't use custom emojis. This will not affect the blocked instances.
-     */
-    "mediaSilencedInstancesDescription": string;
-    /**
      * 連合を許可するサーバー
      */
     "federationAllowedHosts": string;
@@ -1018,10 +6825,6 @@ export interface Locale extends ILocale {
      * これ以上ピン留めできません
      */
     "pinLimitExceeded": string;
-    /**
-     * Installation of Sharkey has been finished! Please create an admin user.
-     */
-    "intro": string;
     /**
      * 完了
      */
@@ -1346,10 +7149,6 @@ export interface Locale extends ILocale {
      * フォルダーを選択
      */
     "selectFolders": string;
-    /**
-     * No file selected
-     */
-    "fileNotSelected": string;
     /**
      * ファイル名を変更
      */
@@ -1723,10 +7522,6 @@ export interface Locale extends ILocale {
      */
     "enableServiceworker": string;
     /**
-     * List one username per line. Use "*@instance.com" to specify all users of an instance
-     */
-    "antennaUsersDescription": string;
-    /**
      * 大文字小文字を区別する
      */
     "caseSensitive": string;
@@ -1798,10 +7593,6 @@ export interface Locale extends ILocale {
      * 情報
      */
     "about": string;
-    /**
-     * About Sharkey
-     */
-    "aboutMisskey": string;
     /**
      * 管理者
      */
@@ -1979,10 +7770,6 @@ export interface Locale extends ILocale {
      */
     "quoteQuestion": string;
     /**
-     * The text in clipboard is long. Would you like to attach it as a text file?
-     */
-    "attachAsFileQuestion": string;
-    /**
      * メッセージに添付できるファイルはひとつです
      */
     "onlyOneFileCanBeAttached": string;
@@ -1990,10 +7777,6 @@ export interface Locale extends ILocale {
      * 続行する前に、登録またはログインが必要です
      */
     "signinRequired": string;
-    /**
-     * To continue, you need to go to your instance to perform this action or sign up / log in to the instance you are trying to interact with.
-     */
-    "signinOrContinueOnRemote": string;
     /**
      * 招待
      */
@@ -2098,10 +7881,6 @@ export interface Locale extends ILocale {
      * ノートのアクションをホバー時のみ表示する
      */
     "showNoteActionsOnlyHover": string;
-    /**
-     * Show the number of reactions in notes
-     */
-    "showReactionsCount": string;
     /**
      * 履歴はありません
      */
@@ -2355,10 +8134,6 @@ export interface Locale extends ILocale {
      */
     "notUseSound": string;
     /**
-     * Output sounds only if Sharkey is active.
-     */
-    "useSoundOnlyWhenActive": string;
-    /**
      * 詳細
      */
     "details": string;
@@ -2423,10 +8198,6 @@ export interface Locale extends ILocale {
      */
     "scratchpad": string;
     /**
-     * The Scratchpad provides an environment for AiScript experiments. You can write, execute, and check the results of it interacting with Sharkey in it.
-     */
-    "scratchpadDescription": string;
-    /**
      * UIインスペクター
      */
     "uiInspector": string;
@@ -2446,10 +8217,6 @@ export interface Locale extends ILocale {
      * Pagesのスクリプトを無効にする
      */
     "disablePagesScript": string;
-    /**
-     * Refresh remote data
-     */
-    "updateRemoteUser": string;
     /**
      * アイコンを解除
      */
@@ -2891,10 +8658,6 @@ export interface Locale extends ILocale {
      */
     "reportAbuse": string;
     /**
-     * Report boost
-     */
-    "reportAbuseRenote": string;
-    /**
      * {name}を通報する
      */
     "reportAbuseOf": ParameterizedString<"name">;
@@ -3015,17 +8778,9 @@ export interface Locale extends ILocale {
      */
     "repliesCount": string;
     /**
-     * Number of boosts sent
-     */
-    "renotesCount": string;
-    /**
      * 返信された数
      */
     "repliedCount": string;
-    /**
-     * Number of boosts received
-     */
-    "renotedCount": string;
     /**
      * フォロー数
      */
@@ -3210,11 +8965,6 @@ export interface Locale extends ILocale {
      * エラーリポートを送信
      */
     "sendErrorReports": string;
-    /**
-     * When turned on, detailed error information will be shared with Sharkey when a problem occurs, helping to improve the quality of Sharkey.
-     * This will include information such the version of your OS, what browser you're using, your activity in Sharkey, etc.
-     */
-    "sendErrorReportsDescription": string;
     /**
      * マイテーマ
      */
@@ -3468,10 +9218,6 @@ export interface Locale extends ILocale {
      */
     "noMaintainerInformationWarning": string;
     /**
-     * Contact URL is not set.
-     */
-    "noInquiryUrlWarning": string;
-    /**
      * Botプロテクションが設定されていません。
      */
     "noBotProtectionWarning": string;
@@ -3592,10 +9338,6 @@ export interface Locale extends ILocale {
      */
     "learnMore": string;
     /**
-     * Sharkey has been updated!
-     */
-    "misskeyUpdated": string;
-    /**
      * 更新情報を見る
      */
     "whatIsNew": string;
@@ -3611,10 +9353,6 @@ export interface Locale extends ILocale {
      * アカウントの削除が進行中です
      */
     "accountDeletionInProgress": string;
-    /**
-     * A name that identifies your account from others on this server. You can use the alphabet (a~z, A~Z), digits (0~9) or underscores (_). Usernames cannot be changed later.
-     */
-    "usernameInfo": string;
     /**
      * 藍モード
      */
@@ -4128,14 +9866,6 @@ export interface Locale extends ILocale {
      */
     "remindMeLater": string;
     /**
-     * Have you taken a liking to Sharkey?
-     */
-    "didYouLikeMisskey": string;
-    /**
-     * {host} uses the free software, Sharkey. We would highly appreciate your donations so development of Sharkey can continue!
-     */
-    "pleaseDonate": ParameterizedString<"host">;
-    /**
      * 対応するソースコードは{anchor}から利用可能です。
      */
     "correspondingSourceIsAvailable": ParameterizedString<"anchor">;
@@ -4243,14 +9973,6 @@ export interface Locale extends ILocale {
      * このまま投稿
      */
     "thisPostMayBeAnnoyingIgnore": string;
-    /**
-     * Collapse boosts you've already seen
-     */
-    "collapseRenotes": string;
-    /**
-     * Collapse boosts that you have boosted or reacted to
-     */
-    "collapseRenotesDescription": string;
     /**
      * サーバー内部エラー
      */
@@ -4416,10 +10138,6 @@ export interface Locale extends ILocale {
      */
     "reactionsDisplaySize": string;
     /**
-     * Limits the maximum width of reactions and display them in reduced size.
-     */
-    "limitWidthOfReaction": string;
-    /**
      * ノートIDまたはURL
      */
     "noteIdOrUrl": string;
@@ -4475,10 +10193,6 @@ export interface Locale extends ILocale {
      * リアクション一覧
      */
     "reactionsList": string;
-    /**
-     * Boosts
-     */
-    "renotesList": string;
     /**
      * 通知の表示
      */
@@ -4596,18 +10310,6 @@ export interface Locale extends ILocale {
      */
     "specifyUser": string;
     /**
-     * Are you sure that you want to look this up?
-     */
-    "lookupConfirm": string;
-    /**
-     * Are you sure you want to open this hashtags page?
-     */
-    "openTagPageConfirm": string;
-    /**
-     * Specify a host
-     */
-    "specifyHost": string;
-    /**
      * プレビューできません
      */
     "failedToPreviewUrl": string;
@@ -4639,10 +10341,6 @@ export interface Locale extends ILocale {
      * あとで
      */
     "later": string;
-    /**
-     * To Sharkey
-     */
-    "goToMisskey": string;
     /**
      * 絵文字の追加辞書
      */
@@ -4776,14 +10474,6 @@ export interface Locale extends ILocale {
      */
     "useSecurityKey": string;
     /**
-     * Replies
-     */
-    "replies": string;
-    /**
-     * Boosts
-     */
-    "renotes": string;
-    /**
      * 返信を見る
      */
     "loadReplies": string;
@@ -4823,10 +10513,6 @@ export interface Locale extends ILocale {
      * 日時
      */
     "dateAndTime": string;
-    /**
-     * Show boosts
-     */
-    "showRenotes": string;
     /**
      * 編集済み
      */
@@ -4876,21 +10562,41 @@ export interface Locale extends ILocale {
      */
     "externalServices": string;
     /**
+     * 翻訳サービス
+     */
+    "translationService": string;
+    /**
+     * 翻訳サービスの種類
+     */
+    "translatorType": string;
+    /**
+     * 無効
+     */
+    "translatorTypeNone": string;
+    /**
+     * DeepL
+     */
+    "translatorTypeDeepL": string;
+    /**
+     * DeepLX
+     */
+    "translatorTypeDeepLX": string;
+    /**
+     * LibreTranslate
+     */
+    "translatorTypeLibreTranslate": string;
+    /**
+     * Google翻訳
+     */
+    "translatorTypeGoogle": string;
+    /**
      * ソースコード
      */
     "sourceCode": string;
     /**
-     * The source code is not yet available. Please contact your administrator to fix this problem.
-     */
-    "sourceCodeIsNotYetProvided": string;
-    /**
      * リポジトリURL
      */
     "repositoryUrl": string;
-    /**
-     * If there is a repository where the source code is publicly available, enter its URL. If you are using Sharkey as-is (without any changes to the source code), enter https://activitypub.software/TransFem-org/Sharkey/.
-     */
-    "repositoryUrlDescription": string;
     /**
      * リポジトリを公開していない場合、代わりにtarballを提供する必要があります。詳細は.config/example.ymlを参照してください。
      */
@@ -5004,10 +10710,6 @@ export interface Locale extends ILocale {
      */
     "overwriteContentConfirm": string;
     /**
-     * Seasonal screen effects
-     */
-    "seasonalScreenEffect": string;
-    /**
      * デコる
      */
     "decorate": string;
@@ -5120,10 +10822,6 @@ export interface Locale extends ILocale {
      */
     "keepOriginalFilenameDescription": string;
     /**
-     * No description
-     */
-    "noDescription": string;
-    /**
      * フォローの際常に確認する
      */
     "alwaysConfirmFollow": string;
@@ -5139,10 +10837,6 @@ export interface Locale extends ILocale {
      * センシティブなメディアを表示するとき確認する
      */
     "confirmWhenRevealingSensitiveMedia": string;
-    /**
-     * This media might be sensitive. Are you sure you want to reveal it?
-     */
-    "sensitiveMediaRevealConfirm": string;
     /**
      * 作成したリスト
      */
@@ -5842,38 +11536,6 @@ export interface Locale extends ILocale {
          */
         "resolveTutorial": string;
     };
-    "_delivery": {
-        /**
-         * 配信状態
-         */
-        "status": string;
-        /**
-         * Suspend delivery
-         */
-        "stop": string;
-        /**
-         * Resume delivery
-         */
-        "resume": string;
-        "_type": {
-            /**
-             * 配信中
-             */
-            "none": string;
-            /**
-             * 手動停止中
-             */
-            "manuallySuspended": string;
-            /**
-             * サーバー削除のため停止中
-             */
-            "goneSuspended": string;
-            /**
-             * サーバー応答なしのため停止中
-             */
-            "autoSuspendedForNotResponding": string;
-        };
-    };
     "_bubbleGame": {
         /**
          * 遊び方
@@ -5928,1812 +11590,11 @@ export interface Locale extends ILocale {
             "section3": string;
         };
     };
-    "_announcement": {
-        /**
-         * 既存ユーザーのみ
-         */
-        "forExistingUsers": string;
-        /**
-         * 有効にすると、このお知らせ作成時点で存在するユーザーにのみお知らせが表示されます。無効にすると、このお知らせ作成後にアカウントを作成したユーザーにもお知らせが表示されます。
-         */
-        "forExistingUsersDescription": string;
-        /**
-         * 既読にするのに確認が必要
-         */
-        "needConfirmationToRead": string;
-        /**
-         * 有効にすると、このお知らせを既読にする際に確認ダイアログが表示されます。また、一括既読操作の対象になりません。
-         */
-        "needConfirmationToReadDescription": string;
-        /**
-         * お知らせを終了
-         */
-        "end": string;
-        /**
-         * アクティブなお知らせが多いため、UXが低下する可能性があります。終了したお知らせはアーカイブすることを検討してください。
-         */
-        "tooManyActiveAnnouncementDescription": string;
-        /**
-         * 既読にしますか？
-         */
-        "readConfirmTitle": string;
-        /**
-         * 「{title}」の内容を読み、既読にします。
-         */
-        "readConfirmText": ParameterizedString<"title">;
-        /**
-         * 特に新規ユーザーのUXを損ねる可能性が高いため、常時掲示するための情報ではなく、即時性が求められる情報の掲示のためにお知らせを使用することを推奨します。
-         */
-        "shouldNotBeUsedToPresentPermanentInfo": string;
-        /**
-         * ダイアログ形式のお知らせが同時に2つ以上ある場合、UXに悪影響を及ぼす可能性が非常に高いため、使用は慎重に行うことを推奨します。
-         */
-        "dialogAnnouncementUxWarn": string;
-        /**
-         * 非通知
-         */
-        "silence": string;
-        /**
-         * オンにすると、このお知らせは通知されず、既読にする必要もなくなります。
-         */
-        "silenceDescription": string;
-        /**
-         * New
-         */
-        "new": string;
-    };
-    "_initialAccountSetting": {
-        /**
-         * アカウントの作成が完了しました！
-         */
-        "accountCreated": string;
-        /**
-         * さっそくアカウントの初期設定を行いましょう。
-         */
-        "letsStartAccountSetup": string;
-        /**
-         * まずはあなたのプロフィールを設定しましょう。
-         */
-        "letsFillYourProfile": string;
-        /**
-         * プロフィール設定
-         */
-        "profileSetting": string;
-        /**
-         * プライバシー設定
-         */
-        "privacySetting": string;
-        /**
-         * これらの設定は後から変更できます。
-         */
-        "theseSettingsCanEditLater": string;
-        /**
-         * この他にも様々な設定を「設定」ページから行えます。ぜひ後で確認してみてください。
-         */
-        "youCanEditMoreSettingsInSettingsPageLater": string;
-        /**
-         * タイムラインを構築するため、気になるユーザーをフォローしてみましょう。
-         */
-        "followUsers": string;
-        /**
-         * プッシュ通知を有効にすると{name}の通知をお使いのデバイスで受け取ることができます。
-         */
-        "pushNotificationDescription": ParameterizedString<"name">;
-        /**
-         * 初期設定が完了しました！
-         */
-        "initialAccountSettingCompleted": string;
-        /**
-         * {name}をお楽しみください！
-         */
-        "haveFun": ParameterizedString<"name">;
-        /**
-         * You can proceed to a tutorial on how to use {name} (Sharkey) or you can exit the setup here and start using it immediately.
-         */
-        "youCanContinueTutorial": ParameterizedString<"name">;
-        /**
-         * チュートリアルを開始
-         */
-        "startTutorial": string;
-        /**
-         * 初期設定をスキップしますか？
-         */
-        "skipAreYouSure": string;
-        /**
-         * 初期設定をあとでやり直しますか？
-         */
-        "laterAreYouSure": string;
-    };
-    "_initialTutorial": {
-        /**
-         * チュートリアルを見る
-         */
-        "launchTutorial": string;
-        /**
-         * チュートリアル
-         */
-        "title": string;
-        /**
-         * よくできました
-         */
-        "wellDone": string;
-        /**
-         * チュートリアルを終了しますか？
-         */
-        "skipAreYouSure": string;
-        "_landing": {
-            /**
-             * チュートリアルへようこそ
-             */
-            "title": string;
-            /**
-             * Here, you can learn the basics of using Sharkey and its features.
-             */
-            "description": string;
-        };
-        "_note": {
-            /**
-             * ノートって何？
-             */
-            "title": string;
-            /**
-             * Posts on Sharkey are called 'Notes.' Notes are arranged chronologically on the timeline and are updated in real-time.
-             */
-            "description": string;
-            /**
-             * 返信することができます。返信に対しての返信も可能で、スレッドのように会話を続けることもできます。
-             */
-            "reply": string;
-            /**
-             * そのノートを自分のタイムラインに流して共有することができます。テキストを追加して引用することも可能です。
-             */
-            "renote": string;
-            /**
-             * リアクションをつけることができます。詳しくは次のページで解説します。
-             */
-            "reaction": string;
-            /**
-             * ノートの詳細を表示したり、リンクをコピーしたりなどの様々な操作が行えます。
-             */
-            "menu": string;
-        };
-        "_reaction": {
-            /**
-             * リアクションって何？
-             */
-            "title": string;
-            /**
-             * ノートには「リアクション」をつけることができます。「いいね」では伝わらないニュアンスも、リアクションで簡単・気軽に表現できます。
-             */
-            "description": string;
-            /**
-             * Reactions can be added by clicking the '{reaction}' button on the note. Try reacting to this sample note!
-             */
-            "letsTryReacting": ParameterizedString<"reaction">;
-            /**
-             * リアクションをつけると先に進めるようになります。
-             */
-            "reactToContinue": string;
-            /**
-             * あなたのノートが誰かにリアクションされると、リアルタイムで通知を受け取ります。
-             */
-            "reactNotification": string;
-            /**
-             * You can undo a reaction by pressing the '{undo}' button.
-             */
-            "reactDone": ParameterizedString<"undo">;
-        };
-        "_timeline": {
-            /**
-             * タイムラインのしくみ
-             */
-            "title": string;
-            /**
-             * Sharkey provides multiple timelines based on usage (some may not be available depending on the server's policies).
-             */
-            "description1": string;
-            /**
-             * あなたがフォローしているアカウントの投稿を見られます。
-             */
-            "home": string;
-            /**
-             * このサーバーにいるユーザー全員の投稿を見られます。
-             */
-            "local": string;
-            /**
-             * ホームタイムラインとローカルタイムラインの投稿が両方表示されます。
-             */
-            "social": string;
-            /**
-             * 接続している他のすべてのサーバーからの投稿を見られます。
-             */
-            "global": string;
-            /**
-             * それぞれのタイムラインは、画面上部でいつでも切り替えられます。
-             */
-            "description2": string;
-            /**
-             * その他にも、リストタイムラインやチャンネルタイムラインなどがあります。詳しくは{link}をご覧ください。
-             */
-            "description3": ParameterizedString<"link">;
-            /**
-             * You can view notes from connected servers picked by your admins.
-             */
-            "bubble": string;
-        };
-        "_postNote": {
-            /**
-             * ノートの投稿設定
-             */
-            "title": string;
-            /**
-             * When posting a note on Sharkey, various options are available. The posting form looks like this.
-             */
-            "description1": string;
-            "_visibility": {
-                /**
-                 * ノートを表示できる相手を制限できます。
-                 */
-                "description": string;
-                /**
-                 * すべてのユーザーに公開。
-                 */
-                "public": string;
-                /**
-                 * Public only on the Home timeline. People visiting your profile, via followers, and through boosts can see it.
-                 */
-                "home": string;
-                /**
-                 * Visible to followers only. Only followers can see it and no one else, and it cannot be boosted by others.
-                 */
-                "followers": string;
-                /**
-                 * 指定したユーザーにのみ公開され、また相手に通知が入ります。ダイレクトメッセージのかわりにお使いいただけます。
-                 */
-                "direct": string;
-                /**
-                 * 機密情報は送信する際は注意してください。
-                 */
-                "doNotSendConfidencialOnDirect1": string;
-                /**
-                 * 送信先のサーバーの管理者は投稿内容を見ることが可能なので、信頼できないサーバーのユーザーにダイレクト投稿を送信する場合は、機密情報の扱いに注意が必要です。
-                 */
-                "doNotSendConfidencialOnDirect2": string;
-                /**
-                 * 他のサーバーに投稿を連合しません。上記の公開範囲に関わらず、他のサーバーのユーザーは、この設定がついたノートを直接閲覧することができなくなります。
-                 */
-                "localOnly": string;
-            };
-            "_cw": {
-                /**
-                 * 内容を隠す（CW）
-                 */
-                "title": string;
-                /**
-                 * 本文のかわりに「注釈」に書いた内容が表示されます。「もっと見る」を押すと本文が表示されます。
-                 */
-                "description": string;
-                "_exampleNote": {
-                    /**
-                     * 飯テロ注意
-                     */
-                    "cw": string;
-                    /**
-                     * チョコのかかったドーナツを食べました🍩😋
-                     */
-                    "note": string;
-                };
-                /**
-                 * サーバーのガイドラインにより必要とされるノートに指定したり、ネタバレ投稿やセンシティブな文章を自主規制したりするときに使います。
-                 */
-                "useCases": string;
-            };
-        };
-        "_howToMakeAttachmentsSensitive": {
-            /**
-             * 添付ファイルをセンシティブにするには？
-             */
-            "title": string;
-            /**
-             * サーバーのガイドラインにより必要とされる際や、そのまま見れる状態にしておくべきではない添付ファイルには、「センシティブ」設定を付けます。
-             */
-            "description": string;
-            /**
-             * 試しに、このフォームに添付された画像をセンシティブにしてみてください！
-             */
-            "tryThisFile": string;
-            "_exampleNote": {
-                /**
-                 * 納豆のフタ開けるのミスったわね…
-                 */
-                "note": string;
-            };
-            /**
-             * 添付ファイルをセンシティブにする際は、そのファイルをクリックしてメニューを開き、「センシティブとして設定」をクリックします。
-             */
-            "method": string;
-            /**
-             * ファイルを添付する際は、サーバーのガイドラインに従ってセンシティブを適切に設定してください。
-             */
-            "sensitiveSucceeded": string;
-            /**
-             * 画像をセンシティブに設定すると先に進めるようになります。
-             */
-            "doItToContinue": string;
-        };
-        "_done": {
-            /**
-             * The tutorial is complete! 🎉
-             */
-            "title": string;
-            /**
-             * The functions introduced here are just a small part. For a more detailed understanding of using Sharkey, please refer to {link}.
-             */
-            "description": ParameterizedString<"link">;
-        };
-    };
-    "_timelineDescription": {
-        /**
-         * ホームタイムラインでは、あなたがフォローしているアカウントの投稿を見られます。
-         */
-        "home": string;
-        /**
-         * ローカルタイムラインでは、このサーバーにいるユーザー全員の投稿を見られます。
-         */
-        "local": string;
-        /**
-         * ソーシャルタイムラインには、ホームタイムラインとローカルタイムラインの投稿が両方表示されます。
-         */
-        "social": string;
-        /**
-         * グローバルタイムラインでは、接続している他のすべてのサーバーからの投稿を見られます。
-         */
-        "global": string;
-        /**
-         * In the Bubble timeline, you can see notes from connected servers picked by your admins.
-         */
-        "bubble": string;
-    };
     "_serverRules": {
         /**
          * 新規登録前に表示する、サーバーの簡潔なルールを設定します。内容は利用規約の要約とすることを推奨します。
          */
         "description": string;
-    };
-    "_serverSettings": {
-        /**
-         * アイコン画像のURL
-         */
-        "iconUrl": string;
-        /**
-         * {host}がアプリとして表示される際のアイコンを指定します。
-         */
-        "appIconDescription": ParameterizedString<"host">;
-        /**
-         * 例: PWAや、スマートフォンのホーム画面にブックマークとして追加された時など
-         */
-        "appIconUsageExample": string;
-        /**
-         * 円形もしくは角丸にクロップされる場合があるため、塗り潰された余白のある背景を持つことが推奨されます。
-         */
-        "appIconStyleRecommendation": string;
-        /**
-         * 解像度は必ず{resolution}である必要があります。
-         */
-        "appIconResolutionMustBe": ParameterizedString<"resolution">;
-        /**
-         * manifest.jsonのオーバーライド
-         */
-        "manifestJsonOverride": string;
-        /**
-         * 略称
-         */
-        "shortName": string;
-        /**
-         * サーバーの正式名称が長い場合に、代わりに表示することのできる略称や通称。
-         */
-        "shortNameDescription": string;
-        /**
-         * 有効にすると、各種タイムラインを取得する際のパフォーマンスが大幅に向上し、データベースへの負荷を軽減することが可能です。ただし、Redisのメモリ使用量は増加します。サーバーのメモリ容量が少ない場合、または動作が不安定な場合は無効にすることができます。
-         */
-        "fanoutTimelineDescription": string;
-        /**
-         * データベースへのフォールバック
-         */
-        "fanoutTimelineDbFallback": string;
-        /**
-         * 有効にすると、タイムラインがキャッシュされていない場合にDBへ追加で問い合わせを行うフォールバック処理を行います。無効にすると、フォールバック処理を行わないことでさらにサーバーの負荷を軽減することができますが、タイムラインが取得できる範囲に制限が生じます。
-         */
-        "fanoutTimelineDbFallbackDescription": string;
-        /**
-         * 有効にすると、リアクション作成時のパフォーマンスが大幅に向上し、データベースへの負荷を軽減することが可能です。ただし、Redisのメモリ使用量は増加します。
-         */
-        "reactionsBufferingDescription": string;
-        /**
-         * Contact URL
-         */
-        "inquiryUrl": string;
-        /**
-         * Specify the URL of a web page that contains a contact form or the instance operators' contact information.
-         */
-        "inquiryUrlDescription": string;
-        /**
-         * アカウントの作成をオープンにする
-         */
-        "openRegistration": string;
-        /**
-         * 登録を開放することはリスクが伴います。サーバーを常に監視し、トラブルが発生した際にすぐに対応できる体制がある場合のみオンにすることを推奨します。
-         */
-        "openRegistrationWarning": string;
-        /**
-         * 一定期間モデレーターのアクティビティが検出されなかった場合、スパム防止のためこの設定は自動でオフになります。
-         */
-        "thisSettingWillAutomaticallyOffWhenModeratorsInactive": string;
-        /**
-         * Logo URL
-         */
-        "sidebarLogoUrl": string;
-        /**
-         * Specifies the logo to use instead of the regular icon in high definition, dynamic-width scenarios.
-         */
-        "sidebarLogoDescription": string;
-        /**
-         * E.g. In the sidebar, to visitors and in the "About" page.
-         */
-        "sidebarLogoUsageExample": string;
-    };
-    "_accountMigration": {
-        /**
-         * 別のアカウントからこのアカウントに移行
-         */
-        "moveFrom": string;
-        /**
-         * 別のアカウントへエイリアスを作成
-         */
-        "moveFromSub": string;
-        /**
-         * 移行元のアカウント #{n}
-         */
-        "moveFromLabel": ParameterizedString<"n">;
-        /**
-         * 別のアカウントからこのアカウントに移行したい場合、ここでエイリアスを作成しておく必要があります。
-         * 移行元のアカウントをこのように入力してください: @username@server.example.com
-         * 削除するには、入力欄を空にして保存します（非推奨）。
-         */
-        "moveFromDescription": string;
-        /**
-         * このアカウントを新しいアカウントへ移行
-         */
-        "moveTo": string;
-        /**
-         * 移行先のアカウント:
-         */
-        "moveToLabel": string;
-        /**
-         * アカウントを移行すると、取り消すことはできません。
-         */
-        "moveCannotBeUndone": string;
-        /**
-         * This will migrate your account to a different one.
-         * 　・Followers from this account will automatically be migrated to the new account
-         * 　・This account will unfollow all users it is currently following
-         * 　・You will be unable to create new notes etc. on this account
-         *
-         * While migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.
-         *
-         * (This explanation applies to Sharkey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)
-         */
-        "moveAccountDescription": string;
-        /**
-         * アカウントの移行には、まずは移行先のアカウントでこのアカウントに対しエイリアスを作成します。
-         * エイリアス作成後、移行先のアカウントを次のように入力してください: @username@server.example.com
-         */
-        "moveAccountHowTo": string;
-        /**
-         * 移行する
-         */
-        "startMigration": string;
-        /**
-         * 本当にこのアカウントを {account} に移行しますか？一度移行すると取り消せず、二度とこのアカウントを元の状態で使用できなくなります。
-         */
-        "migrationConfirm": ParameterizedString<"account">;
-        /**
-         *
-         * アカウントは移行されています。
-         * 移行を取り消すことはできません。
-         */
-        "movedAndCannotBeUndone": string;
-        /**
-         * このアカウントからのフォロー解除は移行操作から24時間後に実行されます。
-         * このアカウントのフォロー・フォロワー数は0になっています。フォロワーの解除はされないため、あなたのフォロワーはこのアカウントのフォロワー向け投稿を引き続き閲覧できます。
-         */
-        "postMigrationNote": string;
-        /**
-         * 移行先のアカウント:
-         */
-        "movedTo": string;
-    };
-    "_achievements": {
-        /**
-         * 獲得日時
-         */
-        "earnedAt": string;
-        "_types": {
-            "_notes1": {
-                /**
-                 * just setting up my shonk
-                 */
-                "title": string;
-                /**
-                 * 初めてノートを投稿した
-                 */
-                "description": string;
-                /**
-                 * Have a good time with Sharkey!
-                 */
-                "flavor": string;
-            };
-            "_notes10": {
-                /**
-                 * いくつかのノート
-                 */
-                "title": string;
-                /**
-                 * ノートを10回投稿した
-                 */
-                "description": string;
-            };
-            "_notes100": {
-                /**
-                 * たくさんのノート
-                 */
-                "title": string;
-                /**
-                 * ノートを100回投稿した
-                 */
-                "description": string;
-            };
-            "_notes500": {
-                /**
-                 * ノートまみれ
-                 */
-                "title": string;
-                /**
-                 * ノートを500回投稿した
-                 */
-                "description": string;
-            };
-            "_notes1000": {
-                /**
-                 * ノートの山
-                 */
-                "title": string;
-                /**
-                 * ノートを1,000回投稿した
-                 */
-                "description": string;
-            };
-            "_notes5000": {
-                /**
-                 * 湧き出るノート
-                 */
-                "title": string;
-                /**
-                 * ノートを5,000回投稿した
-                 */
-                "description": string;
-            };
-            "_notes10000": {
-                /**
-                 * スーパーノート
-                 */
-                "title": string;
-                /**
-                 * ノートを10,000回投稿した
-                 */
-                "description": string;
-            };
-            "_notes20000": {
-                /**
-                 * ニードモアノート
-                 */
-                "title": string;
-                /**
-                 * ノートを20,000回投稿した
-                 */
-                "description": string;
-            };
-            "_notes30000": {
-                /**
-                 * ノートノートノート
-                 */
-                "title": string;
-                /**
-                 * ノートを30,000回投稿した
-                 */
-                "description": string;
-            };
-            "_notes40000": {
-                /**
-                 * ノート工場
-                 */
-                "title": string;
-                /**
-                 * ノートを40,000回投稿した
-                 */
-                "description": string;
-            };
-            "_notes50000": {
-                /**
-                 * ノートの惑星
-                 */
-                "title": string;
-                /**
-                 * ノートを50,000回投稿した
-                 */
-                "description": string;
-            };
-            "_notes60000": {
-                /**
-                 * ノートクエーサー
-                 */
-                "title": string;
-                /**
-                 * ノートを60,000回投稿した
-                 */
-                "description": string;
-            };
-            "_notes70000": {
-                /**
-                 * ブラックノートホール
-                 */
-                "title": string;
-                /**
-                 * ノートを70,000回投稿した
-                 */
-                "description": string;
-            };
-            "_notes80000": {
-                /**
-                 * ノートギャラクシー
-                 */
-                "title": string;
-                /**
-                 * ノートを80,000回投稿した
-                 */
-                "description": string;
-            };
-            "_notes90000": {
-                /**
-                 * ノートバース
-                 */
-                "title": string;
-                /**
-                 * ノートを90,000回投稿した
-                 */
-                "description": string;
-            };
-            "_notes100000": {
-                /**
-                 * ALL YOUR NOTE ARE BELONG TO US
-                 */
-                "title": string;
-                /**
-                 * ノートを100,000回投稿した
-                 */
-                "description": string;
-                /**
-                 * そんなに書くことある？
-                 */
-                "flavor": string;
-            };
-            "_login3": {
-                /**
-                 * ビギナーⅠ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が3日
-                 */
-                "description": string;
-                /**
-                 * 今日からね僕は ミスキストってことで
-                 */
-                "flavor": string;
-            };
-            "_login7": {
-                /**
-                 * ビギナーⅡ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が7日
-                 */
-                "description": string;
-                /**
-                 * 慣れてきましたか？
-                 */
-                "flavor": string;
-            };
-            "_login15": {
-                /**
-                 * ビギナーⅢ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が15日
-                 */
-                "description": string;
-            };
-            "_login30": {
-                /**
-                 * ミスキストⅠ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が30日
-                 */
-                "description": string;
-            };
-            "_login60": {
-                /**
-                 * ミスキストⅡ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が60日
-                 */
-                "description": string;
-            };
-            "_login100": {
-                /**
-                 * ミスキストⅢ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が100日
-                 */
-                "description": string;
-                /**
-                 * そのユーザー、ミスキストにつき
-                 */
-                "flavor": string;
-            };
-            "_login200": {
-                /**
-                 * 常連Ⅰ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が200日
-                 */
-                "description": string;
-            };
-            "_login300": {
-                /**
-                 * 常連Ⅱ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が300日
-                 */
-                "description": string;
-            };
-            "_login400": {
-                /**
-                 * 常連Ⅲ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が400日
-                 */
-                "description": string;
-            };
-            "_login500": {
-                /**
-                 * ベテランⅠ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が500日
-                 */
-                "description": string;
-                /**
-                 * 諸君、私はノートが好きだ
-                 */
-                "flavor": string;
-            };
-            "_login600": {
-                /**
-                 * ベテランⅡ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が600日
-                 */
-                "description": string;
-            };
-            "_login700": {
-                /**
-                 * ベテランⅢ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が700日
-                 */
-                "description": string;
-            };
-            "_login800": {
-                /**
-                 * ノートマスターⅠ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が800日
-                 */
-                "description": string;
-            };
-            "_login900": {
-                /**
-                 * ノートマスターⅡ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が900日
-                 */
-                "description": string;
-            };
-            "_login1000": {
-                /**
-                 * ノートマスターⅢ
-                 */
-                "title": string;
-                /**
-                 * 通算ログイン日数が1,000日
-                 */
-                "description": string;
-                /**
-                 * Thank you for using Sharkey!
-                 */
-                "flavor": string;
-            };
-            "_noteClipped1": {
-                /**
-                 * クリップせずにはいられないな
-                 */
-                "title": string;
-                /**
-                 * 初めてノートをクリップした
-                 */
-                "description": string;
-            };
-            "_noteFavorited1": {
-                /**
-                 * 星をみるひと
-                 */
-                "title": string;
-                /**
-                 * 初めてノートをお気に入りに登録した
-                 */
-                "description": string;
-            };
-            "_myNoteFavorited1": {
-                /**
-                 * 星が欲しい
-                 */
-                "title": string;
-                /**
-                 * 自分のノートが他の人からお気に入りに登録された
-                 */
-                "description": string;
-            };
-            "_profileFilled": {
-                /**
-                 * 準備万端
-                 */
-                "title": string;
-                /**
-                 * プロフィール設定を行った
-                 */
-                "description": string;
-            };
-            "_markedAsCat": {
-                /**
-                 * 吾輩は猫である
-                 */
-                "title": string;
-                /**
-                 * アカウントをCatとして設定した
-                 */
-                "description": string;
-                /**
-                 * 名前はまだない。
-                 */
-                "flavor": string;
-            };
-            "_following1": {
-                /**
-                 * はじめてのフォロー
-                 */
-                "title": string;
-                /**
-                 * 初めてフォローした
-                 */
-                "description": string;
-            };
-            "_following10": {
-                /**
-                 * ついてく、ついてく
-                 */
-                "title": string;
-                /**
-                 * フォローが10人を超した
-                 */
-                "description": string;
-            };
-            "_following50": {
-                /**
-                 * 友達たくさん
-                 */
-                "title": string;
-                /**
-                 * フォローが50人を超した
-                 */
-                "description": string;
-            };
-            "_following100": {
-                /**
-                 * 友達100人
-                 */
-                "title": string;
-                /**
-                 * フォローが100人を超した
-                 */
-                "description": string;
-            };
-            "_following300": {
-                /**
-                 * 友達過多
-                 */
-                "title": string;
-                /**
-                 * フォローが300人を超した
-                 */
-                "description": string;
-            };
-            "_followers1": {
-                /**
-                 * はじめてのフォロワー
-                 */
-                "title": string;
-                /**
-                 * 初めてフォローされた
-                 */
-                "description": string;
-            };
-            "_followers10": {
-                /**
-                 * フォローミー！
-                 */
-                "title": string;
-                /**
-                 * フォロワーが10人を超した
-                 */
-                "description": string;
-            };
-            "_followers50": {
-                /**
-                 * ぞろぞろ
-                 */
-                "title": string;
-                /**
-                 * フォロワーが50人を超した
-                 */
-                "description": string;
-            };
-            "_followers100": {
-                /**
-                 * 人気者
-                 */
-                "title": string;
-                /**
-                 * フォロワーが100人を超した
-                 */
-                "description": string;
-            };
-            "_followers300": {
-                /**
-                 * 一列でお並びください
-                 */
-                "title": string;
-                /**
-                 * フォロワーが300人を超した
-                 */
-                "description": string;
-            };
-            "_followers500": {
-                /**
-                 * 基地局
-                 */
-                "title": string;
-                /**
-                 * フォロワーが500人を超した
-                 */
-                "description": string;
-            };
-            "_followers1000": {
-                /**
-                 * インフルエンサー
-                 */
-                "title": string;
-                /**
-                 * フォロワーが1,000人を超した
-                 */
-                "description": string;
-            };
-            "_collectAchievements30": {
-                /**
-                 * 実績コレクター
-                 */
-                "title": string;
-                /**
-                 * 実績を30個以上獲得した
-                 */
-                "description": string;
-            };
-            "_viewAchievements3min": {
-                /**
-                 * 実績好き
-                 */
-                "title": string;
-                /**
-                 * 実績一覧を3分以上眺め続けた
-                 */
-                "description": string;
-            };
-            "_iLoveMisskey": {
-                /**
-                 * I Love Sharkey
-                 */
-                "title": string;
-                /**
-                 * Post "I ❤ #Sharkey"
-                 */
-                "description": string;
-                /**
-                 * Sharkey's development team greatly appreciates your support!
-                 */
-                "flavor": string;
-            };
-            "_foundTreasure": {
-                /**
-                 * 宝探し
-                 */
-                "title": string;
-                /**
-                 * 隠されたお宝を発見した
-                 */
-                "description": string;
-            };
-            "_client30min": {
-                /**
-                 * ひとやすみ
-                 */
-                "title": string;
-                /**
-                 * Keep Sharkey opened for at least 30 minutes
-                 */
-                "description": string;
-            };
-            "_client60min": {
-                /**
-                 * No "Miss" in Sharkey
-                 */
-                "title": string;
-                /**
-                 * Keep Sharkey opened for at least 60 minutes
-                 */
-                "description": string;
-            };
-            "_noteDeletedWithin1min": {
-                /**
-                 * いまのなし
-                 */
-                "title": string;
-                /**
-                 * 投稿してから1分以内にその投稿を削除した
-                 */
-                "description": string;
-            };
-            "_postedAtLateNight": {
-                /**
-                 * 夜行性
-                 */
-                "title": string;
-                /**
-                 * 深夜にノートを投稿した
-                 */
-                "description": string;
-                /**
-                 * そろそろ寝よう。
-                 */
-                "flavor": string;
-            };
-            "_postedAt0min0sec": {
-                /**
-                 * 時報
-                 */
-                "title": string;
-                /**
-                 * 0分0秒にノートを投稿した
-                 */
-                "description": string;
-                /**
-                 * ポッ ポッ ポッ ピーン
-                 */
-                "flavor": string;
-            };
-            "_selfQuote": {
-                /**
-                 * 自己言及
-                 */
-                "title": string;
-                /**
-                 * 自分のノートを引用した
-                 */
-                "description": string;
-            };
-            "_htl20npm": {
-                /**
-                 * 流れるTL
-                 */
-                "title": string;
-                /**
-                 * ホームタイムラインの流速が20npmを越す
-                 */
-                "description": string;
-            };
-            "_viewInstanceChart": {
-                /**
-                 * アナリスト
-                 */
-                "title": string;
-                /**
-                 * サーバーのチャートを表示した
-                 */
-                "description": string;
-            };
-            "_outputHelloWorldOnScratchpad": {
-                /**
-                 * Hello, world!
-                 */
-                "title": string;
-                /**
-                 * スクラッチパッドで hello world を出力した
-                 */
-                "description": string;
-            };
-            "_open3windows": {
-                /**
-                 * マルチウィンドウ
-                 */
-                "title": string;
-                /**
-                 * ウィンドウを3つ以上開いた状態にした
-                 */
-                "description": string;
-            };
-            "_driveFolderCircularReference": {
-                /**
-                 * 循環参照
-                 */
-                "title": string;
-                /**
-                 * ドライブのフォルダを再帰的な入れ子にしようとした
-                 */
-                "description": string;
-            };
-            "_reactWithoutRead": {
-                /**
-                 * ちゃんと読んだ？
-                 */
-                "title": string;
-                /**
-                 * 100文字以上のテキストを含むノートに投稿されてから3秒以内にリアクションした
-                 */
-                "description": string;
-            };
-            "_clickedClickHere": {
-                /**
-                 * ここをクリック
-                 */
-                "title": string;
-                /**
-                 * ここをクリックした
-                 */
-                "description": string;
-            };
-            "_justPlainLucky": {
-                /**
-                 * 単なるラッキー
-                 */
-                "title": string;
-                /**
-                 * 10秒ごとに0.005%の確率で獲得
-                 */
-                "description": string;
-            };
-            "_setNameToSyuilo": {
-                /**
-                 * 神様コンプレックス
-                 */
-                "title": string;
-                /**
-                 * 名前を syuilo に設定した
-                 */
-                "description": string;
-            };
-            "_passedSinceAccountCreated1": {
-                /**
-                 * 一周年
-                 */
-                "title": string;
-                /**
-                 * アカウント作成から1年経過した
-                 */
-                "description": string;
-            };
-            "_passedSinceAccountCreated2": {
-                /**
-                 * 二周年
-                 */
-                "title": string;
-                /**
-                 * アカウント作成から2年経過した
-                 */
-                "description": string;
-            };
-            "_passedSinceAccountCreated3": {
-                /**
-                 * 三周年
-                 */
-                "title": string;
-                /**
-                 * アカウント作成から3年経過した
-                 */
-                "description": string;
-            };
-            "_loggedInOnBirthday": {
-                /**
-                 * ハッピーバースデー
-                 */
-                "title": string;
-                /**
-                 * 誕生日にログインした
-                 */
-                "description": string;
-            };
-            "_loggedInOnNewYearsDay": {
-                /**
-                 * あけましておめでとうございます
-                 */
-                "title": string;
-                /**
-                 * 元日にログインした
-                 */
-                "description": string;
-                /**
-                 * 今年も弊サーバーをよろしくお願いします
-                 */
-                "flavor": string;
-            };
-            "_cookieClicked": {
-                /**
-                 * クッキーをクリックするゲーム
-                 */
-                "title": string;
-                /**
-                 * クッキーをクリックした
-                 */
-                "description": string;
-                /**
-                 * ソフト間違ってない？
-                 */
-                "flavor": string;
-            };
-            "_brainDiver": {
-                /**
-                 * Brain Diver
-                 */
-                "title": string;
-                /**
-                 * Brain Diverへのリンクを投稿した
-                 */
-                "description": string;
-                /**
-                 * Sharkey-Sharkey La-Tu-Ma
-                 */
-                "flavor": string;
-            };
-            "_smashTestNotificationButton": {
-                /**
-                 * テスト過剰
-                 */
-                "title": string;
-                /**
-                 * 通知のテストをごく短時間のうちに連続して行った
-                 */
-                "description": string;
-            };
-            "_tutorialCompleted": {
-                /**
-                 * Sharkey Elementary Course Diploma
-                 */
-                "title": string;
-                /**
-                 * チュートリアルを完了した
-                 */
-                "description": string;
-            };
-            "_bubbleGameExplodingHead": {
-                /**
-                 * 🤯
-                 */
-                "title": string;
-                /**
-                 * バブルゲームで最も大きいモノを出した
-                 */
-                "description": string;
-            };
-            "_bubbleGameDoubleExplodingHead": {
-                /**
-                 * ダブル🤯
-                 */
-                "title": string;
-                /**
-                 * バブルゲームで最も大きいモノを2つ同時に出した
-                 */
-                "description": string;
-                /**
-                 * これくらいの　おべんとばこに　🤯　🤯　ちょっとつめて
-                 */
-                "flavor": string;
-            };
-        };
-    };
-    "_role": {
-        /**
-         * ロールの作成
-         */
-        "new": string;
-        /**
-         * ロールの編集
-         */
-        "edit": string;
-        /**
-         * ロール名
-         */
-        "name": string;
-        /**
-         * ロールの説明
-         */
-        "description": string;
-        /**
-         * ロールの権限
-         */
-        "permission": string;
-        /**
-         * <b>モデレーター</b>は基本的なモデレーションに関する操作を行えます。
-         * <b>管理者</b>はサーバーの全ての設定を変更できます。
-         */
-        "descriptionOfPermission": string;
-        /**
-         * アサイン
-         */
-        "assignTarget": string;
-        /**
-         * <b>マニュアル</b>は誰がこのロールに含まれるかを手動で管理します。
-         * <b>コンディショナル</b>は条件を設定し、それに合致するユーザーが自動で含まれるようになります。
-         */
-        "descriptionOfAssignTarget": string;
-        /**
-         * マニュアル
-         */
-        "manual": string;
-        /**
-         * マニュアルロール
-         */
-        "manualRoles": string;
-        /**
-         * コンディショナル
-         */
-        "conditional": string;
-        /**
-         * コンディショナルロール
-         */
-        "conditionalRoles": string;
-        /**
-         * 条件
-         */
-        "condition": string;
-        /**
-         * これはコンディショナルロールです。
-         */
-        "isConditionalRole": string;
-        /**
-         * 公開ロール
-         */
-        "isPublic": string;
-        /**
-         * ユーザーのプロフィールでこのロールが表示されます。
-         */
-        "descriptionOfIsPublic": string;
-        /**
-         * オプション
-         */
-        "options": string;
-        /**
-         * ポリシー
-         */
-        "policies": string;
-        /**
-         * ベースロール
-         */
-        "baseRole": string;
-        /**
-         * ベースロールの値を使用
-         */
-        "useBaseValue": string;
-        /**
-         * アサインするロールを選択
-         */
-        "chooseRoleToAssign": string;
-        /**
-         * アイコン画像のURL
-         */
-        "iconUrl": string;
-        /**
-         * バッジとして表示
-         */
-        "asBadge": string;
-        /**
-         * オンにすると、ユーザー名の横にロールのアイコンが表示されます。
-         */
-        "descriptionOfAsBadge": string;
-        /**
-         * ユーザーを見つけやすくする
-         */
-        "isExplorable": string;
-        /**
-         * オンにすると、「みつける」でメンバー一覧が公開されるほか、ロールのタイムラインが利用可能になります。
-         */
-        "descriptionOfIsExplorable": string;
-        /**
-         * 表示順
-         */
-        "displayOrder": string;
-        /**
-         * 数値が大きいほどUI上で先頭に表示されます。
-         */
-        "descriptionOfDisplayOrder": string;
-        /**
-         * アサイン状態を移行先アカウントにも引き継ぐ
-         */
-        "preserveAssignmentOnMoveAccount": string;
-        /**
-         * オンにすると、このロールが付与されたアカウントが移行された際に、移行先アカウントにもこのロールが引き継がれるようになります。
-         */
-        "preserveAssignmentOnMoveAccount_description": string;
-        /**
-         * モデレーターのメンバー編集を許可
-         */
-        "canEditMembersByModerator": string;
-        /**
-         * オンにすると、管理者に加えてモデレーターもこのロールへユーザーをアサイン/アサイン解除できるようになります。オフにすると管理者のみが行えます。
-         */
-        "descriptionOfCanEditMembersByModerator": string;
-        /**
-         * 優先度
-         */
-        "priority": string;
-        "_priority": {
-            /**
-             * 低
-             */
-            "low": string;
-            /**
-             * 中
-             */
-            "middle": string;
-            /**
-             * 高
-             */
-            "high": string;
-        };
-        "_options": {
-            /**
-             * グローバルタイムラインの閲覧
-             */
-            "gtlAvailable": string;
-            /**
-             * ローカルタイムラインの閲覧
-             */
-            "ltlAvailable": string;
-            /**
-             * パブリック投稿の許可
-             */
-            "canPublicNote": string;
-            /**
-             * ノート内の最大メンション数
-             */
-            "mentionMax": string;
-            /**
-             * サーバー招待コードの発行
-             */
-            "canInvite": string;
-            /**
-             * 招待コードの作成可能数
-             */
-            "inviteLimit": string;
-            /**
-             * 招待コードの発行間隔
-             */
-            "inviteLimitCycle": string;
-            /**
-             * 招待コードの有効期限
-             */
-            "inviteExpirationTime": string;
-            /**
-             * カスタム絵文字の管理
-             */
-            "canManageCustomEmojis": string;
-            /**
-             * アバターデコレーションの管理
-             */
-            "canManageAvatarDecorations": string;
-            /**
-             * ドライブ容量
-             */
-            "driveCapacity": string;
-            /**
-             * アップロード可能な最大ファイルサイズ
-             */
-            "maxFileSize": string;
-            /**
-             * ファイルにNSFWを常に付与
-             */
-            "alwaysMarkNsfw": string;
-            /**
-             * Allow users to edit their avatar or banner
-             */
-            "canUpdateBioMedia": string;
-            /**
-             * ノートのピン留めの最大数
-             */
-            "pinMax": string;
-            /**
-             * アンテナの作成可能数
-             */
-            "antennaMax": string;
-            /**
-             * ワードミュートの最大文字数
-             */
-            "wordMuteMax": string;
-            /**
-             * Webhookの作成可能数
-             */
-            "webhookMax": string;
-            /**
-             * クリップの作成可能数
-             */
-            "clipMax": string;
-            /**
-             * クリップ内のノートの最大数
-             */
-            "noteEachClipsMax": string;
-            /**
-             * ユーザーリストの作成可能数
-             */
-            "userListMax": string;
-            /**
-             * ユーザーリスト内のユーザーの最大数
-             */
-            "userEachUserListsMax": string;
-            /**
-             * レートリミット
-             */
-            "rateLimitFactor": string;
-            /**
-             * 小さいほど制限が緩和され、大きいほど制限が強化されます。
-             */
-            "descriptionOfRateLimitFactor": string;
-            /**
-             * 広告の非表示
-             */
-            "canHideAds": string;
-            /**
-             * ノート検索の利用
-             */
-            "canSearchNotes": string;
-            /**
-             * 翻訳機能の利用
-             */
-            "canUseTranslator": string;
-            /**
-             * アイコンデコレーションの最大取付個数
-             */
-            "avatarDecorationLimit": string;
-            /**
-             * アンテナのインポートを許可
-             */
-            "canImportAntennas": string;
-            /**
-             * ブロックのインポートを許可
-             */
-            "canImportBlocking": string;
-            /**
-             * フォローのインポートを許可
-             */
-            "canImportFollowing": string;
-            /**
-             * ミュートのインポートを許可
-             */
-            "canImportMuting": string;
-            /**
-             * リストのインポートを許可
-             */
-            "canImportUserLists": string;
-            /**
-             * チャットを許可
-             */
-            "chatAvailability": string;
-            /**
-             * Can view the bubble timeline
-             */
-            "btlAvailable": string;
-            /**
-             * Can import notes
-             */
-            "canImportNotes": string;
-            /**
-             * Maximum number of scheduled notes
-             */
-            "scheduleNoteMax": string;
-            /**
-             * Can appear in trending notes / users
-             */
-            "canTrend": string;
-        };
-        "_condition": {
-            /**
-             * マニュアルロールにアサイン済み
-             */
-            "roleAssignedTo": string;
-            /**
-             * ローカルユーザー
-             */
-            "isLocal": string;
-            /**
-             * リモートユーザー
-             */
-            "isRemote": string;
-            /**
-             * 猫ユーザー
-             */
-            "isCat": string;
-            /**
-             * botユーザー
-             */
-            "isBot": string;
-            /**
-             * サスペンド済みユーザー
-             */
-            "isSuspended": string;
-            /**
-             * Private account
-             */
-            "isLocked": string;
-            /**
-             * Account is discoverable
-             */
-            "isExplorable": string;
-            /**
-             * アカウント作成から～以内
-             */
-            "createdLessThan": string;
-            /**
-             * アカウント作成から～経過
-             */
-            "createdMoreThan": string;
-            /**
-             * フォロワー数が～以下
-             */
-            "followersLessThanOrEq": string;
-            /**
-             * フォロワー数が～以上
-             */
-            "followersMoreThanOrEq": string;
-            /**
-             * フォロー数が～以下
-             */
-            "followingLessThanOrEq": string;
-            /**
-             * フォロー数が～以上
-             */
-            "followingMoreThanOrEq": string;
-            /**
-             * 投稿数が～以下
-             */
-            "notesLessThanOrEq": string;
-            /**
-             * 投稿数が～以上
-             */
-            "notesMoreThanOrEq": string;
-            /**
-             * ～かつ～
-             */
-            "and": string;
-            /**
-             * ～または～
-             */
-            "or": string;
-            /**
-             * ～ではない
-             */
-            "not": string;
-            /**
-             * Is from a specific instance
-             */
-            "isFromInstance": string;
-            /**
-             * Hostname (case-insensitive)
-             */
-            "isFromInstanceHost": string;
-            /**
-             * Match subdomains
-             */
-            "isFromInstanceSubdomains": string;
-            /**
-             * User is from a bubble instance
-             */
-            "fromBubbleInstance": string;
-            /**
-             * Has X or fewer local followers
-             */
-            "localFollowersLessThanOrEq": string;
-            /**
-             * Has X or more local followers
-             */
-            "localFollowersMoreThanOrEq": string;
-            /**
-             * Follows X or fewer local accounts
-             */
-            "localFollowingLessThanOrEq": string;
-            /**
-             * Follows X or more local accounts
-             */
-            "localFollowingMoreThanOrEq": string;
-            /**
-             * Has X or fewer remote followers
-             */
-            "remoteFollowersLessThanOrEq": string;
-            /**
-             * Has X or more remote followers
-             */
-            "remoteFollowersMoreThanOrEq": string;
-            /**
-             * Follows X or fewer remote accounts
-             */
-            "remoteFollowingLessThanOrEq": string;
-            /**
-             * Follows X or more remote accounts
-             */
-            "remoteFollowingMoreThanOrEq": string;
-        };
-        /**
-         * This condition may be incorrect for remote users.
-         */
-        "remoteDataWarning": string;
     };
     "_sensitiveMediaDetection": {
         /**
@@ -7765,32 +11626,6 @@ export interface Locale extends ILocale {
          */
         "analyzeVideosDescription": string;
     };
-    "_emailUnavailable": {
-        /**
-         * 既に使用されています
-         */
-        "used": string;
-        /**
-         * 形式が正しくありません
-         */
-        "format": string;
-        /**
-         * 恒久的に使用可能なアドレスではありません
-         */
-        "disposable": string;
-        /**
-         * 正しいメールサーバーではありません
-         */
-        "mx": string;
-        /**
-         * メールサーバーが応答しません
-         */
-        "smtp": string;
-        /**
-         * This email address is banned
-         */
-        "banned": string;
-    };
     "_ffVisibility": {
         /**
          * 公開
@@ -7804,28 +11639,6 @@ export interface Locale extends ILocale {
          * 非公開
          */
         "private": string;
-    };
-    "_signup": {
-        /**
-         * ほとんど完了です
-         */
-        "almostThere": string;
-        /**
-         * あなたが使っているメールアドレスを入力してください。メールアドレスが公開されることはありません。
-         */
-        "emailAddressInfo": string;
-        /**
-         * 入力されたメールアドレス({email})宛に確認のメールが送信されました。メールに記載されたリンクにアクセスすると、アカウントの作成が完了します。メールに記載されているリンクの有効期限は30分です。
-         */
-        "emailSent": ParameterizedString<"email">;
-        /**
-         * Your account has been created and is awaiting approval.
-         */
-        "approvalPending": string;
-        /**
-         * Please enter a reason as to why you want to join the instance.
-         */
-        "reasonInfo": string;
     };
     "_accountDelete": {
         /**
@@ -8047,72 +11860,6 @@ export interface Locale extends ILocale {
          */
         "createKey": string;
     };
-    "_aboutMisskey": {
-        /**
-         * Sharkey is open-source software based on Misskey which has been in development by syuilo since 2014.
-         */
-        "about": string;
-        /**
-         * コントリビューター
-         */
-        "contributors": string;
-        /**
-         * 全てのコントリビューター
-         */
-        "allContributors": string;
-        /**
-         * ソースコード
-         */
-        "source": string;
-        /**
-         * Misskey original
-         */
-        "original": string;
-        /**
-         * {name} uses a modified version of the original Sharkey.
-         */
-        "thisIsModifiedVersion": ParameterizedString<"name">;
-        /**
-         * Translate Sharkey
-         */
-        "translation": string;
-        /**
-         * Misskeyに寄付
-         */
-        "donate": string;
-        /**
-         * 他にも多くの方が支援してくれています。ありがとうございます🥰
-         */
-        "morePatrons": string;
-        /**
-         * 支援者
-         */
-        "patrons": string;
-        /**
-         * プロジェクトメンバー
-         */
-        "projectMembers": string;
-        /**
-         * Sharkey original
-         */
-        "original_sharkey": string;
-        /**
-         * Donate to Sharkey
-         */
-        "donate_sharkey": string;
-        /**
-         * Testers
-         */
-        "testers": string;
-        /**
-         * Misskey Contributors
-         */
-        "misskeyContributors": string;
-        /**
-         * Our lovely Sponsors
-         */
-        "ourLovelySponsors": string;
-    };
     "_displayOfSensitiveMedia": {
         /**
          * センシティブ設定されたメディアを隠す
@@ -8140,74 +11887,6 @@ export interface Locale extends ILocale {
          * 常に表示
          */
         "always": string;
-    };
-    "_serverDisconnectedBehavior": {
-        /**
-         * 自動でリロード
-         */
-        "reload": string;
-        /**
-         * ダイアログで警告
-         */
-        "dialog": string;
-        /**
-         * 控えめに警告
-         */
-        "quiet": string;
-        /**
-         * Disable warning
-         */
-        "disabled": string;
-    };
-    "_channel": {
-        /**
-         * チャンネルを作成
-         */
-        "create": string;
-        /**
-         * チャンネルを編集
-         */
-        "edit": string;
-        /**
-         * バナーを設定
-         */
-        "setBanner": string;
-        /**
-         * バナーを削除
-         */
-        "removeBanner": string;
-        /**
-         * トレンド
-         */
-        "featured": string;
-        /**
-         * 管理中
-         */
-        "owned": string;
-        /**
-         * フォロー中
-         */
-        "following": string;
-        /**
-         * {n}人が参加中
-         */
-        "usersCount": ParameterizedString<"n">;
-        /**
-         * {n}投稿があります
-         */
-        "notesCount": ParameterizedString<"n">;
-        /**
-         * 名前と説明
-         */
-        "nameAndDescription": string;
-        /**
-         * 名前のみ
-         */
-        "nameOnly": string;
-        /**
-         * Allow boosts and quote outside the channel
-         */
-        "allowRenoteToExternal": string;
     };
     "_menuDisplay": {
         /**
@@ -8241,288 +11920,6 @@ export interface Locale extends ILocale {
          */
         "muteWordsDescription2": string;
     };
-    "_instanceMute": {
-        /**
-         * This will mute any notes/boosts from the listed instances, including those of users replying to a user from a muted instance.
-         */
-        "instanceMuteDescription": string;
-        /**
-         * 改行で区切って設定します
-         */
-        "instanceMuteDescription2": string;
-        /**
-         * 設定したサーバーのノートを隠します。
-         */
-        "title": string;
-        /**
-         * ミュートするサーバー
-         */
-        "heading": string;
-    };
-    "_theme": {
-        /**
-         * テーマを探す
-         */
-        "explore": string;
-        /**
-         * テーマのインストール
-         */
-        "install": string;
-        /**
-         * テーマの管理
-         */
-        "manage": string;
-        /**
-         * テーマコード
-         */
-        "code": string;
-        /**
-         * 説明
-         */
-        "description": string;
-        /**
-         * {name}をインストールしました
-         */
-        "installed": ParameterizedString<"name">;
-        /**
-         * インストールされたテーマ
-         */
-        "installedThemes": string;
-        /**
-         * 標準のテーマ
-         */
-        "builtinThemes": string;
-        /**
-         * サーバーのテーマ
-         */
-        "instanceTheme": string;
-        /**
-         * そのテーマは既にインストールされています
-         */
-        "alreadyInstalled": string;
-        /**
-         * テーマの形式が間違っています
-         */
-        "invalid": string;
-        /**
-         * テーマを作る
-         */
-        "make": string;
-        /**
-         * ベース
-         */
-        "base": string;
-        /**
-         * 定数を追加
-         */
-        "addConstant": string;
-        /**
-         * 定数
-         */
-        "constant": string;
-        /**
-         * デフォルト値
-         */
-        "defaultValue": string;
-        /**
-         * 色
-         */
-        "color": string;
-        /**
-         * プロパティを参照
-         */
-        "refProp": string;
-        /**
-         * 定数を参照
-         */
-        "refConst": string;
-        /**
-         * キー
-         */
-        "key": string;
-        /**
-         * 関数
-         */
-        "func": string;
-        /**
-         * 関数の種類
-         */
-        "funcKind": string;
-        /**
-         * 引数
-         */
-        "argument": string;
-        /**
-         * 元にするプロパティの名前
-         */
-        "basedProp": string;
-        /**
-         * 不透明度
-         */
-        "alpha": string;
-        /**
-         * 暗さ
-         */
-        "darken": string;
-        /**
-         * 明るさ
-         */
-        "lighten": string;
-        /**
-         * 定数名を入力してください
-         */
-        "inputConstantName": string;
-        /**
-         * ここにテーマコードを貼り付けて、エディターにインポートできます
-         */
-        "importInfo": string;
-        /**
-         * 定数 {const} を削除しても良いですか？
-         */
-        "deleteConstantConfirm": ParameterizedString<"const">;
-        "keys": {
-            /**
-             * アクセント
-             */
-            "accent": string;
-            /**
-             * 背景
-             */
-            "bg": string;
-            /**
-             * 文字
-             */
-            "fg": string;
-            /**
-             * フォーカス
-             */
-            "focus": string;
-            /**
-             * インジケーター
-             */
-            "indicator": string;
-            /**
-             * パネル
-             */
-            "panel": string;
-            /**
-             * 影
-             */
-            "shadow": string;
-            /**
-             * ヘッダー
-             */
-            "header": string;
-            /**
-             * ナビゲーションバーの背景
-             */
-            "navBg": string;
-            /**
-             * ナビゲーションバーの文字
-             */
-            "navFg": string;
-            /**
-             * ナビゲーションバー文字(アクティブ)
-             */
-            "navActive": string;
-            /**
-             * ナビゲーションバーのインジケーター
-             */
-            "navIndicator": string;
-            /**
-             * リンク
-             */
-            "link": string;
-            /**
-             * ハッシュタグ
-             */
-            "hashtag": string;
-            /**
-             * メンション
-             */
-            "mention": string;
-            /**
-             * あなた宛てメンション
-             */
-            "mentionMe": string;
-            /**
-             * Boost
-             */
-            "renote": string;
-            /**
-             * モーダルの背景
-             */
-            "modalBg": string;
-            /**
-             * 分割線
-             */
-            "divider": string;
-            /**
-             * スクロールバーの取っ手
-             */
-            "scrollbarHandle": string;
-            /**
-             * スクロールバーの取っ手（ホバー)
-             */
-            "scrollbarHandleHover": string;
-            /**
-             * 日付ラベルの文字
-             */
-            "dateLabelFg": string;
-            /**
-             * 情報の背景
-             */
-            "infoBg": string;
-            /**
-             * 情報の文字
-             */
-            "infoFg": string;
-            /**
-             * 警告の背景
-             */
-            "infoWarnBg": string;
-            /**
-             * 警告の文字
-             */
-            "infoWarnFg": string;
-            /**
-             * 通知トーストの背景
-             */
-            "toastBg": string;
-            /**
-             * 通知トーストの文字
-             */
-            "toastFg": string;
-            /**
-             * ボタンの背景
-             */
-            "buttonBg": string;
-            /**
-             * ボタンの背景 (ホバー)
-             */
-            "buttonHoverBg": string;
-            /**
-             * 入力ボックスの縁取り
-             */
-            "inputBorder": string;
-            /**
-             * ドライブフォルダーの背景
-             */
-            "driveFolderBg": string;
-            /**
-             * バッジ
-             */
-            "badge": string;
-            /**
-             * チャットの背景
-             */
-            "messageBg": string;
-            /**
-             * 強調された文字
-             */
-            "fgHighlighted": string;
-        };
-    };
     "_sfx": {
         /**
          * ノート
@@ -8544,36 +11941,6 @@ export interface Locale extends ILocale {
          * チャットのメッセージ
          */
         "chatMessage": string;
-    };
-    "_soundSettings": {
-        /**
-         * ドライブの音声を使用
-         */
-        "driveFile": string;
-        /**
-         * ドライブのファイルを選択してください
-         */
-        "driveFileWarn": string;
-        /**
-         * このファイルは対応していません
-         */
-        "driveFileTypeWarn": string;
-        /**
-         * 音声ファイルを選択してください
-         */
-        "driveFileTypeWarnDescription": string;
-        /**
-         * 音声が長すぎます
-         */
-        "driveFileDurationWarn": string;
-        /**
-         * Long audio may disrupt using Sharkey. Still continue?
-         */
-        "driveFileDurationWarnDescription": string;
-        /**
-         * The audio couldn't be loaded. Please make sure you selected an audio file.
-         */
-        "driveFileError": string;
     };
     "_ago": {
         /**
@@ -8665,560 +12032,6 @@ export interface Locale extends ILocale {
          */
         "day": string;
     };
-    "_2fa": {
-        /**
-         * 既に設定は完了しています。
-         */
-        "alreadyRegistered": string;
-        /**
-         * 認証アプリの設定を開始
-         */
-        "registerTOTP": string;
-        /**
-         * まず、{a}や{b}などの認証アプリをお使いのデバイスにインストールします。
-         */
-        "step1": ParameterizedString<"a" | "b">;
-        /**
-         * 次に、表示されているQRコードをアプリでスキャンするか、ボタンをクリックして端末上でアプリを開きます。
-         */
-        "step2": string;
-        /**
-         * デスクトップアプリを使用する場合は次のURIを入力します
-         */
-        "step2Uri": string;
-        /**
-         * 確認コードを入力
-         */
-        "step3Title": string;
-        /**
-         * アプリに表示されている確認コード（トークン）を入力します。
-         */
-        "step3": string;
-        /**
-         * 設定が完了しました
-         */
-        "setupCompleted": string;
-        /**
-         * これからログインするときも、同じようにコードを入力します。
-         */
-        "step4": string;
-        /**
-         * お使いのブラウザはセキュリティキーに対応していません。
-         */
-        "securityKeyNotSupported": string;
-        /**
-         * セキュリティキー・パスキーを登録するには、まず認証アプリの設定を行なってください。
-         */
-        "registerTOTPBeforeKey": string;
-        /**
-         * FIDO2をサポートするハードウェアセキュリティキー、端末の生体認証やPINロック、パスキーといった、WebAuthn由来の鍵を登録します。
-         */
-        "securityKeyInfo": string;
-        /**
-         * セキュリティキー・パスキーを登録する
-         */
-        "registerSecurityKey": string;
-        /**
-         * キーの名前を入力
-         */
-        "securityKeyName": string;
-        /**
-         * ブラウザの指示に従い、セキュリティキーやパスキーを登録してください
-         */
-        "tapSecurityKey": string;
-        /**
-         * セキュリティキーを削除
-         */
-        "removeKey": string;
-        /**
-         * {name}を削除しますか？
-         */
-        "removeKeyConfirm": ParameterizedString<"name">;
-        /**
-         * セキュリティキーが登録されている場合、認証アプリの設定は解除できません。
-         */
-        "whyTOTPOnlyRenew": string;
-        /**
-         * 認証アプリを再設定
-         */
-        "renewTOTP": string;
-        /**
-         * 今までの認証アプリの確認コードおよびバックアップコードは使用できなくなります
-         */
-        "renewTOTPConfirm": string;
-        /**
-         * 再設定する
-         */
-        "renewTOTPOk": string;
-        /**
-         * やめておく
-         */
-        "renewTOTPCancel": string;
-        /**
-         * このウィザードを閉じる前に、以下のバックアップコードを確認してください。
-         */
-        "checkBackupCodesBeforeCloseThisWizard": string;
-        /**
-         * バックアップコード
-         */
-        "backupCodes": string;
-        /**
-         * 認証アプリが使用できなくなった場合、以下のバックアップコードを使ってアカウントにアクセスできます。これらのコードは必ず安全な場所に保管してください。各コードは一回だけ使用できます。
-         */
-        "backupCodesDescription": string;
-        /**
-         * バックアップコードが使用されました。認証アプリが使えなくなっている場合、なるべく早く認証アプリを再設定してください。
-         */
-        "backupCodeUsedWarning": string;
-        /**
-         * バックアップコードが全て使用されました。認証アプリを利用できない場合、これ以上アカウントにアクセスできなくなります。認証アプリを再登録してください。
-         */
-        "backupCodesExhaustedWarning": string;
-        /**
-         * Click here for a detailed guide
-         */
-        "moreDetailedGuideHere": string;
-    };
-    "_permissions": {
-        /**
-         * アカウントの情報を見る
-         */
-        "read:account": string;
-        /**
-         * アカウントの情報を変更する
-         */
-        "write:account": string;
-        /**
-         * ブロックを見る
-         */
-        "read:blocks": string;
-        /**
-         * ブロックを操作する
-         */
-        "write:blocks": string;
-        /**
-         * ドライブを見る
-         */
-        "read:drive": string;
-        /**
-         * ドライブを操作する
-         */
-        "write:drive": string;
-        /**
-         * お気に入りを見る
-         */
-        "read:favorites": string;
-        /**
-         * お気に入りを操作する
-         */
-        "write:favorites": string;
-        /**
-         * フォローの情報を見る
-         */
-        "read:following": string;
-        /**
-         * フォロー・フォロー解除する
-         */
-        "write:following": string;
-        /**
-         * チャットを見る
-         */
-        "read:messaging": string;
-        /**
-         * チャットを操作する
-         */
-        "write:messaging": string;
-        /**
-         * ミュートを見る
-         */
-        "read:mutes": string;
-        /**
-         * ミュートを操作する
-         */
-        "write:mutes": string;
-        /**
-         * ノートを作成・削除する
-         */
-        "write:notes": string;
-        /**
-         * 通知を見る
-         */
-        "read:notifications": string;
-        /**
-         * 通知を操作する
-         */
-        "write:notifications": string;
-        /**
-         * リアクションを見る
-         */
-        "read:reactions": string;
-        /**
-         * リアクションを操作する
-         */
-        "write:reactions": string;
-        /**
-         * 投票する
-         */
-        "write:votes": string;
-        /**
-         * ページを見る
-         */
-        "read:pages": string;
-        /**
-         * ページを操作する
-         */
-        "write:pages": string;
-        /**
-         * ページのいいねを見る
-         */
-        "read:page-likes": string;
-        /**
-         * ページのいいねを操作する
-         */
-        "write:page-likes": string;
-        /**
-         * ユーザーグループを見る
-         */
-        "read:user-groups": string;
-        /**
-         * ユーザーグループを操作する
-         */
-        "write:user-groups": string;
-        /**
-         * チャンネルを見る
-         */
-        "read:channels": string;
-        /**
-         * チャンネルを操作する
-         */
-        "write:channels": string;
-        /**
-         * ギャラリーを見る
-         */
-        "read:gallery": string;
-        /**
-         * ギャラリーを操作する
-         */
-        "write:gallery": string;
-        /**
-         * ギャラリーのいいねを見る
-         */
-        "read:gallery-likes": string;
-        /**
-         * ギャラリーのいいねを操作する
-         */
-        "write:gallery-likes": string;
-        /**
-         * Playを見る
-         */
-        "read:flash": string;
-        /**
-         * Playを操作する
-         */
-        "write:flash": string;
-        /**
-         * Playのいいねを見る
-         */
-        "read:flash-likes": string;
-        /**
-         * Playのいいねを操作する
-         */
-        "write:flash-likes": string;
-        /**
-         * ユーザーからの通報を見る
-         */
-        "read:admin:abuse-user-reports": string;
-        /**
-         * ユーザーアカウントを削除する
-         */
-        "write:admin:delete-account": string;
-        /**
-         * ユーザーのすべてのファイルを削除する
-         */
-        "write:admin:delete-all-files-of-a-user": string;
-        /**
-         * データベースインデックスに関する情報を見る
-         */
-        "read:admin:index-stats": string;
-        /**
-         * データベーステーブルに関する情報を見る
-         */
-        "read:admin:table-stats": string;
-        /**
-         * ユーザーのIPアドレスを見る
-         */
-        "read:admin:user-ips": string;
-        /**
-         * インスタンスのメタデータを見る
-         */
-        "read:admin:meta": string;
-        /**
-         * ユーザーのパスワードをリセットする
-         */
-        "write:admin:reset-password": string;
-        /**
-         * ユーザーからの通報を解決する
-         */
-        "write:admin:resolve-abuse-user-report": string;
-        /**
-         * メールを送る
-         */
-        "write:admin:send-email": string;
-        /**
-         * サーバーの情報を見る
-         */
-        "read:admin:server-info": string;
-        /**
-         * モデレーションログを見る
-         */
-        "read:admin:show-moderation-log": string;
-        /**
-         * ユーザーのプライベートな情報を見る
-         */
-        "read:admin:show-user": string;
-        /**
-         * ユーザーを凍結する
-         */
-        "write:admin:suspend-user": string;
-        /**
-         * ユーザーのアバターを削除する
-         */
-        "write:admin:unset-user-avatar": string;
-        /**
-         * ユーザーのバーナーを削除する
-         */
-        "write:admin:unset-user-banner": string;
-        /**
-         * ユーザーの凍結を解除する
-         */
-        "write:admin:unsuspend-user": string;
-        /**
-         * インスタンスのメタデータを操作する
-         */
-        "write:admin:meta": string;
-        /**
-         * モデレーションノートを操作する
-         */
-        "write:admin:user-note": string;
-        /**
-         * ロールを操作する
-         */
-        "write:admin:roles": string;
-        /**
-         * ロールを見る
-         */
-        "read:admin:roles": string;
-        /**
-         * リレーを操作する
-         */
-        "write:admin:relays": string;
-        /**
-         * リレーを見る
-         */
-        "read:admin:relays": string;
-        /**
-         * 招待コードを操作する
-         */
-        "write:admin:invite-codes": string;
-        /**
-         * 招待コードを見る
-         */
-        "read:admin:invite-codes": string;
-        /**
-         * お知らせを操作する
-         */
-        "write:admin:announcements": string;
-        /**
-         * お知らせを見る
-         */
-        "read:admin:announcements": string;
-        /**
-         * アバターデコレーションを操作する
-         */
-        "write:admin:avatar-decorations": string;
-        /**
-         * アバターデコレーションを見る
-         */
-        "read:admin:avatar-decorations": string;
-        /**
-         * 連合に関する情報を操作する
-         */
-        "write:admin:federation": string;
-        /**
-         * ユーザーアカウントを操作する
-         */
-        "write:admin:account": string;
-        /**
-         * ユーザーに関する情報を見る
-         */
-        "read:admin:account": string;
-        /**
-         * 絵文字を操作する
-         */
-        "write:admin:emoji": string;
-        /**
-         * 絵文字を見る
-         */
-        "read:admin:emoji": string;
-        /**
-         * ジョブキューを操作する
-         */
-        "write:admin:queue": string;
-        /**
-         * ジョブキューに関する情報を見る
-         */
-        "read:admin:queue": string;
-        /**
-         * プロモーションノートを操作する
-         */
-        "write:admin:promo": string;
-        /**
-         * ユーザーのドライブを操作する
-         */
-        "write:admin:drive": string;
-        /**
-         * ユーザーのドライブの関する情報を見る
-         */
-        "read:admin:drive": string;
-        /**
-         * 管理者用のWebsocket APIを使う
-         */
-        "read:admin:stream": string;
-        /**
-         * 広告を操作する
-         */
-        "write:admin:ad": string;
-        /**
-         * 広告を見る
-         */
-        "read:admin:ad": string;
-        /**
-         * 招待コードを作成する
-         */
-        "write:invite-codes": string;
-        /**
-         * 招待コードを取得する
-         */
-        "read:invite-codes": string;
-        /**
-         * クリップのいいねを操作する
-         */
-        "write:clip-favorite": string;
-        /**
-         * クリップのいいねを見る
-         */
-        "read:clip-favorite": string;
-        /**
-         * 連合に関する情報を取得する
-         */
-        "read:federation": string;
-        /**
-         * 違反を報告する
-         */
-        "write:report-abuse": string;
-        /**
-         * チャットを操作する
-         */
-        "write:chat": string;
-        /**
-         * チャットを閲覧する
-         */
-        "read:chat": string;
-        /**
-         * Approve new users
-         */
-        "write:admin:approve-user": string;
-        /**
-         * Decline new users
-         */
-        "write:admin:decline-user": string;
-        /**
-         * Mark users as NSFW
-         */
-        "write:admin:nsfw-user": string;
-        /**
-         * Mark users as not NSFW
-         */
-        "write:admin:unnsfw-user": string;
-        /**
-         * Apply mandatory CW on users
-         */
-        "write:admin:cw-user": string;
-        /**
-         * Silence users
-         */
-        "write:admin:silence-user": string;
-        /**
-         * Un-silence users
-         */
-        "write:admin:unsilence-user": string;
-        /**
-         * Allow/Prohibit quote posts from a user
-         */
-        "write:admin:reject-quotes": string;
-        /**
-         * View your list of scheduled notes
-         */
-        "read:notes-schedule": string;
-        /**
-         * Compose or delete scheduled notes
-         */
-        "write:notes-schedule": string;
-    };
-    "_auth": {
-        /**
-         * アプリへのアクセス許可
-         */
-        "shareAccessTitle": string;
-        /**
-         * 「{name}」がアカウントにアクセスすることを許可しますか？
-         */
-        "shareAccess": ParameterizedString<"name">;
-        /**
-         * アカウントへのアクセスを許可しますか？
-         */
-        "shareAccessAsk": string;
-        /**
-         * {name}は次の権限を要求しています
-         */
-        "permission": ParameterizedString<"name">;
-        /**
-         * このアプリは次の権限を要求しています
-         */
-        "permissionAsk": string;
-        /**
-         * アプリケーションに戻ってやっていってください
-         */
-        "pleaseGoBack": string;
-        /**
-         * アプリケーションに戻っています
-         */
-        "callback": string;
-        /**
-         * アクセスを許可しました
-         */
-        "accepted": string;
-        /**
-         * アクセスを拒否しました
-         */
-        "denied": string;
-        /**
-         * 以下のユーザーとして操作しています
-         */
-        "scopeUser": string;
-        /**
-         * アプリケーションにアクセス許可を与えるには、ログインが必要です。
-         */
-        "pleaseLogin": string;
-        /**
-         * アクセスを許可すると、自動で以下のURLに遷移します
-         */
-        "byClickingYouWillBeRedirectedToThisUrl": string;
-        /**
-         * Allowed
-         */
-        "allowed": string;
-    };
     "_antennaSources": {
         /**
          * 全てのノート
@@ -9271,134 +12084,6 @@ export interface Locale extends ILocale {
          */
         "saturday": string;
     };
-    "_widgets": {
-        /**
-         * プロフィール
-         */
-        "profile": string;
-        /**
-         * サーバー情報
-         */
-        "instanceInfo": string;
-        /**
-         * 付箋
-         */
-        "memo": string;
-        /**
-         * 通知
-         */
-        "notifications": string;
-        /**
-         * タイムライン
-         */
-        "timeline": string;
-        /**
-         * カレンダー
-         */
-        "calendar": string;
-        /**
-         * トレンド
-         */
-        "trends": string;
-        /**
-         * 時計
-         */
-        "clock": string;
-        /**
-         * RSSリーダー
-         */
-        "rss": string;
-        /**
-         * RSSティッカー
-         */
-        "rssTicker": string;
-        /**
-         * アクティビティ
-         */
-        "activity": string;
-        /**
-         * フォト
-         */
-        "photos": string;
-        /**
-         * デジタル時計
-         */
-        "digitalClock": string;
-        /**
-         * UNIX時計
-         */
-        "unixClock": string;
-        /**
-         * 連合
-         */
-        "federation": string;
-        /**
-         * サーバークラウド
-         */
-        "instanceCloud": string;
-        /**
-         * 投稿フォーム
-         */
-        "postForm": string;
-        /**
-         * スライドショー
-         */
-        "slideshow": string;
-        /**
-         * ボタン
-         */
-        "button": string;
-        /**
-         * オンラインユーザー
-         */
-        "onlineUsers": string;
-        /**
-         * ジョブキュー
-         */
-        "jobQueue": string;
-        /**
-         * サーバーメトリクス
-         */
-        "serverMetric": string;
-        /**
-         * AiScriptコンソール
-         */
-        "aiscript": string;
-        /**
-         * AiScript App
-         */
-        "aiscriptApp": string;
-        /**
-         * 藍
-         */
-        "aichan": string;
-        /**
-         * ユーザーリスト
-         */
-        "userList": string;
-        "_userList": {
-            /**
-             * リストを選択
-             */
-            "chooseList": string;
-        };
-        /**
-         * クリッカー
-         */
-        "clicker": string;
-        /**
-         * 今日誕生日のユーザー
-         */
-        "birthdayFollowings": string;
-        /**
-         * チャット
-         */
-        "chat": string;
-        /**
-         * Search
-         */
-        "search": string;
-    };
     "_cw": {
         /**
          * 隠す
@@ -9416,96 +12101,6 @@ export interface Locale extends ILocale {
          * {count}ファイル
          */
         "files": ParameterizedString<"count">;
-    };
-    "_poll": {
-        /**
-         * 選択肢は最低2つ必要です
-         */
-        "noOnlyOneChoice": string;
-        /**
-         * 選択肢{n}
-         */
-        "choiceN": ParameterizedString<"n">;
-        /**
-         * これ以上追加できません
-         */
-        "noMore": string;
-        /**
-         * 複数回答可
-         */
-        "canMultipleVote": string;
-        /**
-         * 期限
-         */
-        "expiration": string;
-        /**
-         * 無期限
-         */
-        "infinite": string;
-        /**
-         * 日時指定
-         */
-        "at": string;
-        /**
-         * 経過指定
-         */
-        "after": string;
-        /**
-         * 期日
-         */
-        "deadlineDate": string;
-        /**
-         * 時間
-         */
-        "deadlineTime": string;
-        /**
-         * 期間
-         */
-        "duration": string;
-        /**
-         * {n}票
-         */
-        "votesCount": ParameterizedString<"n">;
-        /**
-         * 計{n}票
-         */
-        "totalVotes": ParameterizedString<"n">;
-        /**
-         * 投票する
-         */
-        "vote": string;
-        /**
-         * 結果を見る
-         */
-        "showResult": string;
-        /**
-         * 投票済み
-         */
-        "voted": string;
-        /**
-         * 終了済み
-         */
-        "closed": string;
-        /**
-         * 終了まであと{d}日{h}時間
-         */
-        "remainingDays": ParameterizedString<"d" | "h">;
-        /**
-         * 終了まであと{h}時間{m}分
-         */
-        "remainingHours": ParameterizedString<"h" | "m">;
-        /**
-         * 終了まであと{m}分{s}秒
-         */
-        "remainingMinutes": ParameterizedString<"m" | "s">;
-        /**
-         * 終了まであと{s}秒
-         */
-        "remainingSeconds": ParameterizedString<"s">;
-        /**
-         * Multiple choices
-         */
-        "multiple": string;
     };
     "_visibility": {
         /**
@@ -9588,104 +12183,6 @@ export interface Locale extends ILocale {
              */
             "f": string;
         };
-    };
-    "_profile": {
-        /**
-         * 名前
-         */
-        "name": string;
-        /**
-         * ユーザー名
-         */
-        "username": string;
-        /**
-         * 自己紹介
-         */
-        "description": string;
-        /**
-         * ハッシュタグを含めることができます。
-         */
-        "youCanIncludeHashtags": string;
-        /**
-         * 追加情報
-         */
-        "metadata": string;
-        /**
-         * 追加情報を編集
-         */
-        "metadataEdit": string;
-        /**
-         * プロフィールに表として追加情報を表示することができます。
-         */
-        "metadataDescription": string;
-        /**
-         * ラベル
-         */
-        "metadataLabel": string;
-        /**
-         * 内容
-         */
-        "metadataContent": string;
-        /**
-         * アイコン画像を変更
-         */
-        "changeAvatar": string;
-        /**
-         * バナー画像を変更
-         */
-        "changeBanner": string;
-        /**
-         * 内容にURLを設定すると、リンク先のWebサイトに自分のプロフィールへのリンクが含まれている場合に所有者確認済みアイコンを表示させることができます。
-         */
-        "verifiedLinkDescription": string;
-        /**
-         * 最大{max}つまでデコレーションを付けられます。
-         */
-        "avatarDecorationMax": ParameterizedString<"max">;
-        /**
-         * フォローされた時のメッセージ
-         */
-        "followedMessage": string;
-        /**
-         * フォローされた時に相手に表示する短いメッセージを設定できます。
-         */
-        "followedMessageDescription": string;
-        /**
-         * フォローを承認制にしている場合、フォローリクエストを許可した時に表示されます。
-         */
-        "followedMessageDescriptionForLockedAccount": string;
-        /**
-         * Update avatar
-         */
-        "updateAvatar": string;
-        /**
-         * Remove avatar
-         */
-        "removeAvatar": string;
-        /**
-         * Update banner
-         */
-        "updateBanner": string;
-        /**
-         * Remove banner
-         */
-        "removeBanner": string;
-        /**
-         * Change background
-         */
-        "changeBackground": string;
-        /**
-         * Update background
-         */
-        "updateBackground": string;
-        /**
-         * Remove background
-         */
-        "removeBackground": string;
-        /**
-         * ListenBrainz username
-         */
-        "listenbrainz": string;
     };
     "_exportOrImport": {
         /**
@@ -9829,28 +12326,6 @@ export interface Locale extends ILocale {
          */
         "filesTotal": string;
     };
-    "_timelines": {
-        /**
-         * ホーム
-         */
-        "home": string;
-        /**
-         * ローカル
-         */
-        "local": string;
-        /**
-         * ソーシャル
-         */
-        "social": string;
-        /**
-         * グローバル
-         */
-        "global": string;
-        /**
-         * Bubble
-         */
-        "bubble": string;
-    };
     "_play": {
         /**
          * Playの作成
@@ -9913,196 +12388,6 @@ export interface Locale extends ILocale {
          */
         "visibilityDescription": string;
     };
-    "_pages": {
-        /**
-         * ページの作成
-         */
-        "newPage": string;
-        /**
-         * ページの編集
-         */
-        "editPage": string;
-        /**
-         * ソースを表示中
-         */
-        "readPage": string;
-        /**
-         * ページ設定
-         */
-        "pageSetting": string;
-        /**
-         * 指定されたページURLは既に存在しています
-         */
-        "nameAlreadyExists": string;
-        /**
-         * 不正なページURLです
-         */
-        "invalidNameTitle": string;
-        /**
-         * 空白でないか確認してください
-         */
-        "invalidNameText": string;
-        /**
-         * このページを編集
-         */
-        "editThisPage": string;
-        /**
-         * ソースを表示
-         */
-        "viewSource": string;
-        /**
-         * ページを見る
-         */
-        "viewPage": string;
-        /**
-         * いいね
-         */
-        "like": string;
-        /**
-         * いいね解除
-         */
-        "unlike": string;
-        /**
-         * 自分のページ
-         */
-        "my": string;
-        /**
-         * いいねしたページ
-         */
-        "liked": string;
-        /**
-         * 人気
-         */
-        "featured": string;
-        /**
-         * インスペクター
-         */
-        "inspector": string;
-        /**
-         * コンテンツ
-         */
-        "contents": string;
-        /**
-         * ページブロック
-         */
-        "content": string;
-        /**
-         * 変数
-         */
-        "variables": string;
-        /**
-         * タイトル
-         */
-        "title": string;
-        /**
-         * ページURL
-         */
-        "url": string;
-        /**
-         * ページの要約
-         */
-        "summary": string;
-        /**
-         * 中央寄せ
-         */
-        "alignCenter": string;
-        /**
-         * ピン留めされているときにタイトルを非表示
-         */
-        "hideTitleWhenPinned": string;
-        /**
-         * フォント
-         */
-        "font": string;
-        /**
-         * セリフ
-         */
-        "fontSerif": string;
-        /**
-         * サンセリフ
-         */
-        "fontSansSerif": string;
-        /**
-         * アイキャッチ画像を設定
-         */
-        "eyeCatchingImageSet": string;
-        /**
-         * アイキャッチ画像を削除
-         */
-        "eyeCatchingImageRemove": string;
-        /**
-         * ブロックを追加
-         */
-        "chooseBlock": string;
-        /**
-         * セクションタイトルを入力
-         */
-        "enterSectionTitle": string;
-        /**
-         * 種類を選択
-         */
-        "selectType": string;
-        /**
-         * コンテンツ
-         */
-        "contentBlocks": string;
-        /**
-         * 入力
-         */
-        "inputBlocks": string;
-        /**
-         * 特殊
-         */
-        "specialBlocks": string;
-        "blocks": {
-            /**
-             * テキスト
-             */
-            "text": string;
-            /**
-             * テキストエリア
-             */
-            "textarea": string;
-            /**
-             * セクション
-             */
-            "section": string;
-            /**
-             * 画像
-             */
-            "image": string;
-            /**
-             * ボタン
-             */
-            "button": string;
-            /**
-             * 動的ブロック
-             */
-            "dynamic": string;
-            /**
-             * This block type has been removed. Please use {play} from now on.
-             */
-            "dynamicDescription": ParameterizedString<"play">;
-            /**
-             * ノート埋め込み
-             */
-            "note": string;
-            "_note": {
-                /**
-                 * ノートID
-                 */
-                "id": string;
-                /**
-                 * ノートURLをペーストして設定することもできます。
-                 */
-                "idDescription": string;
-                /**
-                 * 詳細な表示
-                 */
-                "detailed": string;
-            };
-        };
-    };
     "_relayStatus": {
         /**
          * 承認待ち
@@ -10116,384 +12401,6 @@ export interface Locale extends ILocale {
          * 拒否済み
          */
         "rejected": string;
-    };
-    "_notification": {
-        /**
-         * ファイルがアップロードされました
-         */
-        "fileUploaded": string;
-        /**
-         * {name}からのメンション
-         */
-        "youGotMention": ParameterizedString<"name">;
-        /**
-         * {name}からのリプライ
-         */
-        "youGotReply": ParameterizedString<"name">;
-        /**
-         * {name}による引用
-         */
-        "youGotQuote": ParameterizedString<"name">;
-        /**
-         * Boost from {name}
-         */
-        "youRenoted": ParameterizedString<"name">;
-        /**
-         * フォローされました
-         */
-        "youWereFollowed": string;
-        /**
-         * フォローリクエストが来ました
-         */
-        "youReceivedFollowRequest": string;
-        /**
-         * フォローリクエストが承認されました
-         */
-        "yourFollowRequestAccepted": string;
-        /**
-         * アンケートの結果が出ました
-         */
-        "pollEnded": string;
-        /**
-         * 新しい投稿
-         */
-        "newNote": string;
-        /**
-         * アンテナ {name}
-         */
-        "unreadAntennaNote": ParameterizedString<"name">;
-        /**
-         * ロールが付与されました
-         */
-        "roleAssigned": string;
-        /**
-         * チャットルームへ招待されました
-         */
-        "chatRoomInvitationReceived": string;
-        /**
-         * プッシュ通知の更新をしました
-         */
-        "emptyPushNotificationMessage": string;
-        /**
-         * 実績を獲得
-         */
-        "achievementEarned": string;
-        /**
-         * 通知テスト
-         */
-        "testNotification": string;
-        /**
-         * 通知の表示を確かめる
-         */
-        "checkNotificationBehavior": string;
-        /**
-         * テスト通知を送信する
-         */
-        "sendTestNotification": string;
-        /**
-         * 通知はこのように表示されます
-         */
-        "notificationWillBeDisplayedLikeThis": string;
-        /**
-         * {n}人がリアクションしました
-         */
-        "reactedBySomeUsers": ParameterizedString<"n">;
-        /**
-         * {n}人がいいねしました
-         */
-        "likedBySomeUsers": ParameterizedString<"n">;
-        /**
-         * Boosted by {n} users
-         */
-        "renotedBySomeUsers": ParameterizedString<"n">;
-        /**
-         * {n}人にフォローされました
-         */
-        "followedBySomeUsers": ParameterizedString<"n">;
-        /**
-         * 通知の履歴をリセットする
-         */
-        "flushNotification": string;
-        /**
-         * {x}のエクスポートが完了しました
-         */
-        "exportOfXCompleted": ParameterizedString<"x">;
-        /**
-         * ログインがありました
-         */
-        "login": string;
-        /**
-         * アクセストークンが作成されました
-         */
-        "createToken": string;
-        /**
-         * 心当たりがない場合は「{text}」を通じてアクセストークンを削除してください。
-         */
-        "createTokenDescription": ParameterizedString<"text">;
-        "_types": {
-            /**
-             * すべて
-             */
-            "all": string;
-            /**
-             * ユーザーの新規投稿
-             */
-            "note": string;
-            /**
-             * フォロー
-             */
-            "follow": string;
-            /**
-             * メンション
-             */
-            "mention": string;
-            /**
-             * リプライ
-             */
-            "reply": string;
-            /**
-             * Boosts
-             */
-            "renote": string;
-            /**
-             * 引用
-             */
-            "quote": string;
-            /**
-             * リアクション
-             */
-            "reaction": string;
-            /**
-             * アンケートが終了
-             */
-            "pollEnded": string;
-            /**
-             * フォロー申請を受け取った
-             */
-            "receiveFollowRequest": string;
-            /**
-             * フォローが受理された
-             */
-            "followRequestAccepted": string;
-            /**
-             * ロールが付与された
-             */
-            "roleAssigned": string;
-            /**
-             * チャットルームへ招待された
-             */
-            "chatRoomInvitationReceived": string;
-            /**
-             * 実績の獲得
-             */
-            "achievementEarned": string;
-            /**
-             * エクスポートが完了した
-             */
-            "exportCompleted": string;
-            /**
-             * ログイン
-             */
-            "login": string;
-            /**
-             * アクセストークンの作成
-             */
-            "createToken": string;
-            /**
-             * 通知のテスト
-             */
-            "test": string;
-            /**
-             * 連携アプリからの通知
-             */
-            "app": string;
-            /**
-             * Edits
-             */
-            "edited": string;
-            /**
-             * Posting scheduled note failed
-             */
-            "scheduledNoteFailed": string;
-            /**
-             * Scheduled note was posted
-             */
-            "scheduledNotePosted": string;
-        };
-        "_actions": {
-            /**
-             * フォローバック
-             */
-            "followBack": string;
-            /**
-             * 返信
-             */
-            "reply": string;
-            /**
-             * Boost
-             */
-            "renote": string;
-        };
-        /**
-         * Note got edited
-         */
-        "edited": string;
-        /**
-         * Posting scheduled note failed
-         */
-        "scheduledNoteFailed": string;
-        /**
-         * Scheduled Note was posted
-         */
-        "scheduledNotePosted": string;
-    };
-    "_deck": {
-        /**
-         * 常にメインカラムを表示
-         */
-        "alwaysShowMainColumn": string;
-        /**
-         * カラムの寄せ
-         */
-        "columnAlign": string;
-        /**
-         * カラム間のマージン
-         */
-        "columnGap": string;
-        /**
-         * デッキメニューの位置
-         */
-        "deckMenuPosition": string;
-        /**
-         * ナビゲーションバーの位置
-         */
-        "navbarPosition": string;
-        /**
-         * カラムを追加
-         */
-        "addColumn": string;
-        /**
-         * 新着ノート通知の設定
-         */
-        "newNoteNotificationSettings": string;
-        /**
-         * カラムの設定
-         */
-        "configureColumn": string;
-        /**
-         * 左に移動
-         */
-        "swapLeft": string;
-        /**
-         * 右に移動
-         */
-        "swapRight": string;
-        /**
-         * 上に移動
-         */
-        "swapUp": string;
-        /**
-         * 下に移動
-         */
-        "swapDown": string;
-        /**
-         * 左にスタック
-         */
-        "stackLeft": string;
-        /**
-         * 右に出す
-         */
-        "popRight": string;
-        /**
-         * プロファイル
-         */
-        "profile": string;
-        /**
-         * 新規プロファイル
-         */
-        "newProfile": string;
-        /**
-         * プロファイルを削除
-         */
-        "deleteProfile": string;
-        /**
-         * カラムを組み合わせて自分だけのインターフェイスを作りましょう！
-         */
-        "introduction": string;
-        /**
-         * カラムを追加するには、画面の + をクリックします。
-         */
-        "introduction2": string;
-        /**
-         * カラムのメニューから、「ウィジェットの編集」を選択してウィジェットを追加してください
-         */
-        "widgetsIntroduction": string;
-        /**
-         * 非ルートページは簡易UIで表示
-         */
-        "useSimpleUiForNonRootPages": string;
-        /**
-         * 「幅を自動調整」が有効の場合、これが幅の最小値となります
-         */
-        "usedAsMinWidthWhenFlexible": string;
-        /**
-         * 幅を自動調整
-         */
-        "flexible": string;
-        /**
-         * プロファイル情報のデバイス間同期を有効にする
-         */
-        "enableSyncBetweenDevicesForProfiles": string;
-        "_columns": {
-            /**
-             * メイン
-             */
-            "main": string;
-            /**
-             * ウィジェット
-             */
-            "widgets": string;
-            /**
-             * 通知
-             */
-            "notifications": string;
-            /**
-             * タイムライン
-             */
-            "tl": string;
-            /**
-             * アンテナ
-             */
-            "antenna": string;
-            /**
-             * リスト
-             */
-            "list": string;
-            /**
-             * チャンネル
-             */
-            "channel": string;
-            /**
-             * あなた宛て
-             */
-            "mentions": string;
-            /**
-             * ダイレクト
-             */
-            "direct": string;
-            /**
-             * ロールタイムライン
-             */
-            "roleTimeline": string;
-            /**
-             * チャット
-             */
-            "chat": string;
-            /**
-             * Following
-             */
-            "following": string;
-        };
     };
     "_dialog": {
         /**
@@ -10524,442 +12431,6 @@ export interface Locale extends ILocale {
          * 追加日が古い順
          */
         "orderByCreatedAtAsc": string;
-    };
-    "_webhookSettings": {
-        /**
-         * Webhookを作成
-         */
-        "createWebhook": string;
-        /**
-         * Webhookを編集
-         */
-        "modifyWebhook": string;
-        /**
-         * 名前
-         */
-        "name": string;
-        /**
-         * シークレット
-         */
-        "secret": string;
-        /**
-         * トリガー
-         */
-        "trigger": string;
-        /**
-         * 有効
-         */
-        "active": string;
-        "_events": {
-            /**
-             * フォローしたとき
-             */
-            "follow": string;
-            /**
-             * フォローされたとき
-             */
-            "followed": string;
-            /**
-             * ノートを投稿したとき
-             */
-            "note": string;
-            /**
-             * 返信されたとき
-             */
-            "reply": string;
-            /**
-             * When boosted
-             */
-            "renote": string;
-            /**
-             * リアクションがあったとき
-             */
-            "reaction": string;
-            /**
-             * メンションされたとき
-             */
-            "mention": string;
-        };
-        "_systemEvents": {
-            /**
-             * ユーザーから通報があったとき
-             */
-            "abuseReport": string;
-            /**
-             * When resolved abuse reports
-             */
-            "abuseReportResolved": string;
-            /**
-             * ユーザーが作成されたとき
-             */
-            "userCreated": string;
-            /**
-             * モデレーターが一定期間非アクティブになったとき
-             */
-            "inactiveModeratorsWarning": string;
-            /**
-             * モデレーターが一定期間非アクティブだったため、システムにより招待制へと変更されたとき
-             */
-            "inactiveModeratorsInvitationOnlyChanged": string;
-        };
-        /**
-         * Webhookを削除しますか？
-         */
-        "deleteConfirm": string;
-        /**
-         * スイッチの右にあるボタンをクリックするとダミーのデータを使用したテスト用Webhookを送信できます。
-         */
-        "testRemarks": string;
-    };
-    "_abuseReport": {
-        "_notificationRecipient": {
-            /**
-             * 通報の通知先を追加
-             */
-            "createRecipient": string;
-            /**
-             * 通報の通知先を編集
-             */
-            "modifyRecipient": string;
-            /**
-             * 通知先の種類
-             */
-            "recipientType": string;
-            "_recipientType": {
-                /**
-                 * メール
-                 */
-                "mail": string;
-                /**
-                 * Webhook
-                 */
-                "webhook": string;
-                "_captions": {
-                    /**
-                     * Send an email to the moderators when an abuse report is received.
-                     */
-                    "mail": string;
-                    /**
-                     * Send a notification to the SystemWebhook when an abuse report is received or resolved.
-                     */
-                    "webhook": string;
-                };
-            };
-            /**
-             * キーワード
-             */
-            "keywords": string;
-            /**
-             * 通知先ユーザー
-             */
-            "notifiedUser": string;
-            /**
-             * 使用するWebhook
-             */
-            "notifiedWebhook": string;
-            /**
-             * 通知先を削除しますか？
-             */
-            "deleteConfirm": string;
-        };
-    };
-    "_moderationLogTypes": {
-        /**
-         * ロールを作成
-         */
-        "createRole": string;
-        /**
-         * ロールを削除
-         */
-        "deleteRole": string;
-        /**
-         * ロールを更新
-         */
-        "updateRole": string;
-        /**
-         * ロールへアサイン
-         */
-        "assignRole": string;
-        /**
-         * ロールのアサイン解除
-         */
-        "unassignRole": string;
-        /**
-         * 凍結
-         */
-        "suspend": string;
-        /**
-         * 凍結解除
-         */
-        "unsuspend": string;
-        /**
-         * カスタム絵文字追加
-         */
-        "addCustomEmoji": string;
-        /**
-         * カスタム絵文字更新
-         */
-        "updateCustomEmoji": string;
-        /**
-         * カスタム絵文字削除
-         */
-        "deleteCustomEmoji": string;
-        /**
-         * サーバー設定更新
-         */
-        "updateServerSettings": string;
-        /**
-         * ユーザーのモデレーションノート更新
-         */
-        "updateUserNote": string;
-        /**
-         * ファイルを削除
-         */
-        "deleteDriveFile": string;
-        /**
-         * ノートを削除
-         */
-        "deleteNote": string;
-        /**
-         * 全体のお知らせを作成
-         */
-        "createGlobalAnnouncement": string;
-        /**
-         * ユーザーへお知らせを作成
-         */
-        "createUserAnnouncement": string;
-        /**
-         * 全体のお知らせを更新
-         */
-        "updateGlobalAnnouncement": string;
-        /**
-         * ユーザーのお知らせを更新
-         */
-        "updateUserAnnouncement": string;
-        /**
-         * 全体のお知らせを削除
-         */
-        "deleteGlobalAnnouncement": string;
-        /**
-         * ユーザーのお知らせを削除
-         */
-        "deleteUserAnnouncement": string;
-        /**
-         * パスワードをリセット
-         */
-        "resetPassword": string;
-        /**
-         * リモートサーバーを停止
-         */
-        "suspendRemoteInstance": string;
-        /**
-         * リモートサーバーを再開
-         */
-        "unsuspendRemoteInstance": string;
-        /**
-         * リモートサーバーのモデレーションノート更新
-         */
-        "updateRemoteInstanceNote": string;
-        /**
-         * ファイルをセンシティブ付与
-         */
-        "markSensitiveDriveFile": string;
-        /**
-         * ファイルをセンシティブ解除
-         */
-        "unmarkSensitiveDriveFile": string;
-        /**
-         * 通報を解決
-         */
-        "resolveAbuseReport": string;
-        /**
-         * 通報を転送
-         */
-        "forwardAbuseReport": string;
-        /**
-         * 通報のモデレーションノート更新
-         */
-        "updateAbuseReportNote": string;
-        /**
-         * 招待コードを作成
-         */
-        "createInvitation": string;
-        /**
-         * 広告を作成
-         */
-        "createAd": string;
-        /**
-         * 広告を削除
-         */
-        "deleteAd": string;
-        /**
-         * 広告を更新
-         */
-        "updateAd": string;
-        /**
-         * アイコンデコレーションを作成
-         */
-        "createAvatarDecoration": string;
-        /**
-         * アイコンデコレーションを更新
-         */
-        "updateAvatarDecoration": string;
-        /**
-         * アイコンデコレーションを削除
-         */
-        "deleteAvatarDecoration": string;
-        /**
-         * ユーザーのアイコンを解除
-         */
-        "unsetUserAvatar": string;
-        /**
-         * ユーザーのバナーを解除
-         */
-        "unsetUserBanner": string;
-        /**
-         * SystemWebhookを作成
-         */
-        "createSystemWebhook": string;
-        /**
-         * SystemWebhookを更新
-         */
-        "updateSystemWebhook": string;
-        /**
-         * SystemWebhookを削除
-         */
-        "deleteSystemWebhook": string;
-        /**
-         * 通報の通知先を作成
-         */
-        "createAbuseReportNotificationRecipient": string;
-        /**
-         * 通報の通知先を更新
-         */
-        "updateAbuseReportNotificationRecipient": string;
-        /**
-         * 通報の通知先を削除
-         */
-        "deleteAbuseReportNotificationRecipient": string;
-        /**
-         * アカウントを削除
-         */
-        "deleteAccount": string;
-        /**
-         * ページを削除
-         */
-        "deletePage": string;
-        /**
-         * Playを削除
-         */
-        "deleteFlash": string;
-        /**
-         * ギャラリーの投稿を削除
-         */
-        "deleteGalleryPost": string;
-        /**
-         * チャットルームを削除
-         */
-        "deleteChatRoom": string;
-        /**
-         * プロキシアカウントの説明を更新
-         */
-        "updateProxyAccountDescription": string;
-        /**
-         * Approved
-         */
-        "approve": string;
-        /**
-         * Declined
-         */
-        "decline": string;
-        /**
-         * Set content warning for user
-         */
-        "setMandatoryCW": string;
-        /**
-         * Set remote instance as NSFW
-         */
-        "setRemoteInstanceNSFW": string;
-        /**
-         * Unset remote instance as NSFW
-         */
-        "unsetRemoteInstanceNSFW": string;
-        /**
-         * Rejected reports from remote instance
-         */
-        "rejectRemoteInstanceReports": string;
-        /**
-         * Accepted reports from remote instance
-         */
-        "acceptRemoteInstanceReports": string;
-        /**
-         * Blocked/Stripped quote posts from user
-         */
-        "rejectQuotesUser": string;
-        /**
-         * Allowed quote posts from user
-         */
-        "allowQuotesUser": string;
-        /**
-         * Cleared a user's drive files
-         */
-        "clearUserFiles": string;
-        /**
-         * Marked user as NSFW
-         */
-        "nsfwUser": string;
-        /**
-         * Un-marked user as NSFW
-         */
-        "unNsfwUser": string;
-        /**
-         * Silenced user
-         */
-        "silenceUser": string;
-        /**
-         * Un-silenced user
-         */
-        "unSilenceUser": string;
-        /**
-         * Created an account
-         */
-        "createAccount": string;
-        /**
-         * Cleared remote drive files
-         */
-        "clearRemoteFiles": string;
-        /**
-         * Cleared owner-less drive files
-         */
-        "clearOwnerlessFiles": string;
-        /**
-         * Updated custom emojis
-         */
-        "updateCustomEmojis": string;
-        /**
-         * Imported custom emojis
-         */
-        "importCustomEmojis": string;
-        /**
-         * Cleared an instance's drive files
-         */
-        "clearInstanceFiles": string;
-        /**
-         * Severed follow relations with an instance
-         */
-        "severFollowRelations": string;
-        /**
-         * Created a note promo
-         */
-        "createPromo": string;
-        /**
-         * Added a relay
-         */
-        "addRelay": string;
-        /**
-         * Removed a relay
-         */
-        "removeRelay": string;
     };
     "_fileViewer": {
         /**
@@ -11117,48 +12588,6 @@ export interface Locale extends ILocale {
                  */
                 "description": string;
             };
-        };
-    };
-    "_dataSaver": {
-        "_media": {
-            /**
-             * メディアの読み込みを無効化
-             */
-            "title": string;
-            /**
-             * 画像・動画が自動で読み込まれるのを防止します。隠れている画像・動画はタップすると読み込まれます。
-             */
-            "description": string;
-        };
-        "_avatar": {
-            /**
-             * アイコン画像のアニメーションを無効化
-             */
-            "title": string;
-            /**
-             * Stop avatar image animation. Animated images can be larger in file size than normal images, potentially leading to further reductions in data traffic.
-             */
-            "description": string;
-        };
-        "_urlPreview": {
-            /**
-             * URLプレビューのサムネイルを非表示
-             */
-            "title": string;
-            /**
-             * URLプレビューのサムネイル画像が読み込まれなくなります。
-             */
-            "description": string;
-        };
-        "_code": {
-            /**
-             * コードハイライトを非表示
-             */
-            "title": string;
-            /**
-             * MFMなどでコードハイライト記法が使われている場合、タップするまで読み込まれなくなります。コードハイライトではハイライトする言語ごとにその定義ファイルを読み込む必要がありますが、それらが自動で読み込まれなくなるため、通信量の削減が見込めます。
-             */
-            "description": string;
         };
     };
     "_hemisphere": {
@@ -11358,60 +12787,6 @@ export interface Locale extends ILocale {
          * サーバーに接続できません
          */
         "header": string;
-    };
-    "_urlPreviewSetting": {
-        /**
-         * URLプレビューの設定
-         */
-        "title": string;
-        /**
-         * URLプレビューを有効にする
-         */
-        "enable": string;
-        /**
-         * プレビュー取得時のタイムアウト(ms)
-         */
-        "timeout": string;
-        /**
-         * If it takes longer than this value to get the preview, the preview won't be generated.
-         */
-        "timeoutDescription": string;
-        /**
-         * Content-Lengthの最大値(byte)
-         */
-        "maximumContentLength": string;
-        /**
-         * Content-Lengthがこの値を超えた場合、プレビューは生成されません。
-         */
-        "maximumContentLengthDescription": string;
-        /**
-         * Generate the preview only if we can get Content-Length
-         */
-        "requireContentLength": string;
-        /**
-         * 相手サーバがContent-Lengthを返さない場合、プレビューは生成されません。
-         */
-        "requireContentLengthDescription": string;
-        /**
-         * User-Agent
-         */
-        "userAgent": string;
-        /**
-         * プレビュー取得時に使用されるUser-Agentを設定します。空欄の場合、デフォルトのUser-Agentが使用されます。
-         */
-        "userAgentDescription": string;
-        /**
-         * Endpoint for proxy to generate previews
-         */
-        "summaryProxy": string;
-        /**
-         * Generate previews using Summaly Proxy, instead of Sharkey itself.
-         */
-        "summaryProxyDescription": string;
-        /**
-         * The following parameters are sent to the proxy as a query string. If the proxy does not support them, the values are ignored.
-         */
-        "summaryProxyDescription2": string;
     };
     "_mediaControls": {
         /**
@@ -11742,16 +13117,6 @@ export interface Locale extends ILocale {
          */
         "description3": ParameterizedString<"link">;
     };
-    "_followRequest": {
-        /**
-         * Received
-         */
-        "recieved": string;
-        /**
-         * Sent
-         */
-        "sent": string;
-    };
     "_remoteLookupErrors": {
         "_federationNotAllowed": {
             /**
@@ -11924,1343 +13289,6 @@ export interface Locale extends ILocale {
          */
         "serverHostPlaceholder": string;
     };
-    /**
-     * Approvals
-     */
-    "approvals": string;
-    /**
-     * Open remote profile
-     */
-    "openRemoteProfile": string;
-    /**
-     * Link to external site warning exclusion list
-     */
-    "trustedLinkUrlPatterns": string;
-    /**
-     * Separate with spaces for an AND condition or with line breaks for an OR condition. Using surrounding keywords with slashes will turn them into a regular expression. If you write only the domain name, it will be a backward match.
-     */
-    "trustedLinkUrlPatternsDescription": string;
-    /**
-     * Mutuals
-     */
-    "mutuals": string;
-    /**
-     * Private account
-     */
-    "isLocked": string;
-    /**
-     * Administrator
-     */
-    "isAdmin": string;
-    /**
-     * Bot user
-     */
-    "isBot": string;
-    /**
-     * Open
-     */
-    "open": string;
-    /**
-     * Destination address
-     */
-    "emailDestination": string;
-    /**
-     * Date
-     */
-    "date": string;
-    /**
-     * Boost (hold Shift for visibility menu)
-     */
-    "renoteShift": string;
-    /**
-     * Quoted.
-     */
-    "quoted": string;
-    /**
-     * Unboosted.
-     */
-    "rmboost": string;
-    /**
-     * Muted
-     */
-    "muted": string;
-    /**
-     * Boosts muted
-     */
-    "renoteMuted": string;
-    /**
-     * Mark all media from user as NSFW
-     */
-    "markAsNSFW": string;
-    /**
-     * Mark as NSFW
-     */
-    "markInstanceAsNSFW": string;
-    /**
-     * Are you sure that you want to mark all media from this account as NSFW?
-     */
-    "nsfwConfirm": string;
-    /**
-     * Are you sure that you want to unmark all media from this account as NSFW?
-     */
-    "unNsfwConfirm": string;
-    /**
-     * Are you sure that you want to approve this account?
-     */
-    "approveConfirm": string;
-    /**
-     * Speak as a cat
-     */
-    "flagSpeakAsCat": string;
-    /**
-     * Your posts will get nyanified when in cat mode. If this isn't working, then please check that you dont have 'Disable cat speak' on under General/Note Display
-     */
-    "flagSpeakAsCatDescription": string;
-    /**
-     * Reject reports from this instance
-     */
-    "rejectReports": string;
-    /**
-     * Strip quote posts from this instance
-     */
-    "rejectQuotesInstance": string;
-    /**
-     * Strip quote posts from this user
-     */
-    "rejectQuotesRemoteUser": string;
-    /**
-     * Block quote posts from this user
-     */
-    "rejectQuotesLocalUser": string;
-    /**
-     * Are you sure you wish to strip quote posts?
-     */
-    "rejectQuotesConfirm": string;
-    /**
-     * Are you sure you wish to allow quote posts?
-     */
-    "allowQuotesConfirm": string;
-    /**
-     * This host is blocked implicitly because a base domain is blocked. To unblock this host, first unblock the base domain(s).
-     */
-    "blockedByBase": string;
-    /**
-     * This host is silenced implicitly because a base domain is silenced. To un-silence this host, first un-silence the base domain(s).
-     */
-    "silencedByBase": string;
-    /**
-     * This host's media is silenced implicitly because a base domain's media is silenced. To un-silence this host, first un-silence the base domain(s).
-     */
-    "mediaSilencedByBase": string;
-    /**
-     * Search drive
-     */
-    "driveSearchbarPlaceholder": string;
-    /**
-     * Background
-     */
-    "background": string;
-    /**
-     * Show content for all replies
-     */
-    "expandAllCws": string;
-    /**
-     * Hide content for all replies
-     */
-    "collapseAllCws": string;
-    /**
-     * Don't use drawer-style menus
-     */
-    "disableDrawer": string;
-    /**
-     * Corner roundness
-     */
-    "cornerRadius": string;
-    /**
-     * Warn you when you forget to put alt text
-     */
-    "warnForMissingAltText": string;
-    /**
-     * Use DeepLX-JS (No Auth Key)
-     */
-    "deeplFreeMode": string;
-    /**
-     * Need Help? Check our documentation to know how to setup DeepLX-JS.
-     */
-    "deeplFreeModeDescription": string;
-    /**
-     * Deletion of all files queued
-     */
-    "deleteAllFilesQueued": string;
-    /**
-     * This is a system account
-     */
-    "systemAccountTitle": string;
-    /**
-     * This account is created and managed automatically by the system, and cannot be logged into.
-     */
-    "systemAccountDescription": string;
-    /**
-     * post is hidden by a filter
-     */
-    "postFiltered": string;
-    /**
-     * Enable favicon notification dot
-     */
-    "enableFaviconNotificationDot": string;
-    /**
-     * Check if the notification dot works on your instance
-     */
-    "verifyNotificationDotWorkingButton": string;
-    /**
-     * Unfortunately, this instance does not support the notification dot feature at this time.
-     */
-    "notificationDotNotWorking": string;
-    /**
-     * The notification dot is functioning properly on this instance.
-     */
-    "notificationDotWorking": string;
-    /**
-     * If the notification dot doesn't work, ask an admin to check our documentation {link}
-     */
-    "notificationDotNotWorkingAdvice": ParameterizedString<"link">;
-    /**
-     * Forward report to remote instance
-     */
-    "forwardReport": string;
-    /**
-     * Instead of your account, an anonymous system account will be displayed as reporter at the remote instance.
-     */
-    "forwardReportIsAnonymous": string;
-    /**
-     * Mark report as resolved
-     */
-    "abuseMarkAsResolved": string;
-    /**
-     * Sharkey specific changes are translated in its own {link}.
-     */
-    "i18nInfoSharkey": ParameterizedString<"link">;
-    /**
-     * Show instance ticker on replies
-     */
-    "showTickerOnReplies": string;
-    /**
-     * Disable cat speak
-     */
-    "disableCatSpeak": string;
-    /**
-     * Search Engine For Search MFM
-     */
-    "searchEngine": string;
-    /**
-     * Other
-     */
-    "searchEngineOther": string;
-    /**
-     * The custom URI must be input in the format like "https://www.google.com/search?q=\{query}" or "https://www.google.com/search?q=%s".
-     */
-    "searchEngineCustomURIDescription": string;
-    /**
-     * Custom URI
-     */
-    "searchEngineCusomURI": string;
-    /**
-     * Make public notes not indexable
-     */
-    "makeIndexable": string;
-    /**
-     * Stop note search from indexing your public notes.
-     */
-    "makeIndexableDescription": string;
-    /**
-     * Enable RSS feed
-     */
-    "enableRss": string;
-    /**
-     * Generate an RSS feed containing your basic profile details and public notes. Users can subscribe to the feed without a follow request or approval.
-     */
-    "enableRssDescription": string;
-    /**
-     * Require approval for new users
-     */
-    "approvalRequiredForSignup": string;
-    /**
-     * Confirm your vote for "{choice}"?
-     * 　You can choose more options after confirmation.
-     */
-    "voteConfirmMulti": ParameterizedString<"choice">;
-    /**
-     * There are users awaiting approval.
-     */
-    "pendingUserApprovals": string;
-    /**
-     * Approve
-     */
-    "approveAccount": string;
-    /**
-     * Deny & Delete
-     */
-    "denyAccount": string;
-    /**
-     * Approved
-     */
-    "approved": string;
-    /**
-     * Not Approved
-     */
-    "notApproved": string;
-    /**
-     * Approval Status
-     */
-    "approvalStatus": string;
-    /**
-     * Number of replies in a thread
-     */
-    "numberOfReplies": string;
-    /**
-     * Increasing this number will display more replies. Setting this too high can cause replies to be cramped and unreadable.
-     */
-    "numberOfRepliesDescription": string;
-    /**
-     * Boost Settings
-     */
-    "boostSettings": string;
-    /**
-     * Show Visibility Selector
-     */
-    "showVisibilitySelectorOnBoost": string;
-    /**
-     * Shows the visiblity selector if enabled when clicking boost, if disabled it will use the default visiblity defined below and the selector will not show up.
-     */
-    "showVisibilitySelectorOnBoostDescription": string;
-    /**
-     * Default boost visibility
-     */
-    "visibilityOnBoost": string;
-    /**
-     * Default like emoji
-     */
-    "defaultLike": string;
-    /**
-     * You can also support {host} directly by donating to your instance administration.
-     */
-    "pleaseDonateInstance": ParameterizedString<"host">;
-    /**
-     * Cancel
-     */
-    "thisPostIsMissingAltTextCancel": string;
-    /**
-     * Post anyway
-     */
-    "thisPostIsMissingAltTextIgnore": string;
-    /**
-     * One of the files attached to this post is missing alt text. Please ensure all the attachments have alt text.
-     */
-    "thisPostIsMissingAltText": string;
-    /**
-     * Collapse notes replied to
-     */
-    "collapseNotesRepliedTo": string;
-    /**
-     * Collapse files
-     */
-    "collapseFiles": string;
-    /**
-     * Uncollapse CWs on notes
-     */
-    "uncollapseCW": string;
-    /**
-     * Always expand long notes
-     */
-    "expandLongNote": string;
-    /**
-     * Load conversation on replies
-     */
-    "autoloadConversation": string;
-    /**
-     * This instance is only accepting users who specify a reason for registration.
-     */
-    "approvalRequiredToRegister": string;
-    /**
-     * Cat friend :3
-     */
-    "oneko": string;
-    /**
-     * This will irreversibly delete this account. Proceed?
-     */
-    "deleteThisAccountConfirm": string;
-    /**
-     * Enable Achievements
-     */
-    "enableAchievements": string;
-    /**
-     * Turning this off will disable the achievement system
-     */
-    "turnOffAchievements": string;
-    /**
-     * Populate Hashtags with Bots
-     */
-    "enableBotTrending": string;
-    /**
-     * Turning this off will stop Bots from populating Hashtags
-     */
-    "turnOffBotTrending": string;
-    /**
-     * Click to open notes
-     */
-    "clickToOpen": string;
-    /**
-     * Show bots in timeline
-     */
-    "showBots": string;
-    /**
-     * Donate
-     */
-    "donation": string;
-    /**
-     * Donation URL
-     */
-    "donationUrl": string;
-    /**
-     * Show Below Avatar
-     */
-    "showBelowAvatar": string;
-    /**
-     * Break following relationships
-     */
-    "severAllFollowRelations": string;
-    /**
-     * Really break all follow relationships? This is irreversible! This will break {followingCount} following and {followersCount} follower relations on {instanceName}!
-     */
-    "severAllFollowRelationsConfirm": ParameterizedString<"followingCount" | "followersCount" | "instanceName">;
-    /**
-     * Severing all follow relations with {host} queued.
-     */
-    "severAllFollowRelationsQueued": ParameterizedString<"host">;
-    /**
-     * Pending follow requests
-     */
-    "pendingFollowRequests": string;
-    /**
-     * Are you sure you want to cancel your follow request?
-     */
-    "undoFollowRequestConfirm": string;
-    /**
-     * Show quotes
-     */
-    "showQuotes": string;
-    /**
-     * Show replies
-     */
-    "showReplies": string;
-    /**
-     * Show non-public
-     */
-    "showNonPublicNotes": string;
-    /**
-     * Allow clicking on pop-up notifications
-     */
-    "allowClickingNotifications": string;
-    /**
-     * Pinned
-     */
-    "pinnedOnly": string;
-    /**
-     * Blocking you
-     */
-    "blockingYou": string;
-    /**
-     * Show warning when opening external URLs
-     */
-    "warnExternalUrl": string;
-    /**
-     * Flash
-     */
-    "flash": string;
-    /**
-     * Files removed
-     */
-    "filesRemoved": string;
-    /**
-     * File imported
-     */
-    "fileImported": string;
-    /**
-     * Failed to load note
-     */
-    "cannotLoadNote": string;
-    "_flash": {
-        /**
-         * Flash Content Hidden
-         */
-        "contentHidden": string;
-        /**
-         * Powered by Ruffle.
-         */
-        "poweredByRuffle": string;
-        /**
-         * Always be wary of arbitrary code execution!
-         */
-        "arbitraryCodeExecutionWarning": string;
-        /**
-         * Flash Content Failed To Load:
-         */
-        "failedToLoad": string;
-        /**
-         * Flash Content Is Loading
-         */
-        "isLoading": string;
-        /**
-         * Loading Ruffle player
-         */
-        "loadingRufflePlayer": string;
-        /**
-         * Loading Flash file
-         */
-        "loadingFlashFile": string;
-        /**
-         * raw.esm.sh could not be accessed, meaning this instance's Content Security Policy is likely out of date. Please contact your instance administrators.
-         */
-        "cspError": string;
-    };
-    "_mfm": {
-        /**
-         * This is not a widespread feature, it may not display properly on most other fedi software, including other Misskey forks
-         */
-        "uncommonFeature": string;
-        /**
-         * MFM is a markup language used on Misskey, Sharkey, Firefish, Akkoma, and more that can be used in many places. Here you can view a list of all available MFM syntax.
-         */
-        "intro": string;
-        /**
-         * Sharkey expands the world of the Fediverse
-         */
-        "dummy": string;
-        /**
-         * Mention
-         */
-        "mention": string;
-        /**
-         * You can specify a user by using an At-Symbol and a username.
-         */
-        "mentionDescription": string;
-        /**
-         * Hashtag
-         */
-        "hashtag": string;
-        /**
-         * You can specify a hashtag using a number sign and text.
-         */
-        "hashtagDescription": string;
-        /**
-         * URL
-         */
-        "url": string;
-        /**
-         * URLs can be displayed.
-         */
-        "urlDescription": string;
-        /**
-         * Link
-         */
-        "link": string;
-        /**
-         * Specific parts of text can be displayed as a URL.
-         */
-        "linkDescription": string;
-        /**
-         * Bold
-         */
-        "bold": string;
-        /**
-         * Highlights letters by making them thicker.
-         */
-        "boldDescription": string;
-        /**
-         * Small
-         */
-        "small": string;
-        /**
-         * Displays content small and thin.
-         */
-        "smallDescription": string;
-        /**
-         * Center
-         */
-        "center": string;
-        /**
-         * Displays content centered.
-         */
-        "centerDescription": string;
-        /**
-         * Unix Time
-         */
-        "unixtime": string;
-        /**
-         * Displays a timestamp in the viewer's current timezone.
-         */
-        "unixtimeDescription": string;
-        /**
-         * Code (Inline)
-         */
-        "inlineCode": string;
-        /**
-         * Displays inline syntax highlighting for (program) code.
-         */
-        "inlineCodeDescription": string;
-        /**
-         * Code (Block)
-         */
-        "blockCode": string;
-        /**
-         * Displays syntax highlighting for multi-line (program) code in a block.
-         */
-        "blockCodeDescription": string;
-        /**
-         * Math (Inline)
-         */
-        "inlineMath": string;
-        /**
-         * Display math formulas (KaTeX) in-line
-         */
-        "inlineMathDescription": string;
-        /**
-         * Math (Block)
-         */
-        "blockMath": string;
-        /**
-         * Display math formulas (KaTeX) in a block
-         */
-        "blockMathDescription": string;
-        /**
-         * Quote
-         */
-        "quote": string;
-        /**
-         * Displays content as a quote.
-         */
-        "quoteDescription": string;
-        /**
-         * Custom Emoji
-         */
-        "emoji": string;
-        /**
-         * By surrounding a custom emoji name with colons, custom emoji can be displayed.
-         */
-        "emojiDescription": string;
-        /**
-         * Search
-         */
-        "search": string;
-        /**
-         * Displays a search box with pre-entered text.
-         */
-        "searchDescription": string;
-        /**
-         * Flip
-         */
-        "flip": string;
-        /**
-         * Flips content horizontally or vertically.
-         */
-        "flipDescription": string;
-        /**
-         * Animation (Jelly)
-         */
-        "jelly": string;
-        /**
-         * Gives content a jelly-like animation.
-         */
-        "jellyDescription": string;
-        /**
-         * Animation (Tada)
-         */
-        "tada": string;
-        /**
-         * Gives content a "Tada!"-like animation.
-         */
-        "tadaDescription": string;
-        /**
-         * Animation (Jump)
-         */
-        "jump": string;
-        /**
-         * Gives content a jumping animation.
-         */
-        "jumpDescription": string;
-        /**
-         * Animation (Bounce)
-         */
-        "bounce": string;
-        /**
-         * Gives content a bouncy animation.
-         */
-        "bounceDescription": string;
-        /**
-         * Animation (Shake)
-         */
-        "shake": string;
-        /**
-         * Gives content a shaking animation.
-         */
-        "shakeDescription": string;
-        /**
-         * Animation (Twitch)
-         */
-        "twitch": string;
-        /**
-         * Gives content a strongly twitching animation.
-         */
-        "twitchDescription": string;
-        /**
-         * Animation (Spin)
-         */
-        "spin": string;
-        /**
-         * Gives content a spinning animation.
-         */
-        "spinDescription": string;
-        /**
-         * Big
-         */
-        "x2": string;
-        /**
-         * Displays content bigger.
-         */
-        "x2Description": string;
-        /**
-         * Very big
-         */
-        "x3": string;
-        /**
-         * Displays content even bigger.
-         */
-        "x3Description": string;
-        /**
-         * Unbelievably big
-         */
-        "x4": string;
-        /**
-         * Displays content even bigger than bigger than big.
-         */
-        "x4Description": string;
-        /**
-         * Blur
-         */
-        "blur": string;
-        /**
-         * Blurs content. It will be displayed clearly when hovered over.
-         */
-        "blurDescription": string;
-        /**
-         * Font
-         */
-        "font": string;
-        /**
-         * Sets the font to display content in.
-         */
-        "fontDescription": string;
-        /**
-         * Rainbow
-         */
-        "rainbow": string;
-        /**
-         * Makes the content appear in rainbow colors.
-         */
-        "rainbowDescription": string;
-        /**
-         * Sparkle
-         */
-        "sparkle": string;
-        /**
-         * Gives content a sparkling particle effect.
-         */
-        "sparkleDescription": string;
-        /**
-         * Rotate
-         */
-        "rotate": string;
-        /**
-         * Turns content by a specified angle.
-         */
-        "rotateDescription": string;
-        /**
-         * Position
-         */
-        "position": string;
-        /**
-         * Move content by a specified amount.
-         */
-        "positionDescription": string;
-        /**
-         * Crop
-         */
-        "crop": string;
-        /**
-         * Crop content.
-         */
-        "cropDescription": string;
-        /**
-         * Follow Mouse
-         */
-        "followMouse": string;
-        /**
-         * Content will follow the mouse. On mobile it will follow wherever the user taps.
-         */
-        "followMouseDescription": string;
-        /**
-         * Scale
-         */
-        "scale": string;
-        /**
-         * Scale content by a specified amount.
-         */
-        "scaleDescription": string;
-        /**
-         * Foreground color
-         */
-        "foreground": string;
-        /**
-         * Change the foreground color of text.
-         */
-        "foregroundDescription": string;
-        /**
-         * Fade
-         */
-        "fade": string;
-        /**
-         * Fade text in and out.
-         */
-        "fadeDescription": string;
-        /**
-         * Background color
-         */
-        "background": string;
-        /**
-         * Change the background color of text.
-         */
-        "backgroundDescription": string;
-        /**
-         * Border
-         */
-        "border": string;
-        /**
-         * Draw a border around the content.
-         */
-        "borderDescription": string;
-        /**
-         * Plain
-         */
-        "plain": string;
-        /**
-         * Deactivates the effects of all MFM contained within this MFM effect.
-         */
-        "plainDescription": string;
-    };
-    "_animatedMFM": {
-        /**
-         * Play MFM Animation
-         */
-        "play": string;
-        /**
-         * Stop MFM Animation
-         */
-        "stop": string;
-        "_alert": {
-            /**
-             * Animated MFMs could include flashing lights and fast moving text/emojis.
-             */
-            "text": string;
-            /**
-             * Animate
-             */
-            "confirm": string;
-        };
-    };
-    "_dataRequest": {
-        /**
-         * Request Data
-         */
-        "title": string;
-        /**
-         * Data requests are only possible every 3 days.
-         */
-        "warn": string;
-        /**
-         * Once the data is ready to download, an email will be sent to the email address registered to this account.
-         */
-        "text": string;
-        /**
-         * Request
-         */
-        "button": string;
-    };
-    "_externalNavigationWarning": {
-        /**
-         * Navigate to an external site
-         */
-        "title": string;
-        /**
-         * Leave {host} and go to an external site
-         */
-        "description": ParameterizedString<"host">;
-        /**
-         * Trust this domain on this device in the future
-         */
-        "trustThisDomain": string;
-    };
-    /**
-     * Remote followers may have incomplete or outdated activity
-     */
-    "remoteFollowersWarning": string;
-    /**
-     * Select a follow relationship...
-     */
-    "selectFollowRelationship": string;
-    /**
-     * Schedule a note
-     */
-    "schedulePost": string;
-    /**
-     * List of scheduled notes
-     */
-    "schedulePostList": string;
-    /**
-     * Post on
-     */
-    "postOn": string;
-    /**
-     * Scheduled Notes
-     */
-    "scheduledNotes": string;
-    /**
-     * Custom robots.txt
-     */
-    "robotsTxt": string;
-    /**
-     * Adding entries here will override the default robots.txt packaged with Sharkey.
-     */
-    "robotsTxtDescription": string;
-    /**
-     * Default content warning for new posts
-     */
-    "defaultCW": string;
-    /**
-     * The value here will be auto-filled as the content warning for all new posts and replies.
-     */
-    "defaultCWDescription": string;
-    /**
-     * Automatic CW priority
-     */
-    "defaultCWPriority": string;
-    /**
-     * Select preferred action when default CW and keep CW settings are both enabled at the same time.
-     */
-    "defaultCWPriorityDescription": string;
-    "_defaultCWPriority": {
-        /**
-         * Use Default (use the default CW, ignoring the inherited CW)
-         */
-        "default": string;
-        /**
-         * Use Parent (use the inherited CW, ignoring the default CW)
-         */
-        "parent": string;
-        /**
-         * Use Default, then Parent (use the default CW, and append the inherited CW)
-         */
-        "defaultParent": string;
-        /**
-         * Use Parent, then Default (use the inherited CW, and append the default CW)
-         */
-        "parentDefault": string;
-    };
-    /**
-     * Generate Keys
-     */
-    "genKeys": string;
-    "_genKeysDialog": {
-        /**
-         * Are you sure that you want to generate new keys? This will stop push notifications for all users who have already enabled them.
-         */
-        "text": string;
-        /**
-         * Generate new keys
-         */
-        "title": string;
-    };
-    "_noteSearch": {
-        /**
-         * Sort by newest to oldest
-         */
-        "newestToOldest": string;
-        /**
-         * File Type
-         */
-        "fileType": string;
-        "_fileType": {
-            /**
-             * None
-             */
-            "none": string;
-            /**
-             * Images
-             */
-            "image": string;
-            /**
-             * Videos
-             */
-            "video": string;
-            /**
-             * Audio
-             */
-            "audio": string;
-            /**
-             * Module
-             */
-            "module": string;
-            /**
-             * Flash
-             */
-            "flash": string;
-        };
-    };
-    /**
-     * ID
-     */
-    "id": string;
-    /**
-     * Force content warning
-     */
-    "mandatoryCW": string;
-    /**
-     * Applies a content warning to all posts created by this user. If the post already has a CW, then this is appended to the end.
-     */
-    "mandatoryCWDescription": string;
-    /**
-     * Fetch linked note
-     */
-    "fetchLinkedNote": string;
-    /**
-     * Add "Translate" to note action menu
-     */
-    "showTranslationButtonInNoteFooter": string;
-    /**
-     * Failed to translate note. Please try again later or contact an administrator for assistance.
-     */
-    "translationFailed": string;
-    "_processErrors": {
-        /**
-         * Unable to process quote. This post may be missing context.
-         */
-        "quoteUnavailable": string;
-    };
-    /**
-     * Authorized Fetch
-     */
-    "authorizedFetchSection": string;
-    /**
-     * Allow unsigned ActivityPub requests:
-     */
-    "authorizedFetchLabel": string;
-    /**
-     * This setting controls the behavior when a remote instance or user attempts to access your content without verifying their identity. If disabled, any remote user can access your profile and posts - even one who has been blocked or defederated.
-     */
-    "authorizedFetchDescription": string;
-    "_authorizedFetchValue": {
-        /**
-         * Never
-         */
-        "never": string;
-        /**
-         * Always
-         */
-        "always": string;
-        /**
-         * Only for essential metadata
-         */
-        "essential": string;
-        /**
-         * Use staff recommendation
-         */
-        "staff": string;
-    };
-    "_authorizedFetchValueDescription": {
-        /**
-         * Block all unsigned requests. Improves privacy and makes blocks more effective, but is not compatible with some very old or uncommon instance software.
-         */
-        "never": string;
-        /**
-         * Allow all unsigned requests. Provides the greatest compatibility with other instances, but reduces privacy and weakens blocks.
-         */
-        "always": string;
-        /**
-         * Allow some limited unsigned requests. Provides a hybrid between "Never" and "Always" by exposing only the minimum profile metadata that is required for federation with older software.
-         */
-        "essential": string;
-        /**
-         * Use the default value of "{value}" recommended by the instance staff.
-         */
-        "staff": ParameterizedString<"value">;
-    };
-    /**
-     * The configuration property 'checkActivityPubGetSignature' has been deprecated and replaced with the new Authorized Fetch setting. Please remove it from your configuration file.
-     */
-    "authorizedFetchLegacyWarning": string;
-    /**
-     * Deleted
-     */
-    "deleted": string;
-    /**
-     * Enable the proxy account.
-     */
-    "enableProxyAccount": string;
-    /**
-     * If disabled, then the proxy account will not be used. User lists will only include notes from local or followed users.
-     */
-    "enableProxyAccountDescription": string;
-    "_confirmPollEdit": {
-        /**
-         * Are you sure you want to edit this poll
-         */
-        "title": string;
-        /**
-         * Editing this poll will cause it to lose all previous votes
-         */
-        "text": string;
-    };
-    /**
-     * Test patterns
-     */
-    "wordMuteTestLabel": string;
-    /**
-     * Enter some text here to test your word patterns. The matched words, if any, will be displayed below.
-     */
-    "wordMuteTestDescription": string;
-    /**
-     * Test
-     */
-    "wordMuteTestTest": string;
-    /**
-     * Matched words: {words}
-     */
-    "wordMuteTestMatch": ParameterizedString<"words">;
-    /**
-     * No results yet, enter some text and click "Test" to check it.
-     */
-    "wordMuteTestNoResults": string;
-    /**
-     * Text does not match any patterns.
-     */
-    "wordMuteTestNoMatch": string;
-    /**
-     * All word mutes are *case-sensitive* and match on any substring, including part of a longer word or name. You can use regular expressions for more precise control.
-     */
-    "wordMuteWarning": string;
-    /**
-     * Bubble timeline
-     */
-    "bubbleTimeline": string;
-    /**
-     * Choose which instances should be displayed in the bubble.
-     */
-    "bubbleTimelineDescription": string;
-    /**
-     * Note: the bubble timeline is hidden by default, and must be enabled via roles.
-     */
-    "bubbleTimelineMustBeEnabled": string;
-    /**
-     * Users popular on the global network
-     */
-    "popularUsersGlobal": string;
-    /**
-     * Users popular on {name}
-     */
-    "popularUsersLocal": ParameterizedString<"name">;
-    /**
-     * Polls trending on {name}
-     */
-    "pollsOnLocal": ParameterizedString<"name">;
-    /**
-     * Polls trending on the global network
-     */
-    "pollsOnRemote": string;
-    /**
-     * Polls that have ended recently
-     */
-    "pollsExpired": string;
-    /**
-     * Trending polls are disabled on this instance.
-     */
-    "trendingPollsDisabled": string;
-    /**
-     * Please log in to view trending polls.
-     */
-    "trendingPollsDisabledLogIn": string;
-    /**
-     * Silenced
-     */
-    "silenced": string;
-    /**
-     * Total followers
-     */
-    "totalFollowers": string;
-    /**
-     * Total following
-     */
-    "totalFollowing": string;
-    /**
-     * Local followers
-     */
-    "localFollowers": string;
-    /**
-     * Local following
-     */
-    "localFollowing": string;
-    /**
-     * Remote followers
-     */
-    "remoteFollowers": string;
-    /**
-     * Remote following
-     */
-    "remoteFollowing": string;
-    /**
-     * Activity Pub
-     */
-    "activityPub": string;
-    /**
-     * IP
-     */
-    "ip": string;
-    /**
-     * The date is when IP address was first used.
-     */
-    "ipTip": string;
-    /**
-     * Period
-     */
-    "rolePeriod": string;
-    /**
-     * Assigned
-     */
-    "roleAssigned": string;
-    /**
-     * automatic
-     */
-    "roleAutomatic": string;
-    /**
-     * Translation timeout
-     */
-    "translationTimeoutLabel": string;
-    /**
-     * Timeout in milliseconds for translation API requests.
-     */
-    "translationTimeoutCaption": string;
-    /**
-     * Staff notes
-     */
-    "staffNotes": string;
-    /**
-     * Icon of {name}
-     */
-    "instanceIconAlt": ParameterizedString<"name">;
-    /**
-     * Attribution Domains
-     */
-    "attributionDomains": string;
-    /**
-     * A list of domains whose content can be attributed to you on link previews, separated by new-line. Any subdomain will also be valid. The following needs to be on the webpage:
-     */
-    "attributionDomainsDescription": string;
-    /**
-     * Written by {user}
-     */
-    "writtenBy": ParameterizedString<"user">;
-    /**
-     * Following (Pub)
-     */
-    "followingPub": string;
-    /**
-     * Followers (Sub)
-     */
-    "followersSub": string;
-    /**
-     * Well-known resources
-     */
-    "wellKnownResources": string;
-    /**
-     * Last posted: {at}
-     */
-    "lastPosted": ParameterizedString<"at">;
-    /**
-     * NSFW
-     */
-    "nsfw": string;
-    /**
-     * Raw
-     */
-    "raw": string;
-    /**
-     * CW
-     */
-    "cw": string;
-    /**
-     * Media Silenced
-     */
-    "mediaSilenced": string;
-    /**
-     * Bubble
-     */
-    "bubble": string;
-    /**
-     * Verified
-     */
-    "verified": string;
-    /**
-     * Not Verified
-     */
-    "notVerified": string;
-    /**
-     * Hibernated
-     */
-    "hibernated": string;
-    /**
-     * When replying to a post with a Content Warning, automatically use the same CW for the reply.
-     */
-    "keepCwDescription": string;
-    /**
-     * Disabled (do not copy CWs)
-     */
-    "keepCwDisabled": string;
-    /**
-     * Enabled (copy CWs verbatim)
-     */
-    "keepCwEnabled": string;
-    /**
-     * Enabled (copy CW and prepend "RE:")
-     */
-    "keepCwPrependRe": string;
-    /**
-     * Note controls
-     */
-    "noteFooterLabel": string;
-    /**
-     * Packed user data in its raw form. Most of these fields are public and visible to all users.
-     */
-    "rawUserDescription": string;
-    /**
-     * Extended user data in its raw form. These fields are private and can only be accessed by moderators.
-     */
-    "rawInfoDescription": string;
-    /**
-     * ActivityPub user data in its raw form. These fields are public and accessible to other instances.
-     */
-    "rawApDescription": string;
-    /**
-     * Signup Reason
-     */
-    "signupReason": string;
 }
 declare const locales: {
     [lang: string]: Locale;
