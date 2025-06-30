@@ -1,6 +1,6 @@
 {
 	"name": "misskey",
-	"version": "2025.4.1-ktn.1",
+	"version": "2025.4.1-ktn.1-alpha.1",
 	"codename": "wind",
 	"repository": {
 		"type": "git",
