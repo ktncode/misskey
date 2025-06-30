@@ -8,21 +8,29 @@ deleteAndEditConfirm: "このノートを削除してもう一度編集します
 openRemoteProfile: "リモートプロフィールを開く"
 trustedLinkUrlPatterns: "外部サイトへのリンク警告 除外リスト"
 trustedLinkUrlPatternsDescription: "スペースで区切るとAND指定になり、改行で区切るとOR指定になります。スラッシュで囲むと正規表現になります。ドメイン名だけ書くと後方一致になります。"
-mutuals: "Mutuals"
+mutuals: "相互フォロー"
+isLocked: "非公開アカウント"
+isAdmin: "管理者"
+isBot: "Bot ユーザー"
+open: "開く"
+emailDestination: "宛先アドレス"
+date: "日付"
 renote: "ブースト"
 unrenote: "ブースト解除"
+renoteShift: "ブースト（Shiftキーを押しながらで公開範囲メニュー）"
 renoted: "ブーストしました。"
 quoted: "引用。"
 rmboost: "ブースト解除しました。"
+renotedToX: "{name}にブーストしました"
 cantRenote: "この投稿はブーストできません。"
 cantReRenote: "ブーストをブーストすることはできません。"
 inChannelRenote: "チャンネル内ブースト"
-muted: "Muted"
+muted: "ミュート済み"
 renoteMute: "ブーストをミュート"
-renoteMuted: "Boosts muted"
+renoteMuted: "ブーストをミュート済み"
 renoteUnmute: "ブーストのミュートを解除"
 markAsNSFW: "ユーザーのすべてのメディアをNSFWとしてマークする"
-markInstanceAsNSFW: "Mark as NSFW"
+markInstanceAsNSFW: "NSFWとしてマーク"
 nsfwConfirm: "このアカウントからのすべてのメディアをNSFWとしてマークしてもよろしいですか？"
 unNsfwConfirm: "このアカウントのすべてのメディアをNSFWとしてマーク解除してもよろしいですか？"
 approveConfirm: "このアカウントを承認してもよろしいですか？"
@@ -32,14 +40,19 @@ flagSpeakAsCatDescription: "有効にすると、あなたの投稿の 「な」
 continueOnRemote: "リモートで続行"
 chooseServerOnMisskeyHub: "Misskey Hubからサーバーを選択"
 mediaSilenceThisInstance: "サーバーをメディアサイレンス"
-rejectReports: "Reject reports from this instance"
+rejectReports: "このインスタンスからの通報を拒否"
+rejectQuotesInstance: "このインスタンスからの引用投稿を削除"
+rejectQuotesRemoteUser: "このユーザーからの引用投稿を削除"
+rejectQuotesLocalUser: "このユーザーからの引用投稿をブロック"
+rejectQuotesConfirm: "引用投稿を削除してもよろしいですか？"
+allowQuotesConfirm: "引用投稿を許可してもよろしいですか？"
 silencedInstancesDescription: "サイレンスしたいサーバーのホストを改行で区切って設定します。サイレンスされたサーバーに所属するアカウントはすべて「サイレンス」として扱われ、フォローがすべてリクエストになります。ブロックしたインスタンスには影響しません。"
 mediaSilencedInstances: "メディアサイレンスしたサーバー"
 mediaSilencedInstancesDescription: "メディアサイレンスしたいサーバーのホストを改行で区切って設定します。メディアサイレンスされたサーバーに所属するアカウントによるファイルはすべてセンシティブとして扱われ、カスタム絵文字が使用できないようになります。ブロックしたインスタンスには影響しません。"
 intro: "Sharkeyのインストールが完了しました！管理者アカウントを作成しましょう。"
-blockedByBase: "This host is blocked implicitly because a base domain is blocked. To unblock this host, first unblock the base domain(s)."
-silencedByBase: "This host is silenced implicitly because a base domain is silenced. To un-silence this host, first un-silence the base domain(s)."
-mediaSilencedByBase: "This host's media is silenced implicitly because a base domain's media is silenced. To un-silence this host, first un-silence the base domain(s)."
+blockedByBase: "このホストは、ベースドメインがブロックされているため、暗黙的にブロックされています。このホストのブロックを解除するには、まずベースドメインのブロックを解除してください。"
+silencedByBase: "このホストは、ベースドメインがサイレンスされているため、暗黙的にサイレンスされています。このホストのサイレンスを解除するには、まずベースドメインのサイレンスを解除してください。"
+mediaSilencedByBase: "このホストのメディアは、ベースドメインのメディアがサイレンスされているため、暗黙的にサイレンスされています。このホストのサイレンスを解除するには、まずベースドメインのサイレンスを解除してください。"
 driveSearchbarPlaceholder: "検索ドライブ"
 fileNotSelected: "ファイルが選択されていません"
 background: "背景"
@@ -58,9 +71,9 @@ deeplFreeModeDescription: "DeepLX-JSの設定方法については、ドキュ�
 useSoundOnlyWhenActive: "Sharkeyがアクティブな時のみサウンドを出力する"
 scratchpadDescription: "スクラッチパッドは、AiScriptの実験環境を提供します。Sharkeyと対話するコードの記述、実行、結果の確認ができます。"
 deleteAllFilesQueued: "キューに入れられたすべてのファイルの削除"
-systemAccountTitle: "This is a system account"
-systemAccountDescription: "This account is created and managed automatically by the system, and cannot be logged into."
-postFiltered: "post is hidden by a filter"
+systemAccountTitle: "これはシステムアカウントです"
+systemAccountDescription: "このアカウントはシステムによって自動的に作成・管理されており、ログインできません。"
+postFiltered: "投稿はフィルターによって非表示になっています"
 enableFaviconNotificationDot: "未読の通知があるときにタブのアイコンを目立たせる"
 verifyNotificationDotWorkingButton: "タブアイコン強調機能の動作確認"
 notificationDotNotWorking: "このサーバーは現時点ではタブアイコン強調機能をサポートしていません。"
@@ -70,7 +83,7 @@ reportAbuseRenote: "ブーストを通報"
 forwardReport: "リモートサーバーに通報を転送する"
 forwardReportIsAnonymous: "リモートサーバーからはあなたの情報は見れず、匿名のシステムアカウントとして表示されます。"
 abuseMarkAsResolved: "対応済みにする"
-i18nInfo: "Sharkeyは有志によって様々な言語に翻訳されています。{link}で翻訳に協力できます。"
+i18nInfoSharkey: "Sharkey固有の変更は{link}で翻訳されています。"
 renotesCount: "ブーストした数"
 renotedCount: "ブーストされた数"
 showTickerOnReplies: "返信にサーバー情報を表示する"
@@ -81,6 +94,8 @@ searchEngineCustomURIDescription: "カスタム検索エンジンのURIは、\"h
 searchEngineCusomURI: "カスタム検索エンジン URI"
 makeIndexable: "公開ノートをインデックス不可にする"
 makeIndexableDescription: "ノート検索があなたの公開ノートをインデックス化しないようにします。"
+enableRss: "RSSフィードを有効にする"
+enableRssDescription: "基本的なプロフィール詳細と公開ノートを含むRSSフィードを生成します。ユーザーはフォローリクエストや承認なしでフィードを購読できます。"
 sendErrorReportsDescription: "オンにすると、問題が発生したときにエラーの詳細情報がSharkeyに共有され、ソフトウェアの品質向上に役立てることができます。エラー情報には、OSのバージョン、ブラウザの種類、行動履歴などが含まれます。"
 noInquiryUrlWarning: "問い合わせ先URLが設定されていません。"
 misskeyUpdated: "Sharkeyが更新されました！"
@@ -119,6 +134,7 @@ oneko: "にゃんこフレンド :3"
 renotesList: "ブースト一覧"
 lookupConfirm: "照会しますか？"
 openTagPageConfirm: "ハッシュタグのページを開きますか？"
+deleteThisAccountConfirm: "このアカウントを不可逆的に削除します。続行しますか？"
 specifyHost: "ホスト指定"
 goToMisskey: "Sharkeyへ"
 enableAchievements: "実績を有効にする"
@@ -135,27 +151,128 @@ repositoryUrlDescription: "ソースコードが公開されているリポジ�
 donation: "寄付する"
 donationUrl: "寄付URL"
 showBelowAvatar: "アイコンの後ろに表示"
-allowClickingNotifications: "ポップアップ通知のクリックを許可する"
 seasonalScreenEffect: "季節に応じた画面の演出"
 noDescription: "説明文はありません"
 sensitiveMediaRevealConfirm: "センシティブなメディアです。表示しますか？"
 severAllFollowRelations: "以下の関係をすべて断ち切る"
 severAllFollowRelationsConfirm: "すべての人間関係を壊す？これは不可逆です！これは{instanceName}の{followingCount}フォローと{followersCount}フォロワーの関係を壊す！"
 severAllFollowRelationsQueued: "キューに入れられた{host}とのすべてのフォロー関係を切断する。"
+pendingFollowRequests: "フォローリクエスト承認待ち"
+undoFollowRequestConfirm: "フォローリクエストを取り消しますか？"
+showQuotes: "引用を表示"
+showReplies: "返信を表示"
+showNonPublicNotes: "非公開投稿を表示"
+allowClickingNotifications: "ポップアップ通知のクリックを許可する"
+pinnedOnly: "ピン留めのみ"
+blockingYou: "あなたをブロック中"
+warnExternalUrl: "外部URLを開くときに警告を表示"
+flash: "Flash"
+filesRemoved: "ファイルが削除されました"
+fileImported: "ファイルがインポートされました"
+cannotLoadNote: "ノートの読み込みに失敗しました"
+remoteFollowersWarning: "リモートフォロワーは不完全または古い活動を持つ可能性があります"
+schedulePost: "予約投稿"
+schedulePostList: "予約投稿一覧"
+postOn: "投稿予定"
+scheduledNotes: "予約投稿"
+selectFollowRelationship: "フォロー関係を選択..."
+robotsTxt: "カスタム robots.txt"
+robotsTxtDescription: "ここにエントリを追加すると、Sharkeyにパッケージされているデフォルトのrobots.txtが上書きされます。"
+defaultCW: "新規投稿のデフォルトコンテンツ警告"
+defaultCWDescription: "ここの値は、すべての新しい投稿と返信のコンテンツ警告として自動入力されます。"
+defaultCWPriority: "自動CW優先度"
+defaultCWPriorityDescription: "デフォルトCWとCW維持設定の両方が同時に有効になっている場合の優先アクションを選択します。"
+genKeys: "キーを生成"
+id: "ID"
+mandatoryCW: "コンテンツ警告を強制"
+mandatoryCWDescription: "このユーザーが作成するすべての投稿にコンテンツ警告を適用します。投稿に既にCWがある場合は、最後に追記されます。"
+fetchLinkedNote: "リンクされたノートを取得"
+showTranslationButtonInNoteFooter: "ノートアクションメニューに「翻訳」を追加"
+translationFailed: "ノートの翻訳に失敗しました。後でもう一度お試しいただくか、管理者にお問い合わせください。"
+authorizedFetchSection: "認証フェッチ"
+authorizedFetchLabel: "署名なしのActivityPubリクエストを許可："
+authorizedFetchDescription: "この設定は、リモートインスタンスまたはユーザーが身元を確認せずにあなたのコンテンツにアクセスしようとする際の動作を制御します。無効にすると、どのリモートユーザーでもあなたのプロフィールと投稿にアクセスできます - ブロックや連合解除された者でも。"
+authorizedFetchLegacyWarning: "設定プロパティ 'checkActivityPubGetSignature' は非推奨となり、新しい認証フェッチ設定に置き換えられました。設定ファイルから削除してください。"
+deleted: "削除済み"
+enableProxyAccount: "プロキシアカウントを有効にする。"
+enableProxyAccountDescription: "無効にすると、プロキシアカウントは使用されません。ユーザーリストには、ローカルユーザーまたはフォローしているユーザーのノートのみが含まれます。"
+wordMuteTestLabel: "パターンをテスト"
+wordMuteTestDescription: "ここにテキストを入力して、単語パターンをテストしてください。一致する単語があれば、下に表示されます。"
+wordMuteTestTest: "テスト"
+wordMuteTestMatch: "一致した単語: {words}"
+wordMuteTestNoResults: "結果はまだありません。テキストを入力して「テスト」をクリックして確認してください。"
+wordMuteTestNoMatch: "テキストはどのパターンとも一致しません。"
+wordMuteWarning: "すべての単語ミュートは*大文字と小文字を区別*し、長い単語や名前の一部を含む任意の部分文字列にマッチします。より精密な制御には正規表現を使用できます。"
+bubbleTimeline: "バブルタイムライン"
+bubbleTimelineDescription: "バブルに表示するインスタンスを選択してください。"
+bubbleTimelineMustBeEnabled: "注意：バブルタイムラインはデフォルトで非表示になっており、ロールを介して有効にする必要があります。"
+popularUsersGlobal: "グローバルネットワークで人気のユーザー"
+popularUsersLocal: "{name}で人気のユーザー"
+pollsOnLocal: "{name}でトレンドの投票"
+pollsOnRemote: "グローバルネットワークでトレンドの投票"
+pollsExpired: "最近終了した投票"
+trendingPollsDisabled: "このインスタンスではトレンド投票が無効になっています。"
+trendingPollsDisabledLogIn: "トレンド投票を表示するにはログインしてください。"
+silenced: "サイレンス済み"
+totalFollowers: "フォロワー総数"
+totalFollowing: "フォロー総数"
+localFollowers: "ローカルフォロワー"
+localFollowing: "ローカルフォロー"
+remoteFollowers: "リモートフォロワー"
+remoteFollowing: "リモートフォロー"
+updateRemoteUser: "リモートデータを更新"
+activityPub: "Activity Pub"
+ip: "IP"
+ipTip: "日付はIPアドレスが最初に使用された日です。"
+rolePeriod: "期間"
+roleAssigned: "割り当て済み"
+roleAutomatic: "自動"
+translationTimeoutLabel: "翻訳タイムアウト"
+translationTimeoutCaption: "翻訳APIリクエストのタイムアウト（ミリ秒）。"
+staffNotes: "スタッフメモ"
+instanceIconAlt: "{name}のアイコン"
+attributionDomains: "帰属ドメイン"
+attributionDomainsDescription: "リンクプレビューであなたに帰属できるコンテンツのドメインのリスト（改行区切り）。サブドメインも有効です。Webページに以下が必要です："
+writtenBy: "{user}による"
+followingPub: "フォロー中（Pub）"
+followersSub: "フォロワー（Sub）"
+wellKnownResources: "Well-knownリソース"
+lastPosted: "最後の投稿: {at}"
+nsfw: "NSFW"
+raw: "Raw"
+cw: "CW"
+mediaSilenced: "メディアサイレンス済み"
+bubble: "バブル"
+verified: "認証済み"
+notVerified: "未認証"
+hibernated: "休眠状態"
+keepCwDescription: "コンテンツ警告付きの投稿に返信する際、自動的に同じCWを返信に使用します。"
+keepCwDisabled: "無効（CWをコピーしない）"
+keepCwEnabled: "有効（CWをそのままコピー）"
+keepCwPrependRe: "有効（CWをコピーして「RE:」を先頭に追加）"
+noteFooterLabel: "ノートコントロール"
+rawUserDescription: "生の形式でパックされたユーザーデータ。これらのフィールドのほとんどは公開されており、すべてのユーザーが表示できます。"
+rawInfoDescription: "生の形式での拡張ユーザーデータ。これらのフィールドはプライベートで、モデレーターのみがアクセスできます。"
+rawApDescription: "生の形式でのActivityPubユーザーデータ。これらのフィールドは公開されており、他のインスタンスからアクセス可能です。"
+signupReason: "登録理由"
+
 _flash:
   contentHidden: "Flashコンテンツ非表示"
-  poweredByRuffle: "Powered by Ruffle." # Doesn't need a translation, apparently.
+  poweredByRuffle: "Powered by Ruffle."
   arbitraryCodeExecutionWarning: "任意コード実行にご注意！"
   failedToLoad: "Flashコンテンツ読込に失敗"
   isLoading: "Flashコンテンツ読込中"
   loadingRufflePlayer: "Ruffleプレイヤー読込中"
   loadingFlashFile: "Flashファイル読込中"
   cspError: "raw.esm.shにアクセスできませんでした。このサーバーのコンテンツセキュリティポリシー(CSP) が廃止されている可能性があり、サーバー管理者に連絡してください。"
+
 _delivery:
   stop: "配信停止"
   resume: "配信再開"
+
 _initialAccountSetting:
   youCanContinueTutorial: "このまま{name}(Sharkey)の使い方についてのチュートリアルに進むこともできますが、ここで中断してすぐに使い始めることもできます。"
+
 _initialTutorial:
   _landing:
     description: "ここでは、Sharkeyの基本的な使い方や機能を確認できます。"
@@ -175,16 +292,20 @@ _initialTutorial:
   _done:
     title: "チュートリアルは終了です🎉"
     description: "ここで紹介した機能はほんの一部にすぎません。Sharkeyの使い方をより詳しく知るには、{link}をご覧ください。"
+
 _timelineDescription:
   bubble: "バブルタイムラインでは、管理者が選択した接続サーバーからの投稿を表示できます。"
+
 _serverSettings:
   sidebarLogoUrl: "ロゴURL"
   sidebarLogoDescription: "高精細、ダイナミック幅のシナリオで通常のアイコンの代わりに使用するロゴを指定します。"
-  sidebarLogoUsageExample:  "例：サイドバー、訪問者用、「情報」ページ"
+  sidebarLogoUsageExample: "例：サイドバー、訪問者用、「情報」ページ"
   inquiryUrl: "問い合わせ先URL"
   inquiryUrlDescription: "サーバー運営者へのお問い合わせフォームのURLや、運営者の連絡先等が記載されたWebページのURLを指定します。"
+
 _accountMigration:
   moveAccountDescription: "新しいアカウントへ移行します。\n　・フォロワーが新しいアカウントを自動でフォローします\n　・このアカウントからのフォローは全て解除されます\n　・このアカウントではノートの作成などができなくなります\n\nフォロワーの移行は自動ですが、フォローの移行は手動で行う必要があります。移行前にこのアカウントでフォローエクスポートし、移行後すぐに移行先アカウントでインポートを行なってください。\nリスト・ミュート・ブロックについても同様ですので、手動で移行する必要があります。\n\n（この説明はこのサーバー（Sharkey v13.12.0以降）の仕様です。Mastodonなどの他のActivityPubソフトウェアでは挙動が異なる場合があります。）"
+
 _achievements:
   _types:
     _notes1:
@@ -202,23 +323,41 @@ _achievements:
       title: "Sharkeyの見すぎ"
       description: "クライアントを起動してから60分以上経過した"
     _brainDiver:
-      flavor: "Misskey-Misskey La-Tu-Ma"
+      flavor: "Sharkey-Sharkey La-Tu-Ma"
     _tutorialCompleted:
       title: "Sharkey初心者講座 修了証"
+
 _role:
   _options:
     btlAvailable: "バブルタイムラインの閲覧"
     canImportNotes: "ノートのインポートが可能"
     canUpdateBioMedia: "アイコンとバナーの更新を許可"
     scheduleNoteMax: "予約投稿の最大数"
+    canTrend: "トレンドノート/ユーザーに表示される"
   _condition:
     isLocked: "鍵アカウントユーザー"
     isExplorable: "「アカウントを見つけやすくする」が有効なユーザー"
+    isFromInstance: "特定のインスタンスから"
+    isFromInstanceHost: "ホスト名（大文字小文字を区別しない）"
+    isFromInstanceSubdomains: "サブドメインとマッチ"
+    fromBubbleInstance: "ユーザーはバブルインスタンス出身"
+    localFollowersLessThanOrEq: "ローカルフォロワーがX人以下"
+    localFollowersMoreThanOrEq: "ローカルフォロワーがX人以上"
+    localFollowingLessThanOrEq: "ローカルフォローがX人以下"
+    localFollowingMoreThanOrEq: "ローカルフォローがX人以上"
+    remoteFollowersLessThanOrEq: "リモートフォロワーがX人以下"
+    remoteFollowersMoreThanOrEq: "リモートフォロワーがX人以上"
+    remoteFollowingLessThanOrEq: "リモートフォローがX人以下"
+    remoteFollowingMoreThanOrEq: "リモートフォローがX人以上"
+  remoteDataWarning: "この条件はリモートユーザーには正確でない場合があります。"
+
 _emailUnavailable:
   banned: "このメールアドレスでは登録できません"
+
 _signup:
   approvalPending: "アカウントが作成され、承認待ちの状態です。"
   reasonInfo: "インスタンスに参加したい理由を入力してください。"
+
 _aboutMisskey:
   about: "Sharkeyは、Misskeyをベースにしたオープンソースのソフトウェアです。"
   original: "Misskey オリジナル"
@@ -227,60 +366,105 @@ _aboutMisskey:
   translation: "Sharkeyを翻訳"
   donate_sharkey: "Sharkeyに寄付"
   testers: "テスター"
+  misskeyContributors: "Misskeyコントリビューター"
+  ourLovelySponsors: "我々の素敵なスポンサー"
+
 _serverDisconnectedBehavior:
   disabled: "警告を無効にする"
+
 _channel:
   allowRenoteToExternal: "チャンネル外へのブーストと引用ブーストを許可する"
+
 _instanceMute:
   instanceMuteDescription: "ミュートしたサーバーのユーザーへの返信を含めて、設定したサーバーの全てのノートとブーストをミュートします。"
+
 _theme:
   keys:
     renote: "Boost"
+
 _soundSettings:
   driveFileDurationWarnDescription: "長い音声を使用するとSharkeyの使用に支障をきたす可能性があります。それでも続行しますか？"
   driveFileError: "音声が読み込めませんでした。設定を変更してください"
+
 _2fa:
   moreDetailedGuideHere: "詳細なガイドはこちら"
+
 _widgets:
   search: "検索"
+
 _poll:
   multiple: "複数の選択肢"
+
 _profile:
+  updateAvatar: "アバターを更新"
+  removeAvatar: "アバターを削除"
   updateBanner: "更新バナー"
   removeBanner: "バナーを削除"
   changeBackground: "背景を変更する"
   updateBackground: "背景を更新する"
   removeBackground: "背景を削除する"
+  listenbrainz: "ListenBrainzユーザー名"
+
 _timelines:
   bubble: "バブル"
+
 _pages:
   blocks:
     dynamicDescription: "このブロックは廃止されています。今後は{play}を利用してください。"
+
 _notification:
   youRenoted: "{name}がBoostしました"
   renotedBySomeUsers: "{n}人がリノートしました"
+  edited: "ノートが編集されました"
+  scheduledNoteFailed: "予約投稿の投稿に失敗しました"
+  scheduledNotePosted: "予約投稿が投稿されました"
   _types:
     renote: "Boost"
     edited: "編集済み"
+    scheduledNoteFailed: "予約投稿の投稿失敗"
+    scheduledNotePosted: "予約投稿が投稿されました"
   _actions:
     renote: "ブースト"
+
 _webhookSettings:
   _events:
     renote: "Boostされたとき"
   _systemEvents:
     abuseReportResolved: "ユーザーからの通報を処理したとき"
+
 _abuseReport:
   _notificationRecipient:
     _recipientType:
       _captions:
         mail: "モデレーター権限を持つユーザーのメールアドレスに通知を送ります(通報を受けた時のみ)"
         webhook: "指定したSystemWebhookに通知を送ります(通報を受けた時と通報を解決した時にそれぞれ発信)"
+
 _moderationLogTypes:
   approve: "承認済み"
-  setRemoteInstanceNSFW: "Set remote instance as NSFW"
-  unsetRemoteInstanceNSFW: "Set remote instance as NSFW"
-  rejectRemoteInstanceReports: "Rejected reports from remote instance"
-  acceptRemoteInstanceReports: "Accepted reports from remote instance"
+  decline: "拒否"
+  setMandatoryCW: "ユーザーにコンテンツ警告を設定"
+  setRemoteInstanceNSFW: "リモートインスタンスをNSFWに設定"
+  unsetRemoteInstanceNSFW: "リモートインスタンスのNSFWを解除"
+  rejectRemoteInstanceReports: "リモートインスタンスからの通報を拒否"
+  acceptRemoteInstanceReports: "リモートインスタンスからの通報を受理"
+  rejectQuotesUser: "ユーザーからの引用投稿をブロック/削除"
+  allowQuotesUser: "ユーザーからの引用投稿を許可"
+  clearUserFiles: "ユーザーのドライブファイルをクリア"
+  nsfwUser: "ユーザーをNSFWとしてマーク"
+  unNsfwUser: "ユーザーをNSFWではないとしてマーク"
+  silenceUser: "ユーザーをサイレンス"
+  unSilenceUser: "ユーザーのサイレンスを解除"
+  createAccount: "アカウントを作成"
+  clearRemoteFiles: "リモートドライブファイルをクリア"
+  clearOwnerlessFiles: "所有者のないドライブファイルをクリア"
+  updateCustomEmojis: "カスタム絵文字を更新"
+  importCustomEmojis: "カスタム絵文字をインポート"
+  clearInstanceFiles: "インスタンスのドライブファイルをクリア"
+  severFollowRelations: "インスタンスとのフォロー関係を切断"
+  createPromo: "ノートプロモを作成"
+  addRelay: "リレーを追加"
+  removeRelay: "リレーを削除"
+
 _mfm:
   uncommonFeature: "この機能は一般的に普及していないため、他のMisskeyフォークを含めた多くのFediverseソフトウェアで表示できないことがあります。"
   intro: "MFM はMisskey, Sharkey, Firefish, Akkomaなど、多くの場所で使用できるマークアップ言語です。ここでは、利用できるMFM構文の一覧をご覧いただけます。"
@@ -299,6 +483,8 @@ _mfm:
   smallDescription: "内容を小さく・薄く表示させることができます。"
   center: "中央寄せ"
   centerDescription: "内容を中央寄せで表示させることができます。"
+  unixtime: "Unix時間"
+  unixtimeDescription: "閲覧者の現在のタイムゾーンでタイムスタンプを表示します。"
   inlineCode: "コード（インライン）"
   inlineCodeDescription: "プログラムなどのコードをインラインでシンタックスハイライトします。"
   blockCode: "コード（ブロック）"
@@ -355,38 +541,106 @@ _mfm:
   scaleDescription: "内容を引き伸ばして表示します。"
   foreground: "文字色"
   foregroundDescription: "文字色を変更します。"
-  fade: 'フェード'
-  fadeDescription: '内容をフェードイン・フェードアウトさせます。'
+  fade: "フェード"
+  fadeDescription: "内容をフェードイン・フェードアウトさせます。"
   background: "背景色"
   backgroundDescription: "背景色を変更します。"
+  border: "ボーダー"
+  borderDescription: "コンテンツの周りにボーダーを描きます。"
   plain: "Plain"
   plainDescription: "内側の構文を全て無効にします。"
+
 _animatedMFM:
   play: "MFMアニメーションを再生"
   stop: "MFMアニメーション停止"
   _alert:
     text: "MFMアニメーションには、高速で点滅したり動いたりするテキスト・絵文字を含む場合があります。"
     confirm: "再生する"
+
 _dataRequest:
   title: "データリクエスト"
   warn: "データリクエストは3日ごとに可能です。"
   text: "データの保存が完了すると、このアカウントに登録されているメールアドレスにメールが送信されます。"
   button: "データリクエスト実行"
+
 _dataSaver:
   _avatar:
     description: "アイコン画像のアニメーションが停止します。アニメーション画像は通常の画像よりファイルサイズが大きいことがあるので、データ通信量をさらに削減できます。"
+
 _urlPreviewSetting:
   timeoutDescription: "プレビュー取得の所要時間がこの値を超えた場合、プレビューは生成されません。"
   requireContentLength: "Content-Lengthが取得できた場合のみプレビューを生成"
   summaryProxy: "プレビューを生成するプロキシのエンドポイント"
-  summaryProxyDescription: "Misskey本体ではなく、サマリープロキシを使用してプレビューを生成します。"
+  summaryProxyDescription: "Sharkey本体ではなく、サマリープロキシを使用してプレビューを生成します。"
   summaryProxyDescription2: "プロキシには下記パラメータがクエリ文字列として連携されます。プロキシ側がこれらをサポートしない場合、設定値は無視されます。"
+
 _externalNavigationWarning:
   title: "外部サイトに移動します"
   description: "{host}を離れて外部サイトに移動します"
   trustThisDomain: "このデバイスで今後このドメインを信頼する"
-schedulePost: "予約投稿"
-schedulePostList: "予約投稿一覧"
+
+_auth:
+  allowed: "許可済み"
+
+_announcement:
+  new: "新着"
+
+_deck:
+  _columns:
+    following: "フォロー中"
+
 _permissions:
+  "write:admin:approve-user": "新規ユーザーを承認"
+  "write:admin:decline-user": "新規ユーザーを拒否"
+  "write:admin:nsfw-user": "ユーザーをNSFWとしてマーク"
+  "write:admin:unnsfw-user": "ユーザーをNSFWではないとしてマーク"
+  "write:admin:cw-user": "ユーザーにCWを強制適用"
+  "write:admin:silence-user": "ユーザーをサイレンス"
+  "write:admin:unsilence-user": "ユーザーのサイレンスを解除"
+  "write:admin:reject-quotes": "ユーザーからの引用投稿を許可/禁止"
   "read:notes-schedule": "予約投稿を見る"
   "write:notes-schedule": "予約投稿を作成・削除する"
+
+_defaultCWPriority:
+  default: "デフォルトを使用（デフォルトCWを使用し、継承されたCWを無視）"
+  parent: "親を使用（継承されたCWを使用し、デフォルトCWを無視）"
+  defaultParent: "デフォルト、次に親（デフォルトCWを使用し、継承されたCWを追加）"
+  parentDefault: "親、次にデフォルト（継承されたCWを使用し、デフォルトCWを追加）"
+
+_genKeysDialog:
+  text: "新しいキーを生成してもよろしいですか？これにより、すでにプッシュ通知を有効にしているすべてのユーザーのプッシュ通知が停止します。"
+  title: "新しいキーを生成"
+
+_noteSearch:
+  newestToOldest: "新着順に並び替え"
+  fileType: "ファイルタイプ"
+  _fileType:
+    none: "なし"
+    image: "画像"
+    video: "動画"
+    audio: "音声"
+    module: "モジュール"
+    flash: "Flash"
+
+_processErrors:
+  quoteUnavailable: "引用を処理できません。この投稿にはコンテキストが不足している可能性があります。"
+
+_authorizedFetchValue:
+  never: "しない"
+  always: "常に"
+  essential: "必須メタデータのみ"
+  staff: "スタッフ推奨設定を使用"
+
+_authorizedFetchValueDescription:
+  never: "すべての署名なしリクエストをブロックします。プライバシーが向上し、ブロックがより効果的になりますが、一部の非常に古いまたは珍しいインスタンスソフトウェアとは互換性がありません。"
+  always: "すべての署名なしリクエストを許可します。他のインスタンスとの最大の互換性を提供しますが、プライバシーが低下し、ブロックが弱くなります。"
+  essential: "制限された署名なしリクエストを許可します。古いソフトウェアとの連合に必要な最小限のプロフィールメタデータのみを公開することで、「しない」と「常に」の間のハイブリッドを提供します。"
+  staff: "インスタンススタッフが推奨するデフォルト値「{value}」を使用します。"
+
+_followRequest:
+  recieved: "受信済み"
+  sent: "送信済み"
+
+_confirmPollEdit:
+  title: "この投票を編集してもよろしいですか"
+  text: "この投票を編集すると、以前のすべての投票が失われます"
