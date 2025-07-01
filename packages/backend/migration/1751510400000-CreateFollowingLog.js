@@ -64,7 +64,7 @@ export class CreateFollowingLog1751510400000 {
 		await queryRunner.query(`DROP INDEX "public"."IDX_following_log_createdAt"`);
 		await queryRunner.query(`DROP INDEX "public"."IDX_following_log_followeeId_type_createdAt"`);
 		await queryRunner.query(`DROP INDEX "public"."IDX_following_log_followerId_type_createdAt"`);
-		await queryRunner.query(`DROP TYPE "public"."following_log_type_enum"`);
 		await queryRunner.query(`DROP TABLE "following_log"`);
+		await queryRunner.query(`DROP TYPE "public"."following_log_type_enum"`);
 	}
 }
