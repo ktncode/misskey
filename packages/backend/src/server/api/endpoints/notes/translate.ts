@@ -137,17 +137,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			// Google Translate handling
 			if (this.serverSettings.translatorType === 'google') {
-				const result = await googleTranslate(note.text, { to: targetLang });
+				const result = await googleTranslate(note.text, { 
+					from: 'auto',
+					to: targetLang,
+				});
 				
-				// Google Translateのレスポンスから言語情報を取得（rawレスポンスの構造を安全に処理）
-				let sourceLang = 'unknown';
-				try {
-					if (result.raw && Array.isArray(result.raw) && result.raw[0] && Array.isArray(result.raw[0]) && result.raw[0][2]) {
-						sourceLang = result.raw[0][2];
-					}
-				} catch {
-					// 言語検出に失敗した場合はunknownのまま
-				}
+				// Google Translateのレスポンスから言語情報を取得
+				// RawResponseのsrcプロパティに検出された言語コードが含まれる
+				const sourceLang = result.raw.src || 'unknown';
 				
 				return {
 					sourceLang,
