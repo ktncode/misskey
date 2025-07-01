@@ -2232,6 +2232,15 @@ export type paths = {
      */
     post: operations['flash___update'];
   };
+  '/following/activities': {
+    /**
+     * following/activities
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:following*
+     */
+    post: operations['following___activities'];
+  };
   '/following/create': {
     /**
      * following/create
@@ -2249,6 +2258,15 @@ export type paths = {
      * **Credential required**: *Yes* / **Permission**: *write:following*
      */
     post: operations['following___delete'];
+  };
+  '/following/history': {
+    /**
+     * following/history
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:following*
+     */
+    post: operations['following___history'];
   };
   '/following/invalidate': {
     /**
@@ -20206,6 +20224,80 @@ export type operations = {
     };
   };
   /**
+   * following/activities
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:following*
+   */
+  following___activities: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId?: string;
+          /**
+           * @default all
+           * @enum {string}
+           */
+          type?: 'follow' | 'unfollow' | 'all';
+          /** Format: misskey:id */
+          sinceId?: string;
+          /** Format: misskey:id */
+          untilId?: string;
+          /** @default 30 */
+          limit?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            followActivities: ({
+                id: string;
+                /** Format: date-time */
+                createdAt: string;
+                /** @enum {string} */
+                type: 'follow' | 'unfollow';
+                user: components['schemas']['UserLite'];
+              })[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
    * following/create
    * @description No description provided.
    *
@@ -20314,6 +20406,73 @@ export type operations = {
       };
       /** @description Too many requests */
       429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * following/history
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:following*
+   */
+  following___history: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId?: string;
+          /** Format: misskey:id */
+          sinceId?: string;
+          /** Format: misskey:id */
+          untilId?: string;
+          /** @default 30 */
+          limit?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            followHistory: {
+                id: string;
+                /** Format: date-time */
+                createdAt: string;
+                user: components['schemas']['UserLite'];
+              }[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
         content: {
           'application/json': components['schemas']['Error'];
         };

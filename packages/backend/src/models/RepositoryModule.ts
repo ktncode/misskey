@@ -31,6 +31,7 @@ import {
 	MiFlash,
 	MiFlashLike,
 	MiFollowing,
+	MiFollowingLog,
 	MiFollowRequest,
 	MiGalleryLike,
 	MiGalleryPost,
@@ -251,6 +252,12 @@ const $usedUsernamesRepository: Provider = {
 const $followingsRepository: Provider = {
 	provide: DI.followingsRepository,
 	useFactory: (db: DataSource) => db.getRepository(MiFollowing).extend(miRepository as MiRepository<MiFollowing>),
+	inject: [DI.db],
+};
+
+const $followingLogsRepository: Provider = {
+	provide: DI.followingLogsRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiFollowingLog).extend(miRepository as MiRepository<MiFollowingLog>),
 	inject: [DI.db],
 };
 
@@ -602,6 +609,7 @@ const $noteScheduleRepository: Provider = {
 		$userIpsRepository,
 		$usedUsernamesRepository,
 		$followingsRepository,
+		$followingLogsRepository,
 		$followRequestsRepository,
 		$instancesRepository,
 		$emojisRepository,
@@ -684,6 +692,7 @@ const $noteScheduleRepository: Provider = {
 		$userIpsRepository,
 		$usedUsernamesRepository,
 		$followingsRepository,
+		$followingLogsRepository,
 		$followRequestsRepository,
 		$instancesRepository,
 		$emojisRepository,

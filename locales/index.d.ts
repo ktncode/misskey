@@ -6330,6 +6330,46 @@ export interface Locale extends ILocale {
      */
     "followRequestPending": string;
     /**
+     * フォロー履歴
+     */
+    "followHistory": string;
+    /**
+     * フォロー履歴
+     */
+    "followingHistory": string;
+    /**
+     * フォロー
+     */
+    "followAction": string;
+    /**
+     * フォロー解除
+     */
+    "unfollowAction": string;
+    /**
+     * フォロー履歴はありません
+     */
+    "noFollowHistory": string;
+    /**
+     * フォローしました
+     */
+    "followed": string;
+    /**
+     * フォローを解除しました
+     */
+    "unfollowed": string;
+    /**
+     * さらに履歴を読み込む
+     */
+    "loadMoreHistory": string;
+    /**
+     * 履歴の種類
+     */
+    "historyType": string;
+    /**
+     * 日時
+     */
+    "dateAndTime": string;
+    /**
      * 絵文字を入力
      */
     "enterEmoji": string;
@@ -6865,10 +6905,6 @@ export interface Locale extends ILocale {
      * 配信停止
      */
     "suspended": string;
-    /**
-     * 全て
-     */
-    "all": string;
     /**
      * 購読中
      */
@@ -10509,10 +10545,6 @@ export interface Locale extends ILocale {
      * 続けるには認証を行ってください
      */
     "authenticationRequiredToContinue": string;
-    /**
-     * 日時
-     */
-    "dateAndTime": string;
     /**
      * 編集済み
      */

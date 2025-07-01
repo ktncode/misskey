@@ -348,10 +348,14 @@ import type {
 	FlashShowResponse,
 	FlashUnlikeRequest,
 	FlashUpdateRequest,
+	FollowingActivitiesRequest,
+	FollowingActivitiesResponse,
 	FollowingCreateRequest,
 	FollowingCreateResponse,
 	FollowingDeleteRequest,
 	FollowingDeleteResponse,
+	FollowingHistoryRequest,
+	FollowingHistoryResponse,
 	FollowingInvalidateRequest,
 	FollowingInvalidateResponse,
 	FollowingRequestsAcceptRequest,
@@ -892,8 +896,10 @@ export type Endpoints = {
 	'flash/show': { req: FlashShowRequest; res: FlashShowResponse };
 	'flash/unlike': { req: FlashUnlikeRequest; res: EmptyResponse };
 	'flash/update': { req: FlashUpdateRequest; res: EmptyResponse };
+	'following/activities': { req: FollowingActivitiesRequest; res: FollowingActivitiesResponse };
 	'following/create': { req: FollowingCreateRequest; res: FollowingCreateResponse };
 	'following/delete': { req: FollowingDeleteRequest; res: FollowingDeleteResponse };
+	'following/history': { req: FollowingHistoryRequest; res: FollowingHistoryResponse };
 	'following/invalidate': { req: FollowingInvalidateRequest; res: FollowingInvalidateResponse };
 	'following/requests/accept': { req: FollowingRequestsAcceptRequest; res: EmptyResponse };
 	'following/requests/cancel': { req: FollowingRequestsCancelRequest; res: FollowingRequestsCancelResponse };

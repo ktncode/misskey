@@ -1835,10 +1835,14 @@ declare namespace entities {
         FlashShowResponse,
         FlashUnlikeRequest,
         FlashUpdateRequest,
+        FollowingActivitiesRequest,
+        FollowingActivitiesResponse,
         FollowingCreateRequest,
         FollowingCreateResponse,
         FollowingDeleteRequest,
         FollowingDeleteResponse,
+        FollowingHistoryRequest,
+        FollowingHistoryResponse,
         FollowingInvalidateRequest,
         FollowingInvalidateResponse,
         FollowingRequestsAcceptRequest,
@@ -2334,6 +2338,12 @@ export const followersVisibilities: readonly ["public", "followers", "private"];
 type Following = components['schemas']['Following'];
 
 // @public (undocumented)
+type FollowingActivitiesRequest = operations['following___activities']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type FollowingActivitiesResponse = operations['following___activities']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
 type FollowingCreateRequest = operations['following___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -2344,6 +2354,12 @@ type FollowingDeleteRequest = operations['following___delete']['requestBody']['c
 
 // @public (undocumented)
 type FollowingDeleteResponse = operations['following___delete']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type FollowingHistoryRequest = operations['following___history']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type FollowingHistoryResponse = operations['following___history']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type FollowingInvalidateRequest = operations['following___invalidate']['requestBody']['content']['application/json'];

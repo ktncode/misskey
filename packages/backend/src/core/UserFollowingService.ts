@@ -18,7 +18,7 @@ import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
 import { UserWebhookService } from '@/core/UserWebhookService.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import { DI } from '@/di-symbols.js';
-import type { FollowingsRepository, FollowRequestsRepository, InstancesRepository, MiMeta, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import type { FollowingsRepository, FollowingLogsRepository, FollowRequestsRepository, InstancesRepository, MiMeta, UserProfilesRepository, UsersRepository } from '@/models/_.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
 import { bindThis } from '@/decorators.js';
@@ -67,6 +67,9 @@ export class UserFollowingService implements OnModuleInit {
 
 		@Inject(DI.followingsRepository)
 		private followingsRepository: FollowingsRepository,
+
+		@Inject(DI.followingLogsRepository)
+		private followingLogsRepository: FollowingLogsRepository,
 
 		@Inject(DI.followRequestsRepository)
 		private followRequestsRepository: FollowRequestsRepository,
@@ -246,6 +249,20 @@ export class UserFollowingService implements OnModuleInit {
 			}
 		});
 
+		// フォロー履歴をログに記録
+		if (!alreadyFollowed) {
+			await this.followingLogsRepository.insert({
+				id: this.idService.gen(),
+				createdAt: new Date(),
+				followerId: follower.id,
+				followeeId: followee.id,
+				type: 'follow',
+			}).catch(err => {
+				// ログ記録エラーは無視（本来の処理を妨げない）
+				this.logger.warn(`Failed to log follow action: ${err.message}`);
+			});
+		}
+
 		// Handled by CacheService
 		//this.cacheService.userFollowingsCache.refresh(follower.id);
 
@@ -362,6 +379,19 @@ export class UserFollowingService implements OnModuleInit {
 		}
 
 		await this.followingsRepository.delete(following.id);
+
+		// フォロー解除履歴をログに記録
+		await this.followingLogsRepository.insert({
+			id: this.idService.gen(),
+			createdAt: new Date(),
+			followerId: follower.id,
+			followeeId: followee.id,
+			type: 'unfollow',
+		}).catch(err => {
+			// ログ記録エラーは無視（本来の処理を妨げない）
+			this.logger.warn(`Failed to log unfollow action: ${err.message}`);
+		});
+
 		await this.internalEventService.emit('unfollow', { followerId: follower.id, followeeId: followee.id });
 
 		this.decrementFollowing(followerUser, followeeUser);
@@ -679,6 +709,19 @@ export class UserFollowingService implements OnModuleInit {
 		if (!following) return;
 
 		await this.followingsRepository.delete(following.id);
+
+		// フォロー解除履歴をログに記録
+		await this.followingLogsRepository.insert({
+			id: this.idService.gen(),
+			createdAt: new Date(),
+			followerId: follower.id,
+			followeeId: followee.id,
+			type: 'unfollow',
+		}).catch(err => {
+			// ログ記録エラーは無視（本来の処理を妨げない）
+			this.logger.warn(`Failed to log unfollow action: ${err.message}`);
+		});
+
 		await this.internalEventService.emit('unfollow', { followerId: follower.id, followeeId: followee.id });
 
 		this.decrementFollowing(followerUser, followeeUser);

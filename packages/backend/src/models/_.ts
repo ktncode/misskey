@@ -46,6 +46,7 @@ import { MiEmoji } from '@/models/Emoji.js';
 import { MiFlash } from '@/models/Flash.js';
 import { MiFlashLike } from '@/models/FlashLike.js';
 import { MiFollowing } from '@/models/Following.js';
+import { MiFollowingLog } from '@/models/FollowingLog.js';
 import { MiFollowRequest } from '@/models/FollowRequest.js';
 import { MiGalleryLike } from '@/models/GalleryLike.js';
 import { MiGalleryPost } from '@/models/GalleryPost.js';
@@ -92,12 +93,12 @@ import { MiUserProfile } from '@/models/UserProfile.js';
 import { MiUserPublickey } from '@/models/UserPublickey.js';
 import { MiUserSecurityKey } from '@/models/UserSecurityKey.js';
 import { MiWebhook } from '@/models/Webhook.js';
-import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity.js';
 import { NoteEdit } from '@/models/NoteEdit.js';
 import { SkApInboxLog } from '@/models/SkApInboxLog.js';
 import { SkApFetchLog } from '@/models/SkApFetchLog.js';
 import { SkApContext } from '@/models/SkApContext.js';
 import { SkLatestNote } from '@/models/LatestNote.js';
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity.js';
 
 export interface MiRepository<T extends ObjectLiteral> {
 	createTableColumnNames(this: Repository<T> & MiRepository<T>): string[];
@@ -188,6 +189,7 @@ export {
 	MiDriveFolder,
 	MiEmoji,
 	MiFollowing,
+	MiFollowingLog,
 	MiFollowRequest,
 	MiGalleryLike,
 	MiGalleryPost,
@@ -268,6 +270,7 @@ export type DriveFilesRepository = Repository<MiDriveFile> & MiRepository<MiDriv
 export type DriveFoldersRepository = Repository<MiDriveFolder> & MiRepository<MiDriveFolder>;
 export type EmojisRepository = Repository<MiEmoji> & MiRepository<MiEmoji>;
 export type FollowingsRepository = Repository<MiFollowing> & MiRepository<MiFollowing>;
+export type FollowingLogsRepository = Repository<MiFollowingLog> & MiRepository<MiFollowingLog>;
 export type FollowRequestsRepository = Repository<MiFollowRequest> & MiRepository<MiFollowRequest>;
 export type GalleryLikesRepository = Repository<MiGalleryLike> & MiRepository<MiGalleryLike>;
 export type GalleryPostsRepository = Repository<MiGalleryPost> & MiRepository<MiGalleryPost>;

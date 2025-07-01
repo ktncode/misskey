@@ -219,6 +219,8 @@ export * as 'flash/unlike' from './endpoints/flash/unlike.js';
 export * as 'flash/update' from './endpoints/flash/update.js';
 export * as 'following/create' from './endpoints/following/create.js';
 export * as 'following/delete' from './endpoints/following/delete.js';
+export * as 'following/history' from './endpoints/following/history.js';
+export * as 'following/activities' from './endpoints/following/activities.js';
 export * as 'following/invalidate' from './endpoints/following/invalidate.js';
 export * as 'following/requests/accept' from './endpoints/following/requests/accept.js';
 export * as 'following/requests/cancel' from './endpoints/following/requests/cancel.js';

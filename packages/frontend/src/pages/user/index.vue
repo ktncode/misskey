@@ -12,6 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<XFiles v-else-if="tab === 'files'" :user="user"/>
 		<XActivity v-else-if="tab === 'activity'" :user="user"/>
+		<XFollowHistory v-else-if="tab === 'follow-history'" :user="user"/>
 		<XAchievements v-else-if="tab === 'achievements'" :user="user"/>
 		<XReactions v-else-if="tab === 'reactions'" :user="user"/>
 		<XClips v-else-if="tab === 'clips'" :user="user"/>
@@ -41,6 +42,7 @@ const XHome = defineAsyncComponent(() => import('./home.vue'));
 const XTimeline = defineAsyncComponent(() => import('./index.timeline.vue'));
 const XFiles = defineAsyncComponent(() => import('./files.vue'));
 const XActivity = defineAsyncComponent(() => import('./activity.vue'));
+const XFollowHistory = defineAsyncComponent(() => import('./follow-history.vue'));
 const XAchievements = defineAsyncComponent(() => import('./achievements.vue'));
 const XReactions = defineAsyncComponent(() => import('./reactions.vue'));
 const XClips = defineAsyncComponent(() => import('./clips.vue'));
@@ -108,6 +110,10 @@ const headerTabs = computed(() => user.value ? [{
 	key: 'activity',
 	title: i18n.ts.activity,
 	icon: 'ti ti-chart-line',
+}, {
+	key: 'follow-history',
+	title: i18n.ts.followHistory,
+	icon: 'ti ti-history',
 }, ...(user.value.host == null ? [{
 	key: 'achievements',
 	title: i18n.ts.achievements,
